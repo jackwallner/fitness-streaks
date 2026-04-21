@@ -11,9 +11,9 @@
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>Fitness Streaks Watch Widget</string>
+    <string>Streak Finder Watch Widget</string>
     <key>CFBundleDisplayName</key>
-    <string>Fitness Streaks</string>
+    <string>Streak Finder</string>
     <key>CFBundlePackageType</key>
     <string>XPC!</string>
     <key>CFBundleShortVersionString</key>

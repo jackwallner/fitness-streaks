@@ -1,31 +1,30 @@
 import SwiftUI
 
-/// GitHub-style calendar heatmap. Columns = weeks, rows = weekdays (Mon–Sun).
-/// Filled cells meet the threshold; faded cells don't.
+/// Pixel calendar heatmap. Columns = weeks, rows = weekdays (Mon–Sun).
+/// Sharp square cells, no corner radius. Met cells get a subtle inset highlight.
 struct CalendarHeatmap: View {
     let entries: [(date: Date, met: Bool, value: Double)]
     let accent: Color
 
-    private let cell: CGFloat = 11
-    private let spacing: CGFloat = 3
+    private let cell: CGFloat = 8
+    private let gap: CGFloat = 2
 
     var body: some View {
         let weeks = groupByWeek(entries)
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .top, spacing: spacing) {
+                HStack(alignment: .top, spacing: gap) {
                     ForEach(Array(weeks.enumerated()), id: \.offset) { idx, week in
-                        VStack(spacing: spacing) {
-                            ForEach(0..<7, id: \.self) { weekdayIndex in
-                                let day = week.first { weekdayOrdinal($0.date) == weekdayIndex }
+                        VStack(spacing: gap) {
+                            ForEach(0..<7, id: \.self) { wd in
+                                let day = week.first { weekdayOrdinal($0.date) == wd }
                                 cellView(day: day)
                             }
                         }
                         .id(idx)
                     }
                 }
-                .padding(.horizontal, 2)
-                .padding(.vertical, 4)
+                .padding(.vertical, 2)
             }
             .onAppear {
                 proxy.scrollTo(weeks.count - 1, anchor: .trailing)
@@ -35,21 +34,24 @@ struct CalendarHeatmap: View {
 
     @ViewBuilder
     private func cellView(day: (date: Date, met: Bool, value: Double)?) -> some View {
-        RoundedRectangle(cornerRadius: 2, style: .continuous)
+        Rectangle()
             .fill(color(for: day))
             .frame(width: cell, height: cell)
+            .overlay(
+                Rectangle()
+                    .stroke(Color.white.opacity(day?.met == true ? 0.2 : 0), lineWidth: 1)
+            )
     }
 
     private func color(for day: (date: Date, met: Bool, value: Double)?) -> Color {
-        guard let day else { return Theme.ringTrack.opacity(0.4) }
+        guard let day else { return Theme.retroInkFaint.opacity(0.5) }
         if day.met { return accent }
         if day.value > 0 { return accent.opacity(0.25) }
-        return Theme.ringTrack.opacity(0.6)
+        return Theme.retroInkFaint.opacity(0.5)
     }
 
     private func weekdayOrdinal(_ date: Date) -> Int {
-        // Monday-first ordering (0 = Mon, 6 = Sun)
-        let wd = DateHelpers.gregorian.component(.weekday, from: date) // 1=Sun...7=Sat
+        let wd = DateHelpers.gregorian.component(.weekday, from: date)
         return (wd + 5) % 7
     }
 

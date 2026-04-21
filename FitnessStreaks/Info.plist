@@ -11,9 +11,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Fitness Streaks</string>
+	<string>Streak Finder</string>
 	<key>CFBundleDisplayName</key>
-	<string>Fitness Streaks</string>
+	<string>Streak Finder</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -22,12 +22,19 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>UILaunchScreen</key>
 	<dict/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>PressStart2P-Regular.ttf</string>
+		<string>JetBrainsMono-Regular.ttf</string>
+		<string>JetBrainsMono-Medium.ttf</string>
+		<string>JetBrainsMono-Bold.ttf</string>
+	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSHealthShareUsageDescription</key>
-	<string>Fitness Streaks reads your activity history (steps, exercise minutes, stand hours, active energy, workouts, distance, flights climbed, mindful minutes, sleep) from Apple Health to surface the streaks you've already built and encourage you to keep them going. Fitness Streaks never writes to Apple Health.</string>
+	<string>Streak Finder reads your activity history (steps, exercise minutes, stand hours, active energy, workouts, distance, flights climbed, mindful minutes, sleep) from Apple Health to surface the streaks you've already built and encourage you to keep them going. Streak Finder never writes to Apple Health.</string>
 	<key>NSHealthUpdateUsageDescription</key>
-	<string>Fitness Streaks does not write any data to Apple Health.</string>
+	<string>Streak Finder does not write any data to Apple Health.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

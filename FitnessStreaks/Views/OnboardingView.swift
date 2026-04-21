@@ -10,68 +10,78 @@ struct OnboardingView: View {
 
     var body: some View {
         ZStack {
-            Theme.background.ignoresSafeArea()
+            Theme.retroBg.ignoresSafeArea()
 
-            VStack(spacing: 28) {
-                Spacer()
+            VStack(spacing: 24) {
+                BlinkingText(text: "▶ INSERT COIN")
+                    .padding(.top, 40)
 
-                VStack(spacing: 18) {
-                    ZStack {
-                        StreakFlame(intensity: 0.9)
-                            .frame(height: 220)
-                        Image(systemName: "flame.fill")
-                            .font(.system(size: 88, weight: .semibold, design: .rounded))
-                            .foregroundStyle(Theme.streakGradient)
-                            .shadow(color: Theme.streakHot.opacity(0.4), radius: 18)
-                    }
+                PixelFlame(size: 96, intensity: 1.0, tint: Theme.retroMagenta)
 
-                    Text("Fitness Streaks")
-                        .font(.system(size: 34, weight: .bold, design: .rounded))
-                        .foregroundStyle(Theme.textPrimary)
-                    Text("See the fitness streaks you've already built.\nAnd keep them going.")
-                        .font(.system(size: 15, weight: .medium, design: .rounded))
-                        .foregroundStyle(Theme.textSecondary)
+                VStack(spacing: 10) {
+                    Text("STREAK\nFINDER")
+                        .font(RetroFont.pixel(22))
+                        .tracking(2)
+                        .foregroundStyle(Theme.retroMagenta)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(6)
+                        .retroGlow(Theme.retroMagenta)
+
+                    Text("Discover the fitness streaks\nyou've already built from\nyour Apple Health data.")
+                        .font(RetroFont.mono(12))
+                        .foregroundStyle(Theme.retroInkDim)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(4)
+                }
+
+                featurePanel
+                    .padding(.horizontal, 20)
+
+                Spacer(minLength: 12)
+
+                if let err = errorText {
+                    Text(err)
+                        .font(RetroFont.mono(10))
+                        .foregroundStyle(Theme.retroRed)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 24)
                 }
 
-                Spacer()
-
-                VStack(spacing: 14) {
-                    if let err = errorText {
-                        Text(err)
-                            .font(.system(size: 13, weight: .medium, design: .rounded))
-                            .foregroundStyle(.red)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, 24)
-                    }
-
-                    Button {
-                        Task { await onStart() }
-                    } label: {
-                        HStack {
-                            if requesting {
-                                ProgressView().tint(.white)
-                            } else {
-                                Text("Connect Apple Health")
-                                    .font(.system(size: 17, weight: .semibold, design: .rounded))
-                            }
-                        }
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(Theme.streakGradient, in: Capsule())
-                        .padding(.horizontal, 24)
-                    }
-                    .disabled(requesting)
-
-                    Text("Reads activity history only. Never writes.")
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundStyle(Theme.textTertiary)
+                PixelButton(title: requesting ? "LOADING..." : "▶ CONNECT HEALTH",
+                            accent: Theme.retroLime) {
+                    Task { await onStart() }
                 }
-                .padding(.bottom, 40)
+                .disabled(requesting)
+                .padding(.horizontal, 20)
+
+                Text("READ-ONLY ACCESS · V1.0.0")
+                    .font(RetroFont.pixel(8))
+                    .tracking(2)
+                    .foregroundStyle(Theme.retroInkFaint)
+                    .padding(.bottom, 24)
             }
         }
+    }
+
+    private var featurePanel: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            featureRow("9 METRICS · STEPS TO SLEEP")
+            featureRow("DAILY & WEEKLY STREAKS")
+            featureRow("CALENDAR HEATMAPS")
+            featureRow("100% LOCAL · NO NETWORK")
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .pixelPanel(color: Theme.retroCyan)
+    }
+
+    private func featureRow(_ text: String) -> some View {
+        HStack(spacing: 8) {
+            Text("▸").foregroundStyle(Theme.retroCyan)
+            Text(text).foregroundStyle(Theme.retroInk)
+        }
+        .font(RetroFont.pixel(10))
+        .tracking(1)
     }
 
     private func onStart() async {
@@ -83,7 +93,7 @@ struct OnboardingView: View {
             settings.hasCompletedSetup = true
             await store.load()
         } catch {
-            errorText = "Couldn't connect to Apple Health. Open Settings → Health → Data Access & Devices → Fitness Streaks."
+            errorText = "Couldn't connect. Try Settings → Health → Data Access → Streak Finder."
         }
     }
 }

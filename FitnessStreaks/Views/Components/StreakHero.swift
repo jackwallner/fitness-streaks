@@ -4,42 +4,74 @@ struct StreakHero: View {
     let streak: Streak
 
     var body: some View {
-        ZStack {
-            StreakFlame(intensity: intensity)
-                .frame(height: 340)
-                .allowsHitTesting(false)
+        VStack(alignment: .leading, spacing: 12) {
+            Text("HERO STREAK")
+                .font(RetroFont.pixel(9))
+                .tracking(2)
+                .foregroundStyle(Theme.retroInkDim)
 
-            VStack(spacing: 6) {
-                Image(systemName: streak.metric.symbol)
-                    .font(.system(size: 28, weight: .semibold, design: .rounded))
-                    .foregroundStyle(Theme.streakGradient)
-                    .padding(.bottom, 4)
+            HStack(spacing: 14) {
+                PixelFlame(size: 56, intensity: intensity, tint: Theme.retroMagenta)
 
-                Text("\(streak.current)")
-                    .font(Theme.bigNumber(120))
-                    .foregroundStyle(Theme.streakGradient)
-                    .shadow(color: Theme.streakHot.opacity(0.35), radius: 14, y: 4)
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Text("\(streak.current)")
+                            .font(RetroFont.pixel(56))
+                            .tracking(2)
+                            .foregroundStyle(Theme.retroMagenta)
+                            .retroGlow(Theme.retroMagenta)
+                            .minimumScaleFactor(0.5)
+                            .lineLimit(1)
+                        Text(streak.cadence == .daily ? "DAYS" : "WKS")
+                            .font(RetroFont.pixel(12))
+                            .foregroundStyle(Theme.retroInk)
+                    }
 
-                Text(streak.cadence == .daily
-                     ? (streak.current == 1 ? "day streak" : "day streak")
-                     : (streak.current == 1 ? "week streak" : "week streak"))
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundStyle(Theme.textSecondary)
-                    .textCase(.lowercase)
-
-                Text(streak.metric.prose(streak.threshold, cadence: streak.cadence))
-                    .font(.system(size: 15, weight: .medium, design: .rounded))
-                    .foregroundStyle(Theme.textPrimary)
-                    .multilineTextAlignment(.center)
-                    .padding(.top, 2)
-                    .padding(.horizontal, 24)
+                    Text(streak.metric.prose(streak.threshold, cadence: streak.cadence))
+                        .font(RetroFont.mono(11))
+                        .foregroundStyle(Theme.retroInk)
+                        .lineLimit(2)
+                }
             }
+
+            HStack {
+                Text("TODAY'S CHARGE")
+                    .font(RetroFont.pixel(9))
+                    .tracking(2)
+                    .foregroundStyle(Theme.retroInkDim)
+                Spacer()
+                Text(chargeLabel)
+                    .font(RetroFont.pixel(9))
+                    .foregroundStyle(streak.currentUnitCompleted ? Theme.retroLime : Theme.retroAmber)
+            }
+            .padding(.top, 4)
+
+            PixelProgressBar(progress: streak.currentUnitProgress,
+                             accent: streak.currentUnitCompleted ? Theme.retroLime : Theme.retroAmber)
+
+            HStack(spacing: 6) {
+                Text("best \(streak.best) · ")
+                if let s = streak.startDate {
+                    Text("since \(DateHelpers.shortDate(s).lowercased())")
+                }
+            }
+            .font(RetroFont.mono(10))
+            .foregroundStyle(Theme.retroInkDim)
+            .padding(.top, 2)
         }
-        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .pixelPanel(color: Theme.retroMagenta)
+    }
+
+    private var chargeLabel: String {
+        let v = streak.metric.format(value: streak.currentUnitValue)
+        let t = streak.metric.format(value: streak.threshold)
+        return "\(v)/\(t) \(streak.metric.unitLabel.uppercased())"
     }
 
     private var intensity: CGFloat {
-        // Ramp up as the streak grows; cap at 1.0 around 30+ days / 8+ weeks.
         let cap: Double = streak.cadence == .daily ? 30 : 8
         return CGFloat(min(1.0, 0.4 + Double(streak.current) / cap * 0.6))
     }

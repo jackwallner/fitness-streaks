@@ -38,6 +38,10 @@ targets:
     sources:
       - path: FitnessStreaks
       - path: Shared
+        excludes:
+          - "Fonts"
+      - path: Shared/Fonts
+        buildPhase: resources
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.jackwallner.streaks
@@ -56,6 +60,10 @@ targets:
     sources:
       - path: FitnessStreaksWatch
       - path: Shared
+        excludes:
+          - "Fonts"
+      - path: Shared/Fonts
+        buildPhase: resources
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.jackwallner.streaks.watch
@@ -72,6 +80,8 @@ targets:
     sources:
       - path: FitnessStreaksWidget
       - path: Shared
+        excludes:
+          - "Fonts"
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.jackwallner.streaks.widget
@@ -84,6 +94,8 @@ targets:
     sources:
       - path: FitnessStreaksWatchWidget
       - path: Shared
+        excludes:
+          - "Fonts"
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.jackwallner.streaks.watch.widget

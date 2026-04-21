@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		039B7F0469AC40361084B9F6 /* StreakMetric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C80A4826A373B331E583A1E /* StreakMetric.swift */; };
 		0676A3765B0C9454BF181232 /* DateHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49F54F94A5A2BE6B4C616141 /* DateHelpers.swift */; };
+		117AE494DDF91AAF1E0C01F7 /* PixelUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AE8DBC73B55DCE8482E14D /* PixelUI.swift */; };
 		14DE9C98D5E4DEDB8E38FEB6 /* WatchComplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A96B250A2CB89C8A8D01A8 /* WatchComplication.swift */; };
 		156578A6A30A9176A4CFB1BC /* DataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F34D2FE6D3914BB5A4D903 /* DataService.swift */; };
 		2E92D2050EDDB3EBE69EFE60 /* WatchTodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57548FD64897F4D07CFB9889 /* WatchTodayView.swift */; };
@@ -18,7 +19,9 @@
 		316ADDFEB63C8D8EBC10274B /* StreakSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537E2A9D042442EE2656139A /* StreakSettings.swift */; };
 		34B0CE7F24E943474678ECA9 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47765767B5A4442FF1480EDE /* App.swift */; };
 		37B29A33455233312F4EAE05 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDE5E401D8E238E4B790CEF /* HealthKitService.swift */; };
+		39AC4C7AB2FC21E18100F78C /* JetBrainsMono-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 502684193E7BD9E73844EB8C /* JetBrainsMono-Medium.ttf */; };
 		3A12CCFD1B62528D2F9A840A /* StreakSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537E2A9D042442EE2656139A /* StreakSettings.swift */; };
+		3A26B173CDA85C0FA02EFE09 /* JetBrainsMono-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 560A6C366B6C97CC3275012C /* JetBrainsMono-Bold.ttf */; };
 		3A59A93F659234843A004B88 /* FitnessStreaksWatchWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 78A7FE53D948CD897854EB67 /* FitnessStreaksWatchWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3D3A5F899C36439D1C49A27D /* StreakSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537E2A9D042442EE2656139A /* StreakSettings.swift */; };
 		40AD79B6755974DBC926F4D7 /* Streak.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF5B8C88482BC235E56075E /* Streak.swift */; };
@@ -27,6 +30,8 @@
 		5E3A4A321CAFAE60BB68AD71 /* CalendarHeatmap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F5E8DB49859EF7F550A39DB /* CalendarHeatmap.swift */; };
 		5E42DD6AA0FE145C1FB2B216 /* DateHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49F54F94A5A2BE6B4C616141 /* DateHelpers.swift */; };
 		601856ADC1518E52DE606529 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 0F4F5633F83589C8EB674ADE /* PrivacyInfo.xcprivacy */; };
+		6047899CB7D8C6F4888DE708 /* JetBrainsMono-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 560A6C366B6C97CC3275012C /* JetBrainsMono-Bold.ttf */; };
+		6223A6635D3E0688E6975E11 /* JetBrainsMono-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 502684193E7BD9E73844EB8C /* JetBrainsMono-Medium.ttf */; };
 		62E4B86E2303336F4E47512F /* StreakEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543D3D4B4FAF0A178E8805F1 /* StreakEngine.swift */; };
 		64011C3FF21D02B3A2DD734D /* StreakDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790E9BD5A98E837F45B5B997 /* StreakDetailView.swift */; };
 		66AE58531FA9867C4446E51F /* DailyActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA88BDC9CCB6015980ECFF3 /* DailyActivity.swift */; };
@@ -44,6 +49,7 @@
 		7E2E1055A306C12427D8D6BA /* FitnessStreaksWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 34156CEE2653079F1813567C /* FitnessStreaksWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7F438B27433392D3D1DBB4D7 /* DataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F34D2FE6D3914BB5A4D903 /* DataService.swift */; };
 		82900F660FEB24A5796AC458 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDE5E401D8E238E4B790CEF /* HealthKitService.swift */; };
+		82F01C345F0E2CD67A487A65 /* JetBrainsMono-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A05515A54F5B25D57C150872 /* JetBrainsMono-Regular.ttf */; };
 		84D6812F0C8A7FEE43194A5C /* StreakStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C302E6F3992442B6C651F13 /* StreakStore.swift */; };
 		8F5705E093278934C59D51DB /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E54FC44A8D7A428347652F2 /* OnboardingView.swift */; };
 		8FB182D4198D2FE8B97B8963 /* FitnessStreaksWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D49FFCC5C215612722C4FD4A /* FitnessStreaksWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -57,9 +63,12 @@
 		ABB7FC3D34A1DA9D82B6A1C3 /* StreakHero.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B4AF29EC104B213DA5DD0CA /* StreakHero.swift */; };
 		AC52324B01990AA975DA0D10 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C4E8CEC684BE97ED0A1826C9 /* Assets.xcassets */; };
 		B6110A80B63934412B2F565F /* StreakEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543D3D4B4FAF0A178E8805F1 /* StreakEngine.swift */; };
+		BC7DDC4F70ED3D72EA3E4073 /* PressStart2P-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1207B858E4FFB44108513342 /* PressStart2P-Regular.ttf */; };
 		BFEF06574CC4B860BE5A6860 /* DateHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49F54F94A5A2BE6B4C616141 /* DateHelpers.swift */; };
+		C32A13DCCDF3810C8CEE3FED /* JetBrainsMono-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A05515A54F5B25D57C150872 /* JetBrainsMono-Regular.ttf */; };
 		CEA8D66BF780261F75668F56 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5499F56557690B4EE92A2E42 /* NotificationService.swift */; };
 		CF41EDA89E06DD2AFB3A485E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D6E754008340281F258E8A /* SettingsView.swift */; };
+		D2021416878234BF4B693C6A /* PressStart2P-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1207B858E4FFB44108513342 /* PressStart2P-Regular.ttf */; };
 		D47D46BF6661A537634EBEBA /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D82D724B9582B040BF8DB6B /* Theme.swift */; };
 		D63427D18D691FC2A7CF2BCB /* StreakStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C302E6F3992442B6C651F13 /* StreakStore.swift */; };
 		E1CE8BA25D7BE55677D54CEF /* StreakEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543D3D4B4FAF0A178E8805F1 /* StreakEngine.swift */; };
@@ -139,6 +148,7 @@
 		06EC66CCAA5304A26B7ED85F /* StreakBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakBadge.swift; sourceTree = "<group>"; };
 		0B4AF29EC104B213DA5DD0CA /* StreakHero.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakHero.swift; sourceTree = "<group>"; };
 		0F4F5633F83589C8EB674ADE /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		1207B858E4FFB44108513342 /* PressStart2P-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PressStart2P-Regular.ttf"; sourceTree = "<group>"; };
 		135A3C0A5AD7A7BA2B0A64CF /* FitnessStreaks.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = FitnessStreaks.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D4AEA661B2CDB0B05946A25 /* FitnessStreaksWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FitnessStreaksWidget.entitlements; sourceTree = "<group>"; };
 		1EDE5E401D8E238E4B790CEF /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
@@ -151,9 +161,11 @@
 		47765767B5A4442FF1480EDE /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		49F54F94A5A2BE6B4C616141 /* DateHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateHelpers.swift; sourceTree = "<group>"; };
 		4E54FC44A8D7A428347652F2 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		502684193E7BD9E73844EB8C /* JetBrainsMono-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "JetBrainsMono-Medium.ttf"; sourceTree = "<group>"; };
 		537E2A9D042442EE2656139A /* StreakSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakSettings.swift; sourceTree = "<group>"; };
 		543D3D4B4FAF0A178E8805F1 /* StreakEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakEngine.swift; sourceTree = "<group>"; };
 		5499F56557690B4EE92A2E42 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		560A6C366B6C97CC3275012C /* JetBrainsMono-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "JetBrainsMono-Bold.ttf"; sourceTree = "<group>"; };
 		57548FD64897F4D07CFB9889 /* WatchTodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTodayView.swift; sourceTree = "<group>"; };
 		5BA88BDC9CCB6015980ECFF3 /* DailyActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyActivity.swift; sourceTree = "<group>"; };
 		5DA2285D9C3624EC0E762310 /* StreakFlame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakFlame.swift; sourceTree = "<group>"; };
@@ -162,12 +174,14 @@
 		6D82D724B9582B040BF8DB6B /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		6F5E8DB49859EF7F550A39DB /* CalendarHeatmap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarHeatmap.swift; sourceTree = "<group>"; };
 		71D6E754008340281F258E8A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		75AE8DBC73B55DCE8482E14D /* PixelUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelUI.swift; sourceTree = "<group>"; };
 		78A7FE53D948CD897854EB67 /* FitnessStreaksWatchWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FitnessStreaksWatchWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		790E9BD5A98E837F45B5B997 /* StreakDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakDetailView.swift; sourceTree = "<group>"; };
 		7DD57D170B35D6F1A4D519C3 /* FitnessStreaksWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitnessStreaksWidget.swift; sourceTree = "<group>"; };
 		88CD00513724423456C0A89B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		9C302E6F3992442B6C651F13 /* StreakStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakStore.swift; sourceTree = "<group>"; };
 		9C80A4826A373B331E583A1E /* StreakMetric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakMetric.swift; sourceTree = "<group>"; };
+		A05515A54F5B25D57C150872 /* JetBrainsMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "JetBrainsMono-Regular.ttf"; sourceTree = "<group>"; };
 		AEF5B8C88482BC235E56075E /* Streak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Streak.swift; sourceTree = "<group>"; };
 		C4E8CEC684BE97ED0A1826C9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D49FFCC5C215612722C4FD4A /* FitnessStreaksWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = FitnessStreaksWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -260,11 +274,24 @@
 			isa = PBXGroup;
 			children = (
 				6F5E8DB49859EF7F550A39DB /* CalendarHeatmap.swift */,
+				75AE8DBC73B55DCE8482E14D /* PixelUI.swift */,
 				06EC66CCAA5304A26B7ED85F /* StreakBadge.swift */,
 				5DA2285D9C3624EC0E762310 /* StreakFlame.swift */,
 				0B4AF29EC104B213DA5DD0CA /* StreakHero.swift */,
 			);
 			path = Components;
+			sourceTree = "<group>";
+		};
+		6D519AF5449A87BE252DA163 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				560A6C366B6C97CC3275012C /* JetBrainsMono-Bold.ttf */,
+				502684193E7BD9E73844EB8C /* JetBrainsMono-Medium.ttf */,
+				A05515A54F5B25D57C150872 /* JetBrainsMono-Regular.ttf */,
+				1207B858E4FFB44108513342 /* PressStart2P-Regular.ttf */,
+			);
+			name = Fonts;
+			path = Shared/Fonts;
 			sourceTree = "<group>";
 		};
 		6FDA4A907528E9FA044622BF /* Views */ = {
@@ -282,6 +309,7 @@
 				C4CE9EC06F09D415339B4C98 /* FitnessStreaksWatch */,
 				1C9F90CD98AEFA2D6E7E2727 /* FitnessStreaksWatchWidget */,
 				0DE70F8C69B0DFBC09AF1E50 /* FitnessStreaksWidget */,
+				6D519AF5449A87BE252DA163 /* Fonts */,
 				4A25F3CDC9BA87CA509C8E58 /* Shared */,
 				4CA933C56090CB8D28481F21 /* Products */,
 			);
@@ -453,6 +481,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				AC52324B01990AA975DA0D10 /* Assets.xcassets in Resources */,
+				3A26B173CDA85C0FA02EFE09 /* JetBrainsMono-Bold.ttf in Resources */,
+				6223A6635D3E0688E6975E11 /* JetBrainsMono-Medium.ttf in Resources */,
+				C32A13DCCDF3810C8CEE3FED /* JetBrainsMono-Regular.ttf in Resources */,
+				D2021416878234BF4B693C6A /* PressStart2P-Regular.ttf in Resources */,
 				601856ADC1518E52DE606529 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -462,6 +494,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				A6E9D296BFA48CA00C3975F2 /* Assets.xcassets in Resources */,
+				6047899CB7D8C6F4888DE708 /* JetBrainsMono-Bold.ttf in Resources */,
+				39AC4C7AB2FC21E18100F78C /* JetBrainsMono-Medium.ttf in Resources */,
+				82F01C345F0E2CD67A487A65 /* JetBrainsMono-Regular.ttf in Resources */,
+				BC7DDC4F70ED3D72EA3E4073 /* PressStart2P-Regular.ttf in Resources */,
 				301D407B208954C2ECA470D3 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -482,6 +518,7 @@
 				725C04D55BBA4E5582F0973E /* HealthKitService.swift in Sources */,
 				CEA8D66BF780261F75668F56 /* NotificationService.swift in Sources */,
 				8F5705E093278934C59D51DB /* OnboardingView.swift in Sources */,
+				117AE494DDF91AAF1E0C01F7 /* PixelUI.swift in Sources */,
 				CF41EDA89E06DD2AFB3A485E /* SettingsView.swift in Sources */,
 				40AD79B6755974DBC926F4D7 /* Streak.swift in Sources */,
 				5D4B2D187CB5D74E96C3E2A9 /* StreakBadge.swift in Sources */,

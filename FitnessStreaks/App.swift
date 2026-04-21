@@ -51,7 +51,7 @@ struct FitnessStreaksApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
-                .preferredColorScheme(settings.appearance.colorScheme)
+                .preferredColorScheme(.dark)
                 .environmentObject(healthKit)
                 .environmentObject(settings)
                 .environmentObject(store)

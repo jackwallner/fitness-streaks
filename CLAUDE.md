@@ -1,4 +1,4 @@
-# Fitness Streaks — Project Guide
+# Streak Finder — Project Guide
 
 iPhone + Apple Watch app that mines Apple Health history for active streaks and encourages the user to keep them alive.
 

@@ -1,58 +1,114 @@
 import SwiftUI
 
+extension Color {
+    init(hex: UInt32, opacity: Double = 1) {
+        let r = Double((hex >> 16) & 0xff) / 255
+        let g = Double((hex >> 8) & 0xff) / 255
+        let b = Double(hex & 0xff) / 255
+        self = Color(red: r, green: g, blue: b, opacity: opacity)
+    }
+}
+
 enum Theme {
-    // MARK: - Adaptive base
+    // MARK: - Retro arcade palette (dark-only)
 
-    #if os(watchOS)
-    static let background = Color.black
-    static let cardSurface = Color(white: 0.12)
-    static let cardSurfaceLight = Color(white: 0.18)
-    static let ringTrack = Color(white: 0.2)
-    static let textPrimary = Color.white
-    static let textSecondary = Color(white: 0.7)
-    static let textTertiary = Color(white: 0.5)
-    #else
-    static let background = Color(.systemBackground)
-    static let cardSurface = Color(.secondarySystemBackground)
-    static let cardSurfaceLight = Color(.tertiarySystemBackground)
-    static let ringTrack = Color(.systemFill)
-    static let textPrimary = Color(.label)
-    static let textSecondary = Color(.secondaryLabel)
-    static let textTertiary = Color(.tertiaryLabel)
-    #endif
+    static let retroBg        = Color(hex: 0x0a0612)
+    static let retroBgRaised  = Color(hex: 0x120a22)
+    static let retroBgCard    = Color(hex: 0x1e1236)
+    static let retroGrid      = Color(hex: 0x2a1a4a)
 
-    // MARK: - Streak palette (fire → ember)
+    static let retroInk       = Color(hex: 0xf4ecff)
+    static let retroInkDim    = Color(hex: 0x8b7cad)
+    static let retroInkFaint  = Color(hex: 0x4a3d6b)
 
-    static let streakHot = Color(red: 1.00, green: 0.37, blue: 0.22)        // #FF5E37 vivid ember
-    static let streakGlow = Color(red: 1.00, green: 0.58, blue: 0.10)       // #FF9419 warm flame
-    static let streakCool = Color(red: 0.95, green: 0.78, blue: 0.30)       // #F2C74D embered gold
+    static let retroMagenta   = Color(hex: 0xff2d95)
+    static let retroCyan      = Color(hex: 0x2dd4ff)
+    static let retroLime      = Color(hex: 0xc8ff00)
+    static let retroAmber     = Color(hex: 0xffb020)
+    static let retroRed       = Color(hex: 0xff3b50)
 
-    // Per-metric accents (distinct + complementary to streak fire)
-    static let accentSteps = Color(red: 0.24, green: 0.73, blue: 0.70)      // teal
-    static let accentExercise = Color(red: 0.36, green: 0.78, blue: 0.46)   // green
-    static let accentStand = Color(red: 0.40, green: 0.70, blue: 0.98)      // sky
-    static let accentEnergy = Color(red: 1.00, green: 0.42, blue: 0.42)     // coral
-    static let accentWorkout = Color(red: 0.62, green: 0.40, blue: 0.82)    // purple
-    static let accentMindful = Color(red: 0.55, green: 0.72, blue: 0.85)    // soft blue
-    static let accentSleep = Color(red: 0.48, green: 0.52, blue: 0.82)      // indigo
-    static let accentDistance = Color(red: 0.20, green: 0.60, blue: 0.85)   // blue
-    static let accentFlights = Color(red: 0.85, green: 0.55, blue: 0.35)    // bronze
+    // MARK: - Legacy aliases (keep existing callsites compiling)
 
-    // MARK: - Constants
-    static let cardRadius: CGFloat = 20
-    static let cardPadding: CGFloat = 20
+    static let background = retroBg
+    static let cardSurface = retroBgRaised
+    static let cardSurfaceLight = retroBgCard
+    static let ringTrack = retroInkFaint
+    static let textPrimary = retroInk
+    static let textSecondary = retroInkDim
+    static let textTertiary = retroInkFaint
 
-    // MARK: - Gradients
+    static let streakHot = retroMagenta
+    static let streakGlow = retroAmber
+    static let streakCool = retroLime
+
+    static let accentSteps = retroLime
+    static let accentExercise = retroMagenta
+    static let accentStand = retroCyan
+    static let accentEnergy = retroAmber
+    static let accentDistance = Color(hex: 0xb088ff)
+    static let accentFlights = Color(hex: 0xff7a00)
+    static let accentWorkout = retroRed
+    static let accentMindful = Color(hex: 0x7aff9e)
+    static let accentSleep = Color(hex: 0x5da9ff)
+
+    static let cardRadius: CGFloat = 0
+    static let cardPadding: CGFloat = 16
+
     static var streakGradient: LinearGradient {
-        LinearGradient(colors: [streakHot, streakGlow], startPoint: .topLeading, endPoint: .bottomTrailing)
+        LinearGradient(colors: [retroMagenta, retroAmber], startPoint: .topLeading, endPoint: .bottomTrailing)
     }
 
     static func gradient(for accent: Color) -> LinearGradient {
         LinearGradient(colors: [accent, accent.opacity(0.7)], startPoint: .topLeading, endPoint: .bottomTrailing)
     }
 
-    // MARK: - Typography
     static func bigNumber(_ size: CGFloat) -> Font {
-        .system(size: size, weight: .bold, design: .rounded)
+        RetroFont.pixel(size)
+    }
+}
+
+// MARK: - Retro typography
+
+enum RetroFont {
+    static func pixel(_ size: CGFloat) -> Font {
+        .custom("PressStart2P-Regular", size: size)
+    }
+
+    static func mono(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
+        let name: String
+        switch weight {
+        case .bold, .heavy, .black: name = "JetBrainsMono-Bold"
+        case .medium, .semibold:    name = "JetBrainsMono-Medium"
+        default:                    name = "JetBrainsMono-Regular"
+        }
+        return .custom(name, size: size)
+    }
+}
+
+// MARK: - Pixel panel styling
+
+struct PixelPanelStyle: ViewModifier {
+    var color: Color = Theme.retroInkFaint
+    var fill: Color = Theme.retroBgRaised
+    var lineWidth: CGFloat = 2
+
+    func body(content: Content) -> some View {
+        content
+            .background(fill)
+            .overlay(Rectangle().stroke(color, lineWidth: lineWidth))
+    }
+}
+
+extension View {
+    func pixelPanel(color: Color = Theme.retroInkFaint,
+                    fill: Color = Theme.retroBgRaised,
+                    lineWidth: CGFloat = 2) -> some View {
+        modifier(PixelPanelStyle(color: color, fill: fill, lineWidth: lineWidth))
+    }
+
+    func retroGlow(_ color: Color, radius: CGFloat = 14) -> some View {
+        self
+            .shadow(color: color.opacity(0.6), radius: radius)
+            .shadow(color: Theme.retroBg, radius: 0, x: 3, y: 3)
     }
 }

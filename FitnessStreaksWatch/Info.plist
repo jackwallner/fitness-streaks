@@ -11,9 +11,9 @@
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>Fitness Streaks</string>
+    <string>Streak Finder</string>
     <key>CFBundleDisplayName</key>
-    <string>Fitness Streaks</string>
+    <string>Streak Finder</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
@@ -23,9 +23,16 @@
     <key>ITSAppUsesNonExemptEncryption</key>
     <false/>
     <key>NSHealthShareUsageDescription</key>
-    <string>Fitness Streaks reads your activity history from Apple Health to surface the streaks you've built. Fitness Streaks never writes to Apple Health.</string>
+    <string>Streak Finder reads your activity history from Apple Health to surface the streaks you've built. Streak Finder never writes to Apple Health.</string>
     <key>NSHealthUpdateUsageDescription</key>
-    <string>Fitness Streaks does not write any data to Apple Health.</string>
+    <string>Streak Finder does not write any data to Apple Health.</string>
+    <key>UIAppFonts</key>
+    <array>
+        <string>PressStart2P-Regular.ttf</string>
+        <string>JetBrainsMono-Regular.ttf</string>
+        <string>JetBrainsMono-Medium.ttf</string>
+        <string>JetBrainsMono-Bold.ttf</string>
+    </array>
     <key>WKApplication</key>
     <true/>
     <key>WKCompanionAppBundleIdentifier</key>

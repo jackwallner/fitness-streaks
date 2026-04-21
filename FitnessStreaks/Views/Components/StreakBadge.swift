@@ -1,63 +1,66 @@
 import SwiftUI
 
+/// Retained for any legacy callsites (onboarding, etc.) — thin wrapper around card.
 struct StreakBadgeRow: View {
+    let streak: Streak
+    var body: some View { StreakBadgeCard(streak: streak) }
+}
+
+struct StreakBadgeCard: View {
     let streak: Streak
 
     var body: some View {
-        HStack(spacing: 14) {
-            ZStack {
-                Circle()
-                    .fill(streak.metric.accent.opacity(0.18))
-                Image(systemName: streak.metric.symbol)
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundStyle(streak.metric.accent)
-            }
-            .frame(width: 40, height: 40)
+        ZStack(alignment: .topTrailing) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 6) {
+                    Image(systemName: streak.metric.symbol)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(streak.metric.accent)
+                        .shadow(color: streak.metric.accent.opacity(0.6), radius: 4)
+                    Text(streak.metric.displayName.uppercased())
+                        .font(RetroFont.pixel(9))
+                        .foregroundStyle(Theme.retroInk)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(streak.metric.displayName)
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .foregroundStyle(Theme.textPrimary)
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                    Text("\(streak.current)")
+                        .font(RetroFont.pixel(26))
+                        .foregroundStyle(streak.metric.accent)
+                        .retroGlow(streak.metric.accent, radius: 10)
+                        .minimumScaleFactor(0.5)
+                        .lineLimit(1)
+                    Text(streak.cadence == .daily ? "DAYS" : "WKS")
+                        .font(RetroFont.pixel(9))
+                        .foregroundStyle(Theme.retroInkDim)
+                }
+
                 Text(subtitle)
-                    .font(.system(size: 13, weight: .medium, design: .rounded))
-                    .foregroundStyle(Theme.textSecondary)
+                    .font(RetroFont.mono(10))
+                    .foregroundStyle(Theme.retroInkDim)
                     .lineLimit(1)
+
+                PixelBarThin(progress: streak.currentUnitProgress, accent: streak.metric.accent)
+                    .padding(.top, 2)
             }
+            .padding(10)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .pixelPanel(color: streak.currentUnitCompleted ? streak.metric.accent : Theme.retroInkFaint)
 
-            Spacer(minLength: 8)
-
-            VStack(alignment: .trailing, spacing: 2) {
-                Text("\(streak.current)")
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
-                    .foregroundStyle(Theme.textPrimary)
-                    .monospacedDigit()
-                Text(streak.cadence == .daily
-                     ? (streak.current == 1 ? "day" : "days")
-                     : (streak.current == 1 ? "week" : "weeks"))
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
-                    .foregroundStyle(Theme.textTertiary)
-                    .textCase(.uppercase)
+            if streak.currentUnitCompleted {
+                Text("✓")
+                    .font(RetroFont.pixel(8))
+                    .foregroundStyle(Theme.retroBg)
+                    .padding(.horizontal, 5)
+                    .padding(.vertical, 2)
+                    .background(streak.metric.accent)
             }
-
-            Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(Theme.textTertiary)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .background(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Theme.cardSurface)
-        )
     }
 
     private var subtitle: String {
         let label = streak.metric.thresholdLabel(streak.threshold, cadence: streak.cadence)
-        if streak.currentUnitCompleted {
-            return "\(label) · done today"
-        }
-        let unit = streak.cadence == .daily ? "today" : "this week"
-        let pct = Int(min(1.0, streak.currentUnitProgress) * 100)
-        return "\(label) · \(pct)% \(unit)"
+        return "\(label) · best \(streak.best)"
     }
 }

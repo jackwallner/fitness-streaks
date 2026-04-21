@@ -62,7 +62,7 @@ struct WatchComplicationView: View {
             if let hero = entry.hero, let m = metric {
                 Text("\(Image(systemName: m.symbol)) \(hero.current) \(hero.cadence == "daily" ? "d" : "w")")
             } else {
-                Text("Fitness Streaks")
+                Text("Streak Finder")
             }
         }
     }
@@ -105,7 +105,7 @@ struct WatchComplicationView: View {
                     .font(.system(size: 9, weight: .medium, design: .rounded))
                     .lineLimit(1)
             } else {
-                Text("Fitness Streaks").font(.system(size: 12, weight: .semibold))
+                Text("Streak Finder").font(.system(size: 12, weight: .semibold))
             }
         }
         .containerBackground(.clear, for: .widget)
@@ -121,7 +121,7 @@ struct WatchComplicationView: View {
                         Text(metric?.displayName ?? "Streak")
                     }
             } else {
-                Image(systemName: "flame").widgetLabel("Fitness Streaks")
+                Image(systemName: "flame").widgetLabel("Streak Finder")
             }
         }
         .containerBackground(.clear, for: .widget)

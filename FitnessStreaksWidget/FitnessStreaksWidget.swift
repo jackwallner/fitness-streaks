@@ -78,7 +78,7 @@ struct StreakWidgetView: View {
                 Text("\(Image(systemName: m.symbol)) \(hero.current) \(cadenceLabel(hero))")
             )
         }
-        return AnyView(Text("Fitness Streaks"))
+        return AnyView(Text("Streak Finder"))
     }
 
     // Lock-screen circular
@@ -127,7 +127,7 @@ struct StreakWidgetView: View {
                     .font(.system(size: 9, weight: .medium, design: .rounded))
                     .lineLimit(1)
             } else {
-                Text("Fitness Streaks")
+                Text("Streak Finder")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
             }
         }
@@ -261,7 +261,7 @@ struct FitnessStreaksWidget: Widget {
         StaticConfiguration(kind: kind, provider: StreakTimelineProvider()) { entry in
             StreakWidgetView(entry: entry)
         }
-        .configurationDisplayName("Fitness Streaks")
+        .configurationDisplayName("Streak Finder")
         .description("Your hottest streak, at a glance.")
         .supportedFamilies([
             .systemSmall,

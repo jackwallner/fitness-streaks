@@ -9,73 +9,216 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section("Appearance") {
-                    Picker("Theme", selection: $settings.appearance) {
-                        ForEach(AppAppearance.allCases, id: \.rawValue) { a in
-                            Text(a.label).tag(a)
-                        }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    notificationsSection
+                    metricsSection
+                    dataSection
+                    aboutSection
+
+                    Text("READ-ONLY · LOCAL-ONLY · NO NETWORK")
+                        .font(RetroFont.pixel(8))
+                        .tracking(2)
+                        .foregroundStyle(Theme.retroInkFaint)
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 20)
+                        .padding(.bottom, 16)
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 16)
+            }
+            .background(Theme.retroBg.ignoresSafeArea())
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("SETTINGS")
+                        .font(RetroFont.pixel(12))
+                        .tracking(2)
+                        .foregroundStyle(Theme.retroMagenta)
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { dismiss() } label: {
+                        Text("DONE")
+                            .font(RetroFont.pixel(10))
+                            .foregroundStyle(Theme.retroCyan)
                     }
-                    .pickerStyle(.segmented)
                 }
+            }
+            .toolbarBackground(Theme.retroBg, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+        }
+    }
 
-                Section {
-                    Toggle("At-risk reminder", isOn: $settings.notificationsEnabled)
-                } header: {
-                    Text("Notifications")
-                } footer: {
-                    Text("Daily 7pm nudge if your hero streak isn't locked in yet.")
+    // MARK: - Appearance
+
+    private var appearanceSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            PixelSectionHeader(title: "Appearance")
+            HStack(spacing: 0) {
+                ForEach(AppAppearance.allCases, id: \.rawValue) { a in
+                    Button {
+                        settings.appearance = a
+                    } label: {
+                        Text(a.label.uppercased())
+                            .font(RetroFont.pixel(10))
+                            .foregroundStyle(settings.appearance == a ? Theme.retroBg : Theme.retroInk)
+                            .padding(.vertical, 10)
+                            .frame(maxWidth: .infinity)
+                            .background(settings.appearance == a ? Theme.retroCyan : Color.clear)
+                            .overlay(Rectangle().stroke(settings.appearance == a ? Theme.retroCyan : Theme.retroInkFaint, lineWidth: 2))
+                    }
+                    .buttonStyle(.plain)
                 }
+            }
+        }
+    }
 
-                Section {
-                    ForEach(StreakMetric.allCases) { metric in
-                        Toggle(isOn: Binding(
+    // MARK: - Notifications
+
+    private var notificationsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            PixelSectionHeader(title: "Notifications")
+            HStack {
+                Text("AT-RISK REMINDER")
+                    .font(RetroFont.pixel(10))
+                    .foregroundStyle(Theme.retroInk)
+                Spacer()
+                PixelToggle(isOn: $settings.notificationsEnabled, accent: Theme.retroMagenta)
+            }
+            .padding(14)
+            .pixelPanel(color: Theme.retroInkFaint)
+
+            Text("Daily 7pm nudge if your hero streak isn't locked in yet.")
+                .font(RetroFont.mono(10))
+                .foregroundStyle(Theme.retroInkDim)
+                .padding(.horizontal, 6)
+        }
+    }
+
+    // MARK: - Metrics
+
+    private var metricsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            PixelSectionHeader(title: "Metrics Tracked")
+            VStack(spacing: 0) {
+                ForEach(Array(StreakMetric.allCases.enumerated()), id: \.offset) { idx, metric in
+                    HStack(spacing: 10) {
+                        Image(systemName: metric.symbol)
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(metric.accent)
+                            .shadow(color: metric.accent.opacity(0.6), radius: 4)
+                            .frame(width: 24)
+                        Text(metric.displayName.uppercased())
+                            .font(RetroFont.pixel(10))
+                            .foregroundStyle(Theme.retroInk)
+                        Spacer()
+                        PixelToggle(isOn: Binding(
                             get: { !settings.isHidden(metric) },
                             set: { on in
                                 if on { settings.hiddenMetrics.remove(metric) }
                                 else { settings.hiddenMetrics.insert(metric) }
                             }
-                        )) {
-                            HStack(spacing: 10) {
-                                Image(systemName: metric.symbol)
-                                    .foregroundStyle(metric.accent)
-                                    .frame(width: 22)
-                                Text(metric.displayName)
-                            }
-                        }
+                        ), accent: metric.accent)
                     }
-                } header: {
-                    Text("Metrics tracked")
-                } footer: {
-                    Text("Turn off metrics you don't want to see streaks for.")
-                }
-
-                Section {
-                    Button {
-                        Task { await store.load() }
-                        dismiss()
-                    } label: {
-                        Label("Refresh now", systemImage: "arrow.clockwise")
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 14)
+                    if idx < StreakMetric.allCases.count - 1 {
+                        dashedLine
                     }
-                }
-
-                Section {
-                    HStack {
-                        Text("Version")
-                        Spacer()
-                        Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
-                            .foregroundStyle(.secondary)
-                    }
-                    Link("Privacy policy", destination: URL(string: "https://jackwallner.github.io/fitness-streaks/privacy-policy.html")!)
                 }
             }
-            .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                }
-            }
+            .pixelPanel(color: Theme.retroInkFaint)
         }
+    }
+
+    private var dashedLine: some View {
+        Rectangle()
+            .fill(Theme.retroInkFaint)
+            .frame(height: 1)
+            .opacity(0.6)
+            .padding(.horizontal, 14)
+    }
+
+    // MARK: - Data
+
+    private var dataSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            PixelSectionHeader(title: "Data")
+            Button {
+                Task { await store.load() }
+                dismiss()
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "arrow.clockwise")
+                    Text("REFRESH NOW")
+                        .font(RetroFont.pixel(10))
+                        .tracking(1)
+                }
+                .foregroundStyle(Theme.retroLime)
+                .padding(14)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .buttonStyle(.plain)
+            .pixelPanel(color: Theme.retroInkFaint)
+        }
+    }
+
+    // MARK: - About
+
+    private var aboutSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            PixelSectionHeader(title: "About")
+            VStack(spacing: 0) {
+                aboutRow(label: "VERSION",
+                         value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
+                dashedLine
+                if let url = URL(string: "https://jackwallner.github.io/fitness-streaks/privacy-policy.html") {
+                    Link(destination: url) {
+                        HStack {
+                            Text("PRIVACY POLICY")
+                                .font(RetroFont.pixel(10))
+                                .foregroundStyle(Theme.retroInk)
+                            Spacer()
+                            Text("↗")
+                                .font(RetroFont.pixel(11))
+                                .foregroundStyle(Theme.retroCyan)
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 14)
+                    }
+                }
+                dashedLine
+                if let url = URL(string: "https://github.com/jackwallner/fitness-streaks") {
+                    Link(destination: url) {
+                        HStack {
+                            Text("SOURCE")
+                                .font(RetroFont.pixel(10))
+                                .foregroundStyle(Theme.retroInk)
+                            Spacer()
+                            Text("↗")
+                                .font(RetroFont.pixel(11))
+                                .foregroundStyle(Theme.retroCyan)
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 14)
+                    }
+                }
+            }
+            .pixelPanel(color: Theme.retroInkFaint)
+        }
+    }
+
+    private func aboutRow(label: String, value: String) -> some View {
+        HStack {
+            Text(label)
+                .font(RetroFont.pixel(10))
+                .foregroundStyle(Theme.retroInk)
+            Spacer()
+            Text(value)
+                .font(RetroFont.mono(11))
+                .foregroundStyle(Theme.retroInkDim)
+        }
+        .padding(.vertical, 12)
+        .padding(.horizontal, 14)
     }
 }

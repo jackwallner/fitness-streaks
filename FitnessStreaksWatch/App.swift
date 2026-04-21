@@ -84,7 +84,7 @@ struct WatchOnboardingView: View {
                 Image(systemName: "flame.fill")
                     .font(.system(size: 40))
                     .foregroundStyle(Theme.streakGradient)
-                Text("Fitness Streaks")
+                Text("Streak Finder")
                     .font(.system(size: 16, weight: .bold, design: .rounded))
                 Text("Allow Health access to see your streaks.")
                     .font(.system(size: 12, weight: .medium, design: .rounded))

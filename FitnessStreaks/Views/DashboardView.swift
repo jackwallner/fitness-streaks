@@ -8,23 +8,32 @@ struct DashboardView: View {
     @State private var showSettings = false
     @State private var selectedStreak: Streak? = nil
 
+    private let grid = [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)]
+
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(alignment: .leading, spacing: 14) {
                     topBar
+                        .padding(.top, 6)
 
                     if let hero = store.hero {
-                        StreakHero(streak: hero)
-                            .padding(.top, 10)
-                            .onTapGesture { selectedStreak = hero }
+                        Button { selectedStreak = hero } label: {
+                            StreakHero(streak: hero)
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.horizontal, 6)
 
-                        heroMeta(for: hero)
-                            .padding(.horizontal, 20)
+                        if !hero.currentUnitCompleted {
+                            atRiskBanner(for: hero)
+                                .padding(.horizontal, 6)
+                        }
 
-                        divider
+                        PixelSectionHeader(title: "Other Streaks · \(store.badges.count) Active")
+                            .padding(.top, 6)
 
-                        badgesSection
+                        badgeGrid
+                            .padding(.horizontal, 6)
                     } else if store.isLoading {
                         loadingState
                     } else {
@@ -33,7 +42,7 @@ struct DashboardView: View {
                 }
                 .padding(.bottom, 32)
             }
-            .background(Theme.background.ignoresSafeArea())
+            .background(Theme.retroBg.ignoresSafeArea())
             .refreshable { await store.load() }
             .navigationDestination(item: $selectedStreak) { streak in
                 StreakDetailView(streak: streak)
@@ -45,130 +54,99 @@ struct DashboardView: View {
     }
 
     private var topBar: some View {
-        HStack {
+        HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Fitness Streaks")
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
-                    .foregroundStyle(Theme.textPrimary)
+                Text("▶ STREAK FINDER")
+                    .font(RetroFont.pixel(12))
+                    .tracking(1)
+                    .foregroundStyle(Theme.retroMagenta)
                 if let updated = store.lastUpdated {
-                    Text("Updated \(relative(updated))")
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundStyle(Theme.textTertiary)
+                    Text("updated \(relative(updated)) · from apple health")
+                        .font(RetroFont.mono(10))
+                        .foregroundStyle(Theme.retroInkDim)
+                } else {
+                    Text("from apple health")
+                        .font(RetroFont.mono(10))
+                        .foregroundStyle(Theme.retroInkDim)
                 }
             }
             Spacer()
-            Button {
-                Task { await store.load() }
-            } label: {
-                Image(systemName: "arrow.clockwise")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(Theme.textSecondary)
-                    .frame(width: 38, height: 38)
-                    .background(Circle().fill(Theme.cardSurface))
-            }
             Button { showSettings = true } label: {
                 Image(systemName: "gearshape.fill")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(Theme.textSecondary)
-                    .frame(width: 38, height: 38)
-                    .background(Circle().fill(Theme.cardSurface))
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Theme.retroInkDim)
+                    .frame(width: 36, height: 36)
+                    .background(Theme.retroBgRaised)
+                    .overlay(Rectangle().stroke(Theme.retroInkFaint, lineWidth: 2))
             }
-        }
-        .padding(.horizontal, 20)
-        .padding(.top, 8)
-    }
-
-    @ViewBuilder
-    private func heroMeta(for hero: Streak) -> some View {
-        HStack(spacing: 10) {
-            metaChip(
-                icon: "trophy.fill",
-                label: "Best \(hero.best) \(hero.cadence == .daily ? "days" : "weeks")"
-            )
-            if let start = hero.startDate {
-                metaChip(icon: "calendar", label: "Since \(DateHelpers.shortDate(start))")
-            }
-            if hero.currentUnitCompleted {
-                metaChip(icon: "checkmark.seal.fill", label: "Locked in today")
-            } else {
-                let pct = Int(min(1.0, hero.currentUnitProgress) * 100)
-                metaChip(icon: "timer", label: "\(pct)% today")
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .center)
-    }
-
-    private func metaChip(icon: String, label: String) -> some View {
-        HStack(spacing: 5) {
-            Image(systemName: icon)
-                .font(.system(size: 11, weight: .semibold))
-            Text(label)
-                .font(.system(size: 11, weight: .semibold, design: .rounded))
-                .lineLimit(1)
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
-        .foregroundStyle(Theme.textSecondary)
-        .background(Capsule().fill(Theme.cardSurface))
-    }
-
-    private var divider: some View {
-        HStack {
-            Text("Other streaks")
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
-                .foregroundStyle(Theme.textTertiary)
-                .textCase(.uppercase)
-            Spacer()
-        }
-        .padding(.horizontal, 24)
-        .padding(.top, 8)
-    }
-
-    private var badgesSection: some View {
-        LazyVStack(spacing: 10) {
-            ForEach(store.badges) { streak in
-                Button { selectedStreak = streak } label: {
-                    StreakBadgeRow(streak: streak)
-                }
-                .buttonStyle(.plain)
-            }
-            if store.badges.isEmpty {
-                Text("Build a few more days and more streaks will appear here.")
-                    .font(.system(size: 13, weight: .medium, design: .rounded))
-                    .foregroundStyle(Theme.textTertiary)
-                    .multilineTextAlignment(.center)
-                    .padding(.top, 12)
-            }
+            .buttonStyle(.plain)
         }
         .padding(.horizontal, 16)
     }
 
+    private func atRiskBanner(for hero: Streak) -> some View {
+        HStack(spacing: 10) {
+            Text("! AT RISK")
+                .font(RetroFont.pixel(9))
+                .tracking(1)
+                .foregroundStyle(Theme.retroRed)
+            Text(riskText(for: hero))
+                .font(RetroFont.mono(11))
+                .foregroundStyle(Theme.retroInk)
+                .lineLimit(1)
+            Spacer()
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
+        .pixelPanel(color: Theme.retroRed, fill: Theme.retroBg)
+    }
+
+    private func riskText(for hero: Streak) -> String {
+        let remaining = max(0, hero.threshold - hero.currentUnitValue)
+        let v = hero.metric.format(value: remaining)
+        let unit = hero.metric.unitLabel
+        let window = hero.cadence == .daily ? "today" : "this week"
+        return "\(v) \(unit) to lock \(window) in"
+    }
+
+    private var badgeGrid: some View {
+        LazyVGrid(columns: grid, spacing: 8) {
+            ForEach(store.badges) { streak in
+                Button { selectedStreak = streak } label: {
+                    StreakBadgeCard(streak: streak)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
     private var loadingState: some View {
         VStack(spacing: 16) {
-            ProgressView()
-                .controlSize(.large)
+            PixelFlame(size: 64, intensity: 0.7)
                 .padding(.top, 80)
-            Text("Reading your Health history…")
-                .font(.system(size: 14, weight: .medium, design: .rounded))
-                .foregroundStyle(Theme.textSecondary)
+            Text("LOADING HEALTH...")
+                .font(RetroFont.pixel(10))
+                .tracking(2)
+                .foregroundStyle(Theme.retroInkDim)
         }
+        .frame(maxWidth: .infinity)
     }
 
     private var emptyState: some View {
         VStack(spacing: 14) {
-            Image(systemName: "flame")
-                .font(.system(size: 56, weight: .regular))
-                .foregroundStyle(Theme.streakGradient)
+            PixelFlame(size: 72, intensity: 0.5, tint: Theme.retroInkDim)
                 .padding(.top, 60)
-            Text("No active streaks yet")
-                .font(.system(size: 20, weight: .semibold, design: .rounded))
-                .foregroundStyle(Theme.textPrimary)
-            Text("Get moving today and your streaks will start building. Pull to refresh.")
-                .font(.system(size: 14, weight: .medium, design: .rounded))
-                .foregroundStyle(Theme.textSecondary)
+            Text("NO ACTIVE STREAKS")
+                .font(RetroFont.pixel(12))
+                .tracking(2)
+                .foregroundStyle(Theme.retroInk)
+            Text("Get moving and they'll start building.\nPull to refresh.")
+                .font(RetroFont.mono(11))
+                .foregroundStyle(Theme.retroInkDim)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
         }
+        .frame(maxWidth: .infinity)
     }
 
     private func relative(_ date: Date) -> String {

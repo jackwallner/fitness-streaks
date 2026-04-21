@@ -1,4 +1,4 @@
-# Fitness Streaks
+# Streak Finder
 
 Native iPhone + Apple Watch app that mines your Apple Health history for the fitness streaks you've already built — the ones you didn't realize were going — and nudges you to keep them alive.
 
