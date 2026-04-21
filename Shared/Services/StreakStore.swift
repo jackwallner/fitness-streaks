@@ -26,7 +26,9 @@ final class StreakStore: ObservableObject {
             try await HealthKitService.shared.refreshCache(days: 400)
             self.streaks = StreakEngine.discover(
                 history: fresh,
-                hiddenMetrics: StreakSettings.shared.hiddenMetrics
+                hiddenMetrics: StreakSettings.shared.hiddenMetrics,
+                vibe: StreakSettings.shared.vibe,
+                minStreakLength: StreakSettings.shared.minStreakLength
             )
             self.lastUpdated = .now
 

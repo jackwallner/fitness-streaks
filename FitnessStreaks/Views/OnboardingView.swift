@@ -5,39 +5,34 @@ struct OnboardingView: View {
     @EnvironmentObject var settings: StreakSettings
     @EnvironmentObject var store: StreakStore
 
+    enum Step: Int, CaseIterable {
+        case intro = 0
+        case vibe = 1
+        case minimum = 2
+    }
+
+    @State private var step: Step = .intro
     @State private var requesting = false
     @State private var errorText: String? = nil
+    @State private var selectedVibe: DiscoveryVibe = .challenging
+    @State private var minLength: Int = 0   // 0 = no minimum
 
     var body: some View {
         ZStack {
             Theme.retroBg.ignoresSafeArea()
 
-            VStack(spacing: 24) {
-                BlinkingText(text: "▶ INSERT COIN")
-                    .padding(.top, 40)
-
-                PixelFlame(size: 96, intensity: 1.0, tint: Theme.retroMagenta)
-
-                VStack(spacing: 10) {
-                    Text("STREAK\nFINDER")
-                        .font(RetroFont.pixel(22))
-                        .tracking(2)
-                        .foregroundStyle(Theme.retroMagenta)
-                        .multilineTextAlignment(.center)
-                        .lineSpacing(6)
-                        .retroGlow(Theme.retroMagenta)
-
-                    Text("Discover the fitness streaks\nyou've already built from\nyour Apple Health data.")
-                        .font(RetroFont.mono(12))
-                        .foregroundStyle(Theme.retroInkDim)
-                        .multilineTextAlignment(.center)
-                        .lineSpacing(4)
-                }
-
-                featurePanel
+            VStack(spacing: 20) {
+                header
+                    .padding(.top, 30)
                     .padding(.horizontal, 20)
 
-                Spacer(minLength: 12)
+                switch step {
+                case .intro:    introStep
+                case .vibe:     vibeStep
+                case .minimum:  minimumStep
+                }
+
+                Spacer(minLength: 8)
 
                 if let err = errorText {
                     Text(err)
@@ -47,20 +42,197 @@ struct OnboardingView: View {
                         .padding(.horizontal, 24)
                 }
 
-                PixelButton(title: requesting ? "LOADING..." : "▶ CONNECT HEALTH",
-                            accent: Theme.retroLime) {
-                    Task { await onStart() }
-                }
-                .disabled(requesting)
-                .padding(.horizontal, 20)
-
-                Text("READ-ONLY ACCESS · V1.0.0")
-                    .font(RetroFont.pixel(8))
-                    .tracking(2)
-                    .foregroundStyle(Theme.retroInkFaint)
+                footer
+                    .padding(.horizontal, 20)
                     .padding(.bottom, 24)
             }
         }
+    }
+
+    // MARK: - Header / footer
+
+    private var header: some View {
+        HStack(spacing: 6) {
+            ForEach(Step.allCases, id: \.rawValue) { s in
+                Rectangle()
+                    .fill(s.rawValue <= step.rawValue ? Theme.retroMagenta : Theme.retroInkFaint)
+                    .frame(height: 4)
+            }
+        }
+    }
+
+    private var footer: some View {
+        HStack(spacing: 10) {
+            if step != .intro {
+                Button {
+                    withAnimation { step = Step(rawValue: step.rawValue - 1) ?? .intro }
+                } label: {
+                    Text("BACK")
+                        .font(RetroFont.mono(11, weight: .bold))
+                        .foregroundStyle(Theme.retroInkDim)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(Theme.retroBgRaised)
+                        .overlay(Rectangle().stroke(Theme.retroInkFaint, lineWidth: 2))
+                }
+                .buttonStyle(.plain)
+            }
+
+            Button {
+                Task { await advance() }
+            } label: {
+                Text(primaryTitle)
+                    .font(RetroFont.mono(12, weight: .bold))
+                    .foregroundStyle(Theme.retroBg)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(Theme.retroLime)
+            }
+            .buttonStyle(.plain)
+            .disabled(requesting)
+        }
+    }
+
+    private var primaryTitle: String {
+        switch step {
+        case .intro:    return requesting ? "CONNECTING..." : "▶ CONNECT HEALTH"
+        case .vibe:     return "NEXT"
+        case .minimum:  return requesting ? "FINDING..." : "▶ FIND MY STREAKS"
+        }
+    }
+
+    // MARK: - Steps
+
+    private var introStep: some View {
+        VStack(spacing: 18) {
+            BlinkingText(text: "▶ INSERT COIN")
+                .padding(.top, 6)
+
+            PixelFlame(size: 88, intensity: 1.0, tint: Theme.retroMagenta)
+
+            VStack(spacing: 8) {
+                Text("STREAK\nFINDER")
+                    .font(RetroFont.mono(26, weight: .bold))
+                    .tracking(2)
+                    .foregroundStyle(Theme.retroMagenta)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
+                    .retroGlow(Theme.retroMagenta)
+
+                Text("Discover the fitness streaks\nyou've already built\nfrom Apple Health.")
+                    .font(RetroFont.mono(12))
+                    .foregroundStyle(Theme.retroInkDim)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
+            }
+
+            featurePanel
+                .padding(.horizontal, 20)
+        }
+    }
+
+    private var vibeStep: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("PICK YOUR VIBE")
+                .font(RetroFont.mono(14, weight: .bold))
+                .tracking(2)
+                .foregroundStyle(Theme.retroInk)
+
+            Text("How do you want your streaks to feel?")
+                .font(RetroFont.mono(11))
+                .foregroundStyle(Theme.retroInkDim)
+                .padding(.bottom, 4)
+
+            ForEach(DiscoveryVibe.allCases, id: \.rawValue) { vibe in
+                vibeRow(vibe)
+            }
+        }
+        .padding(.horizontal, 20)
+    }
+
+    private func vibeRow(_ vibe: DiscoveryVibe) -> some View {
+        let selected = selectedVibe == vibe
+        let accent: Color = {
+            switch vibe {
+            case .sustainable: return Theme.retroCyan
+            case .challenging: return Theme.retroAmber
+            case .lifeChanging: return Theme.retroMagenta
+            }
+        }()
+        return Button {
+            selectedVibe = vibe
+        } label: {
+            HStack(alignment: .top, spacing: 12) {
+                Text(selected ? "◉" : "○")
+                    .font(RetroFont.mono(16, weight: .bold))
+                    .foregroundStyle(selected ? accent : Theme.retroInkFaint)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(vibe.label.uppercased())
+                        .font(RetroFont.mono(12, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(selected ? accent : Theme.retroInk)
+                    Text(vibe.tagline)
+                        .font(RetroFont.mono(11))
+                        .foregroundStyle(Theme.retroInkDim)
+                        .multilineTextAlignment(.leading)
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .pixelPanel(color: selected ? accent : Theme.retroInkFaint,
+                        fill: selected ? Theme.retroBgCard : Theme.retroBgRaised)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var minimumStep: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("MINIMUM LENGTH")
+                .font(RetroFont.mono(14, weight: .bold))
+                .tracking(2)
+                .foregroundStyle(Theme.retroInk)
+
+            Text("Optional. Only show streaks you've kept\ngoing at least this many times.")
+                .font(RetroFont.mono(11))
+                .foregroundStyle(Theme.retroInkDim)
+                .lineSpacing(2)
+
+            VStack(spacing: 10) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(minLength == 0 ? "ANY" : "\(minLength)")
+                        .font(RetroFont.mono(36, weight: .bold))
+                        .foregroundStyle(Theme.retroMagenta)
+                        .retroGlow(Theme.retroMagenta)
+                    if minLength > 0 {
+                        Text("TIMES+")
+                            .font(RetroFont.mono(11, weight: .bold))
+                            .foregroundStyle(Theme.retroInkDim)
+                    }
+                }
+
+                Slider(value: Binding(
+                    get: { Double(minLength) },
+                    set: { minLength = Int($0.rounded()) }
+                ), in: 0...60, step: 1)
+                .tint(Theme.retroMagenta)
+
+                HStack {
+                    Text("ANY").font(RetroFont.mono(9)).foregroundStyle(Theme.retroInkFaint)
+                    Spacer()
+                    Text("60+").font(RetroFont.mono(9)).foregroundStyle(Theme.retroInkFaint)
+                }
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity)
+            .pixelPanel(color: Theme.retroMagenta)
+
+            Text("Tip: \"\(selectedVibe.label)\" vibe will\n\(selectedVibe.tagline.lowercased())")
+                .font(RetroFont.mono(10))
+                .foregroundStyle(Theme.retroInkDim)
+                .lineSpacing(2)
+        }
+        .padding(.horizontal, 20)
     }
 
     private var featurePanel: some View {
@@ -80,20 +252,39 @@ struct OnboardingView: View {
             Text("▸").foregroundStyle(Theme.retroCyan)
             Text(text).foregroundStyle(Theme.retroInk)
         }
-        .font(RetroFont.pixel(10))
+        .font(RetroFont.mono(10, weight: .bold))
         .tracking(1)
     }
 
-    private func onStart() async {
+    // MARK: - Flow
+
+    private func advance() async {
+        errorText = nil
+        switch step {
+        case .intro:
+            await requestAuth()
+            if errorText == nil {
+                withAnimation { step = .vibe }
+            }
+        case .vibe:
+            settings.vibe = selectedVibe
+            withAnimation { step = .minimum }
+        case .minimum:
+            settings.minStreakLength = minLength == 0 ? nil : minLength
+            settings.hasCompletedSetup = true
+            requesting = true
+            await store.load()
+            requesting = false
+        }
+    }
+
+    private func requestAuth() async {
         requesting = true
         defer { requesting = false }
-        errorText = nil
         do {
             try await healthKit.requestAuthorization()
-            settings.hasCompletedSetup = true
-            await store.load()
         } catch {
-            errorText = "Couldn't connect. Try Settings → Health → Data Access → Streak Finder."
+            errorText = "Couldn't connect. Open Settings → Health → Data Access → Streak Finder."
         }
     }
 }

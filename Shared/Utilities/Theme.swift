@@ -70,8 +70,10 @@ enum Theme {
 // MARK: - Retro typography
 
 enum RetroFont {
+    // Former pixel-font callsites now render in JetBrains Mono Bold.
+    // Kept as a shim so existing views compile unchanged.
     static func pixel(_ size: CGFloat) -> Font {
-        .custom("PressStart2P-Regular", size: size)
+        mono(size, weight: .bold)
     }
 
     static func mono(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {

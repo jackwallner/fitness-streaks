@@ -21,6 +21,8 @@ enum StreakEngine {
     static func discover(
         history: [ActivityDay],
         hiddenMetrics: Set<StreakMetric> = [],
+        vibe: DiscoveryVibe = .challenging,
+        minStreakLength: Int? = nil,
         now: Date = .now
     ) -> [Streak] {
         guard !history.isEmpty else { return [] }
@@ -32,31 +34,36 @@ enum StreakEngine {
         var found: [Streak] = []
 
         for metric in StreakMetric.allCases where !hiddenMetrics.contains(metric) {
-            // Daily
-            let bestDaily = pickBest(
-                thresholds: metric.dailyThresholds,
-                minLength: metric == .workouts ? minDailyLength : minDailyLength,
-                build: { threshold in
-                    computeDailyStreak(metric: metric, threshold: threshold, byDay: byDay, today: today)
-                }
-            )
-            if let s = bestDaily { found.append(s) }
+            // Daily — per-vibe threshold pick
+            let dailyCandidates = metric.dailyThresholds.map { t in
+                computeDailyStreak(metric: metric, threshold: t, byDay: byDay, today: today)
+            }
+            if let best = pickByVibe(candidates: dailyCandidates, vibe: vibe, minLength: minDailyLength) {
+                found.append(best)
+            }
 
             // Weekly
             if let weekly = metric.weeklyThresholds {
                 let weekTotals = weeklyTotals(for: metric, byDay: byDay)
-                let bestWeekly = pickBest(
-                    thresholds: weekly,
-                    minLength: minWeeklyLength,
-                    build: { threshold in
-                        computeWeeklyStreak(metric: metric, threshold: threshold, weekTotals: weekTotals, thisWeek: thisWeek)
-                    }
-                )
-                if let s = bestWeekly { found.append(s) }
+                let weeklyCandidates = weekly.map { t in
+                    computeWeeklyStreak(metric: metric, threshold: t, weekTotals: weekTotals, thisWeek: thisWeek)
+                }
+                if let best = pickByVibe(candidates: weeklyCandidates, vibe: vibe, minLength: minWeeklyLength) {
+                    found.append(best)
+                }
             }
         }
 
-        return found.sorted { $0.score > $1.score }
+        // User-requested "I've done it at least N times" floor
+        let filtered: [Streak]
+        if let floor = minStreakLength, floor > 0 {
+            let meeting = found.filter { $0.current >= floor }
+            filtered = meeting.isEmpty ? found : meeting
+        } else {
+            filtered = found
+        }
+
+        return filtered.sorted { vibeScore($0, vibe: vibe) > vibeScore($1, vibe: vibe) }
     }
 
     static func snapshot(from streaks: [Streak]) -> StreakSnapshot {
@@ -80,22 +87,61 @@ enum StreakEngine {
 
     // MARK: - Selection
 
-    private static func pickBest(
-        thresholds: [Double],
-        minLength: Int,
-        build: (Double) -> Streak
-    ) -> Streak? {
-        // Evaluate all thresholds; find the highest threshold whose current >= minLength.
-        // If none qualifies, fall back to the lowest threshold that has at least `absoluteFloor`.
-        let results = thresholds.map(build)
+    /// Choose the best per-(metric,cadence) threshold for a given vibe.
+    /// `candidates` is one Streak per threshold, ascending.
+    private static func pickByVibe(candidates: [Streak], vibe: DiscoveryVibe, minLength: Int) -> Streak? {
+        guard !candidates.isEmpty else { return nil }
+        switch vibe {
+        case .lifeChanging:
+            // Highest threshold where current >= minLength; else highest with any history.
+            if let hit = candidates.reversed().first(where: { $0.current >= minLength }) {
+                return hit
+            }
+            return candidates.reversed().first(where: { $0.current >= absoluteFloor })
+        case .challenging:
+            // Favor mid-tier with real momentum: highest threshold where current >= minLength × 2,
+            // else any threshold meeting minLength, else floor.
+            if let pushed = candidates.reversed().first(where: { $0.current >= max(minLength * 2, minLength + 2) }) {
+                return pushed
+            }
+            if let hit = candidates.reversed().first(where: { $0.current >= minLength }) {
+                return hit
+            }
+            return candidates.first(where: { $0.current >= absoluteFloor })
+        case .sustainable:
+            // Prefer the longest-running streak across tiers, weighting ties toward higher tier.
+            let qualifying = candidates.filter { $0.current >= minLength }
+            let pool = qualifying.isEmpty ? candidates.filter { $0.current >= absoluteFloor } : qualifying
+            return pool.max { a, b in
+                if a.current != b.current { return a.current < b.current }
+                return a.threshold < b.threshold
+            }
+        }
+    }
 
-        if let best = results.reversed().first(where: { $0.current >= minLength }) {
-            return best
+    /// Score tuned per vibe — drives which streak becomes hero and badge ordering.
+    private static func vibeScore(_ s: Streak, vibe: DiscoveryVibe) -> Double {
+        let thresholds = s.cadence == .daily
+            ? s.metric.dailyThresholds
+            : (s.metric.weeklyThresholds ?? s.metric.dailyThresholds)
+        let tierIdx = thresholds.firstIndex(of: s.threshold) ?? 0
+        let tierCount = max(1, thresholds.count)
+        let tierFrac = Double(tierIdx) / Double(tierCount - 1 == 0 ? 1 : tierCount - 1)
+        let len = Double(s.current)
+        let weight = s.metric.weight
+
+        switch vibe {
+        case .sustainable:
+            // Strongly reward length; mild tier bonus.
+            return len * (1.0 + 0.1 * Double(tierIdx)) * weight
+        case .challenging:
+            // Reward both length and tier; penalize extremes.
+            let balance = 1.0 - abs(tierFrac - 0.6) * 0.5
+            return len * (0.8 + 0.7 * Double(tierIdx)) * balance * weight
+        case .lifeChanging:
+            // Strongly reward tier; length still matters but less.
+            return (0.5 + len * 0.3) * (1.0 + 0.35 * Double(tierIdx)) * weight
         }
-        if let floor = results.first(where: { $0.current >= absoluteFloor }) {
-            return floor
-        }
-        return nil
     }
 
     // MARK: - Daily streak

@@ -3,6 +3,38 @@ import SwiftUI
 import Combine
 import WidgetKit
 
+/// How aggressive the user wants the discovered streaks to feel.
+/// Drives StreakEngine ranking and hero selection.
+enum DiscoveryVibe: Int, CaseIterable, Codable, Sendable {
+    case sustainable = 0     // "something I've been doing for a while" — longest lower-tier streak
+    case challenging = 1     // "stretch, but hittable" — mid-tier with recent momentum
+    case lifeChanging = 2    // "I want the top tier" — highest threshold reachable
+
+    var label: String {
+        switch self {
+        case .sustainable: "Sustainable"
+        case .challenging: "Challenging"
+        case .lifeChanging: "Life-changing"
+        }
+    }
+
+    var tagline: String {
+        switch self {
+        case .sustainable: "Streaks you've already built. Keep the chain alive."
+        case .challenging: "A stretch — but within reach with steady effort."
+        case .lifeChanging: "The top tier. Aim high; build toward it."
+        }
+    }
+
+    var short: String {
+        switch self {
+        case .sustainable: "already doing"
+        case .challenging: "push a little"
+        case .lifeChanging: "go big"
+        }
+    }
+}
+
 enum AppAppearance: Int, CaseIterable {
     case system = 0
     case light = 1
@@ -63,6 +95,26 @@ final class StreakSettings: ObservableObject {
         didSet { defaults.set(notificationsEnabled, forKey: "notificationsEnabled") }
     }
 
+    @Published var vibe: DiscoveryVibe {
+        didSet {
+            defaults.set(vibe.rawValue, forKey: "discoveryVibe")
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+    }
+
+    /// Optional floor — "I want something I've done at least N times".
+    /// nil = no minimum preference.
+    @Published var minStreakLength: Int? {
+        didSet {
+            if let v = minStreakLength {
+                defaults.set(v, forKey: "minStreakLength")
+            } else {
+                defaults.removeObject(forKey: "minStreakLength")
+            }
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+    }
+
     /// Metrics the user has opted out of. Empty = all on.
     @Published var hiddenMetrics: Set<StreakMetric> {
         didSet {
@@ -79,6 +131,8 @@ final class StreakSettings: ObservableObject {
         self.hasCompletedSetup = defaults.bool(forKey: "hasCompletedSetup")
         self.appearance = AppAppearance(rawValue: defaults.integer(forKey: "appearance")) ?? .system
         self.notificationsEnabled = defaults.object(forKey: "notificationsEnabled") as? Bool ?? true
+        self.vibe = DiscoveryVibe(rawValue: defaults.integer(forKey: "discoveryVibe")) ?? .challenging
+        self.minStreakLength = (defaults.object(forKey: "minStreakLength") as? Int)
 
         if let raws = defaults.array(forKey: "hiddenMetrics") as? [String] {
             self.hiddenMetrics = Set(raws.compactMap(StreakMetric.init(rawValue:)))

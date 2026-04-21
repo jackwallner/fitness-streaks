@@ -4,63 +4,59 @@ struct StreakHero: View {
     let streak: Streak
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("HERO STREAK")
-                .font(RetroFont.pixel(9))
-                .tracking(2)
-                .foregroundStyle(Theme.retroInkDim)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .center, spacing: 12) {
+                PixelFlame(size: 48, intensity: intensity, tint: Theme.retroMagenta)
 
-            HStack(spacing: 14) {
-                PixelFlame(size: 56, intensity: intensity, tint: Theme.retroMagenta)
-
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("HERO STREAK")
+                        .font(RetroFont.mono(9, weight: .bold))
+                        .tracking(2)
+                        .foregroundStyle(Theme.retroInkDim)
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
                         Text("\(streak.current)")
-                            .font(RetroFont.pixel(56))
-                            .tracking(2)
+                            .font(RetroFont.mono(44, weight: .bold))
                             .foregroundStyle(Theme.retroMagenta)
                             .retroGlow(Theme.retroMagenta)
                             .minimumScaleFactor(0.5)
                             .lineLimit(1)
                         Text(streak.cadence == .daily ? "DAYS" : "WKS")
-                            .font(RetroFont.pixel(12))
+                            .font(RetroFont.mono(11, weight: .bold))
                             .foregroundStyle(Theme.retroInk)
                     }
-
                     Text(streak.metric.prose(streak.threshold, cadence: streak.cadence))
                         .font(RetroFont.mono(11))
                         .foregroundStyle(Theme.retroInk)
-                        .lineLimit(2)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                 }
             }
 
             HStack {
                 Text("TODAY'S CHARGE")
-                    .font(RetroFont.pixel(9))
+                    .font(RetroFont.mono(9, weight: .bold))
                     .tracking(2)
                     .foregroundStyle(Theme.retroInkDim)
                 Spacer()
                 Text(chargeLabel)
-                    .font(RetroFont.pixel(9))
+                    .font(RetroFont.mono(9, weight: .bold))
                     .foregroundStyle(streak.currentUnitCompleted ? Theme.retroLime : Theme.retroAmber)
             }
-            .padding(.top, 4)
 
             PixelProgressBar(progress: streak.currentUnitProgress,
                              accent: streak.currentUnitCompleted ? Theme.retroLime : Theme.retroAmber)
 
-            HStack(spacing: 6) {
-                Text("best \(streak.best) · ")
+            HStack(spacing: 4) {
+                Text("best \(streak.best)")
                 if let s = streak.startDate {
-                    Text("since \(DateHelpers.shortDate(s).lowercased())")
+                    Text("· since \(DateHelpers.shortDate(s).lowercased())")
                 }
             }
             .font(RetroFont.mono(10))
             .foregroundStyle(Theme.retroInkDim)
-            .padding(.top, 2)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 18)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .pixelPanel(color: Theme.retroMagenta)
     }

@@ -11,6 +11,7 @@ struct SettingsView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
+                    vibeSection
                     notificationsSection
                     metricsSection
                     dataSection
@@ -69,6 +70,61 @@ struct SettingsView: View {
                     }
                     .buttonStyle(.plain)
                 }
+            }
+        }
+    }
+
+    // MARK: - Vibe
+
+    private var vibeSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            PixelSectionHeader(title: "Streak Vibe")
+            HStack(spacing: 0) {
+                ForEach(DiscoveryVibe.allCases, id: \.rawValue) { v in
+                    Button {
+                        settings.vibe = v
+                        Task { await store.load() }
+                    } label: {
+                        Text(v.short.uppercased())
+                            .font(RetroFont.mono(9, weight: .bold))
+                            .foregroundStyle(settings.vibe == v ? Theme.retroBg : Theme.retroInk)
+                            .padding(.vertical, 10)
+                            .padding(.horizontal, 4)
+                            .frame(maxWidth: .infinity)
+                            .background(settings.vibe == v ? Theme.retroMagenta : Color.clear)
+                            .overlay(Rectangle().stroke(settings.vibe == v ? Theme.retroMagenta : Theme.retroInkFaint, lineWidth: 2))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            Text(settings.vibe.tagline)
+                .font(RetroFont.mono(10))
+                .foregroundStyle(Theme.retroInkDim)
+                .padding(.horizontal, 6)
+
+            HStack {
+                Text("MIN LENGTH")
+                    .font(RetroFont.mono(10, weight: .bold))
+                    .foregroundStyle(Theme.retroInk)
+                Spacer()
+                Text(settings.minStreakLength.map { "\($0)+" } ?? "ANY")
+                    .font(RetroFont.mono(11, weight: .bold))
+                    .foregroundStyle(Theme.retroMagenta)
+            }
+            .padding(.horizontal, 14)
+            .padding(.top, 4)
+
+            Slider(value: Binding(
+                get: { Double(settings.minStreakLength ?? 0) },
+                set: { v in
+                    let i = Int(v.rounded())
+                    settings.minStreakLength = i == 0 ? nil : i
+                }
+            ), in: 0...60, step: 1)
+            .tint(Theme.retroMagenta)
+            .padding(.horizontal, 14)
+            .onChange(of: settings.minStreakLength) { _, _ in
+                Task { await store.load() }
             }
         }
     }
