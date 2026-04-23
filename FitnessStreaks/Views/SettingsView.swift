@@ -6,6 +6,7 @@ struct SettingsView: View {
     @EnvironmentObject var store: StreakStore
 
     @Environment(\.dismiss) private var dismiss
+    @State private var showingPicker = false
 
     var body: some View {
         NavigationStack {
@@ -47,6 +48,11 @@ struct SettingsView: View {
             }
             .toolbarBackground(Theme.retroBg, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
+            .sheet(isPresented: $showingPicker) {
+                StreakPickerSheet()
+                    .environmentObject(settings)
+                    .environmentObject(store)
+            }
         }
     }
 
@@ -102,6 +108,26 @@ struct SettingsView: View {
                 .foregroundStyle(Theme.retroInkDim)
                 .padding(.horizontal, 6)
 
+            Button {
+                showingPicker = true
+            } label: {
+                HStack {
+                    Text("TRACKED STREAKS")
+                        .font(RetroFont.mono(10, weight: .bold))
+                        .foregroundStyle(Theme.retroInk)
+                    Spacer()
+                    Text(trackedSummary)
+                        .font(RetroFont.mono(11, weight: .bold))
+                        .foregroundStyle(Theme.retroCyan)
+                    Text("›")
+                        .font(RetroFont.mono(14, weight: .bold))
+                        .foregroundStyle(Theme.retroInkDim)
+                }
+                .padding(14)
+            }
+            .buttonStyle(.plain)
+            .pixelPanel(color: Theme.retroInkFaint)
+
             HStack {
                 Text("MIN LENGTH")
                     .font(RetroFont.mono(10, weight: .bold))
@@ -127,6 +153,13 @@ struct SettingsView: View {
                 Task { await store.load() }
             }
         }
+    }
+
+    private var trackedSummary: String {
+        if let set = settings.trackedStreaks {
+            return "\(set.count) PICKED"
+        }
+        return "ALL"
     }
 
     // MARK: - Notifications

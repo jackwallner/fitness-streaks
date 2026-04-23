@@ -9,6 +9,7 @@ struct OnboardingView: View {
         case intro = 0
         case vibe = 1
         case minimum = 2
+        case review = 3
     }
 
     @State private var step: Step = .intro
@@ -16,6 +17,7 @@ struct OnboardingView: View {
     @State private var errorText: String? = nil
     @State private var selectedVibe: DiscoveryVibe = .challenging
     @State private var minLength: Int = 0   // 0 = no minimum
+    @State private var selectedStreaks: Set<String> = []
 
     var body: some View {
         ZStack {
@@ -30,6 +32,7 @@ struct OnboardingView: View {
                 case .intro:    introStep
                 case .vibe:     vibeStep
                 case .minimum:  minimumStep
+                case .review:   reviewStep
                 }
 
                 Spacer(minLength: 8)
@@ -98,6 +101,9 @@ struct OnboardingView: View {
         case .intro:    return requesting ? "CONNECTING..." : "▶ CONNECT HEALTH"
         case .vibe:     return "NEXT"
         case .minimum:  return requesting ? "FINDING..." : "▶ FIND MY STREAKS"
+        case .review:
+            if selectedStreaks.isEmpty { return "PICK AT LEAST ONE" }
+            return "▶ START TRACKING (\(selectedStreaks.count))"
         }
     }
 
@@ -235,6 +241,42 @@ struct OnboardingView: View {
         .padding(.horizontal, 20)
     }
 
+    private var reviewStep: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("YOUR STREAKS")
+                .font(RetroFont.mono(14, weight: .bold))
+                .tracking(2)
+                .foregroundStyle(Theme.retroInk)
+
+            Text("We scanned your Apple Health history.\n★ = most interesting for your vibe.\nTap to opt in or out.")
+                .font(RetroFont.mono(11))
+                .foregroundStyle(Theme.retroInkDim)
+                .lineSpacing(2)
+
+            if store.allCandidates.isEmpty {
+                VStack(spacing: 10) {
+                    PixelFlame(size: 48, intensity: 0.5, tint: Theme.retroInkDim)
+                        .padding(.top, 30)
+                    Text("No streaks found yet.\nMove around a bit and refresh.")
+                        .font(RetroFont.mono(11))
+                        .foregroundStyle(Theme.retroInkDim)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity)
+            } else {
+                ScrollView(showsIndicators: false) {
+                    StreakPickerList(
+                        candidates: store.allCandidates,
+                        selection: $selectedStreaks,
+                        recommendedCount: min(5, store.allCandidates.count)
+                    )
+                    .padding(.bottom, 6)
+                }
+            }
+        }
+        .padding(.horizontal, 20)
+    }
+
     private var featurePanel: some View {
         VStack(alignment: .leading, spacing: 6) {
             featureRow("9 METRICS · STEPS TO SLEEP")
@@ -271,10 +313,24 @@ struct OnboardingView: View {
             withAnimation { step = .minimum }
         case .minimum:
             settings.minStreakLength = minLength == 0 ? nil : minLength
-            settings.hasCompletedSetup = true
+            // Discover candidates before showing the review step.
             requesting = true
+            // Temporarily clear tracked filter so allCandidates reflects everything.
+            settings.trackedStreaks = nil
             await store.load()
             requesting = false
+            // Pre-check the top 5 so first-timers aren't staring at an empty selection.
+            selectedStreaks = Set(
+                store.allCandidates.prefix(5).map {
+                    StreakSettings.streakKey(metric: $0.metric, cadence: $0.cadence)
+                }
+            )
+            withAnimation { step = .review }
+        case .review:
+            guard !selectedStreaks.isEmpty else { return }
+            settings.trackedStreaks = selectedStreaks
+            store.refilter()
+            settings.hasCompletedSetup = true
         }
     }
 

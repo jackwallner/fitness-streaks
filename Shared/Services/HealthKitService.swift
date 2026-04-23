@@ -318,10 +318,17 @@ final class HealthKitService: ObservableObject {
         let history = try await fetchHistory(days: days)
         try upsert(history)
 
-        // Compute & persist snapshot for widgets
+        // Compute & persist snapshot for widgets — widgets only see tracked streaks.
         let settings = StreakSettings.shared
-        let streaks = StreakEngine.discover(history: history, hiddenMetrics: settings.hiddenMetrics, now: .now)
-        let snapshot = StreakEngine.snapshot(from: streaks)
+        let all = StreakEngine.discover(
+            history: history,
+            hiddenMetrics: settings.hiddenMetrics,
+            vibe: settings.vibe,
+            minStreakLength: settings.minStreakLength,
+            now: .now
+        )
+        let tracked = StreakStore.applyTrackedFilter(all)
+        let snapshot = StreakEngine.snapshot(from: tracked)
         SnapshotStore.save(snapshot)
         return history
     }

@@ -124,6 +124,28 @@ final class StreakSettings: ObservableObject {
         }
     }
 
+    /// Which discovered streaks the user opted in to track, keyed as "metric-cadence"
+    /// (e.g. "steps-daily", "workouts-weekly"). `nil` = not yet chosen → treat as "all on".
+    @Published var trackedStreaks: Set<String>? {
+        didSet {
+            if let set = trackedStreaks {
+                defaults.set(Array(set), forKey: "trackedStreaks")
+            } else {
+                defaults.removeObject(forKey: "trackedStreaks")
+            }
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+    }
+
+    static func streakKey(metric: StreakMetric, cadence: StreakCadence) -> String {
+        "\(metric.rawValue)-\(cadence.rawValue)"
+    }
+
+    func isTracked(metric: StreakMetric, cadence: StreakCadence) -> Bool {
+        guard let set = trackedStreaks else { return true }
+        return set.contains(Self.streakKey(metric: metric, cadence: cadence))
+    }
+
     private init() {
         let defaults = UserDefaults(suiteName: DataService.appGroupID) ?? .standard
         self.defaults = defaults
@@ -138,6 +160,12 @@ final class StreakSettings: ObservableObject {
             self.hiddenMetrics = Set(raws.compactMap(StreakMetric.init(rawValue:)))
         } else {
             self.hiddenMetrics = []
+        }
+
+        if let raws = defaults.array(forKey: "trackedStreaks") as? [String] {
+            self.trackedStreaks = Set(raws)
+        } else {
+            self.trackedStreaks = nil
         }
     }
 
