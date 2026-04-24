@@ -1,10 +1,35 @@
 import Foundation
 
+/// A single-hour slice of the day (e.g. 17 → "5–6pm").
+/// When present on a Streak, we're tracking activity WITHIN that hour every day,
+/// not the whole-day total. This is how Streak Finder surfaces hidden rhythms.
+struct HourWindow: Hashable, Sendable, Codable {
+    let startHour: Int   // 0...23
+
+    var label: String {
+        let s = Self.format(hour: startHour)
+        let e = Self.format(hour: (startHour + 1) % 24)
+        return "\(s)–\(e)"
+    }
+
+    static func format(hour: Int) -> String {
+        switch hour {
+        case 0: return "12a"
+        case 12: return "12p"
+        case 1..<12: return "\(hour)a"
+        default: return "\(hour - 12)p"
+        }
+    }
+}
+
 /// A single discovered streak: user has hit `threshold` for `current` consecutive units ending now.
 struct Streak: Identifiable, Hashable, Sendable {
     let metric: StreakMetric
     let cadence: StreakCadence
     let threshold: Double
+    /// If non-nil, this streak is about activity within a specific hour of the day.
+    /// Nil = whole-day/whole-week streak.
+    var window: HourWindow? = nil
 
     /// Consecutive units meeting threshold, including the current unit if it already met it.
     let current: Int
@@ -21,7 +46,20 @@ struct Streak: Identifiable, Hashable, Sendable {
     /// Current unit's raw value (steps so far today, workouts this week, etc.).
     let currentUnitValue: Double
 
-    var id: String { "\(metric.rawValue)-\(cadence.rawValue)-\(Int(threshold))" }
+    var id: String {
+        if let w = window {
+            return "\(metric.rawValue)-\(cadence.rawValue)-h\(w.startHour)-\(Int(threshold))"
+        }
+        return "\(metric.rawValue)-\(cadence.rawValue)-\(Int(threshold))"
+    }
+
+    /// Key used by StreakSettings.trackedStreaks — stable across threshold tier changes.
+    var trackingKey: String {
+        if let w = window {
+            return "\(metric.rawValue)-\(cadence.rawValue)-h\(w.startHour)"
+        }
+        return "\(metric.rawValue)-\(cadence.rawValue)"
+    }
 
     var isActive: Bool { current >= 1 }
 

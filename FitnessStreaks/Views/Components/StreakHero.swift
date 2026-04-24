@@ -24,7 +24,7 @@ struct StreakHero: View {
                             .font(RetroFont.mono(11, weight: .bold))
                             .foregroundStyle(Theme.retroInk)
                     }
-                    Text(streak.metric.prose(streak.threshold, cadence: streak.cadence))
+                    Text(heroProse)
                         .font(RetroFont.mono(11))
                         .foregroundStyle(Theme.retroInk)
                         .lineLimit(1)
@@ -59,6 +59,14 @@ struct StreakHero: View {
         .padding(.vertical, 14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .pixelPanel(color: Theme.retroMagenta)
+    }
+
+    private var heroProse: String {
+        if let w = streak.window {
+            let t = streak.metric.format(value: streak.threshold)
+            return "\(t)+ \(streak.metric.unitLabel) between \(w.label)"
+        }
+        return streak.metric.prose(streak.threshold, cadence: streak.cadence)
     }
 
     private var chargeLabel: String {

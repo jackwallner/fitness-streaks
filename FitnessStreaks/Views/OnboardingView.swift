@@ -322,7 +322,7 @@ struct OnboardingView: View {
             // Pre-check the top 5 so first-timers aren't staring at an empty selection.
             selectedStreaks = Set(
                 store.allCandidates.prefix(5).map {
-                    StreakSettings.streakKey(metric: $0.metric, cadence: $0.cadence)
+                    $0.trackingKey
                 }
             )
             withAnimation { step = .review }

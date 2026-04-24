@@ -19,7 +19,7 @@ struct StreakPickerList: View {
     }
 
     private func row(_ streak: Streak, recommended: Bool) -> some View {
-        let key = StreakSettings.streakKey(metric: streak.metric, cadence: streak.cadence)
+        let key = streak.trackingKey
         let on = selection.contains(key)
         let accent = streak.metric.accent
         return Button {
@@ -38,9 +38,9 @@ struct StreakPickerList: View {
                             .font(RetroFont.mono(11, weight: .bold))
                             .tracking(1)
                             .foregroundStyle(Theme.retroInk)
-                        Text(streak.cadence == .daily ? "DAILY" : "WEEKLY")
+                        Text(cadenceLabel(for: streak))
                             .font(RetroFont.mono(9, weight: .bold))
-                            .foregroundStyle(Theme.retroInkDim)
+                            .foregroundStyle(streak.window != nil ? Theme.retroAmber : Theme.retroInkDim)
                         if recommended {
                             Text("★")
                                 .font(RetroFont.mono(9, weight: .bold))
@@ -71,6 +71,13 @@ struct StreakPickerList: View {
         let label = streak.metric.thresholdLabel(streak.threshold, cadence: streak.cadence)
         let unit = streak.cadence == .daily ? "days" : "wks"
         return "\(streak.current) \(unit) · \(label)"
+    }
+
+    private func cadenceLabel(for streak: Streak) -> String {
+        if let w = streak.window {
+            return w.label.uppercased()
+        }
+        return streak.cadence == .daily ? "DAILY" : "WEEKLY"
     }
 }
 
@@ -142,7 +149,7 @@ struct StreakPickerSheet: View {
             } else {
                 // First time — preselect the recommended top 5
                 selection = Set(store.allCandidates.prefix(5).map {
-                    StreakSettings.streakKey(metric: $0.metric, cadence: $0.cadence)
+                    $0.trackingKey
                 })
             }
         }

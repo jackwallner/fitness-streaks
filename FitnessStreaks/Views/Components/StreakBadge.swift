@@ -17,7 +17,7 @@ struct StreakBadgeCard: View {
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(streak.metric.accent)
                         .shadow(color: streak.metric.accent.opacity(0.6), radius: 4)
-                    Text(streak.metric.displayName.uppercased())
+                    Text(titleText)
                         .font(RetroFont.pixel(9))
                         .foregroundStyle(Theme.retroInk)
                         .lineLimit(1)
@@ -62,5 +62,12 @@ struct StreakBadgeCard: View {
     private var subtitle: String {
         let label = streak.metric.thresholdLabel(streak.threshold, cadence: streak.cadence)
         return "\(label) · best \(streak.best)"
+    }
+
+    private var titleText: String {
+        if let w = streak.window {
+            return "\(streak.metric.displayName.uppercased()) · \(w.label.uppercased())"
+        }
+        return streak.metric.displayName.uppercased()
     }
 }

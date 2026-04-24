@@ -26,7 +26,7 @@ final class StreakStore: ObservableObject {
     static func applyTrackedFilter(_ streaks: [Streak]) -> [Streak] {
         guard let tracked = StreakSettings.shared.trackedStreaks else { return streaks }
         if tracked.isEmpty { return [] }
-        return streaks.filter { tracked.contains(StreakSettings.streakKey(metric: $0.metric, cadence: $0.cadence)) }
+        return streaks.filter { tracked.contains($0.trackingKey) }
     }
 
     private init() {}
@@ -39,8 +39,11 @@ final class StreakStore: ObservableObject {
             let fresh = try await HealthKitService.shared.fetchHistory(days: 400)
             self.history = fresh
             try await HealthKitService.shared.refreshCache(days: 400)
+            // 90 days is enough to detect a real time-of-day rhythm without blowing up query cost.
+            let hourly = (try? await HealthKitService.shared.fetchHourlySteps(days: 90)) ?? [:]
             let all = StreakEngine.discover(
                 history: fresh,
+                hourlySteps: hourly,
                 hiddenMetrics: StreakSettings.shared.hiddenMetrics,
                 vibe: StreakSettings.shared.vibe,
                 minStreakLength: StreakSettings.shared.minStreakLength

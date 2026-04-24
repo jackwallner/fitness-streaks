@@ -61,7 +61,12 @@ enum AppAppearance: Int, CaseIterable {
 /// without re-running the engine. Written to App Group UserDefaults by the main app/watch.
 struct StreakSnapshot: Codable, Sendable {
     struct Item: Codable, Sendable, Identifiable {
-        var id: String { "\(metric)-\(cadence)-\(Int(threshold))" }
+        var id: String {
+            if let h = hourWindow {
+                return "\(metric)-\(cadence)-h\(h)-\(Int(threshold))"
+            }
+            return "\(metric)-\(cadence)-\(Int(threshold))"
+        }
         let metric: String            // raw value of StreakMetric
         let cadence: String           // raw value of StreakCadence
         let threshold: Double
@@ -70,6 +75,7 @@ struct StreakSnapshot: Codable, Sendable {
         let currentUnitCompleted: Bool
         let currentUnitProgress: Double
         let currentUnitValue: Double
+        var hourWindow: Int? = nil    // nil = whole-day; else 0..23 for hour-window streak
     }
 
     let updated: Date
@@ -137,13 +143,16 @@ final class StreakSettings: ObservableObject {
         }
     }
 
-    static func streakKey(metric: StreakMetric, cadence: StreakCadence) -> String {
-        "\(metric.rawValue)-\(cadence.rawValue)"
+    static func streakKey(metric: StreakMetric, cadence: StreakCadence, window: HourWindow? = nil) -> String {
+        if let w = window {
+            return "\(metric.rawValue)-\(cadence.rawValue)-h\(w.startHour)"
+        }
+        return "\(metric.rawValue)-\(cadence.rawValue)"
     }
 
-    func isTracked(metric: StreakMetric, cadence: StreakCadence) -> Bool {
+    func isTracked(metric: StreakMetric, cadence: StreakCadence, window: HourWindow? = nil) -> Bool {
         guard let set = trackedStreaks else { return true }
-        return set.contains(Self.streakKey(metric: metric, cadence: cadence))
+        return set.contains(Self.streakKey(metric: metric, cadence: cadence, window: window))
     }
 
     private init() {

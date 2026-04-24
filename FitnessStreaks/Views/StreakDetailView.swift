@@ -13,14 +13,19 @@ struct StreakDetailView: View {
                 headerCard.padding(.horizontal, 14)
                 todayCard.padding(.horizontal, 14)
 
-                PixelSectionHeader(title: streak.cadence == .daily ? "Last 365 Days" : "Weekly Hits")
-                    .padding(.top, 4)
+                if streak.window != nil {
+                    hourWindowExplainer.padding(.horizontal, 14)
+                    statsRow.padding(.horizontal, 14)
+                } else {
+                    PixelSectionHeader(title: streak.cadence == .daily ? "Last 365 Days" : "Weekly Hits")
+                        .padding(.top, 4)
 
-                heatmapCard.padding(.horizontal, 14)
-                statsRow.padding(.horizontal, 14)
+                    heatmapCard.padding(.horizontal, 14)
+                    statsRow.padding(.horizontal, 14)
 
-                if isHero { weekdayHistogram.padding(.horizontal, 14) }
-                if isHero { thresholdLadder.padding(.horizontal, 14) }
+                    if isHero { weekdayHistogram.padding(.horizontal, 14) }
+                    if isHero { thresholdLadder.padding(.horizontal, 14) }
+                }
             }
             .padding(.vertical, 16)
         }
@@ -36,7 +41,7 @@ struct StreakDetailView: View {
                 }
             }
             ToolbarItem(placement: .principal) {
-                Text(streak.metric.displayName.uppercased())
+                Text(toolbarTitle)
                     .font(RetroFont.pixel(10))
                     .tracking(2)
                     .foregroundStyle(Theme.retroInkDim)
@@ -68,7 +73,7 @@ struct StreakDetailView: View {
                 .tracking(2)
                 .foregroundStyle(Theme.retroInk)
 
-            Text(streak.metric.prose(streak.threshold, cadence: streak.cadence))
+            Text(headerProse)
                 .font(RetroFont.mono(12))
                 .foregroundStyle(Theme.retroInkDim)
                 .multilineTextAlignment(.center)
@@ -78,6 +83,43 @@ struct StreakDetailView: View {
         .padding(.horizontal, 16)
         .frame(maxWidth: .infinity)
         .pixelPanel(color: streak.metric.accent)
+    }
+
+    private var toolbarTitle: String {
+        if let w = streak.window {
+            return "\(streak.metric.displayName.uppercased()) · \(w.label.uppercased())"
+        }
+        return streak.metric.displayName.uppercased()
+    }
+
+    private var headerProse: String {
+        if let w = streak.window {
+            let t = streak.metric.format(value: streak.threshold)
+            return "\(t)+ \(streak.metric.unitLabel) every day between \(w.label)"
+        }
+        return streak.metric.prose(streak.threshold, cadence: streak.cadence)
+    }
+
+    // MARK: - Hour-window explainer
+
+    private var hourWindowExplainer: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: "clock.fill")
+                    .foregroundStyle(Theme.retroAmber)
+                Text("TIME-OF-DAY RHYTHM")
+                    .font(RetroFont.mono(10, weight: .bold))
+                    .tracking(2)
+                    .foregroundStyle(Theme.retroAmber)
+            }
+            Text("Streak Finder spotted a hidden pattern: you consistently hit this target within a single hour of the day. Keep it alive — the next window starts at \(streak.window?.label ?? "").")
+                .font(RetroFont.mono(11))
+                .foregroundStyle(Theme.retroInk)
+                .lineSpacing(3)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .pixelPanel(color: Theme.retroAmber)
     }
 
     // MARK: - Today card

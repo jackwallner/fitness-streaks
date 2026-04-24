@@ -18,8 +18,17 @@ enum StreakEngine {
     /// Hard floor — we never surface streaks shorter than this even if nothing else qualifies.
     static let absoluteFloor = 2
 
+    /// Minimum length for an hour-window streak to be surfaced. These mine tighter rhythms,
+    /// so we demand a longer run to trust the pattern.
+    static let minHourWindowLength = 5
+
+    /// Step thresholds evaluated for each hour of the day.
+    /// 250 is a reasonable "you were doing something" floor.
+    static let hourlyStepThresholds: [Double] = [250, 500, 1000, 1500, 2000, 3000]
+
     static func discover(
         history: [ActivityDay],
+        hourlySteps: [Date: [Int: Double]] = [:],
         hiddenMetrics: Set<StreakMetric> = [],
         vibe: DiscoveryVibe = .challenging,
         minStreakLength: Int? = nil,
@@ -54,6 +63,16 @@ enum StreakEngine {
             }
         }
 
+        // Hour-window streaks: mine hidden time-of-day rhythms in the user's step data.
+        if !hourlySteps.isEmpty && !hiddenMetrics.contains(.steps) {
+            let windowStreaks = discoverHourWindows(
+                hourlySteps: hourlySteps,
+                today: today,
+                vibe: vibe
+            )
+            found.append(contentsOf: windowStreaks)
+        }
+
         // User-requested "I've done it at least N times" floor
         let filtered: [Streak]
         if let floor = minStreakLength, floor > 0 {
@@ -81,7 +100,8 @@ enum StreakEngine {
             best: streak.best,
             currentUnitCompleted: streak.currentUnitCompleted,
             currentUnitProgress: streak.currentUnitProgress,
-            currentUnitValue: streak.currentUnitValue
+            currentUnitValue: streak.currentUnitValue,
+            hourWindow: streak.window?.startHour
         )
     }
 
@@ -142,6 +162,138 @@ enum StreakEngine {
             // Strongly reward tier; length still matters but less.
             return (0.5 + len * 0.3) * (1.0 + 0.35 * Double(tierIdx)) * weight
         }
+    }
+
+    // MARK: - Hour-window miner
+
+    /// For each hour 0..<24, build a per-day series of "steps in that hour", evaluate
+    /// streaks across our tiered hourly thresholds, and return up to 3 non-adjacent
+    /// hours ranked by vibe score.
+    ///
+    /// This is the "Streak Finder" magic — surface surprising rhythms like
+    /// "you always get 1000+ steps between 5–6pm".
+    static func discoverHourWindows(
+        hourlySteps: [Date: [Int: Double]],
+        today: Date,
+        vibe: DiscoveryVibe
+    ) -> [Streak] {
+        var perHourBest: [(Int, Streak)] = []
+
+        for hour in 0..<24 {
+            // Build a day→value map for just this hour.
+            var byDay: [Date: Double] = [:]
+            for (day, hours) in hourlySteps {
+                byDay[day] = hours[hour] ?? 0
+            }
+
+            // Evaluate every threshold tier for this hour.
+            let candidates = hourlyStepThresholds.map { threshold -> Streak in
+                let base = computeDailyStreakFromValues(
+                    metric: .steps,
+                    threshold: threshold,
+                    byDayValues: byDay,
+                    today: today
+                )
+                return Streak(
+                    metric: .steps,
+                    cadence: .daily,
+                    threshold: threshold,
+                    window: HourWindow(startHour: hour),
+                    current: base.current,
+                    best: base.best,
+                    startDate: base.startDate,
+                    lastHitDate: base.lastHitDate,
+                    currentUnitCompleted: base.currentUnitCompleted,
+                    currentUnitProgress: base.currentUnitProgress,
+                    currentUnitValue: base.currentUnitValue
+                )
+            }
+
+            if let best = pickByVibe(candidates: candidates, vibe: vibe, minLength: minHourWindowLength) {
+                perHourBest.append((hour, best))
+            }
+        }
+
+        // Sort hours by vibe score, then pick up to 3 non-adjacent hours so we don't
+        // show "4–5pm" and "5–6pm" both (same walk, different slicing).
+        let ranked = perHourBest.sorted { vibeScore($0.1, vibe: vibe) > vibeScore($1.1, vibe: vibe) }
+
+        var picked: [(Int, Streak)] = []
+        for candidate in ranked {
+            let tooClose = picked.contains { abs($0.0 - candidate.0) <= 1 }
+            if !tooClose { picked.append(candidate) }
+            if picked.count >= 3 { break }
+        }
+
+        return picked.map(\.1)
+    }
+
+    /// Shared streak computation that takes a raw day→value map instead of ActivityDay.
+    /// Used by both the all-day path and the hour-window miner.
+    static func computeDailyStreakFromValues(
+        metric: StreakMetric,
+        threshold: Double,
+        byDayValues: [Date: Double],
+        today: Date
+    ) -> Streak {
+        let todayValue = byDayValues[today] ?? 0
+        let todayMet = todayValue >= threshold
+
+        var currentLen = 0
+        var streakStart: Date? = nil
+        if todayMet {
+            currentLen = 1
+            streakStart = today
+        }
+
+        var cursor = DateHelpers.addDays(-1, to: today)
+        while true {
+            let value = byDayValues[cursor] ?? 0
+            if value >= threshold {
+                currentLen += 1
+                streakStart = cursor
+                cursor = DateHelpers.addDays(-1, to: cursor)
+            } else {
+                break
+            }
+        }
+
+        let sortedDays = byDayValues.keys.sorted()
+        var best = 0
+        var run = 0
+        for d in sortedDays {
+            if (byDayValues[d] ?? 0) >= threshold {
+                run += 1
+                best = max(best, run)
+            } else {
+                run = 0
+            }
+        }
+        best = max(best, currentLen)
+
+        var lastHit: Date? = nil
+        var back = today
+        for _ in 0..<800 {
+            if (byDayValues[back] ?? 0) >= threshold {
+                lastHit = back
+                break
+            }
+            back = DateHelpers.addDays(-1, to: back)
+        }
+
+        let progress = threshold > 0 ? min(todayValue / threshold, 10) : 0
+        return Streak(
+            metric: metric,
+            cadence: .daily,
+            threshold: threshold,
+            current: currentLen,
+            best: best,
+            startDate: streakStart,
+            lastHitDate: lastHit,
+            currentUnitCompleted: todayMet,
+            currentUnitProgress: progress,
+            currentUnitValue: todayValue
+        )
     }
 
     // MARK: - Daily streak

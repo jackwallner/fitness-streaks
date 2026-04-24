@@ -167,6 +167,46 @@ final class HealthKitService: ObservableObject {
         return results
     }
 
+    // MARK: - Hourly steps (for time-of-day pattern mining)
+
+    /// Returns [dayStart: [hour: stepCount]] for the given window.
+    /// Used by StreakEngine.discoverHourWindows to find hidden time-of-day rhythms.
+    func fetchHourlySteps(days: Int) async throws -> [Date: [Int: Double]] {
+        let calendar = DateHelpers.gregorian
+        let end = calendar.date(byAdding: .day, value: 1, to: DateHelpers.startOfDay())
+            ?? DateHelpers.startOfDay()
+        let start = DateHelpers.daysAgo(days - 1)
+
+        let type = HKQuantityType(.stepCount)
+        let interval = DateComponents(hour: 1)
+        let predicate = HKQuery.predicateForSamples(withStart: start, end: end, options: .strictStartDate)
+
+        return try await withCheckedThrowingContinuation { continuation in
+            let query = HKStatisticsCollectionQuery(
+                quantityType: type,
+                quantitySamplePredicate: predicate,
+                options: .cumulativeSum,
+                anchorDate: start,
+                intervalComponents: interval
+            )
+            query.initialResultsHandler = { _, collection, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+                var out: [Date: [Int: Double]] = [:]
+                collection?.enumerateStatistics(from: start, to: end) { stat, _ in
+                    let dayKey = DateHelpers.startOfDay(stat.startDate)
+                    let hour = calendar.component(.hour, from: stat.startDate)
+                    let value = stat.sumQuantity()?.doubleValue(for: .count()) ?? 0
+                    out[dayKey, default: [:]][hour] = value
+                }
+                continuation.resume(returning: out)
+            }
+            self.store.execute(query)
+        }
+    }
+
     // MARK: - Quantity (daily sum)
 
     private func quantityDaily(
@@ -320,8 +360,10 @@ final class HealthKitService: ObservableObject {
 
         // Compute & persist snapshot for widgets — widgets only see tracked streaks.
         let settings = StreakSettings.shared
+        let hourly = (try? await fetchHourlySteps(days: 90)) ?? [:]
         let all = StreakEngine.discover(
             history: history,
+            hourlySteps: hourly,
             hiddenMetrics: settings.hiddenMetrics,
             vibe: settings.vibe,
             minStreakLength: settings.minStreakLength,
