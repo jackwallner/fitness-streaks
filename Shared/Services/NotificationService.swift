@@ -28,9 +28,13 @@ enum NotificationService {
     /// Whether notifications are already authorized — does NOT trigger the system prompt.
     static func isAuthorized() async -> Bool {
         let settings = await UNUserNotificationCenter.current().notificationSettings()
-        return settings.authorizationStatus == .authorized
-            || settings.authorizationStatus == .provisional
-            || settings.authorizationStatus == .ephemeral
+        if settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional {
+            return true
+        }
+        #if os(iOS)
+        if settings.authorizationStatus == .ephemeral { return true }
+        #endif
+        return false
     }
 
     /// Schedule a 7pm daily reminder. The body uses the current hero streak so the nudge feels personal.
