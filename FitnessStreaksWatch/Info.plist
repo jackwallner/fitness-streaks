@@ -24,6 +24,8 @@
     <false/>
     <key>NSHealthShareUsageDescription</key>
     <string>Streak Finder reads your activity history (steps, exercise minutes, stand hours, active energy, workouts, distance, flights climbed, mindful minutes, sleep) from Apple Health to surface the streaks you've already built. Read-only — Streak Finder never writes to Apple Health.</string>
+    <key>NSHealthUpdateUsageDescription</key>
+    <string>Streak Finder is read-only and does not write any data to Apple Health. This string is required by Apple whenever the HealthKit framework is linked.</string>
     <key>UIAppFonts</key>
     <array>
         <string>PressStart2P-Regular.ttf</string>
