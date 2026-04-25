@@ -10,18 +10,25 @@ private let log = Logger(subsystem: "com.jackwallner.streaks", category: "Notifi
 enum NotificationService {
     static let dailyReminderID = "streaks.dailyReminder"
 
+    enum AuthorizationOutcome {
+        case granted
+        case denied            // user denied this prompt
+        case previouslyDenied  // permission already denied — UI should deep-link to Settings
+    }
+
     /// Explicit opt-in. Only call this from a user-initiated toggle so the system prompt
     /// never appears unsolicited (App Store guideline 5.1.1).
-    static func requestAuthorization() async -> Bool {
+    static func requestAuthorization() async -> AuthorizationOutcome {
         let center = UNUserNotificationCenter.current()
         let settings = await center.notificationSettings()
         switch settings.authorizationStatus {
         case .notDetermined:
-            return (try? await center.requestAuthorization(options: [.alert, .sound, .badge])) ?? false
+            let granted = (try? await center.requestAuthorization(options: [.alert, .sound, .badge])) ?? false
+            return granted ? .granted : .denied
         case .denied:
-            return false
+            return .previouslyDenied
         default:
-            return true
+            return .granted
         }
     }
 

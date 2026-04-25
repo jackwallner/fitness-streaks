@@ -82,18 +82,15 @@ final class HealthKitService: ObservableObject {
         }
     }
 
+    /// Reflects current authorization state without ever prompting. The system permission
+    /// sheet must only appear in response to a user-initiated action (App Store 5.1.1),
+    /// so requesting is the caller's job — typically OnboardingView's "CONNECT HEALTH" tap.
     func synchronizeAuthorization() async {
         guard HKHealthStore.isHealthDataAvailable() else { return }
         guard let status = await authorizationRequestStatus() else { return }
-        switch status {
-        case .shouldRequest:
-            do { try await requestAuthorization() }
-            catch { log.error("sync auth failed: \(String(describing: error))") }
-        case .unnecessary:
-            isAuthorized = true
-        @unknown default:
-            isAuthorized = true
-        }
+        // .unnecessary means we've asked at least once; treat that as "proceed to dashboard"
+        // even if the user denied specific types — the empty state guides them to Settings.
+        isAuthorized = (status == .unnecessary)
     }
 
     // MARK: - History fetch

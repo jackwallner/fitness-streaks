@@ -7,6 +7,7 @@ struct SettingsView: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var showingPicker = false
+    @State private var notificationsBlockedBySystem = false
 
     var body: some View {
         NavigationStack {
@@ -177,12 +178,10 @@ struct SettingsView: View {
                         get: { settings.notificationsEnabled },
                         set: { newValue in
                             if newValue {
-                                Task {
-                                    let granted = await NotificationService.requestAuthorization()
-                                    settings.notificationsEnabled = granted
-                                }
+                                Task { await enableNotifications() }
                             } else {
                                 settings.notificationsEnabled = false
+                                notificationsBlockedBySystem = false
                                 NotificationService.cancelAll()
                             }
                         }
@@ -193,10 +192,48 @@ struct SettingsView: View {
             .padding(14)
             .pixelPanel(color: Theme.retroInkFaint)
 
+            if notificationsBlockedBySystem {
+                Button {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                } label: {
+                    Text("BLOCKED IN IOS SETTINGS — TAP TO FIX")
+                        .font(RetroFont.mono(10, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(Theme.retroAmber)
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 12)
+                        .frame(maxWidth: .infinity)
+                        .overlay(Rectangle().stroke(Theme.retroAmber, lineWidth: 2))
+                }
+                .buttonStyle(.plain)
+            }
+
             Text("Daily 7pm nudge if your hero streak isn't locked in yet. iOS will ask for notification permission the first time you turn this on.")
                 .font(RetroFont.mono(10))
                 .foregroundStyle(Theme.retroInkDim)
                 .padding(.horizontal, 6)
+        }
+    }
+
+    private func enableNotifications() async {
+        let outcome = await NotificationService.requestAuthorization()
+        switch outcome {
+        case .granted:
+            settings.notificationsEnabled = true
+            notificationsBlockedBySystem = false
+            // Don't wait for the next refresh — schedule using the current hero immediately.
+            if let hero = store.hero {
+                let label = hero.metric.thresholdLabel(hero.threshold, cadence: hero.cadence)
+                await NotificationService.scheduleDailyReminder(heroLabel: label, currentLength: hero.current)
+            }
+        case .denied:
+            settings.notificationsEnabled = false
+            notificationsBlockedBySystem = false
+        case .previouslyDenied:
+            settings.notificationsEnabled = false
+            notificationsBlockedBySystem = true
         }
     }
 
