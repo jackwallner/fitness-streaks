@@ -160,20 +160,34 @@ struct DashboardView: View {
                 .font(RetroFont.mono(12, weight: .bold))
                 .tracking(2)
                 .foregroundStyle(Theme.retroInk)
-            Text("Get moving and they'll start building.")
+            Text("If you've been moving lately, double-check Streak Finder has Health access.")
                 .font(RetroFont.mono(11))
                 .foregroundStyle(Theme.retroInkDim)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
-            Button("REFRESH") {
-                Task { await store.load() }
+            HStack(spacing: 10) {
+                Button("REFRESH") {
+                    Task { await store.load() }
+                }
+                .buttonStyle(.plain)
+                .font(RetroFont.mono(11, weight: .bold))
+                .foregroundStyle(Theme.retroBg)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 10)
+                .background(Theme.retroLime)
+
+                Button("HEALTH ACCESS") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                }
+                .buttonStyle(.plain)
+                .font(RetroFont.mono(11, weight: .bold))
+                .foregroundStyle(Theme.retroCyan)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 10)
+                .overlay(Rectangle().stroke(Theme.retroCyan, lineWidth: 2))
             }
-            .buttonStyle(.plain)
-            .font(RetroFont.mono(11, weight: .bold))
-            .foregroundStyle(Theme.retroBg)
-            .padding(.horizontal, 18)
-            .padding(.vertical, 10)
-            .background(Theme.retroLime)
         }
         .frame(maxWidth: .infinity)
     }

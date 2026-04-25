@@ -161,7 +161,8 @@ final class StreakSettings: ObservableObject {
 
         self.hasCompletedSetup = defaults.bool(forKey: "hasCompletedSetup")
         self.appearance = AppAppearance(rawValue: defaults.integer(forKey: "appearance")) ?? .system
-        self.notificationsEnabled = defaults.object(forKey: "notificationsEnabled") as? Bool ?? true
+        // Default OFF — never request notification permission until the user explicitly opts in.
+        self.notificationsEnabled = defaults.object(forKey: "notificationsEnabled") as? Bool ?? false
         self.vibe = DiscoveryVibe(rawValue: defaults.integer(forKey: "discoveryVibe")) ?? .challenging
         self.minStreakLength = (defaults.object(forKey: "minStreakLength") as? Int)
 

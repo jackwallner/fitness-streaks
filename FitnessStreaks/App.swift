@@ -41,7 +41,6 @@ struct FitnessStreaksApp: App {
             guard let task = task as? BGAppRefreshTask else { return }
             Self.handleAppRefresh(task)
         }
-        HealthKitService.shared.enableBackgroundDelivery()
         Self.scheduleAppRefresh()
         #if canImport(WatchConnectivity)
         PhoneSyncService.shared.activate()

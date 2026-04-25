@@ -12,10 +12,6 @@ struct FitnessStreaksWatchApp: App {
     @StateObject private var settings = StreakSettings.shared
     @StateObject private var store = StreakStore.shared
 
-    init() {
-        HealthKitService.shared.enableBackgroundDelivery()
-    }
-
     var body: some Scene {
         WindowGroup {
             WatchRootView()

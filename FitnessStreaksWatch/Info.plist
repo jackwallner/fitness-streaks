@@ -23,9 +23,7 @@
     <key>ITSAppUsesNonExemptEncryption</key>
     <false/>
     <key>NSHealthShareUsageDescription</key>
-    <string>Streak Finder reads your activity history from Apple Health to surface the streaks you've built. Streak Finder never writes to Apple Health.</string>
-    <key>NSHealthUpdateUsageDescription</key>
-    <string>Streak Finder does not write any data to Apple Health.</string>
+    <string>Streak Finder reads your activity history (steps, exercise minutes, stand hours, active energy, workouts, distance, flights climbed, mindful minutes, sleep) from Apple Health to surface the streaks you've already built. Read-only — Streak Finder never writes to Apple Health.</string>
     <key>UIAppFonts</key>
     <array>
         <string>PressStart2P-Regular.ttf</string>
@@ -37,9 +35,5 @@
     <true/>
     <key>WKCompanionAppBundleIdentifier</key>
     <string>com.jackwallner.streaks</string>
-    <key>WKBackgroundModes</key>
-    <array>
-        <string>self-care</string>
-    </array>
 </dict>
 </plist>

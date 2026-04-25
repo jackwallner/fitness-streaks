@@ -66,7 +66,6 @@ final class HealthKitService: ObservableObject {
         log.info("Requesting HealthKit authorization for \(self.allReadTypes.count) read types")
         try await store.requestAuthorization(toShare: [], read: allReadTypes)
         isAuthorized = true
-        enableBackgroundDelivery()
     }
 
     func authorizationRequestStatus() async -> HKAuthorizationRequestStatus? {
@@ -94,33 +93,6 @@ final class HealthKitService: ObservableObject {
             isAuthorized = true
         @unknown default:
             isAuthorized = true
-        }
-    }
-
-    // MARK: - Background delivery
-
-    func enableBackgroundDelivery() {
-        guard HKHealthStore.isHealthDataAvailable() else { return }
-
-        for id in quantityTypes {
-            let type = HKQuantityType(id)
-            store.enableBackgroundDelivery(for: type, frequency: .hourly) { success, error in
-                if let error {
-                    log.error("bg delivery \(id.rawValue): \(String(describing: error))")
-                }
-                if success { log.info("bg delivery on: \(id.rawValue)") }
-            }
-
-            let query = HKObserverQuery(sampleType: type, predicate: nil) { _, completion, _ in
-                // `completion` is an HKObserverQueryCompletionHandler — non-Sendable closure;
-                // hopping to the main actor can trigger a data-race warning under strict concurrency.
-                // Fire and forget the cache refresh; call the completion handler synchronously so HK can move on.
-                Task { @MainActor in
-                    try? await HealthKitService.shared.refreshCache()
-                }
-                completion()
-            }
-            store.execute(query)
         }
     }
 

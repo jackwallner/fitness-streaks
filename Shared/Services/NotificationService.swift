@@ -10,7 +10,9 @@ private let log = Logger(subsystem: "com.jackwallner.streaks", category: "Notifi
 enum NotificationService {
     static let dailyReminderID = "streaks.dailyReminder"
 
-    static func requestAuthorizationIfNeeded() async -> Bool {
+    /// Explicit opt-in. Only call this from a user-initiated toggle so the system prompt
+    /// never appears unsolicited (App Store guideline 5.1.1).
+    static func requestAuthorization() async -> Bool {
         let center = UNUserNotificationCenter.current()
         let settings = await center.notificationSettings()
         switch settings.authorizationStatus {
@@ -23,14 +25,23 @@ enum NotificationService {
         }
     }
 
+    /// Whether notifications are already authorized — does NOT trigger the system prompt.
+    static func isAuthorized() async -> Bool {
+        let settings = await UNUserNotificationCenter.current().notificationSettings()
+        return settings.authorizationStatus == .authorized
+            || settings.authorizationStatus == .provisional
+            || settings.authorizationStatus == .ephemeral
+    }
+
     /// Schedule a 7pm daily reminder. The body uses the current hero streak so the nudge feels personal.
+    /// Never prompts for permission — that only happens via a user-initiated toggle.
     static func scheduleDailyReminder(heroLabel: String?, currentLength: Int?) async {
         let enabled = StreakSettings.shared.notificationsEnabled
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [dailyReminderID])
 
         guard enabled,
-              await requestAuthorizationIfNeeded(),
+              await isAuthorized(),
               let heroLabel,
               let currentLength,
               currentLength >= 3 else { return }

@@ -172,12 +172,28 @@ struct SettingsView: View {
                     .font(RetroFont.pixel(10))
                     .foregroundStyle(Theme.retroInk)
                 Spacer()
-                PixelToggle(isOn: $settings.notificationsEnabled, accent: Theme.retroMagenta)
+                PixelToggle(
+                    isOn: Binding(
+                        get: { settings.notificationsEnabled },
+                        set: { newValue in
+                            if newValue {
+                                Task {
+                                    let granted = await NotificationService.requestAuthorization()
+                                    settings.notificationsEnabled = granted
+                                }
+                            } else {
+                                settings.notificationsEnabled = false
+                                NotificationService.cancelAll()
+                            }
+                        }
+                    ),
+                    accent: Theme.retroMagenta
+                )
             }
             .padding(14)
             .pixelPanel(color: Theme.retroInkFaint)
 
-            Text("Daily 7pm nudge if your hero streak isn't locked in yet.")
+            Text("Daily 7pm nudge if your hero streak isn't locked in yet. iOS will ask for notification permission the first time you turn this on.")
                 .font(RetroFont.mono(10))
                 .foregroundStyle(Theme.retroInkDim)
                 .padding(.horizontal, 6)

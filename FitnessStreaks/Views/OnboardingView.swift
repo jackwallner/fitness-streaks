@@ -38,11 +38,27 @@ struct OnboardingView: View {
                 Spacer(minLength: 8)
 
                 if let err = errorText {
-                    Text(err)
-                        .font(RetroFont.mono(10))
-                        .foregroundStyle(Theme.retroRed)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 24)
+                    VStack(spacing: 8) {
+                        Text(err)
+                            .font(RetroFont.mono(10))
+                            .foregroundStyle(Theme.retroRed)
+                            .multilineTextAlignment(.center)
+                        Button {
+                            if let url = URL(string: UIApplication.openSettingsURLString) {
+                                UIApplication.shared.open(url)
+                            }
+                        } label: {
+                            Text("OPEN SETTINGS")
+                                .font(RetroFont.mono(10, weight: .bold))
+                                .tracking(1)
+                                .foregroundStyle(Theme.retroCyan)
+                                .padding(.vertical, 8)
+                                .padding(.horizontal, 14)
+                                .overlay(Rectangle().stroke(Theme.retroCyan, lineWidth: 2))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.horizontal, 24)
                 }
 
                 footer
