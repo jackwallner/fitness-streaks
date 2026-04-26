@@ -117,15 +117,11 @@ final class StreakSettings: ObservableObject {
         }
     }
 
-    /// Optional floor — "I want something I've done at least N times".
-    /// nil = no minimum preference.
-    @Published var minStreakLength: Int? {
+    /// How many days of history to consider when computing completion rates.
+    /// Default 30; range 7–365.
+    @Published var lookbackDays: Int {
         didSet {
-            if let v = minStreakLength {
-                defaults.set(v, forKey: "minStreakLength")
-            } else {
-                defaults.removeObject(forKey: "minStreakLength")
-            }
+            defaults.set(lookbackDays, forKey: "lookbackDays")
             WidgetCenter.shared.reloadAllTimelines()
         }
     }
@@ -173,7 +169,10 @@ final class StreakSettings: ObservableObject {
         // Default OFF — never request notification permission until the user explicitly opts in.
         self.notificationsEnabled = defaults.object(forKey: "notificationsEnabled") as? Bool ?? false
         self.vibe = DiscoveryVibe(rawValue: defaults.integer(forKey: "discoveryVibe")) ?? .challenging
-        self.minStreakLength = (defaults.object(forKey: "minStreakLength") as? Int)
+        // Migration: ignore old minStreakLength semantics; default to 30-day lookback.
+        let raw = defaults.object(forKey: "lookbackDays") as? Int
+            ?? defaults.object(forKey: "minStreakLength") as? Int
+        self.lookbackDays = (raw != nil && raw! >= 7 && raw! <= 365) ? raw! : 30
 
         if let raws = defaults.array(forKey: "hiddenMetrics") as? [String] {
             self.hiddenMetrics = Set(raws.compactMap(StreakMetric.init(rawValue:)))

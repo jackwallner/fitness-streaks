@@ -3,12 +3,13 @@ import Foundation
 /// Mines a history of daily activity values for streaks the user may not realize they have.
 ///
 /// Algorithm (per metric):
-///   1. Compute daily streaks at every threshold in `metric.dailyThresholds`.
-///   2. Compute the historical daily completion rate for each threshold.
-///   3. Pick the HIGHEST-threshold streak where completion rate >= vibe.targetCompletionRate
-///      and `current >= minLength`. Fallbacks ensure we never return empty.
-///   4. Rank all surviving streaks by `Streak.score`.
-///   5. The top-scoring streak becomes the hero; the next N are badges.
+///   1. Slice history to the last `lookbackDays`.
+///   2. Compute daily streaks at every threshold in `metric.dailyThresholds`.
+///   3. Compute the daily completion rate over the lookback window for each threshold.
+///   4. Pick the HIGHEST-threshold streak where completion rate >= vibe.targetCompletionRate
+///      and `current >= minDailyLength`. Fallbacks ensure we never return empty.
+///   5. Rank all surviving streaks by `Streak.score`.
+///   6. The top-scoring streak becomes the hero; the next N are badges.
 ///
 /// "Current" counts today only if it already met the threshold.
 /// This keeps the streak from being "broken" mid-day.
@@ -31,14 +32,17 @@ enum StreakEngine {
         hourlySteps: [Date: [Int: Double]] = [:],
         hiddenMetrics: Set<StreakMetric> = [],
         vibe: DiscoveryVibe = .challenging,
-        minStreakLength: Int? = nil,
+        lookbackDays: Int = 30,
         now: Date = .now
     ) -> [Streak] {
         guard !history.isEmpty else { return [] }
 
         let byDay: [Date: ActivityDay] = Dictionary(uniqueKeysWithValues: history.map { ($0.date, $0) })
         let today = DateHelpers.startOfDay(now)
-        let totalDays = max(1, Double(history.count))
+
+        // Only consider the last N days when computing completion rates.
+        let recentHistory = Array(history.suffix(max(1, lookbackDays)))
+        let windowDays = max(1, Double(recentHistory.count))
 
         var found: [Streak] = []
 
@@ -46,8 +50,8 @@ enum StreakEngine {
             let thresholds = metric.dailyThresholds
             let candidates = thresholds.map { t -> (streak: Streak, completionRate: Double) in
                 let streak = computeDailyStreak(metric: metric, threshold: t, byDay: byDay, today: today)
-                let hitDays = history.filter { $0.value(for: metric) >= t }.count
-                let completionRate = Double(hitDays) / totalDays
+                let hitDays = recentHistory.filter { $0.value(for: metric) >= t }.count
+                let completionRate = Double(hitDays) / windowDays
                 return (streak, completionRate)
             }
             if let best = pickByVibe(candidates: candidates, vibe: vibe, minLength: minDailyLength) {
@@ -65,16 +69,7 @@ enum StreakEngine {
             found.append(contentsOf: windowStreaks)
         }
 
-        // User-requested "I've done it at least N times" floor
-        let filtered: [Streak]
-        if let floor = minStreakLength, floor > 0 {
-            let meeting = found.filter { $0.current >= floor }
-            filtered = meeting.isEmpty ? found : meeting
-        } else {
-            filtered = found
-        }
-
-        return filtered.sorted { vibeScore($0, vibe: vibe) > vibeScore($1, vibe: vibe) }
+        return found.sorted { vibeScore($0, vibe: vibe) > vibeScore($1, vibe: vibe) }
     }
 
     static func snapshot(from streaks: [Streak]) -> StreakSnapshot {

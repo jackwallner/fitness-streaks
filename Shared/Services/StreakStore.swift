@@ -55,7 +55,7 @@ final class StreakStore: ObservableObject {
                 hourlySteps: hourly,
                 hiddenMetrics: StreakSettings.shared.hiddenMetrics,
                 vibe: StreakSettings.shared.vibe,
-                minStreakLength: StreakSettings.shared.minStreakLength
+                lookbackDays: StreakSettings.shared.lookbackDays
             )
             self.allCandidates = all
             self.streaks = Self.applyTrackedFilter(all)
@@ -77,7 +77,7 @@ final class StreakStore: ObservableObject {
                     history: cached,
                     hiddenMetrics: StreakSettings.shared.hiddenMetrics,
                     vibe: StreakSettings.shared.vibe,
-                    minStreakLength: StreakSettings.shared.minStreakLength
+                    lookbackDays: StreakSettings.shared.lookbackDays
                 )
                 self.allCandidates = all
                 self.streaks = Self.applyTrackedFilter(all)

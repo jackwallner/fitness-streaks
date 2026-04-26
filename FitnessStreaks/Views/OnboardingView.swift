@@ -16,7 +16,7 @@ struct OnboardingView: View {
     @State private var requesting = false
     @State private var errorText: String? = nil
     @State private var selectedVibe: DiscoveryVibe = .challenging
-    @State private var minLength: Int = 0   // 0 = no minimum
+    @State private var lookbackDays: Int = 30
     @State private var selectedStreaks: Set<String> = []
 
     var body: some View {
@@ -210,39 +210,37 @@ struct OnboardingView: View {
 
     private var minimumStep: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("MINIMUM LENGTH")
+            Text("LOOKBACK WINDOW")
                 .font(RetroFont.mono(14, weight: .bold))
                 .tracking(2)
                 .foregroundStyle(Theme.retroInk)
 
-            Text("Optional. Only show streaks you've kept\ngoing at least this many times.")
+            Text("How many days of history should we use\nwhen calculating your completion rate?")
                 .font(RetroFont.mono(11))
                 .foregroundStyle(Theme.retroInkDim)
                 .lineSpacing(2)
 
             VStack(spacing: 10) {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text(minLength == 0 ? "ANY" : "\(minLength)")
+                    Text("\(lookbackDays)")
                         .font(RetroFont.mono(36, weight: .bold))
                         .foregroundStyle(Theme.retroMagenta)
                         .retroGlow(Theme.retroMagenta)
-                    if minLength > 0 {
-                        Text("TIMES+")
-                            .font(RetroFont.mono(11, weight: .bold))
-                            .foregroundStyle(Theme.retroInkDim)
-                    }
+                    Text("DAYS")
+                        .font(RetroFont.mono(11, weight: .bold))
+                        .foregroundStyle(Theme.retroInkDim)
                 }
 
                 Slider(value: Binding(
-                    get: { Double(minLength) },
-                    set: { minLength = Int($0.rounded()) }
-                ), in: 0...60, step: 1)
+                    get: { Double(lookbackDays) },
+                    set: { lookbackDays = Int($0.rounded()) }
+                ), in: 7...365, step: 1)
                 .tint(Theme.retroMagenta)
 
                 HStack {
-                    Text("ANY").font(RetroFont.mono(9)).foregroundStyle(Theme.retroInkFaint)
+                    Text("7 DAYS").font(RetroFont.mono(9)).foregroundStyle(Theme.retroInkFaint)
                     Spacer()
-                    Text("60+").font(RetroFont.mono(9)).foregroundStyle(Theme.retroInkFaint)
+                    Text("365 DAYS").font(RetroFont.mono(9)).foregroundStyle(Theme.retroInkFaint)
                 }
             }
             .padding(14)
@@ -328,7 +326,7 @@ struct OnboardingView: View {
             settings.vibe = selectedVibe
             withAnimation { step = .minimum }
         case .minimum:
-            settings.minStreakLength = minLength == 0 ? nil : minLength
+            settings.lookbackDays = lookbackDays
             // Discover candidates before showing the review step.
             requesting = true
             // Temporarily clear tracked filter so allCandidates reflects everything.

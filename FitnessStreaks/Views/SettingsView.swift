@@ -131,11 +131,11 @@ struct SettingsView: View {
             .pixelPanel(color: Theme.retroInkFaint)
 
             HStack {
-                Text("MIN LENGTH")
+                Text("LOOKBACK")
                     .font(RetroFont.mono(10, weight: .bold))
                     .foregroundStyle(Theme.retroInk)
                 Spacer()
-                Text(settings.minStreakLength.map { "\($0)+" } ?? "ANY")
+                Text("\(settings.lookbackDays) days")
                     .font(RetroFont.mono(11, weight: .bold))
                     .foregroundStyle(Theme.retroMagenta)
             }
@@ -143,15 +143,12 @@ struct SettingsView: View {
             .padding(.top, 4)
 
             Slider(value: Binding(
-                get: { Double(settings.minStreakLength ?? 0) },
-                set: { v in
-                    let i = Int(v.rounded())
-                    settings.minStreakLength = i == 0 ? nil : i
-                }
-            ), in: 0...60, step: 1)
+                get: { Double(settings.lookbackDays) },
+                set: { settings.lookbackDays = Int($0.rounded()) }
+            ), in: 7...365, step: 1)
             .tint(Theme.retroMagenta)
             .padding(.horizontal, 14)
-            .onChange(of: settings.minStreakLength) { _, _ in
+            .onChange(of: settings.lookbackDays) { _, _ in
                 Task { await store.load() }
             }
         }
