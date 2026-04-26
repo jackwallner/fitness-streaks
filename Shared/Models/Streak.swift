@@ -45,6 +45,10 @@ struct Streak: Identifiable, Hashable, Sendable {
     let currentUnitProgress: Double
     /// Current unit's raw value (steps so far today, workouts this week, etc.).
     let currentUnitValue: Double
+    /// Historical completion rate over the lookback window used to discover this streak.
+    let completionRate: Double
+    /// Number of days in the lookback window this rate was computed over.
+    let lookbackDays: Int
 
     var id: String {
         if let w = window {
@@ -66,13 +70,39 @@ struct Streak: Identifiable, Hashable, Sendable {
     /// Rough "impressiveness" score used to rank across metrics.
     var score: Double {
         let base = Double(current) * metric.weight
-        // Boost for higher-threshold tiers
-        let thresholds = metric.dailyThresholds
-        if let idx = thresholds.firstIndex(of: threshold) {
-            let tierBonus = 1.0 + Double(idx) * 0.12
-            return base * tierBonus
-        }
-        return base
+        // Lower completion rate = harder threshold = higher score bonus.
+        let difficulty = 1.0 + (1.0 - completionRate) * 0.5
+        return base * difficulty
+    }
+
+    init(
+        metric: StreakMetric,
+        cadence: StreakCadence,
+        threshold: Double,
+        window: HourWindow? = nil,
+        current: Int,
+        best: Int,
+        startDate: Date?,
+        lastHitDate: Date?,
+        currentUnitCompleted: Bool,
+        currentUnitProgress: Double,
+        currentUnitValue: Double,
+        completionRate: Double = 0,
+        lookbackDays: Int = 0
+    ) {
+        self.metric = metric
+        self.cadence = cadence
+        self.threshold = threshold
+        self.window = window
+        self.current = current
+        self.best = best
+        self.startDate = startDate
+        self.lastHitDate = lastHitDate
+        self.currentUnitCompleted = currentUnitCompleted
+        self.currentUnitProgress = currentUnitProgress
+        self.currentUnitValue = currentUnitValue
+        self.completionRate = completionRate
+        self.lookbackDays = lookbackDays
     }
 }
 

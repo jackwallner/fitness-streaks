@@ -63,24 +63,28 @@ final class StreakEngineTests: XCTestCase {
 
     func testCompletionRatePicksThresholdMatchingVibe() {
         let today = day(2026, 4, 26)
-        // 10 days: first 5 at 15k, next 3 at 10k, last 2 at 2k
-        let history = (0..<10).map { offset -> ActivityDay in
-            let steps: Double
-            if offset < 5 { steps = 15_000 }
-            else if offset < 8 { steps = 10_000 }
-            else { steps = 2_000 }
+
+        // Sustainable test data: 8 of 10 days at 10k (today included), last 2 at 2k.
+        // 80% completion at 10k; current streak = 8.
+        let historySust = (0..<10).map { offset -> ActivityDay in
+            let steps: Double = offset < 8 ? 10_000 : 2_000
             return activity(DateHelpers.addDays(-offset, to: today), steps: steps)
         }
-
-        // Sustainable (80% target) → 10k hit on 8/10 days = 80%
-        let sustainable = StreakEngine.discover(history: history, vibe: .sustainable, now: today)
+        let sustainable = StreakEngine.discover(history: historySust, vibe: .sustainable, now: today)
         let sSust = sustainable.first { $0.metric == .steps }
         XCTAssertEqual(sSust?.threshold, 10_000)
+        XCTAssertEqual(sSust?.completionRate ?? 0, 0.80, accuracy: 0.001)
 
-        // Life-changing (50% target) → 15k hit on 5/10 days = 50%
-        let lifeChanging = StreakEngine.discover(history: history, vibe: .lifeChanging, now: today)
+        // Life-changing test data: 5 of 10 days at 15k (today included), rest at 1000.
+        // 50% completion at 15k; current streak = 5.
+        let historyLife = (0..<10).map { offset -> ActivityDay in
+            let steps: Double = offset < 5 ? 15_000 : 1_000
+            return activity(DateHelpers.addDays(-offset, to: today), steps: steps)
+        }
+        let lifeChanging = StreakEngine.discover(history: historyLife, vibe: .lifeChanging, now: today)
         let sLife = lifeChanging.first { $0.metric == .steps }
         XCTAssertEqual(sLife?.threshold, 15_000)
+        XCTAssertEqual(sLife?.completionRate ?? 0, 0.50, accuracy: 0.001)
     }
 
     func testCircularHourDistanceTreatsMidnightAsAdjacent() {

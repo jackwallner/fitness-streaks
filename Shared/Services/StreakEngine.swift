@@ -4,12 +4,12 @@ import Foundation
 ///
 /// Algorithm (per metric):
 ///   1. Slice history to the last `lookbackDays`.
-///   2. Compute daily streaks at every threshold in `metric.dailyThresholds`.
-///   3. Compute the daily completion rate over the lookback window for each threshold.
-///   4. Pick the HIGHEST-threshold streak where completion rate >= vibe.targetCompletionRate
-///      and `current >= minDailyLength`. Fallbacks ensure we never return empty.
-///   5. Rank all surviving streaks by `Streak.score`.
-///   6. The top-scoring streak becomes the hero; the next N are badges.
+///   2. Generate candidate thresholds from the actual values seen in that window.
+///   3. For each candidate, compute the daily completion rate and current streak.
+///   4. Pick the threshold whose completion rate is CLOSEST to vibe.targetCompletionRate.
+///   5. Only surface the metric if the best completion rate is within ±10pp of target.
+///   6. Rank all surviving streaks by `Streak.score`.
+///   7. The top-scoring streak becomes the hero; the next N are badges.
 ///
 /// "Current" counts today only if it already met the threshold.
 /// This keeps the streak from being "broken" mid-day.
@@ -22,6 +22,10 @@ enum StreakEngine {
     /// Minimum length for an hour-window streak to be surfaced. These mine tighter rhythms,
     /// so we demand a longer run to trust the pattern.
     static let minHourWindowLength = 5
+
+    /// How close the best completion rate must be to the vibe target to surface a metric.
+    /// ±10 percentage points — e.g. 50% target → 40–60% qualifies.
+    static let completionTolerance = 0.10
 
     /// Step thresholds evaluated for each hour of the day.
     /// 250 is a reasonable "you were doing something" floor.
@@ -42,19 +46,19 @@ enum StreakEngine {
 
         // Only consider the last N days when computing completion rates.
         let recentHistory = Array(history.suffix(max(1, lookbackDays)))
-        let windowDays = max(1, Double(recentHistory.count))
 
         var found: [Streak] = []
 
         for metric in StreakMetric.allCases where !hiddenMetrics.contains(metric) {
-            let thresholds = metric.dailyThresholds
-            let candidates = thresholds.map { t -> (streak: Streak, completionRate: Double) in
-                let streak = computeDailyStreak(metric: metric, threshold: t, byDay: byDay, today: today)
-                let hitDays = recentHistory.filter { $0.value(for: metric) >= t }.count
-                let completionRate = Double(hitDays) / windowDays
-                return (streak, completionRate)
-            }
-            if let best = pickByVibe(candidates: candidates, vibe: vibe, minLength: minDailyLength) {
+            if let best = discoverBestThreshold(
+                metric: metric,
+                history: history,
+                recentHistory: recentHistory,
+                byDay: byDay,
+                today: today,
+                target: vibe.targetCompletionRate,
+                tolerance: completionTolerance
+            ) {
                 found.append(best)
             }
         }
@@ -92,63 +96,86 @@ enum StreakEngine {
         )
     }
 
-    // MARK: - Selection
+    // MARK: - Smart threshold discovery
 
-    /// Choose the best threshold for a given vibe based on historical completion rate.
-    /// `candidates` is one (Streak, completionRate) per threshold, ascending.
-    private static func pickByVibe(candidates: [(streak: Streak, completionRate: Double)], vibe: DiscoveryVibe, minLength: Int) -> Streak? {
-        guard !candidates.isEmpty else { return nil }
-        let target = vibe.targetCompletionRate
+    /// For a given metric, test every unique value seen in the lookback window as a threshold,
+    /// and return the streak whose completion rate is closest to `target`.
+    /// Only returns a streak if the best completion rate is within `tolerance` of target.
+    private static func discoverBestThreshold(
+        metric: StreakMetric,
+        history: [ActivityDay],
+        recentHistory: [ActivityDay],
+        byDay: [Date: ActivityDay],
+        today: Date,
+        target: Double,
+        tolerance: Double
+    ) -> Streak? {
+        let values = recentHistory.map { $0.value(for: metric) }
+        guard !values.isEmpty else { return nil }
 
-        // Primary: highest threshold that meets target completion rate AND has current streak >= minLength.
-        let qualifying = candidates.filter { $0.completionRate >= target && $0.streak.current >= minLength }
-        if let best = qualifying.last {
-            return best.streak
+        // Discrete metrics (workouts, mindful) don't have meaningful unique continuous values;
+        // fall back to the fixed tier list.
+        let candidates: [Double]
+        switch metric {
+        case .workouts, .mindfulMinutes:
+            candidates = metric.dailyThresholds
+        default:
+            // Use every unique value in the lookback window as a candidate threshold.
+            candidates = Array(Set(values)).sorted()
         }
 
-        // Fallback: highest threshold that meets target completion rate (even if streak is short).
-        let rateQualifying = candidates.filter { $0.completionRate >= target }
-        if let best = rateQualifying.last {
-            return best.streak
+        let windowDays = Double(values.count)
+        var best: (streak: Streak, rate: Double, distance: Double)? = nil
+
+        for threshold in candidates {
+            let hitDays = values.filter { $0 >= threshold }.count
+            let rate = Double(hitDays) / windowDays
+            let distance = abs(rate - target)
+
+            // Compute streak using FULL history (not just lookback) so current streak is accurate.
+            let streak = computeDailyStreak(metric: metric, threshold: threshold, byDay: byDay, today: today)
+
+            // Surface only streaks with a meaningful current run.
+            guard streak.current >= minDailyLength || streak.current >= absoluteFloor else { continue }
+
+            if let current = best {
+                if distance < current.distance {
+                    best = (streak, rate, distance)
+                }
+            } else {
+                best = (streak, rate, distance)
+            }
         }
 
-        // Fallback: highest threshold with ANY streak >= absoluteFloor.
-        let anyStreak = candidates.filter { $0.streak.current >= absoluteFloor }
-        if let best = anyStreak.last {
-            return best.streak
-        }
+        guard let result = best, result.distance <= tolerance else { return nil }
 
-        // Last resort: highest completion rate overall.
-        return candidates.max(by: { $0.completionRate < $1.completionRate })?.streak
+        // Rebuild the Streak with the discovered completion rate attached.
+        return Streak(
+            metric: result.streak.metric,
+            cadence: result.streak.cadence,
+            threshold: result.streak.threshold,
+            window: result.streak.window,
+            current: result.streak.current,
+            best: result.streak.best,
+            startDate: result.streak.startDate,
+            lastHitDate: result.streak.lastHitDate,
+            currentUnitCompleted: result.streak.currentUnitCompleted,
+            currentUnitProgress: result.streak.currentUnitProgress,
+            currentUnitValue: result.streak.currentUnitValue,
+            completionRate: result.rate,
+            lookbackDays: values.count
+        )
     }
 
     /// Score tuned per vibe — drives which streak becomes hero and badge ordering.
+    /// Since smart discovery already targets the vibe's completion rate, the score
+    /// mainly differentiates by streak length and metric weight, with a small
+    /// bonus for lower completion rates (harder thresholds).
     static func vibeScore(_ s: Streak, vibe: DiscoveryVibe) -> Double {
-        let thresholds = s.window == nil ? s.metric.dailyThresholds : hourlyStepThresholds
-        let tierIdx = thresholds.firstIndex(of: s.threshold) ?? 0
-        let tierCount = max(1, thresholds.count)
-        let tierFrac = Double(tierIdx) / Double(tierCount - 1 == 0 ? 1 : tierCount - 1)
         let len = Double(s.current)
         let weight = s.metric.weight
-
-        switch vibe {
-        case .sustainable:
-            // Strongly reward length; mild tier bonus.
-            return len * (1.0 + 0.1 * Double(tierIdx)) * weight
-        case .challenging:
-            // Reward both length and tier; penalize extremes.
-            let balance = 1.0 - abs(tierFrac - 0.6) * 0.5
-            return len * (0.8 + 0.7 * Double(tierIdx)) * balance * weight
-        case .lifeChanging:
-            // Strongly reward tier; length still matters but less.
-            return (0.5 + len * 0.3) * (1.0 + 0.35 * Double(tierIdx)) * weight
-        }
-    }
-
-    /// Convenience overload for callers that don't compute completion rates (e.g. hour windows).
-    private static func pickByVibe(candidates: [Streak], vibe: DiscoveryVibe, minLength: Int) -> Streak? {
-        let wrapped = candidates.map { (streak: $0, completionRate: 1.0) }
-        return pickByVibe(candidates: wrapped, vibe: vibe, minLength: minLength)
+        let difficulty = 1.0 + (1.0 - s.completionRate) * 0.5
+        return len * weight * difficulty
     }
 
     // MARK: - Hour-window miner
@@ -165,6 +192,7 @@ enum StreakEngine {
         vibe: DiscoveryVibe
     ) -> [Streak] {
         var perHourBest: [(Int, Streak)] = []
+        let target = vibe.targetCompletionRate
 
         for hour in 0..<24 {
             // Build a day→value map for just this hour.
@@ -173,32 +201,53 @@ enum StreakEngine {
                 byDay[day] = hours[hour] ?? 0
             }
 
+            let values = Array(byDay.values)
+            guard !values.isEmpty else { continue }
+            let windowDays = Double(values.count)
+
             // Evaluate every threshold tier for this hour.
-            let candidates = hourlyStepThresholds.map { threshold -> Streak in
+            var best: (streak: Streak, rate: Double, distance: Double)? = nil
+            for threshold in hourlyStepThresholds {
+                let hitDays = values.filter { $0 >= threshold }.count
+                let rate = Double(hitDays) / windowDays
+                let distance = abs(rate - target)
+
                 let base = computeDailyStreakFromValues(
                     metric: .steps,
                     threshold: threshold,
                     byDayValues: byDay,
                     today: today
                 )
-                return Streak(
-                    metric: .steps,
-                    cadence: .daily,
-                    threshold: threshold,
-                    window: HourWindow(startHour: hour),
-                    current: base.current,
-                    best: base.best,
-                    startDate: base.startDate,
-                    lastHitDate: base.lastHitDate,
-                    currentUnitCompleted: base.currentUnitCompleted,
-                    currentUnitProgress: base.currentUnitProgress,
-                    currentUnitValue: base.currentUnitValue
-                )
+
+                guard base.current >= minHourWindowLength || base.current >= absoluteFloor else { continue }
+
+                if let current = best {
+                    if distance < current.distance {
+                        best = (base, rate, distance)
+                    }
+                } else {
+                    best = (base, rate, distance)
+                }
             }
 
-            if let best = pickByVibe(candidates: candidates, vibe: vibe, minLength: minHourWindowLength) {
-                perHourBest.append((hour, best))
-            }
+            guard let result = best, result.distance <= completionTolerance else { continue }
+
+            let streak = Streak(
+                metric: .steps,
+                cadence: .daily,
+                threshold: result.streak.threshold,
+                window: HourWindow(startHour: hour),
+                current: result.streak.current,
+                best: result.streak.best,
+                startDate: result.streak.startDate,
+                lastHitDate: result.streak.lastHitDate,
+                currentUnitCompleted: result.streak.currentUnitCompleted,
+                currentUnitProgress: result.streak.currentUnitProgress,
+                currentUnitValue: result.streak.currentUnitValue,
+                completionRate: result.rate,
+                lookbackDays: values.count
+            )
+            perHourBest.append((hour, streak))
         }
 
         // Sort hours by vibe score, then pick up to 3 non-adjacent hours so we don't

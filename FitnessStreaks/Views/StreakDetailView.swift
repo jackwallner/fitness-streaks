@@ -216,10 +216,10 @@ struct StreakDetailView: View {
                      value: "\(streak.best)",
                      unit: "DAYS",
                      color: Theme.retroAmber)
-            statCell(title: "TODAY",
-                     value: streak.metric.format(value: streak.currentUnitValue),
-                     unit: streak.metric.unitLabel.uppercased(),
-                     color: Theme.retroLime)
+            statCell(title: "RATE",
+                     value: "\(Int(streak.completionRate * 100))%",
+                     unit: "\(streak.lookbackDays) DAY WINDOW",
+                     color: Theme.retroMagenta)
         }
     }
 
