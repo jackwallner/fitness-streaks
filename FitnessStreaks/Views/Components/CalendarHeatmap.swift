@@ -3,7 +3,7 @@ import SwiftUI
 /// Pixel calendar heatmap. Columns = weeks, rows = weekdays (Mon–Sun).
 /// Sharp square cells, no corner radius. Met cells get a subtle inset highlight.
 struct CalendarHeatmap: View {
-    let entries: [(date: Date, met: Bool, value: Double)]
+    let entries: [(date: Date, value: Double, met: Bool)]
     let accent: Color
 
     private let cell: CGFloat = 8
@@ -33,7 +33,7 @@ struct CalendarHeatmap: View {
     }
 
     @ViewBuilder
-    private func cellView(day: (date: Date, met: Bool, value: Double)?) -> some View {
+    private func cellView(day: (date: Date, value: Double, met: Bool)?) -> some View {
         Rectangle()
             .fill(color(for: day))
             .frame(width: cell, height: cell)
@@ -43,7 +43,7 @@ struct CalendarHeatmap: View {
             )
     }
 
-    private func color(for day: (date: Date, met: Bool, value: Double)?) -> Color {
+    private func color(for day: (date: Date, value: Double, met: Bool)?) -> Color {
         guard let day else { return Theme.retroInkFaint.opacity(0.5) }
         if day.met { return accent }
         if day.value > 0 { return accent.opacity(0.25) }
@@ -55,11 +55,11 @@ struct CalendarHeatmap: View {
         return (wd + 5) % 7
     }
 
-    private func groupByWeek(_ entries: [(date: Date, met: Bool, value: Double)]) -> [[(date: Date, met: Bool, value: Double)]] {
+    private func groupByWeek(_ entries: [(date: Date, value: Double, met: Bool)]) -> [[(date: Date, value: Double, met: Bool)]] {
         let sorted = entries.sorted { $0.date < $1.date }
-        var result: [[(date: Date, met: Bool, value: Double)]] = []
+        var result: [[(date: Date, value: Double, met: Bool)]] = []
         var currentWeek: Date? = nil
-        var bucket: [(date: Date, met: Bool, value: Double)] = []
+        var bucket: [(date: Date, value: Double, met: Bool)] = []
         for entry in sorted {
             let w = DateHelpers.startOfWeek(entry.date)
             if w != currentWeek {

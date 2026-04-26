@@ -72,13 +72,8 @@ struct FitnessStreaksApp: App {
     private static func handleAppRefresh(_ task: BGAppRefreshTask) {
         scheduleAppRefresh()
         let work = Task { @MainActor in
-            do {
-                await StreakStore.shared.load()
-                return true
-            } catch {
-                log.error("bg refresh failed: \(String(describing: error))")
-                return false
-            }
+            await StreakStore.shared.load()
+            return true
         }
         task.expirationHandler = { work.cancel() }
         Task {
