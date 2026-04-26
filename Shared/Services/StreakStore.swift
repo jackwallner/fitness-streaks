@@ -21,15 +21,24 @@ final class StreakStore: ObservableObject {
     /// edits their selections in Settings or during onboarding.
     func refilter() {
         streaks = Self.applyTrackedFilter(allCandidates)
+        persistCurrentSnapshot()
     }
 
     static func applyTrackedFilter(_ streaks: [Streak]) -> [Streak] {
-        guard let tracked = StreakSettings.shared.trackedStreaks else { return streaks }
+        applyTrackedFilter(streaks, tracked: StreakSettings.shared.trackedStreaks)
+    }
+
+    nonisolated static func applyTrackedFilter(_ streaks: [Streak], tracked: Set<String>?) -> [Streak] {
+        guard let tracked else { return streaks }
         if tracked.isEmpty { return [] }
         return streaks.filter { tracked.contains($0.trackingKey) }
     }
 
     private init() {}
+
+    func persistCurrentSnapshot() {
+        SnapshotStore.save(StreakEngine.snapshot(from: streaks))
+    }
 
     /// Fetches fresh history from HealthKit, runs the engine, updates published state + widget snapshot.
     func load() async {
@@ -38,7 +47,7 @@ final class StreakStore: ObservableObject {
         do {
             let fresh = try await HealthKitService.shared.fetchHistory(days: 400)
             self.history = fresh
-            try await HealthKitService.shared.refreshCache(days: 400)
+            try HealthKitService.shared.cache(fresh)
             // 90 days is enough to detect a real time-of-day rhythm without blowing up query cost.
             let hourly = (try? await HealthKitService.shared.fetchHourlySteps(days: 90)) ?? [:]
             let all = StreakEngine.discover(
@@ -50,12 +59,13 @@ final class StreakStore: ObservableObject {
             )
             self.allCandidates = all
             self.streaks = Self.applyTrackedFilter(all)
+            persistCurrentSnapshot()
             self.lastUpdated = .now
 
-            // Schedule at-risk reminder using hero
             if let hero = self.hero {
-                let label = hero.metric.thresholdLabel(hero.threshold, cadence: hero.cadence)
-                await NotificationService.scheduleDailyReminder(heroLabel: label, currentLength: hero.current)
+                await NotificationService.scheduleDailyReminder(for: hero)
+            } else {
+                NotificationService.cancelAll()
             }
         } catch {
             print("StreakStore load error: \(error)")
@@ -71,6 +81,7 @@ final class StreakStore: ObservableObject {
                 )
                 self.allCandidates = all
                 self.streaks = Self.applyTrackedFilter(all)
+                persistCurrentSnapshot()
             }
         }
     }

@@ -33,7 +33,7 @@ struct StreakHero: View {
             }
 
             HStack {
-                Text("TODAY'S CHARGE")
+                Text(chargeTitle)
                     .font(RetroFont.mono(9, weight: .bold))
                     .tracking(2)
                     .foregroundStyle(Theme.retroInkDim)
@@ -73,6 +73,13 @@ struct StreakHero: View {
         let v = streak.metric.format(value: streak.currentUnitValue)
         let t = streak.metric.format(value: streak.threshold)
         return "\(v)/\(t) \(streak.metric.unitLabel.uppercased())"
+    }
+
+    private var chargeTitle: String {
+        if let w = streak.window {
+            return "\(w.label.uppercased()) CHARGE"
+        }
+        return streak.cadence == .daily ? "TODAY'S CHARGE" : "THIS WEEK'S CHARGE"
     }
 
     private var intensity: CGFloat {

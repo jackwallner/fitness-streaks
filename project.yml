@@ -13,7 +13,7 @@ settings:
     DEVELOPMENT_TEAM: YXG4MP6W39
     CODE_SIGN_STYLE: Automatic
     MARKETING_VERSION: "1.0.0"
-    CURRENT_PROJECT_VERSION: "6"
+    CURRENT_PROJECT_VERSION: "7"
     GENERATE_INFOPLIST_FILE: NO
 
 schemes:
@@ -22,6 +22,10 @@ schemes:
       targets:
         FitnessStreaks: all
         FitnessStreaksWatch: all
+        FitnessStreaksTests: [test]
+    test:
+      targets:
+        - FitnessStreaksTests
     run:
       config: Debug
   FitnessStreaksWatch:
@@ -102,3 +106,16 @@ targets:
         INFOPLIST_FILE: FitnessStreaksWatchWidget/Info.plist
         CODE_SIGN_ENTITLEMENTS: FitnessStreaksWatchWidget/FitnessStreaksWatchWidget.entitlements
         WATCHOS_DEPLOYMENT_TARGET: "10.0"
+
+  FitnessStreaksTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: FitnessStreaksTests
+      - path: Shared
+        excludes:
+          - "Fonts"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.jackwallner.streaks.tests
+        GENERATE_INFOPLIST_FILE: YES

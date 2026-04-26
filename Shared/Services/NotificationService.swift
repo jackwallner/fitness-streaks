@@ -46,20 +46,24 @@ enum NotificationService {
 
     /// Schedule a 7pm daily reminder. The body uses the current hero streak so the nudge feels personal.
     /// Never prompts for permission — that only happens via a user-initiated toggle.
-    static func scheduleDailyReminder(heroLabel: String?, currentLength: Int?) async {
+    static func scheduleDailyReminder(for hero: Streak?) async {
         let enabled = StreakSettings.shared.notificationsEnabled
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [dailyReminderID])
 
         guard enabled,
               await isAuthorized(),
-              let heroLabel,
-              let currentLength,
-              currentLength >= 3 else { return }
+              let hero,
+              hero.current >= 3,
+              !hero.currentUnitCompleted else { return }
+
+        let heroLabel = hero.metric.thresholdLabel(hero.threshold, cadence: hero.cadence)
+        let unit = hero.cadence.pluralLabel
+        let deadline = hero.cadence == .daily ? "before midnight" : "before the week ends"
 
         let content = UNMutableNotificationContent()
         content.title = "Keep the \(heroLabel) streak alive"
-        content.body = "You're at \(currentLength) days. Get it in before midnight."
+        content.body = "You're at \(hero.current) \(unit). Get it in \(deadline)."
         content.sound = .default
         content.interruptionLevel = .active
 

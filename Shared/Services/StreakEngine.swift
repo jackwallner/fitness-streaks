@@ -140,10 +140,10 @@ enum StreakEngine {
     }
 
     /// Score tuned per vibe — drives which streak becomes hero and badge ordering.
-    private static func vibeScore(_ s: Streak, vibe: DiscoveryVibe) -> Double {
-        let thresholds = s.cadence == .daily
-            ? s.metric.dailyThresholds
-            : (s.metric.weeklyThresholds ?? s.metric.dailyThresholds)
+    static func vibeScore(_ s: Streak, vibe: DiscoveryVibe) -> Double {
+        let thresholds = s.window == nil
+            ? (s.cadence == .daily ? s.metric.dailyThresholds : (s.metric.weeklyThresholds ?? s.metric.dailyThresholds))
+            : hourlyStepThresholds
         let tierIdx = thresholds.firstIndex(of: s.threshold) ?? 0
         let tierCount = max(1, thresholds.count)
         let tierFrac = Double(tierIdx) / Double(tierCount - 1 == 0 ? 1 : tierCount - 1)
@@ -220,12 +220,17 @@ enum StreakEngine {
 
         var picked: [(Int, Streak)] = []
         for candidate in ranked {
-            let tooClose = picked.contains { abs($0.0 - candidate.0) <= 1 }
+            let tooClose = picked.contains { circularHourDistance($0.0, candidate.0) <= 1 }
             if !tooClose { picked.append(candidate) }
             if picked.count >= 3 { break }
         }
 
         return picked.map(\.1)
+    }
+
+    static func circularHourDistance(_ a: Int, _ b: Int) -> Int {
+        let distance = abs(a - b)
+        return min(distance, 24 - distance)
     }
 
     /// Shared streak computation that takes a raw day→value map instead of ActivityDay.

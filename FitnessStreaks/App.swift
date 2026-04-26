@@ -50,7 +50,7 @@ struct FitnessStreaksApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
-                .preferredColorScheme(.dark)
+                .preferredColorScheme(settings.appearance.colorScheme)
                 .environmentObject(healthKit)
                 .environmentObject(settings)
                 .environmentObject(store)
@@ -73,7 +73,6 @@ struct FitnessStreaksApp: App {
         scheduleAppRefresh()
         let work = Task { @MainActor in
             do {
-                try await HealthKitService.shared.refreshCache()
                 await StreakStore.shared.load()
                 return true
             } catch {

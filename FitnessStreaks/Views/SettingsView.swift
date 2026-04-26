@@ -13,6 +13,7 @@ struct SettingsView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
+                    appearanceSection
                     vibeSection
                     notificationsSection
                     metricsSection
@@ -224,10 +225,7 @@ struct SettingsView: View {
             settings.notificationsEnabled = true
             notificationsBlockedBySystem = false
             // Don't wait for the next refresh — schedule using the current hero immediately.
-            if let hero = store.hero {
-                let label = hero.metric.thresholdLabel(hero.threshold, cadence: hero.cadence)
-                await NotificationService.scheduleDailyReminder(heroLabel: label, currentLength: hero.current)
-            }
+            await NotificationService.scheduleDailyReminder(for: store.hero)
         case .denied:
             settings.notificationsEnabled = false
             notificationsBlockedBySystem = false
@@ -259,6 +257,7 @@ struct SettingsView: View {
                             set: { on in
                                 if on { settings.hiddenMetrics.remove(metric) }
                                 else { settings.hiddenMetrics.insert(metric) }
+                                Task { await store.load() }
                             }
                         ), accent: metric.accent)
                     }

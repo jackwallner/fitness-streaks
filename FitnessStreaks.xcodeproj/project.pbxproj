@@ -12,13 +12,17 @@
 		117AE494DDF91AAF1E0C01F7 /* PixelUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AE8DBC73B55DCE8482E14D /* PixelUI.swift */; };
 		14DE9C98D5E4DEDB8E38FEB6 /* WatchComplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A96B250A2CB89C8A8D01A8 /* WatchComplication.swift */; };
 		156578A6A30A9176A4CFB1BC /* DataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F34D2FE6D3914BB5A4D903 /* DataService.swift */; };
+		25F21CF803DAE58D6C3ABC78 /* DateHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49F54F94A5A2BE6B4C616141 /* DateHelpers.swift */; };
 		2E92D2050EDDB3EBE69EFE60 /* WatchTodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57548FD64897F4D07CFB9889 /* WatchTodayView.swift */; };
 		301D407B208954C2ECA470D3 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 88CD00513724423456C0A89B /* PrivacyInfo.xcprivacy */; };
 		3029F311A2F44BD52E52A820 /* StreakEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543D3D4B4FAF0A178E8805F1 /* StreakEngine.swift */; };
 		30EF4C3A02E894C7051CC175 /* Streak.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF5B8C88482BC235E56075E /* Streak.swift */; };
 		316ADDFEB63C8D8EBC10274B /* StreakSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537E2A9D042442EE2656139A /* StreakSettings.swift */; };
+		32C925739CCBBE8F58CEEDCD /* DataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F34D2FE6D3914BB5A4D903 /* DataService.swift */; };
 		34B0CE7F24E943474678ECA9 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47765767B5A4442FF1480EDE /* App.swift */; };
+		35022F03337AD95820042752 /* StreakEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543D3D4B4FAF0A178E8805F1 /* StreakEngine.swift */; };
 		37B29A33455233312F4EAE05 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDE5E401D8E238E4B790CEF /* HealthKitService.swift */; };
+		39316DB0B2C1CCA8766EC585 /* StreakStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C302E6F3992442B6C651F13 /* StreakStore.swift */; };
 		39AC4C7AB2FC21E18100F78C /* JetBrainsMono-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 502684193E7BD9E73844EB8C /* JetBrainsMono-Medium.ttf */; };
 		3A12CCFD1B62528D2F9A840A /* StreakSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537E2A9D042442EE2656139A /* StreakSettings.swift */; };
 		3A26B173CDA85C0FA02EFE09 /* JetBrainsMono-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 560A6C366B6C97CC3275012C /* JetBrainsMono-Bold.ttf */; };
@@ -26,6 +30,7 @@
 		3D3A5F899C36439D1C49A27D /* StreakSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537E2A9D042442EE2656139A /* StreakSettings.swift */; };
 		40AD79B6755974DBC926F4D7 /* Streak.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF5B8C88482BC235E56075E /* Streak.swift */; };
 		41E0638A5D9332513F2382FE /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5499F56557690B4EE92A2E42 /* NotificationService.swift */; };
+		5C5162AB7569C6DC0AA56E81 /* StreakEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F67D164655801499990542 /* StreakEngineTests.swift */; };
 		5D4B2D187CB5D74E96C3E2A9 /* StreakBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06EC66CCAA5304A26B7ED85F /* StreakBadge.swift */; };
 		5E3A4A321CAFAE60BB68AD71 /* CalendarHeatmap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F5E8DB49859EF7F550A39DB /* CalendarHeatmap.swift */; };
 		5E42DD6AA0FE145C1FB2B216 /* DateHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49F54F94A5A2BE6B4C616141 /* DateHelpers.swift */; };
@@ -34,6 +39,7 @@
 		6223A6635D3E0688E6975E11 /* JetBrainsMono-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 502684193E7BD9E73844EB8C /* JetBrainsMono-Medium.ttf */; };
 		62E4B86E2303336F4E47512F /* StreakEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543D3D4B4FAF0A178E8805F1 /* StreakEngine.swift */; };
 		64011C3FF21D02B3A2DD734D /* StreakDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790E9BD5A98E837F45B5B997 /* StreakDetailView.swift */; };
+		653BBE118549F0DDA7DC2045 /* Streak.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF5B8C88482BC235E56075E /* Streak.swift */; };
 		66AE58531FA9867C4446E51F /* DailyActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA88BDC9CCB6015980ECFF3 /* DailyActivity.swift */; };
 		6A3407F7D56BAC29F185E475 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5499F56557690B4EE92A2E42 /* NotificationService.swift */; };
 		6ACBA75C35BC355C8882A904 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D82D724B9582B040BF8DB6B /* Theme.swift */; };
@@ -62,15 +68,19 @@
 		AAA8E437649BAAF7A5B0BBC9 /* DataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F34D2FE6D3914BB5A4D903 /* DataService.swift */; };
 		ABB7FC3D34A1DA9D82B6A1C3 /* StreakHero.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B4AF29EC104B213DA5DD0CA /* StreakHero.swift */; };
 		AC52324B01990AA975DA0D10 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C4E8CEC684BE97ED0A1826C9 /* Assets.xcassets */; };
+		B13B1EBB94CAAD64F87F5F5C /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D82D724B9582B040BF8DB6B /* Theme.swift */; };
 		B6110A80B63934412B2F565F /* StreakEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543D3D4B4FAF0A178E8805F1 /* StreakEngine.swift */; };
 		BC7DDC4F70ED3D72EA3E4073 /* PressStart2P-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1207B858E4FFB44108513342 /* PressStart2P-Regular.ttf */; };
 		BFEF06574CC4B860BE5A6860 /* DateHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49F54F94A5A2BE6B4C616141 /* DateHelpers.swift */; };
+		C1B6D765AE9BAB50D4583825 /* StreakMetric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C80A4826A373B331E583A1E /* StreakMetric.swift */; };
 		C32A13DCCDF3810C8CEE3FED /* JetBrainsMono-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A05515A54F5B25D57C150872 /* JetBrainsMono-Regular.ttf */; };
 		CEA8D66BF780261F75668F56 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5499F56557690B4EE92A2E42 /* NotificationService.swift */; };
 		CF41EDA89E06DD2AFB3A485E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D6E754008340281F258E8A /* SettingsView.swift */; };
 		D2021416878234BF4B693C6A /* PressStart2P-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1207B858E4FFB44108513342 /* PressStart2P-Regular.ttf */; };
+		D2A28B93EFF7C980D52981BF /* DailyActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA88BDC9CCB6015980ECFF3 /* DailyActivity.swift */; };
 		D47D46BF6661A537634EBEBA /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D82D724B9582B040BF8DB6B /* Theme.swift */; };
 		D63427D18D691FC2A7CF2BCB /* StreakStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C302E6F3992442B6C651F13 /* StreakStore.swift */; };
+		DDD38A8136426AE3698966BE /* StreakSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537E2A9D042442EE2656139A /* StreakSettings.swift */; };
 		E1CE8BA25D7BE55677D54CEF /* StreakEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543D3D4B4FAF0A178E8805F1 /* StreakEngine.swift */; };
 		E2E61AC6BCD4B0282B1D6FE6 /* StreakSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537E2A9D042442EE2656139A /* StreakSettings.swift */; };
 		ECAC6491381BC89960CCAD2B /* DailyActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA88BDC9CCB6015980ECFF3 /* DailyActivity.swift */; };
@@ -78,9 +88,11 @@
 		EE19A8ADE6C0CBE04B4EE59C /* StreakMetric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C80A4826A373B331E583A1E /* StreakMetric.swift */; };
 		F2E86F0AE4DAF3E53BC5328A /* DailyActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA88BDC9CCB6015980ECFF3 /* DailyActivity.swift */; };
 		F3D56D80D5A934D0F6C9EFD8 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDE5E401D8E238E4B790CEF /* HealthKitService.swift */; };
+		F52C7B1C894DA2F2166D9E78 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5499F56557690B4EE92A2E42 /* NotificationService.swift */; };
 		F6DD448CE8E9163395729354 /* StreakMetric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C80A4826A373B331E583A1E /* StreakMetric.swift */; };
 		FB0006BF610B0D59C3686878 /* StreakStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C302E6F3992442B6C651F13 /* StreakStore.swift */; };
 		FB019E441ED033465152096E /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84469F4922FC57E3F0E0CEE /* DashboardView.swift */; };
+		FD1E89116BA358C0C4E12B94 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDE5E401D8E238E4B790CEF /* HealthKitService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -155,6 +167,7 @@
 		1EDE5E401D8E238E4B790CEF /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
 		1F7A3FE7DC594DF00505EB22 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2DE780A4E064FF2F98F94209 /* FitnessStreaks.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FitnessStreaks.entitlements; sourceTree = "<group>"; };
+		2F84D0BD12D416165B661A04 /* FitnessStreaksTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FitnessStreaksTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		318D40BD757C19EEA98853C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		34156CEE2653079F1813567C /* FitnessStreaksWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitnessStreaksWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3CF993A5F2802AF501333591 /* FitnessStreaksWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FitnessStreaksWatch.entitlements; sourceTree = "<group>"; };
@@ -185,6 +198,7 @@
 		9C80A4826A373B331E583A1E /* StreakMetric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakMetric.swift; sourceTree = "<group>"; };
 		A05515A54F5B25D57C150872 /* JetBrainsMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "JetBrainsMono-Regular.ttf"; sourceTree = "<group>"; };
 		AEF5B8C88482BC235E56075E /* Streak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Streak.swift; sourceTree = "<group>"; };
+		C1F67D164655801499990542 /* StreakEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakEngineTests.swift; sourceTree = "<group>"; };
 		C4E8CEC684BE97ED0A1826C9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D49FFCC5C215612722C4FD4A /* FitnessStreaksWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = FitnessStreaksWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6F34D2FE6D3914BB5A4D903 /* DataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataService.swift; sourceTree = "<group>"; };
@@ -238,6 +252,14 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
+		47A2CA6C84BD0895C87F51DA /* FitnessStreaksTests */ = {
+			isa = PBXGroup;
+			children = (
+				C1F67D164655801499990542 /* StreakEngineTests.swift */,
+			);
+			path = FitnessStreaksTests;
+			sourceTree = "<group>";
+		};
 		4A25F3CDC9BA87CA509C8E58 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
@@ -252,6 +274,7 @@
 			isa = PBXGroup;
 			children = (
 				135A3C0A5AD7A7BA2B0A64CF /* FitnessStreaks.app */,
+				2F84D0BD12D416165B661A04 /* FitnessStreaksTests.xctest */,
 				34156CEE2653079F1813567C /* FitnessStreaksWatch.app */,
 				78A7FE53D948CD897854EB67 /* FitnessStreaksWatchWidget.appex */,
 				D49FFCC5C215612722C4FD4A /* FitnessStreaksWidget.appex */,
@@ -309,6 +332,7 @@
 			isa = PBXGroup;
 			children = (
 				62AC8002A7679F9968281AF5 /* FitnessStreaks */,
+				47A2CA6C84BD0895C87F51DA /* FitnessStreaksTests */,
 				C4CE9EC06F09D415339B4C98 /* FitnessStreaksWatch */,
 				1C9F90CD98AEFA2D6E7E2727 /* FitnessStreaksWatchWidget */,
 				0DE70F8C69B0DFBC09AF1E50 /* FitnessStreaksWidget */,
@@ -407,6 +431,23 @@
 			productReference = 34156CEE2653079F1813567C /* FitnessStreaksWatch.app */;
 			productType = "com.apple.product-type.application";
 		};
+		CA65801D5A346C6EF4E2C5BD /* FitnessStreaksTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B76E3D6976608F5157BCCC97 /* Build configuration list for PBXNativeTarget "FitnessStreaksTests" */;
+			buildPhases = (
+				2F2020F663356EA5858A4CA8 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FitnessStreaksTests;
+			packageProductDependencies = (
+			);
+			productName = FitnessStreaksTests;
+			productReference = 2F84D0BD12D416165B661A04 /* FitnessStreaksTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		DFAE9174135F515541753363 /* FitnessStreaks */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = EDB8F449BA3703AFEB7D2614 /* Build configuration list for PBXNativeTarget "FitnessStreaks" */;
@@ -450,6 +491,10 @@
 						DevelopmentTeam = YXG4MP6W39;
 						ProvisioningStyle = Automatic;
 					};
+					CA65801D5A346C6EF4E2C5BD = {
+						DevelopmentTeam = YXG4MP6W39;
+						ProvisioningStyle = Automatic;
+					};
 					DFAE9174135F515541753363 = {
 						DevelopmentTeam = YXG4MP6W39;
 						ProvisioningStyle = Automatic;
@@ -471,6 +516,7 @@
 			projectRoot = "";
 			targets = (
 				DFAE9174135F515541753363 /* FitnessStreaks */,
+				CA65801D5A346C6EF4E2C5BD /* FitnessStreaksTests */,
 				4B86BF423E3FAC2740024275 /* FitnessStreaksWatch */,
 				34C0C27A1AB221566A4B4CFC /* FitnessStreaksWatchWidget */,
 				2715E062A8CA657880138CFD /* FitnessStreaksWidget */,
@@ -508,6 +554,25 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		2F2020F663356EA5858A4CA8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D2A28B93EFF7C980D52981BF /* DailyActivity.swift in Sources */,
+				32C925739CCBBE8F58CEEDCD /* DataService.swift in Sources */,
+				25F21CF803DAE58D6C3ABC78 /* DateHelpers.swift in Sources */,
+				FD1E89116BA358C0C4E12B94 /* HealthKitService.swift in Sources */,
+				F52C7B1C894DA2F2166D9E78 /* NotificationService.swift in Sources */,
+				653BBE118549F0DDA7DC2045 /* Streak.swift in Sources */,
+				35022F03337AD95820042752 /* StreakEngine.swift in Sources */,
+				5C5162AB7569C6DC0AA56E81 /* StreakEngineTests.swift in Sources */,
+				C1B6D765AE9BAB50D4583825 /* StreakMetric.swift in Sources */,
+				DDD38A8136426AE3698966BE /* StreakSettings.swift in Sources */,
+				39316DB0B2C1CCA8766EC585 /* StreakStore.swift in Sources */,
+				B13B1EBB94CAAD64F87F5F5C /* Theme.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7E441D3F0637B9A9914798C2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -717,7 +782,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = YXG4MP6W39;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -794,7 +859,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = YXG4MP6W39;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -858,6 +923,38 @@
 			};
 			name = Debug;
 		};
+		C895B33FE114C3AB7192BEAE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jackwallner.streaks.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		CFF59280D424966B3F227B4B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jackwallner.streaks.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
 		D2E1B9D01C79A462272D33CC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -901,6 +998,15 @@
 			buildConfigurations = (
 				0421F80DE191F6D878C2E924 /* Debug */,
 				4A382138F8A72A9B33122568 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B76E3D6976608F5157BCCC97 /* Build configuration list for PBXNativeTarget "FitnessStreaksTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CFF59280D424966B3F227B4B /* Debug */,
+				C895B33FE114C3AB7192BEAE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

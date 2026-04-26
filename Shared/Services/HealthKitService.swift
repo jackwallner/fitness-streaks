@@ -20,7 +20,6 @@ final class HealthKitService: ObservableObject {
     private let quantityTypes: [HKQuantityTypeIdentifier] = [
         .stepCount,
         .appleExerciseTime,
-        .appleStandTime,           // stand MINUTES; we'll derive hours = minutes/60 as an approximation
         .activeEnergyBurned,
         .distanceWalkingRunning,
         .flightsClimbed,
@@ -35,6 +34,9 @@ final class HealthKitService: ObservableObject {
         if let sleep = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) {
             set.insert(sleep)
         }
+        if let standHour = HKObjectType.categoryType(forIdentifier: .appleStandHour) {
+            set.insert(standHour)
+        }
         return set
     }
 
@@ -42,10 +44,6 @@ final class HealthKitService: ObservableObject {
         var types: Set<HKObjectType> = categoryReadTypes
         for id in quantityTypes {
             types.insert(HKQuantityType(id))
-        }
-        // Apple Watch stand hours as a distinct "meeting the hour goal" count
-        if let standHours = HKObjectType.quantityType(forIdentifier: .appleStandTime) {
-            types.insert(standHours)
         }
         return types
     }
@@ -104,7 +102,7 @@ final class HealthKitService: ObservableObject {
 
         async let steps = quantityDaily(.stepCount, unit: .count(), start: start, end: end)
         async let exercise = quantityDaily(.appleExerciseTime, unit: .minute(), start: start, end: end)
-        async let standMinutes = quantityDaily(.appleStandTime, unit: .minute(), start: start, end: end)
+        async let standHours = standHourCounts(start: start, end: end)
         async let energy = quantityDaily(.activeEnergyBurned, unit: .kilocalorie(), start: start, end: end)
         async let distance = quantityDaily(.distanceWalkingRunning, unit: .mile(), start: start, end: end)
         async let flights = quantityDaily(.flightsClimbed, unit: .count(), start: start, end: end)
@@ -112,18 +110,17 @@ final class HealthKitService: ObservableObject {
         async let mindful = categoryMinutes(.mindfulSession, start: start, end: end)
         async let sleep = sleepHoursByDay(start: start, end: end)
 
-        let (s, ex, sh, en, dist, fl, wo, mi, sl) = try await (steps, exercise, standMinutes, energy, distance, flights, workouts, mindful, sleep)
+        let (s, ex, sh, en, dist, fl, wo, mi, sl) = try await (steps, exercise, standHours, energy, distance, flights, workouts, mindful, sleep)
 
         var results: [ActivityDay] = []
         var cursor = start
         while cursor < end {
             let key = cursor
-            let standHoursValue = (sh[key] ?? 0) / 60.0 // minutes → hours
             results.append(ActivityDay(
                 date: cursor,
                 steps: s[key] ?? 0,
                 exerciseMinutes: ex[key] ?? 0,
-                standHours: standHoursValue,
+                standHours: sh[key] ?? 0,
                 activeEnergy: en[key] ?? 0,
                 workoutCount: wo[key] ?? 0,
                 mindfulMinutes: mi[key] ?? 0,
@@ -275,6 +272,35 @@ final class HealthKitService: ObservableObject {
         return out
     }
 
+    private func standHourCounts(start: Date, end: Date) async throws -> [Date: Double] {
+        guard let type = HKObjectType.categoryType(forIdentifier: .appleStandHour) else { return [:] }
+        let predicate = HKQuery.predicateForSamples(withStart: start, end: end, options: .strictStartDate)
+        let samples: [HKCategorySample] = try await withCheckedThrowingContinuation { continuation in
+            let query = HKSampleQuery(
+                sampleType: type,
+                predicate: predicate,
+                limit: HKObjectQueryNoLimit,
+                sortDescriptors: nil
+            ) { _, results, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume(returning: (results as? [HKCategorySample]) ?? [])
+                }
+            }
+            store.execute(query)
+        }
+
+        var stoodHoursByDay: [Date: Set<Date>] = [:]
+        for sample in samples where sample.value == HKCategoryValueAppleStandHour.stood.rawValue {
+            let day = DateHelpers.startOfDay(sample.startDate)
+            if let hour = DateHelpers.gregorian.dateInterval(of: .hour, for: sample.startDate)?.start {
+                stoodHoursByDay[day, default: []].insert(hour)
+            }
+        }
+        return stoodHoursByDay.mapValues { Double($0.count) }
+    }
+
     // MARK: - Sleep
 
     /// Sum "asleep" sample durations, attributing to the day each sample ended on.
@@ -309,39 +335,54 @@ final class HealthKitService: ObservableObject {
             HKCategoryValueSleepAnalysis.asleepREM.rawValue,
         ]
 
+        let intervals = samples
+            .filter { asleepValues.contains($0.value) }
+            .map { (start: $0.startDate, end: $0.endDate) }
+        return Self.mergedHoursByDay(intervals: intervals, start: start, end: end)
+    }
+
+    nonisolated static func mergedHoursByDay(intervals: [(start: Date, end: Date)], start: Date, end: Date) -> [Date: Double] {
+        var grouped: [Date: [(Date, Date)]] = [:]
+        for interval in intervals {
+            let clippedStart = max(interval.start, start)
+            let clippedEnd = min(interval.end, end)
+            guard clippedEnd > clippedStart else { continue }
+            grouped[DateHelpers.startOfDay(clippedEnd), default: []].append((clippedStart, clippedEnd))
+        }
+
         var out: [Date: Double] = [:]
-        for s in samples where asleepValues.contains(s.value) {
-            let key = DateHelpers.startOfDay(s.endDate)
-            let hours = s.endDate.timeIntervalSince(s.startDate) / 3600.0
-            out[key, default: 0] += hours
+        for (day, dayIntervals) in grouped {
+            let sorted = dayIntervals.sorted { $0.0 < $1.0 }
+            var merged: [(Date, Date)] = []
+            for interval in sorted {
+                guard let last = merged.last else {
+                    merged.append(interval)
+                    continue
+                }
+                if interval.0 <= last.1 {
+                    merged[merged.count - 1] = (last.0, max(last.1, interval.1))
+                } else {
+                    merged.append(interval)
+                }
+            }
+            out[day] = merged.reduce(0) { total, interval in
+                total + interval.1.timeIntervalSince(interval.0) / 3600.0
+            }
         }
         return out
     }
 
     // MARK: - Cache
 
-    /// Pull a history window into SwiftData so widgets can render from cache.
-    /// Also updates the StreakSnapshot for fast widget reads.
     @discardableResult
     func refreshCache(days: Int = 400) async throws -> [ActivityDay] {
         let history = try await fetchHistory(days: days)
-        try upsert(history)
-
-        // Compute & persist snapshot for widgets — widgets only see tracked streaks.
-        let settings = StreakSettings.shared
-        let hourly = (try? await fetchHourlySteps(days: 90)) ?? [:]
-        let all = StreakEngine.discover(
-            history: history,
-            hourlySteps: hourly,
-            hiddenMetrics: settings.hiddenMetrics,
-            vibe: settings.vibe,
-            minStreakLength: settings.minStreakLength,
-            now: .now
-        )
-        let tracked = StreakStore.applyTrackedFilter(all)
-        let snapshot = StreakEngine.snapshot(from: tracked)
-        SnapshotStore.save(snapshot)
+        try cache(history)
         return history
+    }
+
+    func cache(_ history: [ActivityDay]) throws {
+        try upsert(history)
     }
 
     private func upsert(_ days: [ActivityDay]) throws {

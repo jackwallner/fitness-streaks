@@ -34,7 +34,6 @@ struct FitnessStreaksWatchApp: App {
     private static func handleBackgroundRefresh() async {
         scheduleBackgroundRefresh()
         let work = Task { @MainActor in
-            try? await HealthKitService.shared.refreshCache()
             await StreakStore.shared.load()
         }
         Task {
@@ -91,9 +90,13 @@ struct WatchOnboardingView: View {
                     Task {
                         requesting = true
                         defer { requesting = false }
-                        try? await healthKit.requestAuthorization()
-                        settings.hasCompletedSetup = true
-                        await store.load()
+                        do {
+                            try await healthKit.requestAuthorization()
+                            settings.hasCompletedSetup = true
+                            await store.load()
+                        } catch {
+                            log.error("watch authorization failed: \(String(describing: error))")
+                        }
                     }
                 } label: {
                     Text(requesting ? "…" : "Connect")
