@@ -58,8 +58,8 @@ enum NotificationService {
               !hero.currentUnitCompleted else { return }
 
         let heroLabel = hero.metric.thresholdLabel(hero.threshold, cadence: hero.cadence)
-        let unit = hero.cadence.pluralLabel
-        let deadline = hero.cadence == .daily ? "before midnight" : "before the week ends"
+        let unit = "days"
+        let deadline = "before midnight"
 
         let content = UNMutableNotificationContent()
         content.title = "Keep the \(heroLabel) streak alive"

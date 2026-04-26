@@ -128,8 +128,7 @@ struct DashboardView: View {
         if let window = hero.window {
             return "\(v) \(unit) between \(window.label) to lock today in"
         }
-        let window = hero.cadence == .daily ? "today" : "this week"
-        return "\(v) \(unit) to lock \(window) in"
+        return "\(v) \(unit) to lock today in"
     }
 
     private var badgeGrid: some View {

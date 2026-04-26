@@ -14,14 +14,14 @@ struct CalendarHeatmap: View {
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(alignment: .top, spacing: gap) {
-                    ForEach(Array(weeks.enumerated()), id: \.offset) { idx, week in
+                    ForEach(Array(weeks.enumerated()), id: \.offset) { item in
                         VStack(spacing: gap) {
                             ForEach(0..<7, id: \.self) { wd in
-                                let day = week.first { weekdayOrdinal($0.date) == wd }
+                                let day = item.element.first { weekdayOrdinal($0.date) == wd }
                                 cellView(day: day)
                             }
                         }
-                        .id(idx)
+                        .id(item.offset)
                     }
                 }
                 .padding(.vertical, 2)

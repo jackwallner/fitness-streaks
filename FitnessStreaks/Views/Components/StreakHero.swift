@@ -79,11 +79,11 @@ struct StreakHero: View {
         if let w = streak.window {
             return "\(w.label.uppercased()) CHARGE"
         }
-        return streak.cadence == .daily ? "TODAY'S CHARGE" : "THIS WEEK'S CHARGE"
+        return "TODAY'S CHARGE"
     }
 
     private var intensity: CGFloat {
-        let cap: Double = streak.cadence == .daily ? 30 : 8
+        let cap: Double = 30
         return CGFloat(min(1.0, 0.4 + Double(streak.current) / cap * 0.6))
     }
 }

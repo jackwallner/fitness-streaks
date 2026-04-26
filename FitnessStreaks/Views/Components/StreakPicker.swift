@@ -69,15 +69,14 @@ struct StreakPickerList: View {
 
     private func subtitle(for streak: Streak) -> String {
         let label = streak.metric.thresholdLabel(streak.threshold, cadence: streak.cadence)
-        let unit = streak.cadence == .daily ? "days" : "wks"
-        return "\(streak.current) \(unit) · \(label)"
+        return "\(streak.current) days · \(label)"
     }
 
     private func cadenceLabel(for streak: Streak) -> String {
         if let w = streak.window {
             return w.label.uppercased()
         }
-        return streak.cadence == .daily ? "DAILY" : "WEEKLY"
+        return "DAILY"
     }
 }
 

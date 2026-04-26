@@ -6,9 +6,9 @@ import WidgetKit
 /// How aggressive the user wants the discovered streaks to feel.
 /// Drives StreakEngine ranking and hero selection.
 enum DiscoveryVibe: Int, CaseIterable, Codable, Sendable {
-    case sustainable = 0     // "something I've been doing for a while" — longest lower-tier streak
-    case challenging = 1     // "stretch, but hittable" — mid-tier with recent momentum
-    case lifeChanging = 2    // "I want the top tier" — highest threshold reachable
+    case sustainable = 0     // ~80% historical daily completion — easy to maintain
+    case challenging = 1     // ~65% historical daily completion — stretch to daily
+    case lifeChanging = 2    // ~50% historical daily completion — transformative if daily
 
     var label: String {
         switch self {
@@ -20,9 +20,9 @@ enum DiscoveryVibe: Int, CaseIterable, Codable, Sendable {
 
     var tagline: String {
         switch self {
-        case .sustainable: "Streaks you've already built. Keep the chain alive."
-        case .challenging: "A stretch — but within reach with steady effort."
-        case .lifeChanging: "The top tier. Aim high; build toward it."
+        case .sustainable: "Goals you already hit most days. Turn them into unbroken streaks."
+        case .challenging: "Goals you hit roughly 2 of 3 days. Push to make them daily."
+        case .lifeChanging: "Goals you hit about half the time. Building the daily habit changes everything."
         }
     }
 
@@ -31,6 +31,15 @@ enum DiscoveryVibe: Int, CaseIterable, Codable, Sendable {
         case .sustainable: "already doing"
         case .challenging: "push a little"
         case .lifeChanging: "go big"
+        }
+    }
+
+    /// Minimum historical daily completion rate used to select a threshold for this vibe.
+    var targetCompletionRate: Double {
+        switch self {
+        case .sustainable: 0.80
+        case .challenging: 0.65
+        case .lifeChanging: 0.50
         }
     }
 }
@@ -131,7 +140,7 @@ final class StreakSettings: ObservableObject {
     }
 
     /// Which discovered streaks the user opted in to track, keyed as "metric-cadence"
-    /// (e.g. "steps-daily", "workouts-weekly"). `nil` = not yet chosen → treat as "all on".
+    /// (e.g. "steps-daily", "workouts-daily"). `nil` = not yet chosen → treat as "all on".
     @Published var trackedStreaks: Set<String>? {
         didSet {
             if let set = trackedStreaks {

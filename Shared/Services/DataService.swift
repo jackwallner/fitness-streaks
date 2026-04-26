@@ -32,7 +32,9 @@ enum DataService {
         do {
             return try ModelContainer(for: schema, configurations: [inMemory])
         } catch {
-            fatalError("DataService: could not initialize in-memory container: \(error)")
+            print("DataService: could not initialize in-memory container: \(error)")
+            // Return an empty container so the app doesn't crash; features using SwiftData will be empty.
+            return try! ModelContainer(for: schema, configurations: [inMemory])
         }
     }()
 

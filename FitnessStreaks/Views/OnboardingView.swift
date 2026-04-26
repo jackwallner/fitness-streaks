@@ -249,7 +249,7 @@ struct OnboardingView: View {
             .frame(maxWidth: .infinity)
             .pixelPanel(color: Theme.retroMagenta)
 
-            Text("Tip: \"\(selectedVibe.label)\" vibe will\n\(selectedVibe.tagline.lowercased())")
+            Text("Tip: \"\(selectedVibe.label)\" picks goals you\nalready hit \(Int(selectedVibe.targetCompletionRate * 100))% of the time.\nStrive for 100% daily.")
                 .font(RetroFont.mono(10))
                 .foregroundStyle(Theme.retroInkDim)
                 .lineSpacing(2)
@@ -296,7 +296,7 @@ struct OnboardingView: View {
     private var featurePanel: some View {
         VStack(alignment: .leading, spacing: 6) {
             featureRow("9 METRICS · STEPS TO SLEEP")
-            featureRow("DAILY & WEEKLY STREAKS")
+            featureRow("DAILY STREAKS ONLY")
             featureRow("CALENDAR HEATMAPS")
             featureRow("100% LOCAL · NO NETWORK")
         }

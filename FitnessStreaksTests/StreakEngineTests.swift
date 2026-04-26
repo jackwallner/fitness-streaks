@@ -23,33 +23,9 @@ final class StreakEngineTests: XCTestCase {
         XCTAssertEqual(streak.currentUnitValue, 2_000)
     }
 
-    func testWeeklyStreakContinuesThroughIncompleteCurrentWeek() {
-        let now = day(2026, 4, 26)
-        let thisWeek = DateHelpers.startOfWeek(now)
-        let lastWeek = DateHelpers.addWeeks(-1, to: thisWeek)
-        let twoWeeksAgo = DateHelpers.addWeeks(-2, to: thisWeek)
-        let history = [
-            activity(twoWeeksAgo, steps: 36_000),
-            activity(lastWeek, steps: 40_000),
-            activity(thisWeek, steps: 10_000),
-        ]
-        let totals = StreakEngine.weeklyTotals(for: .steps, byDay: Dictionary(uniqueKeysWithValues: history.map { ($0.date, $0) }))
-
-        let streak = StreakEngine.computeWeeklyStreak(
-            metric: .steps,
-            threshold: 35_000,
-            weekTotals: totals,
-            thisWeek: thisWeek
-        )
-
-        XCTAssertEqual(streak.current, 2)
-        XCTAssertFalse(streak.currentUnitCompleted)
-        XCTAssertEqual(streak.currentUnitValue, 10_000)
-    }
-
     func testTrackedFilteringAndSnapshotUseFilteredStreaks() {
         let steps = streak(metric: .steps, cadence: .daily, threshold: 3_000, current: 5)
-        let workouts = streak(metric: .workouts, cadence: .weekly, threshold: 3, current: 4)
+        let workouts = streak(metric: .workouts, cadence: .daily, threshold: 1, current: 4)
 
         let filtered = StreakStore.applyTrackedFilter([steps, workouts], tracked: [workouts.trackingKey])
         let snapshot = StreakEngine.snapshot(from: filtered)
@@ -83,6 +59,28 @@ final class StreakEngineTests: XCTestCase {
             StreakEngine.vibeScore(high, vibe: .lifeChanging),
             StreakEngine.vibeScore(low, vibe: .lifeChanging)
         )
+    }
+
+    func testCompletionRatePicksThresholdMatchingVibe() {
+        let today = day(2026, 4, 26)
+        // 10 days: first 5 at 15k, next 3 at 10k, last 2 at 2k
+        let history = (0..<10).map { offset -> ActivityDay in
+            let steps: Double
+            if offset < 5 { steps = 15_000 }
+            else if offset < 8 { steps = 10_000 }
+            else { steps = 2_000 }
+            return activity(DateHelpers.addDays(-offset, to: today), steps: steps)
+        }
+
+        // Sustainable (80% target) → 10k hit on 8/10 days = 80%
+        let sustainable = StreakEngine.discover(history: history, vibe: .sustainable, now: today)
+        let sSust = sustainable.first { $0.metric == .steps }
+        XCTAssertEqual(sSust?.threshold, 10_000)
+
+        // Life-changing (50% target) → 15k hit on 5/10 days = 50%
+        let lifeChanging = StreakEngine.discover(history: history, vibe: .lifeChanging, now: today)
+        let sLife = lifeChanging.first { $0.metric == .steps }
+        XCTAssertEqual(sLife?.threshold, 15_000)
     }
 
     func testCircularHourDistanceTreatsMidnightAsAdjacent() {

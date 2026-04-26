@@ -10,16 +10,86 @@ extension Color {
 }
 
 enum Theme {
-    // MARK: - Retro arcade palette (dark-only)
+    // MARK: - Retro arcade palette (light + dark adaptive)
 
-    static let retroBg        = Color(hex: 0x0a0612)
-    static let retroBgRaised  = Color(hex: 0x120a22)
-    static let retroBgCard    = Color(hex: 0x1e1236)
-    static let retroGrid      = Color(hex: 0x2a1a4a)
+    static var retroBg: Color {
+        #if os(iOS)
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .light
+                ? UIColor(Color(hex: 0xf5f2ff))
+                : UIColor(Color(hex: 0x0a0612))
+        })
+        #else
+        Color(hex: 0x0a0612)
+        #endif
+    }
+    static var retroBgRaised: Color {
+        #if os(iOS)
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .light
+                ? UIColor(Color(hex: 0xffffff))
+                : UIColor(Color(hex: 0x120a22))
+        })
+        #else
+        Color(hex: 0x120a22)
+        #endif
+    }
+    static var retroBgCard: Color {
+        #if os(iOS)
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .light
+                ? UIColor(Color(hex: 0xede8fc))
+                : UIColor(Color(hex: 0x1e1236))
+        })
+        #else
+        Color(hex: 0x1e1236)
+        #endif
+    }
+    static var retroGrid: Color {
+        #if os(iOS)
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .light
+                ? UIColor(Color(hex: 0xd8d0ee))
+                : UIColor(Color(hex: 0x2a1a4a))
+        })
+        #else
+        Color(hex: 0x2a1a4a)
+        #endif
+    }
 
-    static let retroInk       = Color(hex: 0xf4ecff)
-    static let retroInkDim    = Color(hex: 0x8b7cad)
-    static let retroInkFaint  = Color(hex: 0x4a3d6b)
+    static var retroInk: Color {
+        #if os(iOS)
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .light
+                ? UIColor(Color(hex: 0x120824))
+                : UIColor(Color(hex: 0xf4ecff))
+        })
+        #else
+        Color(hex: 0xf4ecff)
+        #endif
+    }
+    static var retroInkDim: Color {
+        #if os(iOS)
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .light
+                ? UIColor(Color(hex: 0x6b5b8a))
+                : UIColor(Color(hex: 0x8b7cad))
+        })
+        #else
+        Color(hex: 0x8b7cad)
+        #endif
+    }
+    static var retroInkFaint: Color {
+        #if os(iOS)
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .light
+                ? UIColor(Color(hex: 0xb0a0cc))
+                : UIColor(Color(hex: 0x4a3d6b))
+        })
+        #else
+        Color(hex: 0x4a3d6b)
+        #endif
+    }
 
     static let retroMagenta   = Color(hex: 0xff2d95)
     static let retroCyan      = Color(hex: 0x2dd4ff)

@@ -4,17 +4,17 @@ import Foundation
 ///
 /// Algorithm (per metric):
 ///   1. Compute daily streaks at every threshold in `metric.dailyThresholds`.
-///   2. Compute weekly streaks at every threshold in `metric.weeklyThresholds`.
-///   3. Pick the HIGHEST-threshold streak per (metric, cadence) where `current >= minLength`.
+///   2. Compute the historical daily completion rate for each threshold.
+///   3. Pick the HIGHEST-threshold streak where completion rate >= vibe.targetCompletionRate
+///      and `current >= minLength`. Fallbacks ensure we never return empty.
 ///   4. Rank all surviving streaks by `Streak.score`.
 ///   5. The top-scoring streak becomes the hero; the next N are badges.
 ///
-/// "Current" counts the live unit (today / this week) only if it already met the threshold.
+/// "Current" counts today only if it already met the threshold.
 /// This keeps the streak from being "broken" mid-day.
 enum StreakEngine {
     /// Minimum current length to surface a streak. Anything shorter is treated as trivia.
     static let minDailyLength = 3
-    static let minWeeklyLength = 2
     /// Hard floor — we never surface streaks shorter than this even if nothing else qualifies.
     static let absoluteFloor = 2
 
@@ -38,28 +38,20 @@ enum StreakEngine {
 
         let byDay: [Date: ActivityDay] = Dictionary(uniqueKeysWithValues: history.map { ($0.date, $0) })
         let today = DateHelpers.startOfDay(now)
-        let thisWeek = DateHelpers.startOfWeek(now)
+        let totalDays = max(1, Double(history.count))
 
         var found: [Streak] = []
 
         for metric in StreakMetric.allCases where !hiddenMetrics.contains(metric) {
-            // Daily — per-vibe threshold pick
-            let dailyCandidates = metric.dailyThresholds.map { t in
-                computeDailyStreak(metric: metric, threshold: t, byDay: byDay, today: today)
+            let thresholds = metric.dailyThresholds
+            let candidates = thresholds.map { t -> (streak: Streak, completionRate: Double) in
+                let streak = computeDailyStreak(metric: metric, threshold: t, byDay: byDay, today: today)
+                let hitDays = history.filter { $0.value(for: metric) >= t }.count
+                let completionRate = Double(hitDays) / totalDays
+                return (streak, completionRate)
             }
-            if let best = pickByVibe(candidates: dailyCandidates, vibe: vibe, minLength: minDailyLength) {
+            if let best = pickByVibe(candidates: candidates, vibe: vibe, minLength: minDailyLength) {
                 found.append(best)
-            }
-
-            // Weekly
-            if let weekly = metric.weeklyThresholds {
-                let weekTotals = weeklyTotals(for: metric, byDay: byDay)
-                let weeklyCandidates = weekly.map { t in
-                    computeWeeklyStreak(metric: metric, threshold: t, weekTotals: weekTotals, thisWeek: thisWeek)
-                }
-                if let best = pickByVibe(candidates: weeklyCandidates, vibe: vibe, minLength: minWeeklyLength) {
-                    found.append(best)
-                }
             }
         }
 
@@ -107,43 +99,37 @@ enum StreakEngine {
 
     // MARK: - Selection
 
-    /// Choose the best per-(metric,cadence) threshold for a given vibe.
-    /// `candidates` is one Streak per threshold, ascending.
-    private static func pickByVibe(candidates: [Streak], vibe: DiscoveryVibe, minLength: Int) -> Streak? {
+    /// Choose the best threshold for a given vibe based on historical completion rate.
+    /// `candidates` is one (Streak, completionRate) per threshold, ascending.
+    private static func pickByVibe(candidates: [(streak: Streak, completionRate: Double)], vibe: DiscoveryVibe, minLength: Int) -> Streak? {
         guard !candidates.isEmpty else { return nil }
-        switch vibe {
-        case .lifeChanging:
-            // Highest threshold where current >= minLength; else highest with any history.
-            if let hit = candidates.reversed().first(where: { $0.current >= minLength }) {
-                return hit
-            }
-            return candidates.reversed().first(where: { $0.current >= absoluteFloor })
-        case .challenging:
-            // Favor mid-tier with real momentum: highest threshold where current >= minLength × 2,
-            // else any threshold meeting minLength, else floor.
-            if let pushed = candidates.reversed().first(where: { $0.current >= max(minLength * 2, minLength + 2) }) {
-                return pushed
-            }
-            if let hit = candidates.reversed().first(where: { $0.current >= minLength }) {
-                return hit
-            }
-            return candidates.first(where: { $0.current >= absoluteFloor })
-        case .sustainable:
-            // Prefer the longest-running streak across tiers, weighting ties toward higher tier.
-            let qualifying = candidates.filter { $0.current >= minLength }
-            let pool = qualifying.isEmpty ? candidates.filter { $0.current >= absoluteFloor } : qualifying
-            return pool.max { a, b in
-                if a.current != b.current { return a.current < b.current }
-                return a.threshold < b.threshold
-            }
+        let target = vibe.targetCompletionRate
+
+        // Primary: highest threshold that meets target completion rate AND has current streak >= minLength.
+        let qualifying = candidates.filter { $0.completionRate >= target && $0.streak.current >= minLength }
+        if let best = qualifying.last {
+            return best.streak
         }
+
+        // Fallback: highest threshold that meets target completion rate (even if streak is short).
+        let rateQualifying = candidates.filter { $0.completionRate >= target }
+        if let best = rateQualifying.last {
+            return best.streak
+        }
+
+        // Fallback: highest threshold with ANY streak >= absoluteFloor.
+        let anyStreak = candidates.filter { $0.streak.current >= absoluteFloor }
+        if let best = anyStreak.last {
+            return best.streak
+        }
+
+        // Last resort: highest completion rate overall.
+        return candidates.max(by: { $0.completionRate < $1.completionRate })?.streak
     }
 
     /// Score tuned per vibe — drives which streak becomes hero and badge ordering.
     static func vibeScore(_ s: Streak, vibe: DiscoveryVibe) -> Double {
-        let thresholds = s.window == nil
-            ? (s.cadence == .daily ? s.metric.dailyThresholds : (s.metric.weeklyThresholds ?? s.metric.dailyThresholds))
-            : hourlyStepThresholds
+        let thresholds = s.window == nil ? s.metric.dailyThresholds : hourlyStepThresholds
         let tierIdx = thresholds.firstIndex(of: s.threshold) ?? 0
         let tierCount = max(1, thresholds.count)
         let tierFrac = Double(tierIdx) / Double(tierCount - 1 == 0 ? 1 : tierCount - 1)
@@ -162,6 +148,12 @@ enum StreakEngine {
             // Strongly reward tier; length still matters but less.
             return (0.5 + len * 0.3) * (1.0 + 0.35 * Double(tierIdx)) * weight
         }
+    }
+
+    /// Convenience overload for callers that don't compute completion rates (e.g. hour windows).
+    private static func pickByVibe(candidates: [Streak], vibe: DiscoveryVibe, minLength: Int) -> Streak? {
+        let wrapped = candidates.map { (streak: $0, completionRate: 1.0) }
+        return pickByVibe(candidates: wrapped, vibe: vibe, minLength: minLength)
     }
 
     // MARK: - Hour-window miner
@@ -374,85 +366,6 @@ enum StreakEngine {
         )
     }
 
-    // MARK: - Weekly
-
-    static func weeklyTotals(for metric: StreakMetric, byDay: [Date: ActivityDay]) -> [Date: Double] {
-        var totals: [Date: Double] = [:]
-        for (day, activity) in byDay {
-            let weekStart = DateHelpers.startOfWeek(day)
-            totals[weekStart, default: 0] += activity.value(for: metric)
-        }
-        return totals
-    }
-
-    static func computeWeeklyStreak(
-        metric: StreakMetric,
-        threshold: Double,
-        weekTotals: [Date: Double],
-        thisWeek: Date
-    ) -> Streak {
-        let thisValue = weekTotals[thisWeek] ?? 0
-        let thisMet = thisValue >= threshold
-
-        var currentLen = 0
-        var streakStart: Date? = nil
-        if thisMet {
-            currentLen = 1
-            streakStart = thisWeek
-        }
-
-        var cursor = DateHelpers.addWeeks(-1, to: thisWeek)
-        while true {
-            let v = weekTotals[cursor] ?? 0
-            if v >= threshold {
-                currentLen += 1
-                streakStart = cursor
-                cursor = DateHelpers.addWeeks(-1, to: cursor)
-            } else {
-                break
-            }
-        }
-
-        // Best weekly streak
-        let sortedWeeks = weekTotals.keys.sorted()
-        var best = 0
-        var run = 0
-        for w in sortedWeeks {
-            if (weekTotals[w] ?? 0) >= threshold {
-                run += 1
-                best = max(best, run)
-            } else {
-                run = 0
-            }
-        }
-        best = max(best, currentLen)
-
-        // Last week that met threshold
-        var lastHit: Date? = nil
-        var back = thisWeek
-        for _ in 0..<200 {
-            if (weekTotals[back] ?? 0) >= threshold {
-                lastHit = back
-                break
-            }
-            back = DateHelpers.addWeeks(-1, to: back)
-        }
-
-        let progress = threshold > 0 ? min(thisValue / threshold, 10) : 0
-        return Streak(
-            metric: metric,
-            cadence: .weekly,
-            threshold: threshold,
-            current: currentLen,
-            best: best,
-            startDate: streakStart,
-            lastHitDate: lastHit,
-            currentUnitCompleted: thisMet,
-            currentUnitProgress: progress,
-            currentUnitValue: thisValue
-        )
-    }
-
     // MARK: - Detail helpers
 
     /// For the detail screen: per-day value + whether it met the threshold.
@@ -463,25 +376,8 @@ enum StreakEngine {
     ) -> [(date: Date, value: Double, met: Bool)] {
         history.map { day in
             let v = day.value(for: metric)
-            return (day.date, v, v >= threshold)
+            return (date: day.date, value: v, met: v >= threshold)
         }
     }
 
-    /// For the detail screen (weekly): per-week total + hit/miss.
-    static func weeklyHistory(
-        for metric: StreakMetric,
-        threshold: Double,
-        history: [ActivityDay]
-    ) -> [(weekStart: Date, total: Double, met: Bool)] {
-        var totals: [Date: Double] = [:]
-        for day in history {
-            let w = DateHelpers.startOfWeek(day.date)
-            totals[w, default: 0] += day.value(for: metric)
-        }
-        let sorted = totals.keys.sorted()
-        return sorted.map { w in
-            let t = totals[w] ?? 0
-            return (w, t, t >= threshold)
-        }
-    }
 }

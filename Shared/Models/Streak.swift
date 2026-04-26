@@ -67,7 +67,7 @@ struct Streak: Identifiable, Hashable, Sendable {
     var score: Double {
         let base = Double(current) * metric.weight
         // Boost for higher-threshold tiers
-        let thresholds = cadence == .daily ? metric.dailyThresholds : (metric.weeklyThresholds ?? metric.dailyThresholds)
+        let thresholds = metric.dailyThresholds
         if let idx = thresholds.firstIndex(of: threshold) {
             let tierBonus = 1.0 + Double(idx) * 0.12
             return base * tierBonus

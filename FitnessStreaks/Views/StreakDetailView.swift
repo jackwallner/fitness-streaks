@@ -17,7 +17,7 @@ struct StreakDetailView: View {
                     hourWindowExplainer.padding(.horizontal, 14)
                     statsRow.padding(.horizontal, 14)
                 } else {
-                    PixelSectionHeader(title: streak.cadence == .daily ? "Last 365 Days" : "Weekly Hits")
+                    PixelSectionHeader(title: "Last 365 Days")
                         .padding(.top, 4)
 
                     heatmapCard.padding(.horizontal, 14)
@@ -68,7 +68,7 @@ struct StreakDetailView: View {
                 .minimumScaleFactor(0.5)
                 .lineLimit(1)
 
-            Text(streak.cadence == .daily ? "DAYS IN A ROW" : "WEEKS IN A ROW")
+            Text("DAYS IN A ROW")
                 .font(RetroFont.pixel(11))
                 .tracking(2)
                 .foregroundStyle(Theme.retroInk)
@@ -127,7 +127,7 @@ struct StreakDetailView: View {
     private var todayCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(streak.cadence == .daily ? "TODAY" : "THIS WEEK")
+                Text("TODAY")
                     .font(RetroFont.pixel(9))
                     .tracking(2)
                     .foregroundStyle(Theme.retroInkDim)
@@ -153,20 +153,15 @@ struct StreakDetailView: View {
 
     private var heatmapCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            if streak.cadence == .daily {
-                CalendarHeatmap(
-                    entries: StreakEngine.dailyHistory(
-                        for: streak.metric,
-                        threshold: streak.threshold,
-                        history: store.history
-                    ),
-                    accent: streak.metric.accent
-                )
-                legendRow
-            } else {
-                weeklyBars
-                legendRow
-            }
+            CalendarHeatmap(
+                entries: StreakEngine.dailyHistory(
+                    for: streak.metric,
+                    threshold: streak.threshold,
+                    history: store.history
+                ),
+                accent: streak.metric.accent
+            )
+            legendRow
         }
         .padding(14)
         .pixelPanel(color: streak.metric.accent)
@@ -209,32 +204,19 @@ struct StreakDetailView: View {
         return Double(hits) / Double(weeks)
     }
 
-    private var weeklyBars: some View {
-        let weeks = StreakEngine.weeklyHistory(for: streak.metric, threshold: streak.threshold, history: store.history)
-        let maxVal = max(streak.threshold * 1.4, weeks.map(\.total).max() ?? streak.threshold)
-        return HStack(alignment: .bottom, spacing: 3) {
-            ForEach(Array(weeks.enumerated()), id: \.offset) { _, w in
-                Rectangle()
-                    .fill(w.met ? streak.metric.accent : streak.metric.accent.opacity(0.25))
-                    .frame(height: max(4, CGFloat(w.total / maxVal) * 80))
-            }
-        }
-        .frame(height: 80)
-    }
-
     // MARK: - Stats row
 
     private var statsRow: some View {
         HStack(spacing: 8) {
             statCell(title: "CURRENT",
                      value: "\(streak.current)",
-                     unit: streak.cadence == .daily ? "DAYS" : "WKS",
+                     unit: "DAYS",
                      color: streak.metric.accent)
             statCell(title: "BEST",
                      value: "\(streak.best)",
-                     unit: streak.cadence == .daily ? "DAYS" : "WKS",
+                     unit: "DAYS",
                      color: Theme.retroAmber)
-            statCell(title: streak.cadence == .daily ? "TODAY" : "WEEK",
+            statCell(title: "TODAY",
                      value: streak.metric.format(value: streak.currentUnitValue),
                      unit: streak.metric.unitLabel.uppercased(),
                      color: Theme.retroLime)
@@ -308,9 +290,7 @@ struct StreakDetailView: View {
     // MARK: - Threshold ladder (hero only)
 
     private var thresholdLadder: some View {
-        let thresholds = streak.cadence == .daily
-            ? streak.metric.dailyThresholds
-            : (streak.metric.weeklyThresholds ?? [])
+        let thresholds = streak.metric.dailyThresholds
 
         return VStack(alignment: .leading, spacing: 0) {
             Text("THRESHOLD TIERS")
@@ -329,26 +309,12 @@ struct StreakDetailView: View {
     }
 
     private func ladderRow(threshold t: Double) -> some View {
-        let s: Streak = {
-            if streak.cadence == .daily {
-                return StreakEngine.computeDailyStreak(
-                    metric: streak.metric,
-                    threshold: t,
-                    byDay: Dictionary(uniqueKeysWithValues: store.history.map { ($0.date, $0) }),
-                    today: DateHelpers.startOfDay()
-                )
-            }
-            let totals = StreakEngine.weeklyTotals(
-                for: streak.metric,
-                byDay: Dictionary(uniqueKeysWithValues: store.history.map { ($0.date, $0) })
-            )
-            return StreakEngine.computeWeeklyStreak(
-                metric: streak.metric,
-                threshold: t,
-                weekTotals: totals,
-                thisWeek: DateHelpers.startOfWeek()
-            )
-        }()
+        let s = StreakEngine.computeDailyStreak(
+            metric: streak.metric,
+            threshold: t,
+            byDay: Dictionary(uniqueKeysWithValues: store.history.map { ($0.date, $0) }),
+            today: DateHelpers.startOfDay()
+        )
         let active = t == streak.threshold
         return HStack(spacing: 10) {
             Rectangle()
@@ -357,7 +323,7 @@ struct StreakDetailView: View {
                 .opacity(active ? 1 : 0.2)
                 .shadow(color: streak.metric.accent.opacity(active ? 0.8 : 0), radius: 6)
             VStack(alignment: .leading, spacing: 2) {
-                Text(streak.metric.thresholdLabel(t, cadence: streak.cadence).uppercased())
+                Text(streak.metric.thresholdLabel(t, cadence: .daily).uppercased())
                     .font(RetroFont.pixel(10))
                     .foregroundStyle(active ? streak.metric.accent : Theme.retroInk)
                 if active {

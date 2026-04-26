@@ -87,21 +87,6 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
         }
     }
 
-    /// Weekly totals (sum across the week) to evaluate. `nil` = no weekly cadence surfaced.
-    var weeklyThresholds: [Double]? {
-        switch self {
-        case .steps: [35_000, 50_000, 70_000, 100_000]
-        case .exerciseMinutes: [75, 100, 150, 200, 300]
-        case .standHours: [42, 56, 70]
-        case .activeEnergy: [1_500, 2_000, 3_000, 4_000, 5_000]
-        case .workouts: [2, 3, 4, 5, 7]
-        case .mindfulMinutes: [10, 30, 60]
-        case .sleepHours: [42, 49, 56]
-        case .distanceMiles: [10, 20, 30, 50]
-        case .flightsClimbed: [25, 50, 100]
-        }
-    }
-
     var unitLabel: String {
         switch self {
         case .steps: "steps"
@@ -140,32 +125,21 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
     func thresholdLabel(_ threshold: Double, cadence: StreakCadence) -> String {
         switch self {
         case .workouts:
-            if cadence == .daily { return "any workout" }
-            let n = Int(threshold.rounded())
-            return n == 1 ? "1 workout/wk" : "\(n) workouts/wk"
+            return "any workout"
         default:
             let v = format(value: threshold)
-            switch cadence {
-            case .daily: return "\(v) \(unitLabel)"
-            case .weekly: return "\(v) \(unitLabel)/wk"
-            }
+            return "\(v) \(unitLabel)"
         }
     }
 
-    /// Human-readable prose for the detail view, e.g. "10,000+ steps every day" or "100+ exercise minutes each week".
+    /// Human-readable prose for the detail view, e.g. "10,000+ steps every day".
     func prose(_ threshold: Double, cadence: StreakCadence) -> String {
-        switch (self, cadence) {
-        case (.workouts, .daily):
+        switch self {
+        case .workouts:
             return "A workout every day"
-        case (.workouts, .weekly):
-            let n = Int(threshold.rounded())
-            return n == 1 ? "A workout every week" : "\(n)+ workouts every week"
         default:
             let formatted = formatWithCommas(threshold)
-            switch cadence {
-            case .daily: return "\(formatted)+ \(unitLabel) every day"
-            case .weekly: return "\(formatted)+ \(unitLabel) every week"
-            }
+            return "\(formatted)+ \(unitLabel) every day"
         }
     }
 
