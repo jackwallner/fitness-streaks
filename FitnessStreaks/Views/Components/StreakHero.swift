@@ -33,7 +33,7 @@ struct StreakHero: View {
             }
 
             HStack {
-                Text(chargeTitle)
+                Text(progressTitle)
                     .font(RetroFont.mono(9, weight: .bold))
                     .tracking(2)
                     .foregroundStyle(Theme.retroInkDim)
@@ -47,7 +47,7 @@ struct StreakHero: View {
                              accent: streak.currentUnitCompleted ? Theme.retroLime : Theme.retroAmber)
 
             HStack(spacing: 4) {
-                Text("best \(streak.best)")
+                Text("best \(streak.best) in \(streak.lookbackDays)d")
                 if let s = streak.startDate {
                     Text("· since \(DateHelpers.shortDate(s).lowercased())")
                 }
@@ -75,11 +75,11 @@ struct StreakHero: View {
         return "\(v)/\(t) \(streak.metric.unitLabel.uppercased())"
     }
 
-    private var chargeTitle: String {
+    private var progressTitle: String {
         if let w = streak.window {
-            return "\(w.label.uppercased()) CHARGE"
+            return "\(w.label.uppercased()) PROGRESS"
         }
-        return "TODAY'S CHARGE"
+        return "TODAY'S PROGRESS"
     }
 
     private var intensity: CGFloat {

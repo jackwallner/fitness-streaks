@@ -61,7 +61,7 @@ struct StreakBadgeCard: View {
 
     private var subtitle: String {
         let label = streak.metric.thresholdLabel(streak.threshold, cadence: streak.cadence)
-        return "\(label) · best \(streak.best)"
+        return "\(label) · best \(streak.best) in \(streak.lookbackDays)d"
     }
 
     private var titleText: String {

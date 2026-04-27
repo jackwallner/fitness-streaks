@@ -15,6 +15,8 @@ final class DailyActivity {
     var sleepHours: Double
     var distanceMiles: Double
     var flightsClimbed: Double
+    var earlySteps: Double
+    var heartRateMinutes: Double
     var lastUpdated: Date
 
     init(
@@ -27,7 +29,9 @@ final class DailyActivity {
         mindfulMinutes: Double = 0,
         sleepHours: Double = 0,
         distanceMiles: Double = 0,
-        flightsClimbed: Double = 0
+        flightsClimbed: Double = 0,
+        earlySteps: Double = 0,
+        heartRateMinutes: Double = 0
     ) {
         let normalized = DateHelpers.startOfDay(date)
         self.dateString = DateHelpers.dayKey(normalized)
@@ -41,6 +45,8 @@ final class DailyActivity {
         self.sleepHours = sleepHours
         self.distanceMiles = distanceMiles
         self.flightsClimbed = flightsClimbed
+        self.earlySteps = earlySteps
+        self.heartRateMinutes = heartRateMinutes
         self.lastUpdated = Date()
     }
 
@@ -55,7 +61,9 @@ final class DailyActivity {
             mindfulMinutes: mindfulMinutes,
             sleepHours: sleepHours,
             distanceMiles: distanceMiles,
-            flightsClimbed: flightsClimbed
+            flightsClimbed: flightsClimbed,
+            earlySteps: earlySteps,
+            heartRateMinutes: heartRateMinutes
         )
     }
 }

@@ -50,14 +50,36 @@ final class StreakStore: ObservableObject {
         do {
             let previous = self.streaks
             let fresh = try await HealthKitService.shared.fetchHistory(days: 400)
-            self.history = fresh
-            try HealthKitService.shared.cache(fresh)
             // 90 days is enough to detect a real time-of-day rhythm without blowing up query cost.
             let hourly = (try? await HealthKitService.shared.fetchHourlySteps(days: 90)) ?? [:]
+            // Compute early steps (0–8am) from hourly data so the engine can evaluate .earlySteps streaks.
+            var enriched = fresh
+            if !hourly.isEmpty {
+                enriched = fresh.map { day in
+                    let hours = hourly[day.date] ?? [:]
+                    let early = (0..<8).reduce(0.0) { sum, h in sum + (hours[h] ?? 0) }
+                    return ActivityDay(
+                        date: day.date,
+                        steps: day.steps,
+                        exerciseMinutes: day.exerciseMinutes,
+                        standHours: day.standHours,
+                        activeEnergy: day.activeEnergy,
+                        workoutCount: day.workoutCount,
+                        mindfulMinutes: day.mindfulMinutes,
+                        sleepHours: day.sleepHours,
+                        distanceMiles: day.distanceMiles,
+                        flightsClimbed: day.flightsClimbed,
+                        earlySteps: early,
+                        heartRateMinutes: day.heartRateMinutes
+                    )
+                }
+            }
+            self.history = enriched
+            try HealthKitService.shared.cache(enriched)
             let settings = StreakSettings.shared
             settings.pruneBroken()
             var all = StreakEngine.discover(
-                history: fresh,
+                history: enriched,
                 hourlySteps: hourly,
                 hiddenMetrics: settings.hiddenMetrics,
                 vibe: settings.vibe,
@@ -67,9 +89,9 @@ final class StreakStore: ObservableObject {
                 gracePreservations: settings.gracePreservations
             )
             var filtered = Self.applyTrackedFilter(all)
-            await handleBreaks(previous: previous, fresh: filtered, all: all, hourly: hourly, history: fresh)
+            await handleBreaks(previous: previous, fresh: filtered, all: all, hourly: hourly, history: enriched)
             all = StreakEngine.discover(
-                history: fresh,
+                history: enriched,
                 hourlySteps: hourly,
                 hiddenMetrics: settings.hiddenMetrics,
                 vibe: settings.vibe,

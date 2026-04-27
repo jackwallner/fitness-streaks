@@ -127,18 +127,24 @@ struct ActivityDay: Hashable, Sendable {
     let sleepHours: Double
     let distanceMiles: Double
     let flightsClimbed: Double
+    let earlySteps: Double
+    let heartRateMinutes: Double
 
     func value(for metric: StreakMetric) -> Double {
         switch metric {
-        case .steps: steps
-        case .exerciseMinutes: exerciseMinutes
-        case .standHours: standHours
-        case .activeEnergy: activeEnergy
-        case .workouts: workoutCount
-        case .mindfulMinutes: mindfulMinutes
-        case .sleepHours: sleepHours
-        case .distanceMiles: distanceMiles
-        case .flightsClimbed: flightsClimbed
+        case .steps: return steps
+        case .exerciseMinutes: return exerciseMinutes
+        case .standHours: return standHours
+        case .activeEnergy: return activeEnergy
+        case .workouts: return workoutCount
+        case .mindfulMinutes: return mindfulMinutes
+        case .sleepHours: return sleepHours
+        case .distanceMiles: return distanceMiles
+        case .flightsClimbed: return flightsClimbed
+        case .earlySteps: return earlySteps
+        case .intensityRatio:
+            return exerciseMinutes > 0 ? activeEnergy / exerciseMinutes : 0
+        case .heartRateMinutes: return heartRateMinutes
         }
     }
 }

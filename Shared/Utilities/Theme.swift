@@ -91,11 +91,61 @@ enum Theme {
         #endif
     }
 
-    static let retroMagenta   = Color(hex: 0xff2d95)
-    static let retroCyan      = Color(hex: 0x2dd4ff)
-    static let retroLime      = Color(hex: 0xc8ff00)
-    static let retroAmber     = Color(hex: 0xffb020)
-    static let retroRed       = Color(hex: 0xff3b50)
+    static var retroMagenta: Color {
+        #if os(iOS)
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .light
+                ? UIColor(Color(hex: 0xcc2266))
+                : UIColor(Color(hex: 0xff2d95))
+        })
+        #else
+        Color(hex: 0xff2d95)
+        #endif
+    }
+    static var retroCyan: Color {
+        #if os(iOS)
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .light
+                ? UIColor(Color(hex: 0x0099bb))
+                : UIColor(Color(hex: 0x2dd4ff))
+        })
+        #else
+        Color(hex: 0x2dd4ff)
+        #endif
+    }
+    static var retroLime: Color {
+        #if os(iOS)
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .light
+                ? UIColor(Color(hex: 0x8aaa00))
+                : UIColor(Color(hex: 0xc8ff00))
+        })
+        #else
+        Color(hex: 0xc8ff00)
+        #endif
+    }
+    static var retroAmber: Color {
+        #if os(iOS)
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .light
+                ? UIColor(Color(hex: 0xcc7a00))
+                : UIColor(Color(hex: 0xffb020))
+        })
+        #else
+        Color(hex: 0xffb020)
+        #endif
+    }
+    static var retroRed: Color {
+        #if os(iOS)
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .light
+                ? UIColor(Color(hex: 0xcc2233))
+                : UIColor(Color(hex: 0xff3b50))
+        })
+        #else
+        Color(hex: 0xff3b50)
+        #endif
+    }
 
     // MARK: - Legacy aliases (keep existing callsites compiling)
 
@@ -115,11 +165,74 @@ enum Theme {
     static let accentExercise = retroMagenta
     static let accentStand = retroCyan
     static let accentEnergy = retroAmber
-    static let accentDistance = Color(hex: 0xb088ff)
-    static let accentFlights = Color(hex: 0xff7a00)
+    static let accentHeartRate = Color(hex: 0xff2d55)
+    static var accentDistance: Color {
+        #if os(iOS)
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .light
+                ? UIColor(Color(hex: 0x7044cc))
+                : UIColor(Color(hex: 0xb088ff))
+        })
+        #else
+        Color(hex: 0xb088ff)
+        #endif
+    }
+    static var accentFlights: Color {
+        #if os(iOS)
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .light
+                ? UIColor(Color(hex: 0xcc5500))
+                : UIColor(Color(hex: 0xff7a00))
+        })
+        #else
+        Color(hex: 0xff7a00)
+        #endif
+    }
     static let accentWorkout = retroRed
-    static let accentMindful = Color(hex: 0x7aff9e)
-    static let accentSleep = Color(hex: 0x5da9ff)
+    static var accentMindful: Color {
+        #if os(iOS)
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .light
+                ? UIColor(Color(hex: 0x2a9955))
+                : UIColor(Color(hex: 0x7aff9e))
+        })
+        #else
+        Color(hex: 0x7aff9e)
+        #endif
+    }
+    static var accentSleep: Color {
+        #if os(iOS)
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .light
+                ? UIColor(Color(hex: 0x0d5599))
+                : UIColor(Color(hex: 0x5da9ff))
+        })
+        #else
+        Color(hex: 0x5da9ff)
+        #endif
+    }
+    static var accentEarly: Color {
+        #if os(iOS)
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .light
+                ? UIColor(Color(hex: 0xcc6600))
+                : UIColor(Color(hex: 0xffa040))
+        })
+        #else
+        Color(hex: 0xffa040)
+        #endif
+    }
+    static var accentIntensity: Color {
+        #if os(iOS)
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .light
+                ? UIColor(Color(hex: 0xcc3366))
+                : UIColor(Color(hex: 0xff5a8f))
+        })
+        #else
+        Color(hex: 0xff5a8f)
+        #endif
+    }
 
     static let cardRadius: CGFloat = 0
     static let cardPadding: CGFloat = 16

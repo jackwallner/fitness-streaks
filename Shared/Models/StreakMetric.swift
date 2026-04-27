@@ -12,6 +12,9 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
     case sleepHours
     case distanceMiles
     case flightsClimbed
+    case earlySteps
+    case intensityRatio
+    case heartRateMinutes
 
     var id: String { rawValue }
 
@@ -26,6 +29,9 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
         case .sleepHours: "Sleep"
         case .distanceMiles: "Distance"
         case .flightsClimbed: "Flights climbed"
+        case .earlySteps: "Early Steps"
+        case .intensityRatio: "Intensity"
+        case .heartRateMinutes: "Cardio Minutes"
         }
     }
 
@@ -40,6 +46,9 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
         case .sleepHours: "bed.double.fill"
         case .distanceMiles: "location.fill"
         case .flightsClimbed: "stairs"
+        case .earlySteps: "sunrise.fill"
+        case .intensityRatio: "bolt.heart.fill"
+        case .heartRateMinutes: "heart.fill"
         }
     }
 
@@ -54,6 +63,9 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
         case .sleepHours: Theme.accentSleep
         case .distanceMiles: Theme.accentDistance
         case .flightsClimbed: Theme.accentFlights
+        case .earlySteps: Theme.accentEarly
+        case .intensityRatio: Theme.accentIntensity
+        case .heartRateMinutes: Theme.accentHeartRate
         }
     }
 
@@ -69,6 +81,9 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
         case .flightsClimbed: 0.85
         case .mindfulMinutes: 0.85
         case .sleepHours: 0.9
+        case .earlySteps: 1.0
+        case .intensityRatio: 1.1
+        case .heartRateMinutes: 1.15
         }
     }
 
@@ -84,6 +99,9 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
         case .sleepHours: [6, 7, 8]
         case .distanceMiles: [1, 3, 5, 8]
         case .flightsClimbed: [5, 10, 20]
+        case .earlySteps: [500, 1_000, 2_000, 3_000, 5_000]
+        case .intensityRatio: [5, 8, 10, 12, 15, 20]
+        case .heartRateMinutes: [3, 5, 10, 15, 20, 30]
         }
     }
 
@@ -98,6 +116,9 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
         case .sleepHours: "hr sleep"
         case .distanceMiles: "mi"
         case .flightsClimbed: "flights"
+        case .earlySteps: "early steps"
+        case .intensityRatio: "kcal/min"
+        case .heartRateMinutes: "min cardio"
         }
     }
 
@@ -118,6 +139,17 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
             return String(format: "%.1f", value)
         case .distanceMiles:
             return String(format: value < 10 ? "%.1f" : "%.0f", value)
+        case .earlySteps:
+            let v = Int(value.rounded())
+            if v >= 1000 {
+                let k = Double(v) / 1000.0
+                return String(format: k.truncatingRemainder(dividingBy: 1) == 0 ? "%.0fk" : "%.1fk", k)
+            }
+            return "\(v)"
+        case .intensityRatio:
+            return String(format: "%.1f", value)
+        case .heartRateMinutes:
+            return "\(Int(value.rounded()))"
         }
     }
 

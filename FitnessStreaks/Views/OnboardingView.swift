@@ -145,15 +145,16 @@ struct OnboardingView: View {
 
             VStack(spacing: 8) {
                 Text("STREAK\nFINDER")
-                    .font(RetroFont.mono(26, weight: .bold))
+                    .font(RetroFont.mono(32, weight: .bold))
                     .tracking(2)
                     .foregroundStyle(Theme.retroMagenta)
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
                     .retroGlow(Theme.retroMagenta)
+                    .minimumScaleFactor(0.7)
 
                 Text("Discover the fitness streaks\nyou've already built\nfrom Apple Health.")
-                    .font(RetroFont.mono(12))
+                    .font(RetroFont.mono(14))
                     .foregroundStyle(Theme.retroInkDim)
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
@@ -167,12 +168,12 @@ struct OnboardingView: View {
     private var vibeStep: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("PICK YOUR VIBE")
-                .font(RetroFont.mono(14, weight: .bold))
+                .font(RetroFont.mono(16, weight: .bold))
                 .tracking(2)
                 .foregroundStyle(Theme.retroInk)
 
             Text("How do you want your streaks to feel?")
-                .font(RetroFont.mono(11))
+                .font(RetroFont.mono(13))
                 .foregroundStyle(Theme.retroInkDim)
                 .padding(.bottom, 4)
 
@@ -201,11 +202,11 @@ struct OnboardingView: View {
                     .foregroundStyle(selected ? accent : Theme.retroInkFaint)
                 VStack(alignment: .leading, spacing: 4) {
                     Text(vibe.label.uppercased())
-                        .font(RetroFont.mono(12, weight: .bold))
+                        .font(RetroFont.mono(14, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(selected ? accent : Theme.retroInk)
                     Text(vibe.tagline)
-                        .font(RetroFont.mono(11))
+                        .font(RetroFont.mono(13))
                         .foregroundStyle(Theme.retroInkDim)
                         .multilineTextAlignment(.leading)
                 }
@@ -222,23 +223,23 @@ struct OnboardingView: View {
     private var minimumStep: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("DISCOVERY WINDOW")
-                .font(RetroFont.mono(14, weight: .bold))
+                .font(RetroFont.mono(16, weight: .bold))
                 .tracking(2)
                 .foregroundStyle(Theme.retroInk)
 
             Text("How many days of history should we use\nwhen suggesting new streak thresholds?")
-                .font(RetroFont.mono(11))
+                .font(RetroFont.mono(13))
                 .foregroundStyle(Theme.retroInkDim)
                 .lineSpacing(2)
 
             VStack(spacing: 10) {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                     Text("\(lookbackDays)")
-                        .font(RetroFont.mono(36, weight: .bold))
+                        .font(RetroFont.mono(42, weight: .bold))
                         .foregroundStyle(Theme.retroMagenta)
                         .retroGlow(Theme.retroMagenta)
                     Text("DAYS")
-                        .font(RetroFont.mono(11, weight: .bold))
+                        .font(RetroFont.mono(13, weight: .bold))
                         .foregroundStyle(Theme.retroInkDim)
                 }
 
@@ -249,9 +250,9 @@ struct OnboardingView: View {
                 .tint(Theme.retroMagenta)
 
                 HStack {
-                    Text("7 DAYS").font(RetroFont.mono(9)).foregroundStyle(Theme.retroInkFaint)
+                    Text("7 DAYS").font(RetroFont.mono(11)).foregroundStyle(Theme.retroInkFaint)
                     Spacer()
-                    Text("365 DAYS").font(RetroFont.mono(9)).foregroundStyle(Theme.retroInkFaint)
+                    Text("365 DAYS").font(RetroFont.mono(11)).foregroundStyle(Theme.retroInkFaint)
                 }
             }
             .padding(14)
@@ -259,7 +260,7 @@ struct OnboardingView: View {
             .pixelPanel(color: Theme.retroMagenta)
 
             Text("Tip: \"\(selectedVibe.label)\" picks goals you\nalready hit \(Int(selectedVibe.targetCompletionRate * 100))% of the time.\nExisting streaks stay locked after setup.")
-                .font(RetroFont.mono(10))
+                .font(RetroFont.mono(13))
                 .foregroundStyle(Theme.retroInkDim)
                 .lineSpacing(2)
         }
@@ -269,12 +270,12 @@ struct OnboardingView: View {
     private var reviewStep: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("YOUR STREAKS")
-                .font(RetroFont.mono(14, weight: .bold))
+                .font(RetroFont.mono(16, weight: .bold))
                 .tracking(2)
                 .foregroundStyle(Theme.retroInk)
 
             Text("We scanned your Apple Health history.\n★ = most interesting for your vibe.\nTap to opt in or out.")
-                .font(RetroFont.mono(11))
+                .font(RetroFont.mono(13))
                 .foregroundStyle(Theme.retroInkDim)
                 .lineSpacing(2)
 
@@ -283,7 +284,7 @@ struct OnboardingView: View {
                     PixelFlame(size: 48, intensity: 0.5, tint: Theme.retroInkDim)
                         .padding(.top, 30)
                     Text("No streaks discovered yet.\nFinish setup — Streak Finder will\nsurface them as your Apple Health\nhistory grows.")
-                        .font(RetroFont.mono(11))
+                        .font(RetroFont.mono(13))
                         .foregroundStyle(Theme.retroInkDim)
                         .multilineTextAlignment(.center)
                         .lineSpacing(2)

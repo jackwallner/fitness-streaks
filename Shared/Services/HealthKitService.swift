@@ -23,6 +23,7 @@ final class HealthKitService: ObservableObject {
         .activeEnergyBurned,
         .distanceWalkingRunning,
         .flightsClimbed,
+        .heartRate,
     ]
 
     /// Category types (mindful session, sleep analysis) + workout type.
@@ -109,8 +110,9 @@ final class HealthKitService: ObservableObject {
         async let workouts = workoutCounts(start: start, end: end)
         async let mindful = categoryMinutes(.mindfulSession, start: start, end: end)
         async let sleep = sleepHoursByDay(start: start, end: end)
+        async let hr = heartRateMinutesAbove(thresholdBPM: 100, start: start, end: end)
 
-        let (s, ex, sh, en, dist, fl, wo, mi, sl) = try await (steps, exercise, standHours, energy, distance, flights, workouts, mindful, sleep)
+        let (s, ex, sh, en, dist, fl, wo, mi, sl, hrm) = try await (steps, exercise, standHours, energy, distance, flights, workouts, mindful, sleep, hr)
 
         var results: [ActivityDay] = []
         var cursor = start
@@ -126,7 +128,9 @@ final class HealthKitService: ObservableObject {
                 mindfulMinutes: mi[key] ?? 0,
                 sleepHours: sl[key] ?? 0,
                 distanceMiles: dist[key] ?? 0,
-                flightsClimbed: fl[key] ?? 0
+                flightsClimbed: fl[key] ?? 0,
+                earlySteps: 0,
+                heartRateMinutes: hrm[key] ?? 0
             ))
             cursor = DateHelpers.addDays(1, to: cursor)
         }
@@ -372,6 +376,59 @@ final class HealthKitService: ObservableObject {
         return out
     }
 
+    // MARK: - Heart Rate
+
+    /// Approximate minutes per day with heart rate above `thresholdBPM`.
+    /// Counts time between consecutive elevated samples (capped at 30s) to avoid
+    /// overcounting sparse background readings, then converts to minutes.
+    private func heartRateMinutesAbove(thresholdBPM: Double, start: Date, end: Date) async throws -> [Date: Double] {
+        let type = HKQuantityType(.heartRate)
+        let predicate = HKQuery.predicateForSamples(withStart: start, end: end, options: .strictStartDate)
+
+        let samples: [HKQuantitySample] = try await withCheckedThrowingContinuation { continuation in
+            let query = HKSampleQuery(
+                sampleType: type,
+                predicate: predicate,
+                limit: HKObjectQueryNoLimit,
+                sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)]
+            ) { _, results, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume(returning: (results as? [HKQuantitySample]) ?? [])
+                }
+            }
+            store.execute(query)
+        }
+
+        let unit = HKUnit.count().unitDivided(by: .minute())
+        var byDay: [Date: [HKQuantitySample]] = [:]
+        for sample in samples {
+            let day = DateHelpers.startOfDay(sample.startDate)
+            byDay[day, default: []].append(sample)
+        }
+
+        var out: [Date: Double] = [:]
+        for (day, daySamples) in byDay {
+            let elevated = daySamples.filter { $0.quantity.doubleValue(for: unit) > thresholdBPM }
+            guard !elevated.isEmpty else { continue }
+
+            var totalSeconds: Double = 0
+            var previous: Date? = nil
+            for sample in elevated {
+                if let prev = previous {
+                    let gap = sample.startDate.timeIntervalSince(prev)
+                    totalSeconds += min(gap, 30)
+                } else {
+                    totalSeconds += 5 // first sample in a burst
+                }
+                previous = sample.startDate
+            }
+            out[day] = totalSeconds / 60.0
+        }
+        return out
+    }
+
     // MARK: - Cache
 
     @discardableResult
@@ -403,6 +460,8 @@ final class HealthKitService: ObservableObject {
                 existing.sleepHours = day.sleepHours
                 existing.distanceMiles = day.distanceMiles
                 existing.flightsClimbed = day.flightsClimbed
+                existing.earlySteps = day.earlySteps
+                existing.heartRateMinutes = day.heartRateMinutes
                 existing.lastUpdated = Date()
             } else {
                 let record = DailyActivity(
@@ -415,7 +474,9 @@ final class HealthKitService: ObservableObject {
                     mindfulMinutes: day.mindfulMinutes,
                     sleepHours: day.sleepHours,
                     distanceMiles: day.distanceMiles,
-                    flightsClimbed: day.flightsClimbed
+                    flightsClimbed: day.flightsClimbed,
+                    earlySteps: day.earlySteps,
+                    heartRateMinutes: day.heartRateMinutes
                 )
                 context.insert(record)
             }
