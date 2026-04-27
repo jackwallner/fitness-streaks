@@ -68,7 +68,7 @@ struct StreakDetailView: View {
                 .minimumScaleFactor(0.5)
                 .lineLimit(1)
 
-            Text("DAYS IN A ROW")
+            Text(streak.cadence == .daily ? "DAYS IN A ROW" : "WEEKS IN A ROW")
                 .font(RetroFont.pixel(11))
                 .tracking(2)
                 .foregroundStyle(Theme.retroInk)
@@ -210,11 +210,11 @@ struct StreakDetailView: View {
         HStack(spacing: 8) {
             statCell(title: "CURRENT",
                      value: "\(streak.current)",
-                     unit: "DAYS",
+                     unit: streak.cadence == .daily ? "DAYS" : "WEEKS",
                      color: streak.metric.accent)
             statCell(title: "BEST",
                      value: "\(streak.best)",
-                     unit: "DAYS",
+                     unit: streak.cadence == .daily ? "DAYS" : "WEEKS",
                      color: Theme.retroAmber)
             statCell(title: "RATE",
                      value: "\(Int(streak.completionRate * 100))%",

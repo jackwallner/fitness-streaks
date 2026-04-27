@@ -8,7 +8,7 @@ import Foundation
 ///   3. For each candidate, compute the daily completion rate and current streak.
 ///   4. Pick the threshold whose completion rate is CLOSEST to vibe.targetCompletionRate.
 ///   5. Only surface the metric if the best completion rate is within ±10pp of target.
-///   6. Rank all surviving streaks by `Streak.score`.
+///   6. Rank all surviving streaks by `vibeScore`.
 ///   7. The top-scoring streak becomes the hero; the next N are badges.
 ///
 /// "Current" counts today only if it already met the threshold.
@@ -175,7 +175,19 @@ enum StreakEngine {
         let len = Double(s.current)
         let weight = s.metric.weight
         let difficulty = 1.0 + (1.0 - s.completionRate) * 0.5
-        return len * weight * difficulty
+
+        let thresholdBonus: Double
+        if s.window != nil {
+            if let idx = hourlyStepThresholds.firstIndex(where: { $0 >= s.threshold }) {
+                thresholdBonus = 1.0 + Double(idx) * 0.15
+            } else {
+                thresholdBonus = 1.0 + Double(hourlyStepThresholds.count) * 0.15
+            }
+        } else {
+            thresholdBonus = 1.0
+        }
+
+        return len * weight * difficulty * thresholdBonus
     }
 
     // MARK: - Hour-window miner

@@ -105,10 +105,10 @@ struct OnboardingView: View {
                     .foregroundStyle(Theme.retroBg)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
-                    .background(Theme.retroLime)
+                    .background(isPrimaryDisabled ? Theme.retroInkFaint : Theme.retroLime)
             }
             .buttonStyle(.plain)
-            .disabled(requesting)
+            .disabled(isPrimaryDisabled)
         }
     }
 
@@ -118,9 +118,20 @@ struct OnboardingView: View {
         case .vibe:     return "NEXT"
         case .minimum:  return requesting ? "FINDING..." : "▶ FIND MY STREAKS"
         case .review:
+            // Empty candidates is the App Store reviewer / fresh-device path:
+            // let them finish anyway so the dashboard is reachable.
+            if store.allCandidates.isEmpty { return "▶ FINISH SETUP" }
             if selectedStreaks.isEmpty { return "PICK AT LEAST ONE" }
             return "▶ START TRACKING (\(selectedStreaks.count))"
         }
+    }
+
+    private var isPrimaryDisabled: Bool {
+        if requesting { return true }
+        if step == .review && !store.allCandidates.isEmpty && selectedStreaks.isEmpty {
+            return true
+        }
+        return false
     }
 
     // MARK: - Steps
@@ -271,10 +282,11 @@ struct OnboardingView: View {
                 VStack(spacing: 10) {
                     PixelFlame(size: 48, intensity: 0.5, tint: Theme.retroInkDim)
                         .padding(.top, 30)
-                    Text("No streaks found yet.\nMove around a bit and refresh.")
+                    Text("No streaks discovered yet.\nFinish setup — Streak Finder will\nsurface them as your Apple Health\nhistory grows.")
                         .font(RetroFont.mono(11))
                         .foregroundStyle(Theme.retroInkDim)
                         .multilineTextAlignment(.center)
+                        .lineSpacing(2)
                 }
                 .frame(maxWidth: .infinity)
             } else {
@@ -341,6 +353,15 @@ struct OnboardingView: View {
             )
             withAnimation { step = .review }
         case .review:
+            if store.allCandidates.isEmpty {
+                // No streaks discovered (fresh device / sparse Apple Health history).
+                // Finish anyway with "track everything" semantics so future candidates
+                // surface automatically; the dashboard's empty state guides from here.
+                settings.trackedStreaks = nil
+                store.refilter()
+                settings.hasCompletedSetup = true
+                return
+            }
             guard !selectedStreaks.isEmpty else { return }
             settings.trackedStreaks = selectedStreaks
             store.refilter()

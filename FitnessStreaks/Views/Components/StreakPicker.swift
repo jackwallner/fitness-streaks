@@ -69,7 +69,7 @@ struct StreakPickerList: View {
 
     private func subtitle(for streak: Streak) -> String {
         let label = streak.metric.thresholdLabel(streak.threshold, cadence: streak.cadence)
-        return "\(streak.current) days · \(label)"
+        return "\(streak.current) \(streak.cadence.pluralLabel) · \(label)"
     }
 
     private func cadenceLabel(for streak: Streak) -> String {
