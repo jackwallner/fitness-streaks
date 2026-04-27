@@ -16,9 +16,16 @@ struct SettingsView: View {
                     appearanceSection
                     vibeSection
                     notificationsSection
+                    graceSection
                     metricsSection
                     dataSection
                     aboutSection
+
+                    Text("Changes save automatically.")
+                        .font(RetroFont.mono(10))
+                        .foregroundStyle(Theme.retroInkDim)
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 8)
 
                     Text("READ-ONLY · LOCAL-ONLY · NO NETWORK")
                         .font(RetroFont.pixel(8))
@@ -42,7 +49,7 @@ struct SettingsView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { dismiss() } label: {
-                        Text("DONE")
+                        Text("CLOSE")
                             .font(RetroFont.pixel(10))
                             .foregroundStyle(Theme.retroCyan)
                     }
@@ -50,6 +57,7 @@ struct SettingsView: View {
             }
             .toolbarBackground(Theme.retroBg, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
+            .preferredColorScheme(settings.appearance.colorScheme)
             .sheet(isPresented: $showingPicker) {
                 StreakPickerSheet()
                     .environmentObject(settings)
@@ -131,7 +139,7 @@ struct SettingsView: View {
             .pixelPanel(color: Theme.retroInkFaint)
 
             HStack {
-                Text("LOOKBACK")
+                Text("DISCOVERY WINDOW")
                     .font(RetroFont.mono(10, weight: .bold))
                     .foregroundStyle(Theme.retroInk)
                 Spacer()
@@ -151,6 +159,11 @@ struct SettingsView: View {
             .onChange(of: settings.lookbackDays) { _, _ in
                 Task { await store.load() }
             }
+
+            Text("How many days of history we use when suggesting new streak thresholds. Existing streaks stay locked at their committed value.")
+                .font(RetroFont.mono(10))
+                .foregroundStyle(Theme.retroInkDim)
+                .padding(.horizontal, 14)
         }
     }
 
@@ -208,11 +221,55 @@ struct SettingsView: View {
                 .buttonStyle(.plain)
             }
 
-            Text("Daily 7pm nudge if your hero streak isn't locked in yet. iOS will ask for notification permission the first time you turn this on.")
+            DatePicker(
+                "REMINDER TIME",
+                selection: notificationTimeBinding,
+                displayedComponents: .hourAndMinute
+            )
+            .font(RetroFont.mono(10, weight: .bold))
+            .foregroundStyle(Theme.retroInk)
+            .tint(Theme.retroMagenta)
+            .padding(14)
+            .pixelPanel(color: Theme.retroInkFaint)
+            .disabled(!settings.notificationsEnabled)
+            .onChange(of: settings.notificationHour) { _, _ in
+                Task { await NotificationService.scheduleDailyReminder(for: store.hero) }
+            }
+            .onChange(of: settings.notificationMinute) { _, _ in
+                Task { await NotificationService.scheduleDailyReminder(for: store.hero) }
+            }
+
+            Text("Daily nudge at \(notificationTimeLabel) if your primary streak isn't locked in yet. iOS will ask for notification permission the first time you turn this on.")
                 .font(RetroFont.mono(10))
                 .foregroundStyle(Theme.retroInkDim)
                 .padding(.horizontal, 6)
         }
+    }
+
+    private var notificationTimeBinding: Binding<Date> {
+        Binding(
+            get: {
+                DateHelpers.gregorian.date(from: DateComponents(
+                    year: 2000,
+                    month: 1,
+                    day: 1,
+                    hour: settings.notificationHour,
+                    minute: settings.notificationMinute
+                )) ?? .now
+            },
+            set: { date in
+                let comps = DateHelpers.gregorian.dateComponents([.hour, .minute], from: date)
+                settings.notificationHour = comps.hour ?? 19
+                settings.notificationMinute = comps.minute ?? 0
+            }
+        )
+    }
+
+    private var notificationTimeLabel: String {
+        let date = notificationTimeBinding.wrappedValue
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
     }
 
     private func enableNotifications() async {
@@ -229,6 +286,31 @@ struct SettingsView: View {
         case .previouslyDenied:
             settings.notificationsEnabled = false
             notificationsBlockedBySystem = true
+        }
+    }
+
+    private var graceSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            PixelSectionHeader(title: "Streak Protection")
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("EARN GRACE DAYS")
+                        .font(RetroFont.pixel(10))
+                        .foregroundStyle(Theme.retroInk)
+                    Text("\(settings.earnedGraceDays) banked · +1 every 30 days")
+                        .font(RetroFont.mono(10))
+                        .foregroundStyle(Theme.retroInkDim)
+                }
+                Spacer()
+                PixelToggle(isOn: $settings.graceDaysEnabled, accent: Theme.retroLime)
+            }
+            .padding(14)
+            .pixelPanel(color: Theme.retroInkFaint)
+
+            Text("When enabled, each 30-day run earns one grace day that can automatically preserve a streak after one missed day.")
+                .font(RetroFont.mono(10))
+                .foregroundStyle(Theme.retroInkDim)
+                .padding(.horizontal, 6)
         }
     }
 

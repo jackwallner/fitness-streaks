@@ -4,6 +4,7 @@ struct StreakDetailView: View {
     let streak: Streak
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var store: StreakStore
+    @EnvironmentObject var settings: StreakSettings
 
     var isHero: Bool { store.hero?.id == streak.id }
 
@@ -12,6 +13,7 @@ struct StreakDetailView: View {
             VStack(spacing: 16) {
                 headerCard.padding(.horizontal, 14)
                 todayCard.padding(.horizontal, 14)
+                if canRecalibrate { recalibrateCard.padding(.horizontal, 14) }
 
                 if streak.window != nil {
                     hourWindowExplainer.padding(.horizontal, 14)
@@ -147,6 +149,64 @@ struct StreakDetailView: View {
         }
         .padding(14)
         .pixelPanel(color: Theme.retroAmber)
+    }
+
+    private var canRecalibrate: Bool {
+        streak.customID == nil && settings.committedThresholds[streak.trackingKey] != nil
+    }
+
+    private var recalibrateCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("LOCKED GOAL")
+                        .font(RetroFont.pixel(9))
+                        .tracking(2)
+                        .foregroundStyle(Theme.retroInkDim)
+                    Text(recalibrationPreview)
+                        .font(RetroFont.mono(11))
+                        .foregroundStyle(Theme.retroInk)
+                }
+                Spacer()
+                Button {
+                    settings.clearCommittedThreshold(for: streak.trackingKey)
+                    Task { await store.load() }
+                    dismiss()
+                } label: {
+                    Text("RECALIBRATE")
+                        .font(RetroFont.mono(10, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(Theme.retroCyan)
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 10)
+                        .overlay(Rectangle().stroke(Theme.retroCyan, lineWidth: 2))
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(14)
+        .pixelPanel(color: Theme.retroCyan)
+    }
+
+    private var recalibrationPreview: String {
+        guard let suggested = suggestedThreshold else {
+            return "Currently \(streak.metric.thresholdLabel(streak.threshold, cadence: streak.cadence))"
+        }
+        return "Currently \(streak.metric.thresholdLabel(streak.threshold, cadence: streak.cadence)) → suggests \(streak.metric.thresholdLabel(suggested, cadence: streak.cadence))"
+    }
+
+    private var suggestedThreshold: Double? {
+        if streak.window != nil { return nil }
+        let candidates = StreakEngine.discover(
+            history: store.history,
+            hiddenMetrics: settings.hiddenMetrics,
+            vibe: settings.vibe,
+            lookbackDays: settings.lookbackDays,
+            committedThresholds: settings.committedThresholds.filter { $0.key != streak.trackingKey },
+            customStreaks: settings.customStreaks,
+            gracePreservations: settings.gracePreservations
+        )
+        return candidates.first { $0.trackingKey == streak.trackingKey }?.threshold
     }
 
     // MARK: - Heatmap

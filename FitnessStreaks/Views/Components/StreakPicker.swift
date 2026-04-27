@@ -38,6 +38,11 @@ struct StreakPickerList: View {
                             .font(RetroFont.mono(11, weight: .bold))
                             .tracking(1)
                             .foregroundStyle(Theme.retroInk)
+                        if streak.customID != nil {
+                            Text("CUSTOM")
+                                .font(RetroFont.mono(9, weight: .bold))
+                                .foregroundStyle(Theme.retroLime)
+                        }
                         Text(cadenceLabel(for: streak))
                             .font(RetroFont.mono(9, weight: .bold))
                             .foregroundStyle(streak.window != nil ? Theme.retroAmber : Theme.retroInkDim)
@@ -69,12 +74,15 @@ struct StreakPickerList: View {
 
     private func subtitle(for streak: Streak) -> String {
         let label = streak.metric.thresholdLabel(streak.threshold, cadence: streak.cadence)
-        return "\(streak.current) \(streak.cadence.pluralLabel) · \(label)"
+        if let window = streak.window {
+            return "\(streak.current) \(streak.cadence.pluralLabel) · \(label) between \(window.label)"
+        }
+        return "\(streak.current) \(streak.cadence.pluralLabel) · \(label) daily"
     }
 
     private func cadenceLabel(for streak: Streak) -> String {
         if let w = streak.window {
-            return w.label.uppercased()
+            return "BY \(w.label.uppercased())"
         }
         return "DAILY"
     }
@@ -87,6 +95,7 @@ struct StreakPickerSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var selection: Set<String> = []
+    @State private var showingBuilder = false
 
     var body: some View {
         NavigationStack {
@@ -103,6 +112,25 @@ struct StreakPickerSheet: View {
                         selection: $selection,
                         recommendedCount: min(5, store.allCandidates.count)
                     )
+                    .padding(.horizontal, 14)
+
+                    Button {
+                        showingBuilder = true
+                    } label: {
+                        HStack {
+                            Text("+ BUILD YOUR OWN")
+                                .font(RetroFont.mono(10, weight: .bold))
+                                .tracking(1)
+                                .foregroundStyle(Theme.retroLime)
+                            Spacer()
+                            Text("CUSTOM")
+                                .font(RetroFont.mono(9, weight: .bold))
+                                .foregroundStyle(Theme.retroInkDim)
+                        }
+                        .padding(14)
+                        .pixelPanel(color: Theme.retroLime, fill: Theme.retroBgRaised)
+                    }
+                    .buttonStyle(.plain)
                     .padding(.horizontal, 14)
 
                     if store.allCandidates.isEmpty {
@@ -141,6 +169,13 @@ struct StreakPickerSheet: View {
             }
             .toolbarBackground(Theme.retroBg, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
+            .sheet(isPresented: $showingBuilder) {
+                CustomStreakBuilderSheet { custom in
+                    settings.customStreaks.append(custom)
+                    selection.insert(custom.trackingKey)
+                    Task { await store.load() }
+                }
+            }
         }
         .onAppear {
             if let current = settings.trackedStreaks {
@@ -158,5 +193,125 @@ struct StreakPickerSheet: View {
         settings.trackedStreaks = selection
         store.refilter()
         dismiss()
+    }
+}
+
+struct CustomStreakBuilderSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
+    let onSave: (CustomStreak) -> Void
+
+    @State private var metric: StreakMetric = .steps
+    @State private var threshold: Double = 3_000
+    @State private var usesHourWindow = false
+    @State private var hour = 10
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Create a fixed goal that stays locked until you edit it.")
+                        .font(RetroFont.mono(11))
+                        .foregroundStyle(Theme.retroInkDim)
+                        .padding(.horizontal, 14)
+
+                    VStack(spacing: 0) {
+                        Picker("Metric", selection: $metric) {
+                            ForEach(StreakMetric.allCases) { metric in
+                                Text(metric.displayName).tag(metric)
+                            }
+                        }
+                        .pickerStyle(.navigationLink)
+                        .padding(14)
+
+                        Rectangle()
+                            .fill(Theme.retroInkFaint)
+                            .frame(height: 1)
+                            .padding(.horizontal, 14)
+
+                        HStack {
+                            Text("THRESHOLD")
+                                .font(RetroFont.mono(10, weight: .bold))
+                                .foregroundStyle(Theme.retroInk)
+                            Spacer()
+                            TextField("0", value: $threshold, format: .number)
+                                .keyboardType(.decimalPad)
+                                .multilineTextAlignment(.trailing)
+                                .font(RetroFont.mono(12, weight: .bold))
+                                .foregroundStyle(Theme.retroLime)
+                                .frame(width: 120)
+                            Text(metric.unitLabel.uppercased())
+                                .font(RetroFont.mono(9, weight: .bold))
+                                .foregroundStyle(Theme.retroInkDim)
+                        }
+                        .padding(14)
+
+                        Rectangle()
+                            .fill(Theme.retroInkFaint)
+                            .frame(height: 1)
+                            .padding(.horizontal, 14)
+
+                        if metric == .steps {
+                            HStack {
+                                Text("TIME WINDOW")
+                                    .font(RetroFont.mono(10, weight: .bold))
+                                    .foregroundStyle(Theme.retroInk)
+                                Spacer()
+                                PixelToggle(isOn: $usesHourWindow, accent: Theme.retroAmber)
+                            }
+                            .padding(14)
+                        }
+
+                        if usesHourWindow && metric == .steps {
+                            Picker("Hour", selection: $hour) {
+                                ForEach(0..<24, id: \.self) { h in
+                                    Text(HourWindow(startHour: h).label).tag(h)
+                                }
+                            }
+                            .pickerStyle(.wheel)
+                            .frame(height: 120)
+                        }
+                    }
+                    .pixelPanel(color: Theme.retroInkFaint)
+                    .padding(.horizontal, 14)
+                }
+                .padding(.vertical, 16)
+            }
+            .background(Theme.retroBg.ignoresSafeArea())
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("CUSTOM STREAK")
+                        .font(RetroFont.mono(12, weight: .bold))
+                        .tracking(2)
+                        .foregroundStyle(Theme.retroMagenta)
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button { dismiss() } label: {
+                        Text("CANCEL")
+                            .font(RetroFont.mono(10, weight: .bold))
+                            .foregroundStyle(Theme.retroInkDim)
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        onSave(CustomStreak(
+                            id: UUID().uuidString,
+                            metric: metric,
+                            cadence: .daily,
+                            threshold: threshold,
+                            hourWindow: usesHourWindow && metric == .steps ? hour : nil
+                        ))
+                        dismiss()
+                    } label: {
+                        Text("ADD")
+                            .font(RetroFont.mono(10, weight: .bold))
+                            .foregroundStyle(Theme.retroLime)
+                    }
+                }
+            }
+            .toolbarBackground(Theme.retroBg, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+        }
     }
 }

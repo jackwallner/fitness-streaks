@@ -221,12 +221,12 @@ struct OnboardingView: View {
 
     private var minimumStep: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("LOOKBACK WINDOW")
+            Text("DISCOVERY WINDOW")
                 .font(RetroFont.mono(14, weight: .bold))
                 .tracking(2)
                 .foregroundStyle(Theme.retroInk)
 
-            Text("How many days of history should we use\nwhen calculating your completion rate?")
+            Text("How many days of history should we use\nwhen suggesting new streak thresholds?")
                 .font(RetroFont.mono(11))
                 .foregroundStyle(Theme.retroInkDim)
                 .lineSpacing(2)
@@ -258,7 +258,7 @@ struct OnboardingView: View {
             .frame(maxWidth: .infinity)
             .pixelPanel(color: Theme.retroMagenta)
 
-            Text("Tip: \"\(selectedVibe.label)\" picks goals you\nalready hit \(Int(selectedVibe.targetCompletionRate * 100))% of the time.\nStrive for 100% daily.")
+            Text("Tip: \"\(selectedVibe.label)\" picks goals you\nalready hit \(Int(selectedVibe.targetCompletionRate * 100))% of the time.\nExisting streaks stay locked after setup.")
                 .font(RetroFont.mono(10))
                 .foregroundStyle(Theme.retroInkDim)
                 .lineSpacing(2)

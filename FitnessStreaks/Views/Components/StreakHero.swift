@@ -9,7 +9,7 @@ struct StreakHero: View {
                 PixelFlame(size: 48, intensity: intensity, tint: Theme.retroMagenta)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("HERO STREAK")
+                    Text("PRIMARY STREAK")
                         .font(RetroFont.mono(9, weight: .bold))
                         .tracking(2)
                         .foregroundStyle(Theme.retroInkDim)

@@ -85,11 +85,34 @@ struct StreakSnapshot: Codable, Sendable {
         let currentUnitProgress: Double
         let currentUnitValue: Double
         var hourWindow: Int? = nil    // nil = whole-day; else 0..23 for hour-window streak
+        var customID: String? = nil
     }
 
     let updated: Date
     let hero: Item?
     let badges: [Item]
+    var recentlyBroken: [BrokenStreak] = []
+}
+
+struct BrokenStreak: Codable, Sendable, Identifiable, Hashable {
+    var id: String { "\(key)-\(Int(brokenAt.timeIntervalSince1970))" }
+    let key: String
+    let metric: StreakMetric
+    let cadence: StreakCadence
+    let threshold: Double
+    let hourWindow: Int?
+    let brokenLength: Int
+    let brokenAt: Date
+}
+
+struct CustomStreak: Codable, Sendable, Identifiable, Hashable {
+    var id: String
+    var metric: StreakMetric
+    var cadence: StreakCadence
+    var threshold: Double
+    var hourWindow: Int?
+
+    var trackingKey: String { "custom-\(id)" }
 }
 
 @MainActor
@@ -108,6 +131,26 @@ final class StreakSettings: ObservableObject {
 
     @Published var notificationsEnabled: Bool {
         didSet { defaults.set(notificationsEnabled, forKey: "notificationsEnabled") }
+    }
+
+    @Published var notificationHour: Int {
+        didSet { defaults.set(notificationHour, forKey: "notificationHour") }
+    }
+
+    @Published var notificationMinute: Int {
+        didSet { defaults.set(notificationMinute, forKey: "notificationMinute") }
+    }
+
+    @Published var graceDaysEnabled: Bool {
+        didSet { defaults.set(graceDaysEnabled, forKey: "graceDaysEnabled") }
+    }
+
+    @Published var earnedGraceDays: Int {
+        didSet { defaults.set(earnedGraceDays, forKey: "earnedGraceDays") }
+    }
+
+    @Published var graceAwardTier: Int {
+        didSet { defaults.set(graceAwardTier, forKey: "graceAwardTier") }
     }
 
     @Published var vibe: DiscoveryVibe {
@@ -148,7 +191,29 @@ final class StreakSettings: ObservableObject {
         }
     }
 
-    static func streakKey(metric: StreakMetric, cadence: StreakCadence, window: HourWindow? = nil) -> String {
+    @Published var committedThresholds: [String: Double] {
+        didSet { saveCodable(committedThresholds, key: "committedThresholds") }
+    }
+
+    @Published var customStreaks: [CustomStreak] {
+        didSet {
+            saveCodable(customStreaks, key: "customStreaks")
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+    }
+
+    @Published var recentlyBroken: [BrokenStreak] {
+        didSet {
+            saveCodable(recentlyBroken, key: "recentlyBroken")
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+    }
+
+    @Published var gracePreservations: [String: GracePreservation] {
+        didSet { saveCodable(gracePreservations, key: "gracePreservations") }
+    }
+
+    nonisolated static func streakKey(metric: StreakMetric, cadence: StreakCadence, window: HourWindow? = nil) -> String {
         if let w = window {
             return "\(metric.rawValue)-\(cadence.rawValue)-h\(w.startHour)"
         }
@@ -168,6 +233,11 @@ final class StreakSettings: ObservableObject {
         self.appearance = AppAppearance(rawValue: defaults.integer(forKey: "appearance")) ?? .system
         // Default OFF — never request notification permission until the user explicitly opts in.
         self.notificationsEnabled = defaults.object(forKey: "notificationsEnabled") as? Bool ?? false
+        self.notificationHour = defaults.object(forKey: "notificationHour") as? Int ?? 19
+        self.notificationMinute = defaults.object(forKey: "notificationMinute") as? Int ?? 0
+        self.graceDaysEnabled = defaults.object(forKey: "graceDaysEnabled") as? Bool ?? false
+        self.earnedGraceDays = defaults.object(forKey: "earnedGraceDays") as? Int ?? 0
+        self.graceAwardTier = defaults.object(forKey: "graceAwardTier") as? Int ?? 0
         self.vibe = DiscoveryVibe(rawValue: defaults.integer(forKey: "discoveryVibe")) ?? .challenging
         // Migration: ignore old minStreakLength semantics; default to 30-day lookback.
         let raw = defaults.object(forKey: "lookbackDays") as? Int
@@ -185,6 +255,11 @@ final class StreakSettings: ObservableObject {
         } else {
             self.trackedStreaks = nil
         }
+
+        self.committedThresholds = Self.loadCodable([String: Double].self, key: "committedThresholds", defaults: defaults) ?? [:]
+        self.customStreaks = Self.loadCodable([CustomStreak].self, key: "customStreaks", defaults: defaults) ?? []
+        self.recentlyBroken = Self.loadCodable([BrokenStreak].self, key: "recentlyBroken", defaults: defaults) ?? []
+        self.gracePreservations = Self.loadCodable([String: GracePreservation].self, key: "gracePreservations", defaults: defaults) ?? [:]
     }
 
     func isHidden(_ metric: StreakMetric) -> Bool { hiddenMetrics.contains(metric) }
@@ -196,6 +271,64 @@ final class StreakSettings: ObservableObject {
             hiddenMetrics.insert(metric)
         }
     }
+
+    func commitThresholds(for streaks: [Streak]) {
+        var next = committedThresholds
+        for streak in streaks where streak.customID == nil {
+            if next[streak.trackingKey] == nil {
+                next[streak.trackingKey] = streak.threshold
+            }
+        }
+        committedThresholds = next
+    }
+
+    func clearCommittedThreshold(for key: String) {
+        committedThresholds.removeValue(forKey: key)
+    }
+
+    func dismissBroken(_ broken: BrokenStreak) {
+        recentlyBroken.removeAll { $0.id == broken.id }
+    }
+
+    func pruneBroken(now: Date = .now) {
+        recentlyBroken.removeAll { now.timeIntervalSince($0.brokenAt) > 48 * 60 * 60 }
+    }
+
+    func awardGraceDays(from streaks: [Streak]) {
+        guard graceDaysEnabled else { return }
+        let tier = streaks.map { $0.current / 30 }.max() ?? 0
+        if tier > graceAwardTier {
+            earnedGraceDays = min(9, earnedGraceDays + (tier - graceAwardTier))
+            graceAwardTier = tier
+        }
+    }
+
+    func consumeGraceDay() -> Bool {
+        guard graceDaysEnabled, earnedGraceDays > 0 else { return false }
+        earnedGraceDays -= 1
+        return true
+    }
+
+    private func saveCodable<T: Encodable>(_ value: T, key: String) {
+        guard let data = try? JSONEncoder().encode(value) else { return }
+        defaults.set(data, forKey: key)
+    }
+
+    private static func loadCodable<T: Decodable>(_ type: T.Type, key: String, defaults: UserDefaults) -> T? {
+        guard let data = defaults.data(forKey: key) else { return nil }
+        return try? JSONDecoder().decode(type, from: data)
+    }
+}
+
+struct GracePreservation: Codable, Sendable, Hashable {
+    let key: String
+    let missedDate: Date
+    let preservedLength: Int
+    let threshold: Double
+    let metric: StreakMetric
+    let cadence: StreakCadence
+    let hourWindow: Int?
+    let grantedAt: Date
 }
 
 enum SnapshotStore {

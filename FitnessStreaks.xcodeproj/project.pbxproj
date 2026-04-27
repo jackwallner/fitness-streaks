@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		039B7F0469AC40361084B9F6 /* StreakMetric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C80A4826A373B331E583A1E /* StreakMetric.swift */; };
 		0676A3765B0C9454BF181232 /* DateHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49F54F94A5A2BE6B4C616141 /* DateHelpers.swift */; };
+		0A0B72F188682498F53C82DA /* BrokenStreakSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CC00364817F95876F570F12 /* BrokenStreakSheet.swift */; };
 		117AE494DDF91AAF1E0C01F7 /* PixelUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AE8DBC73B55DCE8482E14D /* PixelUI.swift */; };
 		14DE9C98D5E4DEDB8E38FEB6 /* WatchComplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A96B250A2CB89C8A8D01A8 /* WatchComplication.swift */; };
 		156578A6A30A9176A4CFB1BC /* DataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F34D2FE6D3914BB5A4D903 /* DataService.swift */; };
@@ -183,6 +184,7 @@
 		560A6C366B6C97CC3275012C /* JetBrainsMono-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "JetBrainsMono-Bold.ttf"; sourceTree = "<group>"; };
 		57548FD64897F4D07CFB9889 /* WatchTodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTodayView.swift; sourceTree = "<group>"; };
 		5BA88BDC9CCB6015980ECFF3 /* DailyActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyActivity.swift; sourceTree = "<group>"; };
+		5CC00364817F95876F570F12 /* BrokenStreakSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokenStreakSheet.swift; sourceTree = "<group>"; };
 		5DA2285D9C3624EC0E762310 /* StreakFlame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakFlame.swift; sourceTree = "<group>"; };
 		63E9700FA312E118B27535BD /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		665F6C75B8B73C8F29A8D0AB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -220,6 +222,7 @@
 		1257F7EF20D99C56AE358598 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				5CC00364817F95876F570F12 /* BrokenStreakSheet.swift */,
 				F84469F4922FC57E3F0E0CEE /* DashboardView.swift */,
 				4E54FC44A8D7A428347652F2 /* OnboardingView.swift */,
 				71D6E754008340281F258E8A /* SettingsView.swift */,
@@ -578,6 +581,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				34B0CE7F24E943474678ECA9 /* App.swift in Sources */,
+				0A0B72F188682498F53C82DA /* BrokenStreakSheet.swift in Sources */,
 				5E3A4A321CAFAE60BB68AD71 /* CalendarHeatmap.swift in Sources */,
 				ECAC6491381BC89960CCAD2B /* DailyActivity.swift in Sources */,
 				FB019E441ED033465152096E /* DashboardView.swift in Sources */,
@@ -782,7 +786,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 12;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = YXG4MP6W39;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -859,7 +863,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 12;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = YXG4MP6W39;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;

@@ -37,6 +37,9 @@ enum StreakEngine {
         hiddenMetrics: Set<StreakMetric> = [],
         vibe: DiscoveryVibe = .challenging,
         lookbackDays: Int = 30,
+        committedThresholds: [String: Double] = [:],
+        customStreaks: [CustomStreak] = [],
+        gracePreservations: [String: GracePreservation] = [:],
         now: Date = .now
     ) -> [Streak] {
         guard !history.isEmpty else { return [] }
@@ -57,7 +60,9 @@ enum StreakEngine {
                 byDay: byDay,
                 today: today,
                 target: vibe.targetCompletionRate,
-                tolerance: completionTolerance
+                tolerance: completionTolerance,
+                committedThresholds: committedThresholds,
+                gracePreservations: gracePreservations
             ) {
                 found.append(best)
             }
@@ -68,10 +73,26 @@ enum StreakEngine {
             let windowStreaks = discoverHourWindows(
                 hourlySteps: hourlySteps,
                 today: today,
-                vibe: vibe
+                vibe: vibe,
+                committedThresholds: committedThresholds,
+                gracePreservations: gracePreservations
             )
             found.append(contentsOf: windowStreaks)
         }
+
+        let custom = customStreaks
+            .filter { !hiddenMetrics.contains($0.metric) }
+            .map { custom in
+                customStreak(
+                    custom,
+                    byDay: byDay,
+                    hourlySteps: hourlySteps,
+                    today: today,
+                    lookbackDays: recentHistory.count,
+                    gracePreservations: gracePreservations
+                )
+            }
+        found.append(contentsOf: custom)
 
         return found.sorted { vibeScore($0, vibe: vibe) > vibeScore($1, vibe: vibe) }
     }
@@ -92,7 +113,8 @@ enum StreakEngine {
             currentUnitCompleted: streak.currentUnitCompleted,
             currentUnitProgress: streak.currentUnitProgress,
             currentUnitValue: streak.currentUnitValue,
-            hourWindow: streak.window?.startHour
+            hourWindow: streak.window?.startHour,
+            customID: streak.customID
         )
     }
 
@@ -108,8 +130,23 @@ enum StreakEngine {
         byDay: [Date: ActivityDay],
         today: Date,
         target: Double,
-        tolerance: Double
+        tolerance: Double,
+        committedThresholds: [String: Double],
+        gracePreservations: [String: GracePreservation]
     ) -> Streak? {
+        let key = StreakSettings.streakKey(metric: metric, cadence: .daily)
+        if let committed = committedThresholds[key] {
+            let rate = completionRate(metric: metric, threshold: committed, recentHistory: recentHistory)
+            return applyingGrace(
+                to: computeDailyStreak(metric: metric, threshold: committed, byDay: byDay, today: today),
+                key: key,
+                today: today,
+                gracePreservations: gracePreservations,
+                completionRate: rate,
+                lookbackDays: recentHistory.count
+            )
+        }
+
         let values = recentHistory.map { $0.value(for: metric) }
         guard !values.isEmpty else { return nil }
 
@@ -133,7 +170,14 @@ enum StreakEngine {
             let distance = abs(rate - target)
 
             // Compute streak using FULL history (not just lookback) so current streak is accurate.
-            let streak = computeDailyStreak(metric: metric, threshold: threshold, byDay: byDay, today: today)
+            let streak = applyingGrace(
+                to: computeDailyStreak(metric: metric, threshold: threshold, byDay: byDay, today: today),
+                key: key,
+                today: today,
+                gracePreservations: gracePreservations,
+                completionRate: rate,
+                lookbackDays: values.count
+            )
 
             // Surface only streaks with a meaningful current run.
             guard streak.current >= minDailyLength || streak.current >= absoluteFloor else { continue }
@@ -148,23 +192,7 @@ enum StreakEngine {
         }
 
         guard let result = best, result.distance <= tolerance else { return nil }
-
-        // Rebuild the Streak with the discovered completion rate attached.
-        return Streak(
-            metric: result.streak.metric,
-            cadence: result.streak.cadence,
-            threshold: result.streak.threshold,
-            window: result.streak.window,
-            current: result.streak.current,
-            best: result.streak.best,
-            startDate: result.streak.startDate,
-            lastHitDate: result.streak.lastHitDate,
-            currentUnitCompleted: result.streak.currentUnitCompleted,
-            currentUnitProgress: result.streak.currentUnitProgress,
-            currentUnitValue: result.streak.currentUnitValue,
-            completionRate: result.rate,
-            lookbackDays: values.count
-        )
+        return result.streak
     }
 
     /// Score tuned per vibe — drives which streak becomes hero and badge ordering.
@@ -201,12 +229,16 @@ enum StreakEngine {
     static func discoverHourWindows(
         hourlySteps: [Date: [Int: Double]],
         today: Date,
-        vibe: DiscoveryVibe
+        vibe: DiscoveryVibe,
+        committedThresholds: [String: Double] = [:],
+        gracePreservations: [String: GracePreservation] = [:]
     ) -> [Streak] {
         var perHourBest: [(Int, Streak)] = []
         let target = vibe.targetCompletionRate
 
         for hour in 0..<24 {
+            let window = HourWindow(startHour: hour)
+            let key = StreakSettings.streakKey(metric: .steps, cadence: .daily, window: window)
             // Build a day→value map for just this hour.
             var byDay: [Date: Double] = [:]
             for (day, hours) in hourlySteps {
@@ -217,6 +249,41 @@ enum StreakEngine {
             guard !values.isEmpty else { continue }
             let windowDays = Double(values.count)
 
+            if let committed = committedThresholds[key] {
+                let hitDays = values.filter { $0 >= committed }.count
+                let rate = Double(hitDays) / windowDays
+                let base = computeDailyStreakFromValues(
+                    metric: .steps,
+                    threshold: committed,
+                    byDayValues: byDay,
+                    today: today
+                )
+                let streak = applyingGrace(
+                    to: Streak(
+                        metric: .steps,
+                        cadence: .daily,
+                        threshold: committed,
+                        window: window,
+                        current: base.current,
+                        best: base.best,
+                        startDate: base.startDate,
+                        lastHitDate: base.lastHitDate,
+                        currentUnitCompleted: base.currentUnitCompleted,
+                        currentUnitProgress: base.currentUnitProgress,
+                        currentUnitValue: base.currentUnitValue,
+                        completionRate: rate,
+                        lookbackDays: values.count
+                    ),
+                    key: key,
+                    today: today,
+                    gracePreservations: gracePreservations,
+                    completionRate: rate,
+                    lookbackDays: values.count
+                )
+                perHourBest.append((hour, streak))
+                continue
+            }
+
             // Evaluate every threshold tier for this hour.
             var best: (streak: Streak, rate: Double, distance: Double)? = nil
             for threshold in hourlyStepThresholds {
@@ -224,11 +291,19 @@ enum StreakEngine {
                 let rate = Double(hitDays) / windowDays
                 let distance = abs(rate - target)
 
-                let base = computeDailyStreakFromValues(
+                let computed = computeDailyStreakFromValues(
                     metric: .steps,
                     threshold: threshold,
                     byDayValues: byDay,
                     today: today
+                )
+                let base = applyingGrace(
+                    to: computed,
+                    key: key,
+                    today: today,
+                    gracePreservations: gracePreservations,
+                    completionRate: rate,
+                    lookbackDays: values.count
                 )
 
                 guard base.current >= minHourWindowLength || base.current >= absoluteFloor else { continue }
@@ -248,7 +323,7 @@ enum StreakEngine {
                 metric: .steps,
                 cadence: .daily,
                 threshold: result.streak.threshold,
-                window: HourWindow(startHour: hour),
+                window: window,
                 current: result.streak.current,
                 best: result.streak.best,
                 startDate: result.streak.startDate,
@@ -419,6 +494,124 @@ enum StreakEngine {
             currentUnitCompleted: todayMet,
             currentUnitProgress: progress,
             currentUnitValue: todayValue
+        )
+    }
+
+    static func completionRate(metric: StreakMetric, threshold: Double, recentHistory: [ActivityDay]) -> Double {
+        guard !recentHistory.isEmpty else { return 0 }
+        let hitDays = recentHistory.filter { $0.value(for: metric) >= threshold }.count
+        return Double(hitDays) / Double(recentHistory.count)
+    }
+
+    private static func applyingGrace(
+        to streak: Streak,
+        key: String,
+        today: Date,
+        gracePreservations: [String: GracePreservation],
+        completionRate: Double,
+        lookbackDays: Int
+    ) -> Streak {
+        guard let preservation = gracePreservations[key] else {
+            return Streak(
+                customID: streak.customID,
+                metric: streak.metric,
+                cadence: streak.cadence,
+                threshold: streak.threshold,
+                window: streak.window,
+                current: streak.current,
+                best: streak.best,
+                startDate: streak.startDate,
+                lastHitDate: streak.lastHitDate,
+                currentUnitCompleted: streak.currentUnitCompleted,
+                currentUnitProgress: streak.currentUnitProgress,
+                currentUnitValue: streak.currentUnitValue,
+                completionRate: completionRate,
+                lookbackDays: lookbackDays
+            )
+        }
+
+        let missed = DateHelpers.startOfDay(preservation.missedDate)
+        let daysAfterMiss = max(0, DateHelpers.gregorian.dateComponents([.day], from: missed, to: today).day ?? 0)
+        let canBridge = streak.current >= max(0, daysAfterMiss - 1)
+        let bridgedCurrent = canBridge ? max(streak.current, preservation.preservedLength + streak.current) : streak.current
+        let bridgedStart = canBridge ? DateHelpers.addDays(-(bridgedCurrent - 1), to: today) : streak.startDate
+
+        return Streak(
+            customID: streak.customID,
+            metric: streak.metric,
+            cadence: streak.cadence,
+            threshold: streak.threshold,
+            window: streak.window,
+            current: bridgedCurrent,
+            best: max(streak.best, bridgedCurrent),
+            startDate: bridgedStart,
+            lastHitDate: streak.lastHitDate,
+            currentUnitCompleted: streak.currentUnitCompleted,
+            currentUnitProgress: streak.currentUnitProgress,
+            currentUnitValue: streak.currentUnitValue,
+            completionRate: completionRate,
+            lookbackDays: lookbackDays
+        )
+    }
+
+    private static func customStreak(
+        _ custom: CustomStreak,
+        byDay: [Date: ActivityDay],
+        hourlySteps: [Date: [Int: Double]],
+        today: Date,
+        lookbackDays: Int,
+        gracePreservations: [String: GracePreservation]
+    ) -> Streak {
+        let key = custom.trackingKey
+        let base: Streak
+        let rate: Double
+
+        if let hour = custom.hourWindow {
+            var values: [Date: Double] = [:]
+            for (day, hours) in hourlySteps {
+                values[day] = hours[hour] ?? 0
+            }
+            base = computeDailyStreakFromValues(
+                metric: custom.metric,
+                threshold: custom.threshold,
+                byDayValues: values,
+                today: today
+            )
+            rate = values.isEmpty ? 0 : Double(values.values.filter { $0 >= custom.threshold }.count) / Double(values.count)
+        } else {
+            base = computeDailyStreak(
+                metric: custom.metric,
+                threshold: custom.threshold,
+                byDay: byDay,
+                today: today
+            )
+            let recent = Array(byDay.values.sorted { $0.date < $1.date }.suffix(max(1, lookbackDays)))
+            rate = completionRate(metric: custom.metric, threshold: custom.threshold, recentHistory: recent)
+        }
+
+        let window = custom.hourWindow.map(HourWindow.init(startHour:))
+        let customBase = Streak(
+            customID: custom.id,
+            metric: custom.metric,
+            cadence: custom.cadence,
+            threshold: custom.threshold,
+            window: window,
+            current: base.current,
+            best: base.best,
+            startDate: base.startDate,
+            lastHitDate: base.lastHitDate,
+            currentUnitCompleted: base.currentUnitCompleted,
+            currentUnitProgress: base.currentUnitProgress,
+            currentUnitValue: base.currentUnitValue
+        )
+
+        return applyingGrace(
+            to: customBase,
+            key: key,
+            today: today,
+            gracePreservations: gracePreservations,
+            completionRate: rate,
+            lookbackDays: lookbackDays
         )
     }
 

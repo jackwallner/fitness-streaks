@@ -24,6 +24,7 @@ struct HourWindow: Hashable, Sendable, Codable {
 
 /// A single discovered streak: user has hit `threshold` for `current` consecutive units ending now.
 struct Streak: Identifiable, Hashable, Sendable {
+    let customID: String?
     let metric: StreakMetric
     let cadence: StreakCadence
     let threshold: Double
@@ -51,6 +52,9 @@ struct Streak: Identifiable, Hashable, Sendable {
     let lookbackDays: Int
 
     var id: String {
+        if let customID {
+            return "custom-\(customID)-\(Int(threshold))"
+        }
         if let w = window {
             return "\(metric.rawValue)-\(cadence.rawValue)-h\(w.startHour)-\(Int(threshold))"
         }
@@ -59,6 +63,9 @@ struct Streak: Identifiable, Hashable, Sendable {
 
     /// Key used by StreakSettings.trackedStreaks — stable across threshold tier changes.
     var trackingKey: String {
+        if let customID {
+            return "custom-\(customID)"
+        }
         if let w = window {
             return "\(metric.rawValue)-\(cadence.rawValue)-h\(w.startHour)"
         }
@@ -76,6 +83,7 @@ struct Streak: Identifiable, Hashable, Sendable {
     }
 
     init(
+        customID: String? = nil,
         metric: StreakMetric,
         cadence: StreakCadence,
         threshold: Double,
@@ -90,6 +98,7 @@ struct Streak: Identifiable, Hashable, Sendable {
         completionRate: Double = 0,
         lookbackDays: Int = 0
     ) {
+        self.customID = customID
         self.metric = metric
         self.cadence = cadence
         self.threshold = threshold

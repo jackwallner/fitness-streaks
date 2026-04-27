@@ -4,11 +4,12 @@ import os
 
 private let log = Logger(subsystem: "com.jackwallner.streaks", category: "Notifications")
 
-/// Local notifications for at-risk streaks. Fires once daily at 7pm if the hero streak
+/// Local notifications for at-risk streaks. Fires once daily if the hero streak
 /// hasn't been completed yet for today.
 @MainActor
 enum NotificationService {
     static let dailyReminderID = "streaks.dailyReminder"
+    static let brokenPrefix = "streaks.broken."
 
     enum AuthorizationOutcome {
         case granted
@@ -44,7 +45,7 @@ enum NotificationService {
         return false
     }
 
-    /// Schedule a 7pm daily reminder. The body uses the current hero streak so the nudge feels personal.
+    /// Schedule a daily reminder. The body uses the current hero streak so the nudge feels personal.
     /// Never prompts for permission — that only happens via a user-initiated toggle.
     static func scheduleDailyReminder(for hero: Streak?) async {
         let enabled = StreakSettings.shared.notificationsEnabled
@@ -75,8 +76,8 @@ enum NotificationService {
         content.interruptionLevel = .active
 
         var comps = DateComponents()
-        comps.hour = 19
-        comps.minute = 0
+        comps.hour = StreakSettings.shared.notificationHour
+        comps.minute = StreakSettings.shared.notificationMinute
         let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: true)
 
         let request = UNNotificationRequest(identifier: dailyReminderID, content: content, trigger: trigger)
@@ -85,6 +86,28 @@ enum NotificationService {
             log.info("Scheduled daily streak reminder")
         } catch {
             log.error("Failed to schedule reminder: \(String(describing: error))")
+        }
+    }
+
+    static func notifyStreakBroken(_ broken: BrokenStreak) async {
+        guard await isAuthorized() else { return }
+
+        let content = UNMutableNotificationContent()
+        content.title = "Streak ended"
+        content.body = "Your \(broken.metric.displayName.lowercased()) streak ended at \(broken.brokenLength) \(broken.cadence.pluralLabel). Restart anytime — the count is yours to set again."
+        content.sound = .default
+        content.interruptionLevel = .active
+
+        let request = UNNotificationRequest(
+            identifier: "\(brokenPrefix)\(broken.id)",
+            content: content,
+            trigger: UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        )
+
+        do {
+            try await UNUserNotificationCenter.current().add(request)
+        } catch {
+            log.error("Failed to schedule broken streak notification: \(String(describing: error))")
         }
     }
 
