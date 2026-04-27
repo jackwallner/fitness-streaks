@@ -125,7 +125,7 @@ enum Theme {
     static let cardPadding: CGFloat = 16
 
     static var streakGradient: LinearGradient {
-        LinearGradient(colors: [retroMagenta, retroAmber], startPoint: .topLeading, endPoint: .bottomTrailing)
+        LinearGradient(colors: [retroLime, retroMagenta], startPoint: .topLeading, endPoint: .bottomTrailing)
     }
 
     static func gradient(for accent: Color) -> LinearGradient {

@@ -78,7 +78,7 @@ struct StreakWidgetView: View {
                 Text("\(Image(systemName: m.symbol)) \(hero.current) \(cadenceLabel(hero))")
             )
         }
-        return AnyView(Text("Streak Finder"))
+        return AnyView(Text("No streak yet — open app"))
     }
 
     // Lock-screen circular
@@ -127,7 +127,7 @@ struct StreakWidgetView: View {
                     .font(.system(size: 9, weight: .medium, design: .rounded))
                     .lineLimit(1)
             } else {
-                Text("Streak Finder")
+                Text("No streak yet")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
             }
         }
@@ -157,10 +157,10 @@ struct StreakWidgetView: View {
                         .foregroundStyle(.white.opacity(0.75))
                         .lineLimit(1)
                 } else {
-                    Image(systemName: "flame")
+                    Image(systemName: "figure.run")
                         .font(.system(size: 34, weight: .regular))
                         .foregroundStyle(.white.opacity(0.9))
-                    Text("Open the app to sync")
+                    Text("No streak yet — open app")
                         .font(.system(size: 11, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.85))
                         .multilineTextAlignment(.center)
@@ -195,7 +195,7 @@ struct StreakWidgetView: View {
                             .foregroundStyle(.white.opacity(0.75))
                             .lineLimit(1)
                     } else {
-                        Image(systemName: "flame")
+                        Image(systemName: "figure.run")
                             .font(.system(size: 28))
                             .foregroundStyle(.white)
                     }
@@ -226,7 +226,7 @@ struct StreakWidgetView: View {
                     }
                 }
                 if entry.badges.isEmpty {
-                    Text("More streaks appear as you go")
+                    Text("No streak yet — open app")
                         .font(.system(size: 11, weight: .medium, design: .rounded))
                         .foregroundStyle(.secondary)
                 }

@@ -35,6 +35,7 @@ struct FitnessStreaksApp: App {
     @StateObject private var healthKit = HealthKitService.shared
     @StateObject private var settings = StreakSettings.shared
     @StateObject private var store = StreakStore.shared
+    @Environment(\.scenePhase) private var scenePhase
 
     init() {
         BGTaskScheduler.shared.register(forTaskWithIdentifier: refreshTaskID, using: DispatchQueue.main) { task in
@@ -57,6 +58,12 @@ struct FitnessStreaksApp: App {
                 .task {
                     await healthKit.synchronizeAuthorization()
                     await store.load()
+                }
+                .onChange(of: scenePhase) { _, phase in
+                    guard phase == .active else { return }
+                    let stale = store.lastUpdated.map { Date().timeIntervalSince($0) > 60 } ?? true
+                    guard stale else { return }
+                    Task { await store.load() }
                 }
         }
         .modelContainer(DataService.sharedModelContainer)
