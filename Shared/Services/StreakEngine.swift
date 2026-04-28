@@ -157,8 +157,10 @@ enum StreakEngine {
         case .workouts, .mindfulMinutes:
             candidates = metric.dailyThresholds
         default:
-            // Use every unique value in the lookback window as a candidate threshold.
-            candidates = Array(Set(values)).sorted()
+            // Use every unique non-zero value in the lookback window as a candidate threshold.
+            // Threshold of 0 causes computeDailyStreak's `while true` loop to never terminate
+            // (cursor walks into the past indefinitely because byDay[cursor] ?? 0 >= 0 is always true).
+            candidates = Array(Set(values).filter { $0 > 0 }).sorted()
         }
 
         let windowDays = Double(values.count)
@@ -364,6 +366,11 @@ enum StreakEngine {
         byDayValues: [Date: Double],
         today: Date
     ) -> Streak {
+        guard threshold > 0 else {
+            return Streak(metric: metric, cadence: .daily, threshold: threshold,
+                          current: 0, best: 0, startDate: nil, lastHitDate: nil,
+                          currentUnitCompleted: false, currentUnitProgress: 0, currentUnitValue: 0)
+        }
         let todayValue = byDayValues[today] ?? 0
         let todayMet = todayValue >= threshold
 
@@ -432,6 +439,11 @@ enum StreakEngine {
         byDay: [Date: ActivityDay],
         today: Date
     ) -> Streak {
+        guard threshold > 0 else {
+            return Streak(metric: metric, cadence: .daily, threshold: threshold,
+                          current: 0, best: 0, startDate: nil, lastHitDate: nil,
+                          currentUnitCompleted: false, currentUnitProgress: 0, currentUnitValue: 0)
+        }
         // Current streak: walk backward from today. The current day only counts if it's met.
         let todayValue = byDay[today]?.value(for: metric) ?? 0
         let todayMet = todayValue >= threshold
