@@ -423,6 +423,22 @@ struct SettingsView: View {
                         .padding(.horizontal, 14)
                     }
                 }
+                dashedLine
+                if let url = URL(string: "mailto:jackwallner@gmail.com") {
+                    Link(destination: url) {
+                        HStack {
+                            Text("SUPPORT")
+                                .font(RetroFont.pixel(10))
+                                .foregroundStyle(Theme.retroInk)
+                            Spacer()
+                            Text("↗")
+                                .font(RetroFont.pixel(11))
+                                .foregroundStyle(Theme.retroCyan)
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 14)
+                    }
+                }
             }
             .pixelPanel(color: Theme.retroInkFaint)
         }
