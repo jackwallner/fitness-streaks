@@ -306,7 +306,8 @@ final class StreakSettings: ObservableObject {
 
     func awardGraceDays(from streaks: [Streak]) {
         guard graceDaysEnabled else { return }
-        let tier = streaks.map { $0.current / 30 }.max() ?? 0
+        // Tier is driven by the hero streak so the user understands the reward source.
+        let tier = (streaks.first?.current ?? 0) / 30
         if tier > graceAwardTier {
             earnedGraceDays = min(9, earnedGraceDays + (tier - graceAwardTier))
             graceAwardTier = tier

@@ -102,7 +102,7 @@ enum NotificationService {
 
         let content = UNMutableNotificationContent()
         content.title = "Streak ended"
-        content.body = "Your \(broken.metric.displayName.lowercased()) streak ended at \(broken.brokenLength) \(broken.cadence.pluralLabel). Restart anytime — the count is yours to set again."
+        content.body = "Your \(broken.metric.displayName.lowercased()) streak ended at \(broken.brokenLength) \(broken.cadence.pluralLabel). Keep the same goal or pick a new one in the app."
         content.sound = .default
         content.interruptionLevel = .active
 

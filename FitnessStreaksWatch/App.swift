@@ -35,6 +35,7 @@ struct FitnessStreaksWatchApp: App {
         scheduleBackgroundRefresh()
         let work = Task { @MainActor in
             await StreakStore.shared.load()
+            WidgetCenter.shared.reloadAllTimelines()
         }
         Task {
             try? await Task.sleep(for: .seconds(8))

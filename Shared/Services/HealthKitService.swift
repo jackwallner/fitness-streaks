@@ -383,13 +383,22 @@ final class HealthKitService: ObservableObject {
     /// overcounting sparse background readings, then converts to minutes.
     private func heartRateMinutesAbove(thresholdBPM: Double, start: Date, end: Date) async throws -> [Date: Double] {
         let type = HKQuantityType(.heartRate)
-        let predicate = HKQuery.predicateForSamples(withStart: start, end: end, options: .strictStartDate)
+        let unit = HKUnit.count().unitDivided(by: .minute())
+
+        // Filter at the HealthKit level so we never load millions of low-BPM samples.
+        let thresholdQuantity = HKQuantity(unit: unit, doubleValue: thresholdBPM)
+        let quantityPredicate = HKQuery.predicateForQuantitySamples(with: .greaterThan, quantity: thresholdQuantity)
+        let datePredicate = HKQuery.predicateForSamples(withStart: start, end: end, options: .strictStartDate)
+        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [datePredicate, quantityPredicate])
+
+        // Cap at 50,000 samples (~14 h of 1 Hz workout data) as a safety valve.
+        let sampleLimit = 50_000
 
         let samples: [HKQuantitySample] = try await withCheckedThrowingContinuation { continuation in
             let query = HKSampleQuery(
                 sampleType: type,
                 predicate: predicate,
-                limit: HKObjectQueryNoLimit,
+                limit: sampleLimit,
                 sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)]
             ) { _, results, error in
                 if let error {
@@ -400,8 +409,6 @@ final class HealthKitService: ObservableObject {
             }
             store.execute(query)
         }
-
-        let unit = HKUnit.count().unitDivided(by: .minute())
         var byDay: [Date: [HKQuantitySample]] = [:]
         for sample in samples {
             let day = DateHelpers.startOfDay(sample.startDate)

@@ -33,8 +33,14 @@ enum DataService {
             return try ModelContainer(for: schema, configurations: [inMemory])
         } catch {
             print("DataService: could not initialize in-memory container: \(error)")
-            // Return an empty container so the app doesn't crash; features using SwiftData will be empty.
-            return try! ModelContainer(for: schema, configurations: [inMemory])
+            // Try once more with a fresh configuration name to avoid store-lock issues.
+            let fallback = ModelConfiguration("FitnessStreaksFallback", schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+            if let container = try? ModelContainer(for: schema, configurations: [fallback]) {
+                return container
+            }
+            // Absolute last resort: differently-named config. This path is effectively unreachable.
+            let minimal = ModelConfiguration("FitnessStreaksMinimal", schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+            return try! ModelContainer(for: schema, configurations: [minimal])
         }
     }()
 

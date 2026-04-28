@@ -11,6 +11,7 @@ final class StreakStore: ObservableObject {
     /// Used by the streak-selection picker so the user can opt streaks in/out.
     @Published var allCandidates: [Streak] = []
     @Published var history: [ActivityDay] = []
+    @Published var hourlySteps: [Date: [Int: Double]] = [:]
     @Published var isLoading: Bool = false
     @Published var lastUpdated: Date? = nil
 
@@ -89,6 +90,7 @@ final class StreakStore: ObservableObject {
                 }
             }
             self.history = enriched
+            self.hourlySteps = hourly
             try HealthKitService.shared.cache(enriched)
             let settings = StreakSettings.shared
             settings.pruneBroken()
@@ -134,6 +136,7 @@ final class StreakStore: ObservableObject {
                 let settings = StreakSettings.shared
                 self.history = cached
                 let hourly = (try? await HealthKitService.shared.fetchHourlySteps(days: 90)) ?? [:]
+                self.hourlySteps = hourly
                 let all = StreakEngine.discover(
                     history: cached,
                     hourlySteps: hourly,

@@ -35,6 +35,8 @@ struct DashboardView: View {
                         StreakHero(streak: hero)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel("\(hero.metric.displayName) streak: \(hero.current) \(hero.cadence.pluralLabel), threshold \(Int(hero.threshold)) \(hero.metric.unitLabel)")
+                    .accessibilityHint("View streak details")
                     .padding(.horizontal, 6)
 
                     if shouldShowAtRisk, let hero = store.hero, !hero.currentUnitCompleted, hero.current >= 2 {
@@ -129,6 +131,7 @@ struct DashboardView: View {
                     .overlay(Rectangle().stroke(Theme.retroInkFaint, lineWidth: 2))
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Refresh streaks from Apple Health")
             Button { showSettings = true } label: {
                 Image(systemName: "gearshape.fill")
                     .font(.system(size: 14, weight: .semibold))
@@ -138,6 +141,7 @@ struct DashboardView: View {
                     .overlay(Rectangle().stroke(Theme.retroInkFaint, lineWidth: 2))
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Open settings")
         }
         .padding(.horizontal, 16)
     }
@@ -158,6 +162,8 @@ struct DashboardView: View {
         .padding(.horizontal, 12)
         .frame(maxWidth: .infinity)
         .pixelPanel(color: Theme.retroRed, fill: Theme.retroBg)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("At risk: \(streak.metric.displayName). \(riskText(for: streak))")
     }
 
     private func riskText(for streak: Streak) -> String {
@@ -179,7 +185,7 @@ struct DashboardView: View {
                     .font(RetroFont.mono(9, weight: .bold))
                     .tracking(1)
                     .foregroundStyle(Theme.retroRed)
-                Text("\(broken.brokenLength)-day \(broken.metric.displayName.lowercased()) run · TAP FOR OPTIONS")
+                Text("\(broken.brokenLength)-\(broken.cadence.pluralLabel) \(broken.metric.displayName.lowercased()) run · TAP FOR OPTIONS")
                     .font(RetroFont.mono(10))
                     .foregroundStyle(Theme.retroInk)
                     .lineLimit(1)
@@ -191,6 +197,7 @@ struct DashboardView: View {
             .pixelPanel(color: Theme.retroRed, fill: Theme.retroBg)
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("Streak ended: \(broken.brokenLength) \(broken.cadence.pluralLabel) \(broken.metric.displayName.lowercased()) run. Tap for recovery options.")
     }
 
     private var findMoreButton: some View {
@@ -210,7 +217,7 @@ struct DashboardView: View {
             .padding(12)
             .pixelPanel(color: Theme.retroInkFaint, fill: Theme.retroBgRaised)
         }
-        .buttonStyle(.plain)
+        .accessibilityLabel("Find more streaks")
     }
 
     private var badgeGrid: some View {
@@ -221,9 +228,7 @@ struct DashboardView: View {
                         StreakBadgeCard(streak: streak)
                     }
                     .buttonStyle(.plain)
-                    if shouldShowAtRisk, !streak.currentUnitCompleted, streak.current >= 2 {
-                        atRiskBanner(for: streak)
-                    }
+                    .accessibilityLabel("\(streak.metric.displayName) streak: \(streak.current) \(streak.cadence.pluralLabel)")
                 }
             }
         }
@@ -264,6 +269,7 @@ struct DashboardView: View {
                 .padding(.horizontal, 18)
                 .padding(.vertical, 10)
                 .background(Theme.retroLime)
+                .accessibilityLabel("Find more streaks")
 
                 Button("REFRESH") {
                     Task { await store.load() }
@@ -274,6 +280,7 @@ struct DashboardView: View {
                 .padding(.horizontal, 18)
                 .padding(.vertical, 10)
                 .overlay(Rectangle().stroke(Theme.retroLime, lineWidth: 2))
+                .accessibilityLabel("Refresh streaks from Apple Health")
 
                 Button("HEALTH ACCESS") {
                     if let url = URL(string: UIApplication.openSettingsURLString) {
@@ -286,6 +293,7 @@ struct DashboardView: View {
                 .padding(.horizontal, 18)
                 .padding(.vertical, 10)
                 .overlay(Rectangle().stroke(Theme.retroCyan, lineWidth: 2))
+                .accessibilityLabel("Open iOS Settings for Health access")
             }
         }
         .frame(maxWidth: .infinity)

@@ -88,6 +88,8 @@ struct StreakDetailView: View {
         .padding(.horizontal, 16)
         .frame(maxWidth: .infinity)
         .pixelPanel(color: streak.metric.accent)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(streak.metric.displayName) streak: \(streak.current) \(streak.cadence == .daily ? "days" : "weeks") in a row, threshold \(Int(streak.threshold)) \(streak.metric.unitLabel)")
     }
 
     private var toolbarTitle: String {
@@ -152,6 +154,8 @@ struct StreakDetailView: View {
         }
         .padding(14)
         .pixelPanel(color: Theme.retroAmber)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Today's progress: \(Int(min(1, streak.currentUnitProgress) * 100)) percent. \(streak.currentUnitCompleted ? "Goal locked in." : "Goal not yet locked in.")")
     }
 
     private func statusCard(_ text: String) -> some View {
@@ -194,6 +198,7 @@ struct StreakDetailView: View {
                         .overlay(Rectangle().stroke(Theme.retroCyan, lineWidth: 2))
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("Recalibrate threshold from Apple Health")
             }
         }
         .padding(14)
@@ -225,6 +230,7 @@ struct StreakDetailView: View {
                         .overlay(Rectangle().stroke(Theme.retroMagenta, lineWidth: 2))
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("Make this the primary streak on the dashboard")
             }
         }
         .padding(14)
@@ -256,6 +262,7 @@ struct StreakDetailView: View {
         if streak.window != nil { return nil }
         let candidates = StreakEngine.discover(
             history: store.history,
+            hourlySteps: store.hourlySteps,
             hiddenMetrics: settings.hiddenMetrics,
             vibe: settings.vibe,
             lookbackDays: settings.lookbackDays,

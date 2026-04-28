@@ -202,6 +202,9 @@ struct SettingsView: View {
             }
             .padding(14)
             .pixelPanel(color: Theme.retroInkFaint)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("At-risk reminder notifications")
+            .accessibilityValue(settings.notificationsEnabled ? "On" : "Off")
 
             if notificationsBlockedBySystem {
                 Button {
@@ -219,6 +222,7 @@ struct SettingsView: View {
                         .overlay(Rectangle().stroke(Theme.retroAmber, lineWidth: 2))
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("Notifications blocked in iOS settings. Tap to open Settings app.")
             }
 
             DatePicker(
@@ -342,6 +346,9 @@ struct SettingsView: View {
                     }
                     .padding(.vertical, 12)
                     .padding(.horizontal, 14)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("\(metric.displayName) tracking")
+                    .accessibilityValue(!settings.isHidden(metric) ? "On" : "Off")
                     if idx < StreakMetric.allCases.count - 1 {
                         dashedLine
                     }

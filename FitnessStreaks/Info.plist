@@ -36,9 +36,7 @@
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Streak Finder is read-only and does not write any data to Apple Health. This string is required by Apple whenever the HealthKit framework is linked.</string>
 	<key>UIBackgroundModes</key>
-	<array>
-		<string>fetch</string>
-	</array>
+	<array/>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>com.jackwallner.streaks.refresh</string>
