@@ -11,7 +11,11 @@ struct DashboardView: View {
     @State private var selectedBroken: BrokenStreak? = nil
 
     private let grid = [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)]
-    private let maxBadges = 4
+    private static let relativeFormatter: RelativeDateTimeFormatter = {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .short
+        return formatter
+    }()
 
     var body: some View {
         NavigationStack {
@@ -19,9 +23,11 @@ struct DashboardView: View {
                 topBar
                     .padding(.top, 4)
 
-                if let broken = settings.recentlyBroken.first {
-                    brokenBanner(broken)
-                        .padding(.horizontal, 6)
+                if !settings.recentlyBroken.isEmpty {
+                    ForEach(settings.recentlyBroken.prefix(3)) { broken in
+                        brokenBanner(broken)
+                            .padding(.horizontal, 6)
+                    }
                 }
 
                 if let hero = store.hero {
@@ -31,9 +37,11 @@ struct DashboardView: View {
                     .buttonStyle(.plain)
                     .padding(.horizontal, 6)
 
-                    if !hero.currentUnitCompleted {
-                        atRiskBanner(for: hero)
-                            .padding(.horizontal, 6)
+                    if !atRiskStreaks.isEmpty {
+                        ForEach(atRiskStreaks.prefix(3)) { streak in
+                            atRiskBanner(for: streak)
+                                .padding(.horizontal, 6)
+                        }
                     }
 
                     if !visibleBadges.isEmpty {
@@ -83,7 +91,13 @@ struct DashboardView: View {
     }
 
     private var visibleBadges: [Streak] {
-        Array(store.badges.prefix(maxBadges))
+        store.badges
+    }
+
+    private var atRiskStreaks: [Streak] {
+        store.streaks
+            .filter { !$0.currentUnitCompleted && $0.current >= 2 }
+            .sorted { $0.current > $1.current }
     }
 
     private var topBar: some View {
@@ -128,13 +142,13 @@ struct DashboardView: View {
         .padding(.horizontal, 16)
     }
 
-    private func atRiskBanner(for hero: Streak) -> some View {
+    private func atRiskBanner(for streak: Streak) -> some View {
         HStack(spacing: 10) {
             Text("! AT RISK")
                 .font(RetroFont.mono(9, weight: .bold))
                 .tracking(1)
                 .foregroundStyle(Theme.retroRed)
-            Text(riskText(for: hero))
+            Text("\(streak.metric.displayName): \(riskText(for: streak))")
                 .font(RetroFont.mono(11))
                 .foregroundStyle(Theme.retroInk)
                 .lineLimit(1)
@@ -145,11 +159,11 @@ struct DashboardView: View {
         .pixelPanel(color: Theme.retroRed, fill: Theme.retroBg)
     }
 
-    private func riskText(for hero: Streak) -> String {
-        let remaining = max(0, hero.threshold - hero.currentUnitValue)
-        let v = hero.metric.format(value: remaining)
-        let unit = hero.metric.unitLabel
-        if let window = hero.window {
+    private func riskText(for streak: Streak) -> String {
+        let remaining = max(0, streak.threshold - streak.currentUnitValue)
+        let v = streak.metric.format(value: remaining)
+        let unit = streak.metric.unitLabel
+        if let window = streak.window {
             return "\(v) \(unit) between \(window.label) to lock today in"
         }
         return "\(v) \(unit) to lock today in"
@@ -164,7 +178,7 @@ struct DashboardView: View {
                     .font(RetroFont.mono(9, weight: .bold))
                     .tracking(1)
                     .foregroundStyle(Theme.retroRed)
-                Text("\(broken.brokenLength)-day \(broken.metric.displayName.lowercased()) run · TAP TO RESTART")
+                Text("\(broken.brokenLength)-day \(broken.metric.displayName.lowercased()) run · TAP FOR OPTIONS")
                     .font(RetroFont.mono(10))
                     .foregroundStyle(Theme.retroInk)
                     .lineLimit(1)
@@ -229,12 +243,12 @@ struct DashboardView: View {
                 .font(RetroFont.mono(12, weight: .bold))
                 .tracking(2)
                 .foregroundStyle(Theme.retroInk)
-            Text("If you've been moving lately, double-check Streak Finder has Health access.")
+            Text("Connect Apple Health, refresh after activity, or build a custom streak to start.")
                 .font(RetroFont.mono(11))
                 .foregroundStyle(Theme.retroInkDim)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
-            HStack(spacing: 10) {
+            VStack(spacing: 10) {
                 Button("+ FIND MORE STREAKS") {
                     showPicker = true
                 }
@@ -275,9 +289,7 @@ struct DashboardView: View {
         let age = Date().timeIntervalSince(date)
         if age < 30 { return "just updated" }
         if age < 60 { return "<1 min ago" }
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .short
-        return formatter.localizedString(for: date, relativeTo: .now)
+        return Self.relativeFormatter.localizedString(for: date, relativeTo: .now)
     }
 
     private func restart(_ broken: BrokenStreak) {

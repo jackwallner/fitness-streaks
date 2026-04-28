@@ -431,73 +431,12 @@ enum StreakEngine {
         byDay: [Date: ActivityDay],
         today: Date
     ) -> Streak {
-        guard threshold > 0 else {
-            return Streak(metric: metric, cadence: .daily, threshold: threshold,
-                          current: 0, best: 0, startDate: nil, lastHitDate: nil,
-                          currentUnitCompleted: false, currentUnitProgress: 0, currentUnitValue: 0)
-        }
-        // Current streak: walk backward from today. The current day only counts if it's met.
-        let todayValue = byDay[today]?.value(for: metric) ?? 0
-        let todayMet = todayValue >= threshold
-
-        var currentLen = 0
-        var streakStartDate: Date? = nil
-
-        if todayMet {
-            currentLen = 1
-            streakStartDate = today
-        }
-
-        var cursor = DateHelpers.addDays(-1, to: today)
-        while true {
-            let value = byDay[cursor]?.value(for: metric) ?? 0
-            if value >= threshold {
-                currentLen += 1
-                streakStartDate = cursor
-                cursor = DateHelpers.addDays(-1, to: cursor)
-            } else {
-                break
-            }
-        }
-
-        // Best streak: scan full history in order.
-        let sortedDays = byDay.keys.sorted()
-        var best = 0
-        var run = 0
-        for d in sortedDays {
-            let value = byDay[d]?.value(for: metric) ?? 0
-            if value >= threshold {
-                run += 1
-                best = max(best, run)
-            } else {
-                run = 0
-            }
-        }
-        best = max(best, currentLen)
-
-        // Most recent day that met the threshold
-        var lastHit: Date? = nil
-        var back = today
-        for _ in 0..<800 {
-            if (byDay[back]?.value(for: metric) ?? 0) >= threshold {
-                lastHit = back
-                break
-            }
-            back = DateHelpers.addDays(-1, to: back)
-        }
-
-        let progress = threshold > 0 ? min(todayValue / threshold, 10) : 0
-        return Streak(
+        let values = Dictionary(uniqueKeysWithValues: byDay.map { ($0.key, $0.value.value(for: metric)) })
+        return computeDailyStreakFromValues(
             metric: metric,
-            cadence: .daily,
             threshold: threshold,
-            current: currentLen,
-            best: best,
-            startDate: streakStartDate,
-            lastHitDate: lastHit,
-            currentUnitCompleted: todayMet,
-            currentUnitProgress: progress,
-            currentUnitValue: todayValue
+            byDayValues: values,
+            today: today
         )
     }
 
@@ -536,7 +475,7 @@ enum StreakEngine {
 
         let missed = DateHelpers.startOfDay(preservation.missedDate)
         let daysAfterMiss = max(0, DateHelpers.gregorian.dateComponents([.day], from: missed, to: today).day ?? 0)
-        let canBridge = streak.current >= max(0, daysAfterMiss - 1)
+        let canBridge = daysAfterMiss == 1
         let bridgedCurrent = canBridge ? max(streak.current, preservation.preservedLength + streak.current) : streak.current
         let bridgedStart = canBridge ? DateHelpers.addDays(-(bridgedCurrent - 1), to: today) : streak.startDate
 

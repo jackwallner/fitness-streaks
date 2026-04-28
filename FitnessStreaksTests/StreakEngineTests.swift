@@ -136,6 +136,69 @@ final class StreakEngineTests: XCTestCase {
         XCTAssertEqual(StreakEngine.circularHourDistance(22, 1), 3)
     }
 
+    func testDailyStreakDelegatesToValueComputation() {
+        let today = day(2026, 4, 26)
+        let history = (0..<4).map { offset in
+            activity(DateHelpers.addDays(-offset, to: today), steps: offset == 3 ? 1_000 : 4_000)
+        }
+        let byDay = Dictionary(uniqueKeysWithValues: history.map { ($0.date, $0) })
+        let byValue = Dictionary(uniqueKeysWithValues: history.map { ($0.date, $0.steps) })
+
+        let activityResult = StreakEngine.computeDailyStreak(
+            metric: .steps,
+            threshold: 3_000,
+            byDay: byDay,
+            today: today
+        )
+        let valueResult = StreakEngine.computeDailyStreakFromValues(
+            metric: .steps,
+            threshold: 3_000,
+            byDayValues: byValue,
+            today: today
+        )
+
+        XCTAssertEqual(activityResult.current, valueResult.current)
+        XCTAssertEqual(activityResult.best, valueResult.best)
+        XCTAssertEqual(activityResult.currentUnitCompleted, valueResult.currentUnitCompleted)
+        XCTAssertEqual(activityResult.currentUnitValue, valueResult.currentUnitValue)
+    }
+
+    func testBestReminderCandidateIncludesSecondaryAtRiskStreaks() {
+        let completedHero = streak(
+            metric: .steps,
+            cadence: .daily,
+            threshold: 3_000,
+            current: 12,
+            currentUnitCompleted: true,
+            currentUnitValue: 3_000
+        )
+        let atRiskBadge = streak(
+            metric: .workouts,
+            cadence: .daily,
+            threshold: 1,
+            current: 6,
+            currentUnitCompleted: false,
+            currentUnitValue: 0
+        )
+
+        let reminder = NotificationService.bestReminderCandidate(from: [completedHero, atRiskBadge])
+
+        XCTAssertEqual(reminder?.trackingKey, atRiskBadge.trackingKey)
+    }
+
+    func testBestReminderCandidateIgnoresOneDayStreaks() {
+        let newStreak = streak(
+            metric: .steps,
+            cadence: .daily,
+            threshold: 3_000,
+            current: 1,
+            currentUnitCompleted: false,
+            currentUnitValue: 1_000
+        )
+
+        XCTAssertNil(NotificationService.bestReminderCandidate(from: [newStreak]))
+    }
+
     func testSleepHoursMergeOverlappingIntervals() {
         let sleepDay = day(2026, 4, 26)
         let previousNight = DateHelpers.addDays(-1, to: sleepDay)

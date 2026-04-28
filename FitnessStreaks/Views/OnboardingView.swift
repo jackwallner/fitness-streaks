@@ -60,6 +60,18 @@ struct OnboardingView: View {
                                 .overlay(Rectangle().stroke(Theme.retroCyan, lineWidth: 2))
                         }
                         .buttonStyle(.plain)
+                        Button {
+                            finishEmptySetup()
+                        } label: {
+                            Text("SKIP FOR NOW")
+                                .font(RetroFont.mono(10, weight: .bold))
+                                .tracking(1)
+                                .foregroundStyle(Theme.retroInkDim)
+                                .padding(.vertical, 8)
+                                .padding(.horizontal, 14)
+                                .overlay(Rectangle().stroke(Theme.retroInkFaint, lineWidth: 2))
+                        }
+                        .buttonStyle(.plain)
                     }
                     .padding(.horizontal, 24)
                 }
@@ -134,6 +146,9 @@ struct OnboardingView: View {
     private var isPrimaryDisabled: Bool {
         if requesting { return true }
         if step == .review && !store.allCandidates.isEmpty && selectedStreaks.isEmpty {
+            return true
+        }
+        if step == .primary && selectedStreaks.isEmpty {
             return true
         }
         return false
@@ -264,7 +279,7 @@ struct OnboardingView: View {
             .frame(maxWidth: .infinity)
             .pixelPanel(color: Theme.retroMagenta)
 
-            Text("Tip: \"\(selectedVibe.label)\" picks goals you\nalready hit \(Int(selectedVibe.targetCompletionRate * 100))% of the time.\nExisting streaks stay locked after setup.")
+            Text("Tip: \"\(selectedVibe.label)\" picks goals you\nalready hit \(Int(selectedVibe.targetCompletionRate * 100))% of the time.\nYou choose which ones to track next.")
                 .font(RetroFont.mono(13))
                 .foregroundStyle(Theme.retroInkDim)
                 .lineSpacing(2)
@@ -279,7 +294,7 @@ struct OnboardingView: View {
                 .tracking(2)
                 .foregroundStyle(Theme.retroInk)
 
-            Text("We scanned your Apple Health history.\n★ = most interesting for your vibe.\nTap to opt in or out.")
+            Text("We scanned your Apple Health history.\n★ = most interesting for your vibe.\nPick at least one to start tracking.")
                 .font(RetroFont.mono(13))
                 .foregroundStyle(Theme.retroInkDim)
                 .lineSpacing(2)
@@ -377,7 +392,7 @@ struct OnboardingView: View {
     private var featurePanel: some View {
         VStack(alignment: .leading, spacing: 6) {
             featureRow("8 METRICS · STEPS TO SLEEP")
-            featureRow("DAILY STREAKS ONLY")
+            featureRow("FITNESS STREAKS FROM HEALTH")
             featureRow("CALENDAR HEATMAPS")
             featureRow("100% LOCAL · NO NETWORK")
         }
@@ -410,27 +425,14 @@ struct OnboardingView: View {
             withAnimation { step = .minimum }
         case .minimum:
             settings.lookbackDays = lookbackDays
-            // Discover candidates before showing the review step.
             requesting = true
-            // Temporarily clear tracked filter so allCandidates reflects everything.
-            settings.trackedStreaks = nil
             await store.load()
             requesting = false
-            // Pre-check the top 5 so first-timers aren't staring at an empty selection.
-            selectedStreaks = Set(
-                store.allCandidates.prefix(5).map {
-                    $0.trackingKey
-                }
-            )
+            selectedStreaks = []
             withAnimation { step = .review }
         case .review:
             if store.allCandidates.isEmpty {
-                // No streaks discovered (fresh device / sparse Apple Health history).
-                // Finish anyway with "track everything" semantics so future candidates
-                // surface automatically; the dashboard's empty state guides from here.
-                settings.trackedStreaks = nil
-                store.refilter()
-                settings.hasCompletedSetup = true
+                finishEmptySetup()
                 return
             }
             guard !selectedStreaks.isEmpty else { return }
@@ -462,5 +464,11 @@ struct OnboardingView: View {
         } catch {
             errorText = "Couldn't connect. Open Settings → Health → Data Access → Streak Finder."
         }
+    }
+
+    private func finishEmptySetup() {
+        settings.trackedStreaks = nil
+        store.refilter()
+        settings.hasCompletedSetup = true
     }
 }

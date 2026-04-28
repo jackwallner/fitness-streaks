@@ -20,7 +20,7 @@ struct BrokenStreakSheet: View {
                         .font(RetroFont.mono(12, weight: .bold))
                         .tracking(2)
                         .foregroundStyle(Theme.retroRed)
-                    Text("Your \(broken.metric.displayName.lowercased()) run ended at \(broken.brokenLength) \(broken.cadence.pluralLabel). Restart the same goal or pick a new one.")
+                    Text("Your \(broken.metric.displayName.lowercased()) run ended at \(broken.brokenLength) \(broken.cadence.pluralLabel). Keep the same goal on your dashboard or pick a new one.")
                         .font(RetroFont.mono(12))
                         .foregroundStyle(Theme.retroInk)
                         .lineSpacing(3)
@@ -32,7 +32,7 @@ struct BrokenStreakSheet: View {
                     restart()
                     close()
                 } label: {
-                    Text("RESTART SAME GOAL")
+                    Text("KEEP SAME GOAL")
                         .font(RetroFont.mono(11, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(Theme.retroBg)

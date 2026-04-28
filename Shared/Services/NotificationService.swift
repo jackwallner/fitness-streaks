@@ -4,7 +4,7 @@ import os
 
 private let log = Logger(subsystem: "com.jackwallner.streaks", category: "Notifications")
 
-/// Local notifications for at-risk streaks. Fires once daily if the hero streak
+/// Local notifications for at-risk streaks. Fires once daily if the most urgent tracked streak
 /// hasn't been completed yet for today.
 @MainActor
 enum NotificationService {
@@ -45,25 +45,23 @@ enum NotificationService {
         return false
     }
 
-    /// Schedule a daily reminder. The body uses the current hero streak so the nudge feels personal.
+    /// Schedule a daily reminder. The body uses the most urgent incomplete streak so the nudge feels personal.
     /// Never prompts for permission — that only happens via a user-initiated toggle.
-    static func scheduleDailyReminder(for hero: Streak?) async {
+    static func scheduleDailyReminder(for streaks: [Streak]) async {
         let enabled = StreakSettings.shared.notificationsEnabled
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [dailyReminderID])
 
         guard enabled,
               await isAuthorized(),
-              let hero,
-              hero.current >= 3,
-              !hero.currentUnitCompleted else { return }
+              let reminder = bestReminderCandidate(from: streaks) else { return }
 
-        let heroLabel = hero.metric.thresholdLabel(hero.threshold, cadence: hero.cadence)
-        let unit = hero.cadence.pluralLabel
+        let heroLabel = reminder.metric.thresholdLabel(reminder.threshold, cadence: reminder.cadence)
+        let unit = reminder.cadence.pluralLabel
         let deadline: String
-        if let window = hero.window {
+        if let window = reminder.window {
             deadline = "by \(window.label)"
-        } else if hero.cadence == .weekly {
+        } else if reminder.cadence == .weekly {
             deadline = "this week"
         } else {
             deadline = "before midnight"
@@ -71,7 +69,7 @@ enum NotificationService {
 
         let content = UNMutableNotificationContent()
         content.title = "Keep the \(heroLabel) streak alive"
-        content.body = "You're at \(hero.current) \(unit). Get it in \(deadline)."
+        content.body = "You're at \(reminder.current) \(unit). Get it in \(deadline)."
         content.sound = .default
         content.interruptionLevel = .active
 
@@ -87,6 +85,16 @@ enum NotificationService {
         } catch {
             log.error("Failed to schedule reminder: \(String(describing: error))")
         }
+    }
+
+    nonisolated static func bestReminderCandidate(from streaks: [Streak]) -> Streak? {
+        streaks
+            .filter { !$0.currentUnitCompleted && $0.current >= 2 }
+            .sorted {
+                if $0.current != $1.current { return $0.current > $1.current }
+                return $0.currentUnitProgress < $1.currentUnitProgress
+            }
+            .first
     }
 
     static func notifyStreakBroken(_ broken: BrokenStreak) async {

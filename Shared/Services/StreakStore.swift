@@ -103,17 +103,19 @@ final class StreakStore: ObservableObject {
                 gracePreservations: settings.gracePreservations
             )
             var filtered = Self.applyTrackedFilter(all)
-            await handleBreaks(previous: previous, fresh: filtered, all: all, hourly: hourly, history: enriched)
-            all = StreakEngine.discover(
-                history: enriched,
-                hourlySteps: hourly,
-                hiddenMetrics: settings.hiddenMetrics,
-                vibe: settings.vibe,
-                lookbackDays: settings.lookbackDays,
-                committedThresholds: settings.committedThresholds,
-                customStreaks: settings.customStreaks,
-                gracePreservations: settings.gracePreservations
-            )
+            await handleBreaks(previous: previous, fresh: filtered, hourly: hourly, history: enriched)
+            if settings.gracePreservations.isEmpty == false || settings.recentlyBroken.isEmpty == false {
+                all = StreakEngine.discover(
+                    history: enriched,
+                    hourlySteps: hourly,
+                    hiddenMetrics: settings.hiddenMetrics,
+                    vibe: settings.vibe,
+                    lookbackDays: settings.lookbackDays,
+                    committedThresholds: settings.committedThresholds,
+                    customStreaks: settings.customStreaks,
+                    gracePreservations: settings.gracePreservations
+                )
+            }
             filtered = Self.applyTrackedFilter(all)
             filtered = Self.applyManualOrder(filtered, manualOrder: settings.manualStreakOrder)
             self.allCandidates = all
@@ -123,11 +125,7 @@ final class StreakStore: ObservableObject {
             persistCurrentSnapshot()
             self.lastUpdated = .now
 
-            if let hero = self.hero {
-                await NotificationService.scheduleDailyReminder(for: hero)
-            } else {
-                NotificationService.cancelAll()
-            }
+            await NotificationService.scheduleDailyReminder(for: self.streaks)
         } catch {
             print("StreakStore load error: \(error)")
             // Fall back to cached snapshot values if HK read failed
@@ -135,8 +133,10 @@ final class StreakStore: ObservableObject {
             if !cached.isEmpty {
                 let settings = StreakSettings.shared
                 self.history = cached
+                let hourly = (try? await HealthKitService.shared.fetchHourlySteps(days: 90)) ?? [:]
                 let all = StreakEngine.discover(
                     history: cached,
+                    hourlySteps: hourly,
                     hiddenMetrics: settings.hiddenMetrics,
                     vibe: settings.vibe,
                     lookbackDays: settings.lookbackDays,
@@ -156,7 +156,6 @@ final class StreakStore: ObservableObject {
     private func handleBreaks(
         previous: [Streak],
         fresh: [Streak],
-        all: [Streak],
         hourly: [Date: [Int: Double]],
         history: [ActivityDay]
     ) async {

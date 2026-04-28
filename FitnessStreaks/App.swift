@@ -91,12 +91,11 @@ struct FitnessStreaksApp: App {
 }
 
 private struct RootView: View {
-    @EnvironmentObject var healthKit: HealthKitService
     @EnvironmentObject var settings: StreakSettings
 
     var body: some View {
         Group {
-            if settings.hasCompletedSetup && healthKit.hasRequestedAuthorization {
+            if settings.hasCompletedSetup {
                 DashboardView()
             } else {
                 OnboardingView()

@@ -192,8 +192,9 @@ struct StreakPickerSheet: View {
                     Button { save() } label: {
                         Text("SAVE")
                             .font(RetroFont.mono(10, weight: .bold))
-                            .foregroundStyle(Theme.retroLime)
+                            .foregroundStyle(selection.isEmpty ? Theme.retroInkFaint : Theme.retroLime)
                     }
+                    .disabled(selection.isEmpty)
                 }
             }
             .toolbarBackground(Theme.retroBg, for: .navigationBar)
@@ -212,10 +213,8 @@ struct StreakPickerSheet: View {
                 selection = current
                 orderedSelection = settings.manualStreakOrder.filter { current.contains($0) }
             } else {
-                // First time — preselect the recommended top 5
-                let preselected = store.allCandidates.prefix(5).map { $0.trackingKey }
-                selection = Set(preselected)
-                orderedSelection = preselected
+                selection = []
+                orderedSelection = []
             }
         }
         .onChange(of: selection) { _, new in
@@ -283,6 +282,25 @@ struct CustomStreakBuilderSheet: View {
     @State private var usesHourWindow = false
     @State private var hour = 10
 
+    private var allowsFractionalThreshold: Bool {
+        switch metric {
+        case .sleepHours, .distanceMiles, .intensityRatio:
+            return true
+        default:
+            return false
+        }
+    }
+
+    private var sanitizedThreshold: Double {
+        metric == .workouts ? 1 : threshold
+    }
+
+    private var thresholdIsValid: Bool {
+        sanitizedThreshold.isFinite
+            && sanitizedThreshold > 0
+            && (allowsFractionalThreshold || sanitizedThreshold.rounded() == sanitizedThreshold)
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -300,6 +318,12 @@ struct CustomStreakBuilderSheet: View {
                         }
                         .pickerStyle(.navigationLink)
                         .padding(14)
+                        .onChange(of: metric) { _, newMetric in
+                            if newMetric == .workouts {
+                                threshold = 1
+                                usesHourWindow = false
+                            }
+                        }
 
                         Rectangle()
                             .fill(Theme.retroInkFaint)
@@ -312,16 +336,25 @@ struct CustomStreakBuilderSheet: View {
                                 .foregroundStyle(Theme.retroInk)
                             Spacer()
                             TextField("0", value: $threshold, format: .number)
-                                .keyboardType(.decimalPad)
+                                .keyboardType(allowsFractionalThreshold ? .decimalPad : .numberPad)
                                 .multilineTextAlignment(.trailing)
                                 .font(RetroFont.mono(12, weight: .bold))
                                 .foregroundStyle(Theme.retroLime)
                                 .frame(width: 120)
+                                .disabled(metric == .workouts)
                             Text(metric.unitLabel.uppercased())
                                 .font(RetroFont.mono(9, weight: .bold))
                                 .foregroundStyle(Theme.retroInkDim)
                         }
                         .padding(14)
+
+                        if !thresholdIsValid {
+                            Text(allowsFractionalThreshold ? "Enter a value greater than 0." : "Enter a whole number greater than 0.")
+                                .font(RetroFont.mono(10))
+                                .foregroundStyle(Theme.retroRed)
+                                .padding(.horizontal, 14)
+                                .padding(.bottom, 12)
+                        }
 
                         Rectangle()
                             .fill(Theme.retroInkFaint)
@@ -376,15 +409,16 @@ struct CustomStreakBuilderSheet: View {
                             id: UUID().uuidString,
                             metric: metric,
                             cadence: .daily,
-                            threshold: threshold,
+                            threshold: sanitizedThreshold,
                             hourWindow: usesHourWindow && metric == .steps ? hour : nil
                         ))
                         dismiss()
                     } label: {
                         Text("ADD")
                             .font(RetroFont.mono(10, weight: .bold))
-                            .foregroundStyle(Theme.retroLime)
+                            .foregroundStyle(thresholdIsValid ? Theme.retroLime : Theme.retroInkFaint)
                     }
+                    .disabled(!thresholdIsValid)
                 }
             }
             .toolbarBackground(Theme.retroBg, for: .navigationBar)

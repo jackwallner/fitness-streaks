@@ -5,6 +5,7 @@ struct StreakDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var store: StreakStore
     @EnvironmentObject var settings: StreakSettings
+    @State private var actionMessage: String? = nil
 
     var isHero: Bool { store.hero?.id == streak.id }
 
@@ -13,6 +14,7 @@ struct StreakDetailView: View {
             VStack(spacing: 16) {
                 headerCard.padding(.horizontal, 14)
                 todayCard.padding(.horizontal, 14)
+                if let actionMessage { statusCard(actionMessage).padding(.horizontal, 14) }
                 if canRecalibrate { recalibrateCard.padding(.horizontal, 14) }
                 if !isHero { makePrimaryCard.padding(.horizontal, 14) }
 
@@ -26,8 +28,8 @@ struct StreakDetailView: View {
                     heatmapCard.padding(.horizontal, 14)
                     statsRow.padding(.horizontal, 14)
 
-                    if isHero { weekdayHistogram.padding(.horizontal, 14) }
-                    if isHero { thresholdLadder.padding(.horizontal, 14) }
+                    weekdayHistogram.padding(.horizontal, 14)
+                    thresholdLadder.padding(.horizontal, 14)
                 }
             }
             .padding(.vertical, 16)
@@ -38,8 +40,8 @@ struct StreakDetailView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button { dismiss() } label: {
-                    Text("◄ BACK")
-                        .font(RetroFont.pixel(10))
+                    Label("Back", systemImage: "chevron.left")
+                        .font(RetroFont.mono(10, weight: .bold))
                         .foregroundStyle(Theme.retroMagenta)
                 }
             }
@@ -152,6 +154,15 @@ struct StreakDetailView: View {
         .pixelPanel(color: Theme.retroAmber)
     }
 
+    private func statusCard(_ text: String) -> some View {
+        Text(text)
+            .font(RetroFont.mono(11, weight: .bold))
+            .foregroundStyle(Theme.retroLime)
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .pixelPanel(color: Theme.retroLime, fill: Theme.retroBg)
+    }
+
     private var canRecalibrate: Bool {
         streak.customID == nil && settings.committedThresholds[streak.trackingKey] != nil
     }
@@ -172,7 +183,7 @@ struct StreakDetailView: View {
                 Button {
                     settings.clearCommittedThreshold(for: streak.trackingKey)
                     Task { await store.load() }
-                    dismiss()
+                    actionMessage = "Recalibrating from Apple Health..."
                 } label: {
                     Text("RECALIBRATE")
                         .font(RetroFont.mono(10, weight: .bold))
@@ -231,7 +242,7 @@ struct StreakDetailView: View {
             settings.trackedStreaks = tracked
         }
         store.refilter()
-        dismiss()
+        actionMessage = "Primary streak updated."
     }
 
     private var recalibrationPreview: String {
@@ -355,7 +366,7 @@ struct StreakDetailView: View {
 
     private var weekdayHistogram: some View {
         let vals = weekdayValues()
-        let median = vals.sorted()[vals.count / 2]
+        let median = vals.isEmpty ? 0 : vals.sorted()[vals.count / 2]
         let maxVal = max(1, vals.max() ?? 1)
         return VStack(alignment: .leading, spacing: 10) {
             Text("BY DAY OF WEEK")

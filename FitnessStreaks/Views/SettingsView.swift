@@ -233,13 +233,13 @@ struct SettingsView: View {
             .pixelPanel(color: Theme.retroInkFaint)
             .disabled(!settings.notificationsEnabled)
             .onChange(of: settings.notificationHour) { _, _ in
-                Task { await NotificationService.scheduleDailyReminder(for: store.hero) }
+                Task { await NotificationService.scheduleDailyReminder(for: store.streaks) }
             }
             .onChange(of: settings.notificationMinute) { _, _ in
-                Task { await NotificationService.scheduleDailyReminder(for: store.hero) }
+                Task { await NotificationService.scheduleDailyReminder(for: store.streaks) }
             }
 
-            Text("Daily nudge at \(notificationTimeLabel) if your primary streak isn't locked in yet. iOS will ask for notification permission the first time you turn this on.")
+            Text("Daily nudge at \(notificationTimeLabel) if a tracked streak isn't locked in yet. iOS will ask for notification permission the first time you turn this on.")
                 .font(RetroFont.mono(10))
                 .foregroundStyle(Theme.retroInkDim)
                 .padding(.horizontal, 6)
@@ -278,8 +278,8 @@ struct SettingsView: View {
         case .granted:
             settings.notificationsEnabled = true
             notificationsBlockedBySystem = false
-            // Don't wait for the next refresh — schedule using the current hero immediately.
-            await NotificationService.scheduleDailyReminder(for: store.hero)
+            // Don't wait for the next refresh — schedule using the current streaks immediately.
+            await NotificationService.scheduleDailyReminder(for: store.streaks)
         case .denied:
             settings.notificationsEnabled = false
             notificationsBlockedBySystem = false
@@ -366,7 +366,6 @@ struct SettingsView: View {
             PixelSectionHeader(title: "Data")
             Button {
                 Task { await store.load() }
-                dismiss()
             } label: {
                 HStack(spacing: 8) {
                     Image(systemName: "arrow.clockwise")
