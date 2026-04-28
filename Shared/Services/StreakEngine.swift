@@ -52,7 +52,7 @@ enum StreakEngine {
 
         var found: [Streak] = []
 
-        for metric in StreakMetric.allCases where !hiddenMetrics.contains(metric) {
+        for metric in StreakMetric.allCases where !hiddenMetrics.contains(metric) && metric != .earlySteps {
             if let best = discoverBestThreshold(
                 metric: metric,
                 history: history,

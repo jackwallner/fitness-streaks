@@ -37,11 +37,9 @@ struct DashboardView: View {
                     .buttonStyle(.plain)
                     .padding(.horizontal, 6)
 
-                    if !atRiskStreaks.isEmpty {
-                        ForEach(atRiskStreaks.prefix(3)) { streak in
-                            atRiskBanner(for: streak)
-                                .padding(.horizontal, 6)
-                        }
+                    if shouldShowAtRisk, let hero = store.hero, !hero.currentUnitCompleted, hero.current >= 2 {
+                        atRiskBanner(for: hero)
+                            .padding(.horizontal, 6)
                     }
 
                     if !visibleBadges.isEmpty {
@@ -94,10 +92,12 @@ struct DashboardView: View {
         store.badges
     }
 
-    private var atRiskStreaks: [Streak] {
-        store.streaks
-            .filter { !$0.currentUnitCompleted && $0.current >= 2 }
-            .sorted { $0.current > $1.current }
+    private var shouldShowAtRisk: Bool {
+        let now = Calendar.current.dateComponents([.hour, .minute], from: Date())
+        guard let currentHour = now.hour, let currentMinute = now.minute else { return false }
+        let thresholdHour = settings.notificationHour
+        let thresholdMinute = settings.notificationMinute
+        return currentHour > thresholdHour || (currentHour == thresholdHour && currentMinute >= thresholdMinute)
     }
 
     private var topBar: some View {
@@ -156,6 +156,7 @@ struct DashboardView: View {
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 12)
+        .frame(maxWidth: .infinity)
         .pixelPanel(color: Theme.retroRed, fill: Theme.retroBg)
     }
 
@@ -215,10 +216,15 @@ struct DashboardView: View {
     private var badgeGrid: some View {
         LazyVGrid(columns: grid, spacing: 8) {
             ForEach(visibleBadges) { streak in
-                Button { selectedStreak = streak } label: {
-                    StreakBadgeCard(streak: streak)
+                VStack(spacing: 6) {
+                    Button { selectedStreak = streak } label: {
+                        StreakBadgeCard(streak: streak)
+                    }
+                    .buttonStyle(.plain)
+                    if shouldShowAtRisk, !streak.currentUnitCompleted, streak.current >= 2 {
+                        atRiskBanner(for: streak)
+                    }
                 }
-                .buttonStyle(.plain)
             }
         }
     }

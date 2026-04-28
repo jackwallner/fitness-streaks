@@ -239,7 +239,7 @@ final class StreakSettings: ObservableObject {
         self.defaults = defaults
 
         self.hasCompletedSetup = defaults.bool(forKey: "hasCompletedSetup")
-        self.appearance = AppAppearance(rawValue: defaults.integer(forKey: "appearance")) ?? .system
+        self.appearance = AppAppearance(rawValue: defaults.integer(forKey: "appearance")) ?? .light
         // Default OFF — never request notification permission until the user explicitly opts in.
         self.notificationsEnabled = defaults.object(forKey: "notificationsEnabled") as? Bool ?? false
         self.notificationHour = defaults.object(forKey: "notificationHour") as? Int ?? 19
@@ -256,8 +256,7 @@ final class StreakSettings: ObservableObject {
         if let raws = defaults.array(forKey: "hiddenMetrics") as? [String] {
             self.hiddenMetrics = Set(raws.compactMap(StreakMetric.init(rawValue:)))
         } else {
-            // Default: hide earlySteps metric (derived from hourly, often noisy)
-            self.hiddenMetrics = [.earlySteps]
+            self.hiddenMetrics = []
         }
 
         if let raws = defaults.array(forKey: "trackedStreaks") as? [String] {

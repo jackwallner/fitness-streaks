@@ -40,6 +40,22 @@ struct OnboardingView: View {
 
                 Spacer(minLength: 8)
 
+                if requesting {
+                    HStack(spacing: 10) {
+                        ProgressView()
+                            .tint(Theme.retroMagenta)
+                        Text(step == .intro ? "CONNECTING TO APPLE HEALTH..." : "FINDING YOUR STREAKS...")
+                            .font(RetroFont.mono(12, weight: .bold))
+                            .tracking(1)
+                            .foregroundStyle(Theme.retroMagenta)
+                    }
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 20)
+                    .background(Theme.retroBgCard)
+                    .overlay(Rectangle().stroke(Theme.retroMagenta, lineWidth: 2))
+                    .padding(.bottom, 8)
+                }
+
                 if let err = errorText {
                     VStack(spacing: 8) {
                         Text(err)

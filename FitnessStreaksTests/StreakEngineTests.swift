@@ -87,20 +87,6 @@ final class StreakEngineTests: XCTestCase {
         XCTAssertEqual(sLife?.completionRate ?? 0, 0.50, accuracy: 0.001)
     }
 
-    func testEarlyStepsDiscoveredFromHistory() {
-        let today = day(2026, 4, 26)
-        // 5 of 7 days meet 1000 early steps → 71% completion, within challenging tolerance (55-75%)
-        let history = (0..<7).map { offset -> ActivityDay in
-            let early: Double = offset < 5 ? 1_500 : 200
-            return activity(DateHelpers.addDays(-offset, to: today), steps: 10_000, earlySteps: early)
-        }
-
-        let discovered = StreakEngine.discover(history: history, vibe: .challenging, now: today)
-        let early = discovered.first { $0.metric == StreakMetric.earlySteps }
-        XCTAssertNotNil(early)
-        XCTAssertEqual(early?.current ?? 0, 5)
-    }
-
     func testIntensityRatioComputedFromEnergyAndExercise() {
         let today = day(2026, 4, 26)
         // Ratios: 10, 8, 6. Threshold 8 → 2/3 = 67%, within challenging tolerance (55-75%)
