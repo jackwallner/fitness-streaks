@@ -40,10 +40,10 @@ Streak Finder scans your Apple Health history to uncover hidden patterns and con
 `fitness,streaks,health,steps,workout,pixel,retro,tracker,healthkit,momentum,apple health,daily,habits,pedometer`
 
 ### Support URL
-`https://github.com/jackwallner/fitness-streaks` (or your support email: `mailto:jackwallner@gmail.com`)
+`https://jackwallner.github.io/fitness-streaks/`
 
 ### Marketing URL
-`https://github.com/jackwallner/fitness-streaks`
+`https://jackwallner.github.io/fitness-streaks/`
 
 ---
 

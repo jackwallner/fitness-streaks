@@ -424,7 +424,7 @@ struct SettingsView: View {
                     }
                 }
                 dashedLine
-                if let url = URL(string: "mailto:jackwallner@gmail.com") {
+                if let url = URL(string: "https://jackwallner.github.io/fitness-streaks/") {
                     Link(destination: url) {
                         HStack {
                             Text("SUPPORT")
