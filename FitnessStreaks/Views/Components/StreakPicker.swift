@@ -95,17 +95,46 @@ struct StreakPickerSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var selection: Set<String> = []
+    @State private var orderedSelection: [String] = []
     @State private var showingBuilder = false
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 14) {
-                    Text("Pick the streaks you want on your dashboard. ★ are the most interesting for your current vibe.")
+                    Text("Pick the streaks you want on your dashboard. ★ are the most interesting for your current vibe.\n\nDrag to reorder — first becomes your primary streak.")
                         .font(RetroFont.mono(11))
                         .foregroundStyle(Theme.retroInkDim)
                         .lineSpacing(2)
                         .padding(.horizontal, 14)
+
+                    // Reorder section: only selected streaks, draggable
+                    if !selectedStreaks.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("YOUR ORDER (drag to reorder)")
+                                .font(RetroFont.mono(10, weight: .bold))
+                                .tracking(1)
+                                .foregroundStyle(Theme.retroMagenta)
+                                .padding(.horizontal, 14)
+
+                            LazyVStack(spacing: 8) {
+                                ForEach(selectedStreaks) { streak in
+                                    reorderRow(streak)
+                                }
+                                .onMove(perform: move)
+                            }
+                            .padding(.horizontal, 14)
+                        }
+                        .padding(.vertical, 8)
+                        .background(Theme.retroBgRaised)
+                    }
+
+                    Text("ALL STREAKS")
+                        .font(RetroFont.mono(10, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(Theme.retroInkDim)
+                        .padding(.horizontal, 14)
+                        .padding(.top, 8)
 
                     StreakPickerList(
                         candidates: store.allCandidates,
@@ -173,6 +202,7 @@ struct StreakPickerSheet: View {
                 CustomStreakBuilderSheet { custom in
                     settings.customStreaks.append(custom)
                     selection.insert(custom.trackingKey)
+                    orderedSelection.append(custom.trackingKey)
                     Task { await store.load() }
                 }
             }
@@ -180,17 +210,64 @@ struct StreakPickerSheet: View {
         .onAppear {
             if let current = settings.trackedStreaks {
                 selection = current
+                orderedSelection = settings.manualStreakOrder.filter { current.contains($0) }
             } else {
                 // First time — preselect the recommended top 5
-                selection = Set(store.allCandidates.prefix(5).map {
-                    $0.trackingKey
-                })
+                let preselected = store.allCandidates.prefix(5).map { $0.trackingKey }
+                selection = Set(preselected)
+                orderedSelection = preselected
             }
         }
+        .onChange(of: selection) { _, new in
+            // Add newly selected items to the end of orderedSelection
+            for key in new where !orderedSelection.contains(key) {
+                orderedSelection.append(key)
+            }
+            // Remove deselected items from orderedSelection
+            orderedSelection.removeAll { !new.contains($0) }
+        }
+    }
+
+    private var selectedStreaks: [Streak] {
+        orderedSelection.compactMap { key in
+            store.allCandidates.first { $0.trackingKey == key }
+        }
+    }
+
+    private func reorderRow(_ streak: Streak) -> some View {
+        let accent = streak.metric.accent
+        return HStack(spacing: 12) {
+            Image(systemName: "line.3.horizontal")
+                .font(.system(size: 14))
+                .foregroundStyle(Theme.retroInkFaint)
+            Image(systemName: streak.metric.symbol)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(accent)
+                .frame(width: 20)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(streak.metric.displayName.uppercased())
+                    .font(RetroFont.mono(10, weight: .bold))
+                    .tracking(1)
+                    .foregroundStyle(Theme.retroInk)
+                Text(streak.metric.thresholdLabel(streak.threshold, cadence: streak.cadence))
+                    .font(RetroFont.mono(9))
+                    .foregroundStyle(Theme.retroInkDim)
+            }
+            Spacer()
+        }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 12)
+        .background(Theme.retroBg)
+        .overlay(Rectangle().stroke(Theme.retroInkFaint, lineWidth: 1))
+    }
+
+    private func move(from source: IndexSet, to destination: Int) {
+        orderedSelection.move(fromOffsets: source, toOffset: destination)
     }
 
     private func save() {
         settings.trackedStreaks = selection
+        settings.manualStreakOrder = orderedSelection
         store.refilter()
         dismiss()
     }

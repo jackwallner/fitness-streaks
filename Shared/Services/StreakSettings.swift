@@ -213,6 +213,15 @@ final class StreakSettings: ObservableObject {
         didSet { saveCodable(gracePreservations, key: "gracePreservations") }
     }
 
+    /// Manual ordering of streak tracking keys. First = hero, rest = badges in order.
+    /// Streaks not in this list are sorted by engine score after listed ones.
+    @Published var manualStreakOrder: [String] {
+        didSet {
+            saveCodable(manualStreakOrder, key: "manualStreakOrder")
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+    }
+
     nonisolated static func streakKey(metric: StreakMetric, cadence: StreakCadence, window: HourWindow? = nil) -> String {
         if let w = window {
             return "\(metric.rawValue)-\(cadence.rawValue)-h\(w.startHour)"
@@ -260,6 +269,7 @@ final class StreakSettings: ObservableObject {
         self.customStreaks = Self.loadCodable([CustomStreak].self, key: "customStreaks", defaults: defaults) ?? []
         self.recentlyBroken = Self.loadCodable([BrokenStreak].self, key: "recentlyBroken", defaults: defaults) ?? []
         self.gracePreservations = Self.loadCodable([String: GracePreservation].self, key: "gracePreservations", defaults: defaults) ?? [:]
+        self.manualStreakOrder = Self.loadCodable([String].self, key: "manualStreakOrder", defaults: defaults) ?? []
     }
 
     func isHidden(_ metric: StreakMetric) -> Bool { hiddenMetrics.contains(metric) }

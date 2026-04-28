@@ -68,17 +68,7 @@ enum StreakEngine {
             }
         }
 
-        // Hour-window streaks: mine hidden time-of-day rhythms in the user's step data.
-        if !hourlySteps.isEmpty && !hiddenMetrics.contains(.steps) {
-            let windowStreaks = discoverHourWindows(
-                hourlySteps: hourlySteps,
-                today: today,
-                vibe: vibe,
-                committedThresholds: committedThresholds,
-                gracePreservations: gracePreservations
-            )
-            found.append(contentsOf: windowStreaks)
-        }
+        // Hour-window streaks removed — daily streaks only per user request.
 
         let custom = customStreaks
             .filter { !hiddenMetrics.contains($0.metric) }

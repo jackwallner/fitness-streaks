@@ -20,7 +20,9 @@ final class StreakStore: ObservableObject {
     /// Re-apply the tracked-streaks filter without refetching — used after the user
     /// edits their selections in Settings or during onboarding.
     func refilter() {
-        streaks = Self.applyTrackedFilter(allCandidates)
+        var filtered = Self.applyTrackedFilter(allCandidates)
+        filtered = Self.applyManualOrder(filtered, manualOrder: StreakSettings.shared.manualStreakOrder)
+        streaks = filtered
         StreakSettings.shared.commitThresholds(for: streaks)
         persistCurrentSnapshot()
     }
@@ -33,6 +35,18 @@ final class StreakStore: ObservableObject {
         guard let tracked else { return streaks }
         if tracked.isEmpty { return [] }
         return streaks.filter { tracked.contains($0.trackingKey) }
+    }
+
+    /// Apply manual ordering: items in manualOrder come first in that order,
+    /// remaining items follow sorted by their original engine ranking.
+    static func applyManualOrder(_ streaks: [Streak], manualOrder: [String]) -> [Streak] {
+        guard !manualOrder.isEmpty else { return streaks }
+        let orderIndex = Dictionary(uniqueKeysWithValues: manualOrder.enumerated().map { ($0.element, $0.offset) })
+        return streaks.sorted {
+            let idx0 = orderIndex[$0.trackingKey] ?? Int.max
+            let idx1 = orderIndex[$1.trackingKey] ?? Int.max
+            return idx0 < idx1
+        }
     }
 
     private init() {}
@@ -101,6 +115,7 @@ final class StreakStore: ObservableObject {
                 gracePreservations: settings.gracePreservations
             )
             filtered = Self.applyTrackedFilter(all)
+            filtered = Self.applyManualOrder(filtered, manualOrder: settings.manualStreakOrder)
             self.allCandidates = all
             self.streaks = filtered
             settings.commitThresholds(for: filtered)
@@ -130,7 +145,9 @@ final class StreakStore: ObservableObject {
                     gracePreservations: settings.gracePreservations
                 )
                 self.allCandidates = all
-                self.streaks = Self.applyTrackedFilter(all)
+                var filtered = Self.applyTrackedFilter(all)
+                filtered = Self.applyManualOrder(filtered, manualOrder: settings.manualStreakOrder)
+                self.streaks = filtered
                 persistCurrentSnapshot()
             }
         }
