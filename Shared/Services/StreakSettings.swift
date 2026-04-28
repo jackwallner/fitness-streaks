@@ -256,7 +256,8 @@ final class StreakSettings: ObservableObject {
         if let raws = defaults.array(forKey: "hiddenMetrics") as? [String] {
             self.hiddenMetrics = Set(raws.compactMap(StreakMetric.init(rawValue:)))
         } else {
-            self.hiddenMetrics = []
+            // Default: hide earlySteps metric (derived from hourly, often noisy)
+            self.hiddenMetrics = [.earlySteps]
         }
 
         if let raws = defaults.array(forKey: "trackedStreaks") as? [String] {

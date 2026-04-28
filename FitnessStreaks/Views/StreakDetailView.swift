@@ -14,6 +14,7 @@ struct StreakDetailView: View {
                 headerCard.padding(.horizontal, 14)
                 todayCard.padding(.horizontal, 14)
                 if canRecalibrate { recalibrateCard.padding(.horizontal, 14) }
+                if !isHero { makePrimaryCard.padding(.horizontal, 14) }
 
                 if streak.window != nil {
                     hourWindowExplainer.padding(.horizontal, 14)
@@ -186,6 +187,51 @@ struct StreakDetailView: View {
         }
         .padding(14)
         .pixelPanel(color: Theme.retroCyan)
+    }
+
+    private var makePrimaryCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("MAKE THIS YOUR PRIMARY")
+                        .font(RetroFont.pixel(9))
+                        .tracking(2)
+                        .foregroundStyle(Theme.retroInkDim)
+                    Text("Move to top of dashboard")
+                        .font(RetroFont.mono(11))
+                        .foregroundStyle(Theme.retroInk)
+                }
+                Spacer()
+                Button {
+                    makePrimary()
+                } label: {
+                    Text("MAKE PRIMARY")
+                        .font(RetroFont.mono(10, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(Theme.retroMagenta)
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 10)
+                        .overlay(Rectangle().stroke(Theme.retroMagenta, lineWidth: 2))
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(14)
+        .pixelPanel(color: Theme.retroMagenta)
+    }
+
+    private func makePrimary() {
+        // Move this streak to front of manual order
+        var newOrder = settings.manualStreakOrder.filter { $0 != streak.trackingKey }
+        newOrder.insert(streak.trackingKey, at: 0)
+        settings.manualStreakOrder = newOrder
+        // Ensure it's tracked
+        if var tracked = settings.trackedStreaks {
+            tracked.insert(streak.trackingKey)
+            settings.trackedStreaks = tracked
+        }
+        store.refilter()
+        dismiss()
     }
 
     private var recalibrationPreview: String {

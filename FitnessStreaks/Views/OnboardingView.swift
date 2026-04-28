@@ -10,6 +10,7 @@ struct OnboardingView: View {
         case vibe = 1
         case minimum = 2
         case review = 3
+        case primary = 4
     }
 
     @State private var step: Step = .intro
@@ -18,6 +19,7 @@ struct OnboardingView: View {
     @State private var selectedVibe: DiscoveryVibe = .challenging
     @State private var lookbackDays: Int = 30
     @State private var selectedStreaks: Set<String> = []
+    @State private var primaryStreakKey: String? = nil
 
     var body: some View {
         ZStack {
@@ -33,6 +35,7 @@ struct OnboardingView: View {
                 case .vibe:     vibeStep
                 case .minimum:  minimumStep
                 case .review:   reviewStep
+                case .primary:  primaryStep
                 }
 
                 Spacer(minLength: 8)
@@ -122,7 +125,9 @@ struct OnboardingView: View {
             // let them finish anyway so the dashboard is reachable.
             if store.allCandidates.isEmpty { return "▶ FINISH SETUP" }
             if selectedStreaks.isEmpty { return "PICK AT LEAST ONE" }
-            return "▶ START TRACKING (\(selectedStreaks.count))"
+            return "NEXT"
+        case .primary:
+            return "▶ START TRACKING"
         }
     }
 
@@ -304,9 +309,74 @@ struct OnboardingView: View {
         .padding(.horizontal, 20)
     }
 
+    private var primaryStep: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("PICK YOUR PRIMARY")
+                .font(RetroFont.mono(16, weight: .bold))
+                .tracking(2)
+                .foregroundStyle(Theme.retroInk)
+
+            Text("Which streak deserves the top spot?\nThis becomes your hero streak on the dashboard.")
+                .font(RetroFont.mono(13))
+                .foregroundStyle(Theme.retroInkDim)
+                .lineSpacing(2)
+
+            let candidates = store.allCandidates.filter { selectedStreaks.contains($0.trackingKey) }
+
+            if candidates.isEmpty {
+                Text("No streaks selected. Go back to pick at least one.")
+                    .font(RetroFont.mono(13))
+                    .foregroundStyle(Theme.retroRed)
+                    .padding(.top, 20)
+            } else {
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 10) {
+                        ForEach(candidates) { streak in
+                            primaryRow(streak)
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+            }
+        }
+        .padding(.horizontal, 20)
+    }
+
+    private func primaryRow(_ streak: Streak) -> some View {
+        let selected = primaryStreakKey == streak.trackingKey
+        return Button {
+            primaryStreakKey = streak.trackingKey
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: streak.metric.symbol)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(streak.metric.accent)
+                    .frame(width: 28)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(streak.metric.displayName.uppercased())
+                        .font(RetroFont.mono(12, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(selected ? streak.metric.accent : Theme.retroInk)
+                    Text(streak.metric.thresholdLabel(streak.threshold, cadence: streak.cadence))
+                        .font(RetroFont.mono(10))
+                        .foregroundStyle(Theme.retroInkDim)
+                }
+                Spacer()
+                Text(selected ? "◉ PRIMARY" : "○")
+                    .font(RetroFont.mono(10, weight: .bold))
+                    .foregroundStyle(selected ? Theme.retroLime : Theme.retroInkFaint)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .pixelPanel(color: selected ? streak.metric.accent : Theme.retroInkFaint,
+                        fill: selected ? Theme.retroBgCard : Theme.retroBgRaised)
+        }
+        .buttonStyle(.plain)
+    }
+
     private var featurePanel: some View {
         VStack(alignment: .leading, spacing: 6) {
-            featureRow("9 METRICS · STEPS TO SLEEP")
+            featureRow("8 METRICS · STEPS TO SLEEP")
             featureRow("DAILY STREAKS ONLY")
             featureRow("CALENDAR HEATMAPS")
             featureRow("100% LOCAL · NO NETWORK")
@@ -365,6 +435,20 @@ struct OnboardingView: View {
             }
             guard !selectedStreaks.isEmpty else { return }
             settings.trackedStreaks = selectedStreaks
+            // Pre-select first selected streak as primary default
+            if primaryStreakKey == nil {
+                primaryStreakKey = selectedStreaks.sorted().first
+            }
+            withAnimation { step = .primary }
+        case .primary:
+            guard !selectedStreaks.isEmpty else { return }
+            // Set manual order with primary first
+            var order = selectedStreaks.sorted()
+            if let primary = primaryStreakKey, let idx = order.firstIndex(of: primary) {
+                order.remove(at: idx)
+                order.insert(primary, at: 0)
+            }
+            settings.manualStreakOrder = order
             store.refilter()
             settings.hasCompletedSetup = true
         }
