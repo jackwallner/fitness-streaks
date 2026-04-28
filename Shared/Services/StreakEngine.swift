@@ -62,7 +62,8 @@ enum StreakEngine {
                 target: vibe.targetCompletionRate,
                 tolerance: completionTolerance,
                 committedThresholds: committedThresholds,
-                gracePreservations: gracePreservations
+                gracePreservations: gracePreservations,
+                requestedLookback: lookbackDays
             ) {
                 found.append(best)
             }
@@ -78,7 +79,7 @@ enum StreakEngine {
                     byDay: byDay,
                     hourlySteps: hourlySteps,
                     today: today,
-                    lookbackDays: recentHistory.count,
+                    lookbackDays: lookbackDays,
                     gracePreservations: gracePreservations
                 )
             }
@@ -122,7 +123,8 @@ enum StreakEngine {
         target: Double,
         tolerance: Double,
         committedThresholds: [String: Double],
-        gracePreservations: [String: GracePreservation]
+        gracePreservations: [String: GracePreservation],
+        requestedLookback: Int
     ) -> Streak? {
         let key = StreakSettings.streakKey(metric: metric, cadence: .daily)
         if let committed = committedThresholds[key] {
@@ -133,7 +135,7 @@ enum StreakEngine {
                 today: today,
                 gracePreservations: gracePreservations,
                 completionRate: rate,
-                lookbackDays: recentHistory.count
+                lookbackDays: requestedLookback
             )
         }
 
@@ -168,7 +170,7 @@ enum StreakEngine {
                 today: today,
                 gracePreservations: gracePreservations,
                 completionRate: rate,
-                lookbackDays: values.count
+                lookbackDays: requestedLookback
             )
 
             // Surface only streaks with a meaningful current run.
