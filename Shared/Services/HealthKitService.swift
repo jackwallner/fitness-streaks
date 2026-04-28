@@ -14,7 +14,7 @@ final class HealthKitService: ObservableObject {
     static let shared = HealthKitService()
 
     private let store = HKHealthStore()
-    @Published var isAuthorized: Bool = false
+    @Published var hasRequestedAuthorization: Bool = false
 
     /// Quantity types we query as statistics collections.
     private let quantityTypes: [HKQuantityTypeIdentifier] = [
@@ -53,7 +53,7 @@ final class HealthKitService: ObservableObject {
         Task {
             let status = await self.authorizationRequestStatus()
             if status == .unnecessary {
-                self.isAuthorized = true
+                self.hasRequestedAuthorization = true
             }
         }
     }
@@ -64,7 +64,7 @@ final class HealthKitService: ObservableObject {
         guard HKHealthStore.isHealthDataAvailable() else { return }
         log.info("Requesting HealthKit authorization for \(self.allReadTypes.count) read types")
         try await store.requestAuthorization(toShare: [], read: allReadTypes)
-        isAuthorized = true
+        hasRequestedAuthorization = true
     }
 
     func authorizationRequestStatus() async -> HKAuthorizationRequestStatus? {
@@ -89,7 +89,7 @@ final class HealthKitService: ObservableObject {
         guard let status = await authorizationRequestStatus() else { return }
         // .unnecessary means we've asked at least once; treat that as "proceed to dashboard"
         // even if the user denied specific types — the empty state guides them to Settings.
-        isAuthorized = (status == .unnecessary)
+        hasRequestedAuthorization = (status == .unnecessary)
     }
 
     // MARK: - History fetch

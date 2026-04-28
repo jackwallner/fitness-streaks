@@ -96,7 +96,7 @@ private struct RootView: View {
 
     var body: some View {
         Group {
-            if settings.hasCompletedSetup && healthKit.isAuthorized {
+            if settings.hasCompletedSetup && healthKit.hasRequestedAuthorization {
                 DashboardView()
             } else {
                 OnboardingView()

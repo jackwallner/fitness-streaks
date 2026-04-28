@@ -59,7 +59,7 @@ struct WatchRootView: View {
     @EnvironmentObject var settings: StreakSettings
 
     var body: some View {
-        if healthKit.isAuthorized && settings.hasCompletedSetup {
+        if healthKit.hasRequestedAuthorization && settings.hasCompletedSetup {
             WatchTodayView()
         } else {
             WatchOnboardingView()
