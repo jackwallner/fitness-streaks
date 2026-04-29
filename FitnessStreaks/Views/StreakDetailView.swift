@@ -89,7 +89,7 @@ struct StreakDetailView: View {
         .frame(maxWidth: .infinity)
         .pixelPanel(color: streak.metric.accent)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(streak.metric.displayName) streak: \(streak.current) \(streak.cadence == .daily ? "days" : "weeks") in a row, threshold \(Int(streak.threshold)) \(streak.metric.unitLabel)")
+        .accessibilityLabel("\(streak.metric.displayName) streak: \(streak.current) \(streak.cadence.pluralLabel) in a row, threshold \(Int(streak.threshold)) \(streak.metric.unitLabel)")
     }
 
     private var toolbarTitle: String {

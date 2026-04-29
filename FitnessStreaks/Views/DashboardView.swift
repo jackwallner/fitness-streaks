@@ -185,7 +185,7 @@ struct DashboardView: View {
                     .font(RetroFont.mono(9, weight: .bold))
                     .tracking(1)
                     .foregroundStyle(Theme.retroRed)
-                Text("\(broken.brokenLength)-\(broken.cadence.pluralLabel) \(broken.metric.displayName.lowercased()) run · TAP FOR OPTIONS")
+                Text("\(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) run · TAP FOR OPTIONS")
                     .font(RetroFont.mono(10))
                     .foregroundStyle(Theme.retroInk)
                     .lineLimit(1)
@@ -217,6 +217,7 @@ struct DashboardView: View {
             .padding(12)
             .pixelPanel(color: Theme.retroInkFaint, fill: Theme.retroBgRaised)
         }
+        .buttonStyle(.plain)
         .accessibilityLabel("Find more streaks")
     }
 
