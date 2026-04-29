@@ -200,8 +200,37 @@ enum StreakEngine {
             }
         }
 
-        guard let result = best, result.distance <= tolerance else { return nil }
-        return result.streak
+        if let result = best, result.distance <= tolerance {
+            return result.streak
+        }
+
+        // Fallback: calibrated discovery found nothing within tolerance, but the user
+        // may still be sustaining a low/easy goal every day. Walk the fixed tier list
+        // descending and surface the highest tier with a meaningful active run, so
+        // every tracked metric gets *some* streak when the user has data.
+        //
+        // Gate on coverage: if fewer than 30% of lookback days have a non-zero value,
+        // the metric isn't really being tracked — skip rather than fabricating a goal.
+        let nonZeroDays = values.filter { $0 > 0 }.count
+        let coverage = Double(nonZeroDays) / windowDays
+        guard coverage >= 0.3 else { return nil }
+
+        for threshold in metric.dailyThresholds.sorted(by: >) {
+            let rate = completionRate(metric: metric, threshold: threshold, recentHistory: recentHistory)
+            let streak = applyingGrace(
+                to: computeDailyStreak(metric: metric, threshold: threshold, byDay: byDay, today: today),
+                key: key,
+                today: today,
+                gracePreservations: gracePreservations,
+                completionRate: rate,
+                lookbackDays: requestedLookback
+            )
+            if streak.current >= minDailyLength {
+                return streak
+            }
+        }
+
+        return nil
     }
 
     /// Score tuned per vibe — drives which streak becomes hero and badge ordering.
