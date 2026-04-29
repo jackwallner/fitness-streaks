@@ -85,7 +85,8 @@ final class StreakStore: ObservableObject {
                         distanceMiles: day.distanceMiles,
                         flightsClimbed: day.flightsClimbed,
                         earlySteps: early,
-                        heartRateMinutes: day.heartRateMinutes
+                        heartRateMinutes: day.heartRateMinutes,
+                        workoutDetails: day.workoutDetails
                     )
                 }
             }
@@ -125,6 +126,7 @@ final class StreakStore: ObservableObject {
             settings.commitThresholds(for: filtered)
             settings.awardGraceDays(from: filtered)
             persistCurrentSnapshot()
+            recordLastKnownLengths()
             self.lastUpdated = .now
 
             await NotificationService.scheduleDailyReminder(for: self.streaks)
@@ -168,14 +170,42 @@ final class StreakStore: ObservableObject {
         var newBroken = settings.recentlyBroken
         var preservations = settings.gracePreservations
 
-        for old in previous where old.current >= 3 {
-            let newCurrent = freshByKey[old.trackingKey]?.current ?? 0
+        // Build a baseline of "what we last saw before this load." Use in-memory `previous`
+        // when present; otherwise fall back to persisted last-known lengths so we still detect
+        // breaks after a cold start (force-quit, reboot, post-midnight launch).
+        var baseline: [String: Streak] = Dictionary(uniqueKeysWithValues: previous.map { ($0.trackingKey, $0) })
+        for (key, length) in settings.lastKnownStreakLengths where baseline[key] == nil {
+            // Reconstruct just enough of a Streak to drive break detection.
+            // Threshold/metric come from fresh (post-break) when available; otherwise default to
+            // values we can't recover (the user will still see the broken banner with `?` cadence).
+            if let f = freshByKey[key] {
+                baseline[key] = Streak(
+                    customID: f.customID,
+                    metric: f.metric,
+                    cadence: f.cadence,
+                    threshold: f.threshold,
+                    window: f.window,
+                    workoutType: f.workoutType,
+                    workoutMeasure: f.workoutMeasure,
+                    current: length,
+                    best: max(length, f.best),
+                    startDate: nil,
+                    lastHitDate: nil,
+                    currentUnitCompleted: false,
+                    currentUnitProgress: 0,
+                    currentUnitValue: 0
+                )
+            }
+        }
+
+        for (key, old) in baseline where old.current >= 3 {
+            let newCurrent = freshByKey[key]?.current ?? 0
             guard newCurrent == 0 else { continue }
-            guard !newBroken.contains(where: { $0.key == old.trackingKey }) else { continue }
+            guard !newBroken.contains(where: { $0.key == key }) else { continue }
 
             if settings.consumeGraceDay() {
-                preservations[old.trackingKey] = GracePreservation(
-                    key: old.trackingKey,
+                preservations[key] = GracePreservation(
+                    key: key,
                     missedDate: DateHelpers.addDays(-1, to: today),
                     preservedLength: old.current,
                     threshold: old.threshold,
@@ -188,7 +218,7 @@ final class StreakStore: ObservableObject {
             }
 
             let broken = BrokenStreak(
-                key: old.trackingKey,
+                key: key,
                 metric: old.metric,
                 cadence: old.cadence,
                 threshold: old.threshold,
@@ -202,5 +232,12 @@ final class StreakStore: ObservableObject {
 
         settings.gracePreservations = preservations
         settings.recentlyBroken = newBroken
+    }
+
+    /// Snapshot the current tracked streak lengths so the next launch can detect breaks
+    /// that happened while the app was killed.
+    fileprivate func recordLastKnownLengths() {
+        let map = Dictionary(uniqueKeysWithValues: streaks.map { ($0.trackingKey, $0.current) })
+        StreakSettings.shared.lastKnownStreakLengths = map
     }
 }

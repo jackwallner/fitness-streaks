@@ -17,6 +17,9 @@ final class DailyActivity {
     var flightsClimbed: Double
     var earlySteps: Double
     var heartRateMinutes: Double
+    /// JSON blob of `[String: WorkoutDailyStat]` keyed by workout-type catalog key.
+    /// Optional + JSON-encoded so adding/removing fields does not require a SwiftData migration.
+    var workoutDetailsJSON: String?
     var lastUpdated: Date
 
     init(
@@ -31,7 +34,8 @@ final class DailyActivity {
         distanceMiles: Double = 0,
         flightsClimbed: Double = 0,
         earlySteps: Double = 0,
-        heartRateMinutes: Double = 0
+        heartRateMinutes: Double = 0,
+        workoutDetails: [String: WorkoutDailyStat] = [:]
     ) {
         let normalized = DateHelpers.startOfDay(date)
         self.dateString = DateHelpers.dayKey(normalized)
@@ -47,7 +51,13 @@ final class DailyActivity {
         self.flightsClimbed = flightsClimbed
         self.earlySteps = earlySteps
         self.heartRateMinutes = heartRateMinutes
+        self.workoutDetailsJSON = Self.encodeDetails(workoutDetails)
         self.lastUpdated = Date()
+    }
+
+    var workoutDetails: [String: WorkoutDailyStat] {
+        get { Self.decodeDetails(workoutDetailsJSON) }
+        set { workoutDetailsJSON = Self.encodeDetails(newValue) }
     }
 
     func asActivityDay() -> ActivityDay {
@@ -63,7 +73,19 @@ final class DailyActivity {
             distanceMiles: distanceMiles,
             flightsClimbed: flightsClimbed,
             earlySteps: earlySteps,
-            heartRateMinutes: heartRateMinutes
+            heartRateMinutes: heartRateMinutes,
+            workoutDetails: workoutDetails
         )
+    }
+
+    private static func encodeDetails(_ details: [String: WorkoutDailyStat]) -> String? {
+        guard !details.isEmpty else { return nil }
+        guard let data = try? JSONEncoder().encode(details) else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+
+    private static func decodeDetails(_ json: String?) -> [String: WorkoutDailyStat] {
+        guard let json, let data = json.data(using: .utf8) else { return [:] }
+        return (try? JSONDecoder().decode([String: WorkoutDailyStat].self, from: data)) ?? [:]
     }
 }

@@ -60,14 +60,14 @@ struct StreakBadgeCard: View {
     }
 
     private var subtitle: String {
-        let label = streak.metric.thresholdLabel(streak.threshold, cadence: streak.cadence)
+        let label = streak.thresholdLabel
         return "\(label) · best \(streak.best) in \(streak.lookbackDays)d"
     }
 
     private var titleText: String {
         if let w = streak.window {
-            return "\(streak.metric.displayName.uppercased()) · \(w.label.uppercased())"
+            return "\(streak.displayName.uppercased()) · \(w.label.uppercased())"
         }
-        return streak.metric.displayName.uppercased()
+        return streak.displayName.uppercased()
     }
 }

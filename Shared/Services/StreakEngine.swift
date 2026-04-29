@@ -105,7 +105,9 @@ enum StreakEngine {
             currentUnitProgress: streak.currentUnitProgress,
             currentUnitValue: streak.currentUnitValue,
             hourWindow: streak.window?.startHour,
-            customID: streak.customID
+            customID: streak.customID,
+            workoutType: streak.workoutType,
+            workoutMeasure: streak.workoutMeasure?.rawValue
         )
     }
 
@@ -461,6 +463,8 @@ enum StreakEngine {
                 cadence: streak.cadence,
                 threshold: streak.threshold,
                 window: streak.window,
+                workoutType: streak.workoutType,
+                workoutMeasure: streak.workoutMeasure,
                 current: streak.current,
                 best: streak.best,
                 startDate: streak.startDate,
@@ -485,6 +489,8 @@ enum StreakEngine {
             cadence: streak.cadence,
             threshold: streak.threshold,
             window: streak.window,
+            workoutType: streak.workoutType,
+            workoutMeasure: streak.workoutMeasure,
             current: bridgedCurrent,
             best: max(streak.best, bridgedCurrent),
             startDate: bridgedStart,
@@ -509,7 +515,23 @@ enum StreakEngine {
         let base: Streak
         let rate: Double
 
-        if let hour = custom.hourWindow {
+        if let workoutTypeKey = custom.workoutType, custom.metric == .workouts {
+            let measure = custom.workoutMeasure ?? .count
+            var values: [Date: Double] = [:]
+            for (day, activity) in byDay {
+                let stat = activity.workoutDetails[workoutTypeKey] ?? .zero
+                values[day] = stat.value(for: measure)
+            }
+            base = computeDailyStreakFromValues(
+                metric: custom.metric,
+                threshold: custom.threshold,
+                byDayValues: values,
+                today: today
+            )
+            let recent = Array(values.keys.sorted().suffix(max(1, lookbackDays)))
+            let recentVals = recent.compactMap { values[$0] }
+            rate = recentVals.isEmpty ? 0 : Double(recentVals.filter { $0 >= custom.threshold }.count) / Double(recentVals.count)
+        } else if let hour = custom.hourWindow {
             var values: [Date: Double] = [:]
             for (day, hours) in hourlySteps {
                 values[day] = hours[hour] ?? 0
@@ -539,6 +561,8 @@ enum StreakEngine {
             cadence: custom.cadence,
             threshold: custom.threshold,
             window: window,
+            workoutType: custom.workoutType,
+            workoutMeasure: custom.workoutMeasure,
             current: base.current,
             best: base.best,
             startDate: base.startDate,

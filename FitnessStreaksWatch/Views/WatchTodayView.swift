@@ -30,10 +30,10 @@ struct WatchTodayView: View {
     private func heroView(_ s: Streak) -> some View {
         VStack(spacing: 4) {
             HStack(spacing: 4) {
-                Image(systemName: s.metric.symbol)
+                Image(systemName: s.displaySymbol)
                     .foregroundStyle(Theme.streakHot)
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
-                Text(s.metric.displayName)
+                Text(s.displayName)
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
             }
             Text("\(s.current)")
@@ -43,7 +43,7 @@ struct WatchTodayView: View {
             Text(s.cadence == .daily ? (s.current == 1 ? "day" : "days") : (s.current == 1 ? "week" : "weeks"))
                 .font(.system(size: 12, weight: .semibold, design: .rounded))
                 .foregroundStyle(.secondary)
-            Text(s.metric.thresholdLabel(s.threshold, cadence: s.cadence))
+            Text(s.thresholdLabel)
                 .font(.system(size: 11, weight: .medium, design: .rounded))
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
@@ -53,11 +53,11 @@ struct WatchTodayView: View {
 
     private func badgeRow(_ s: Streak) -> some View {
         HStack(spacing: 8) {
-            Image(systemName: s.metric.symbol)
+            Image(systemName: s.displaySymbol)
                 .foregroundStyle(s.metric.accent)
                 .font(.system(size: 13, weight: .semibold))
                 .frame(width: 18)
-            Text(s.metric.displayName)
+            Text(s.displayName)
                 .font(.system(size: 12, weight: .semibold, design: .rounded))
             Spacer()
             Text("\(s.current)")

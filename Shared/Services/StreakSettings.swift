@@ -74,6 +74,9 @@ struct StreakSnapshot: Codable, Sendable {
             if let h = hourWindow {
                 return "\(metric)-\(cadence)-h\(h)-\(Int(threshold))"
             }
+            if let type = workoutType {
+                return "\(metric)-\(cadence)-\(type)-\(Int(threshold))"
+            }
             return "\(metric)-\(cadence)-\(Int(threshold))"
         }
         let metric: String            // raw value of StreakMetric
@@ -86,6 +89,35 @@ struct StreakSnapshot: Codable, Sendable {
         let currentUnitValue: Double
         var hourWindow: Int? = nil    // nil = whole-day; else 0..23 for hour-window streak
         var customID: String? = nil
+        var workoutType: String? = nil  // WorkoutTypeCatalog.Entry.key when this is a per-type streak
+        var workoutMeasure: String? = nil // raw of WorkoutMeasure when workoutType is set
+
+        var workoutTypeEntry: WorkoutTypeCatalog.Entry? {
+            workoutType.flatMap(WorkoutTypeCatalog.entry(forKey:))
+        }
+        var workoutMeasureValue: WorkoutMeasure? {
+            workoutMeasure.flatMap(WorkoutMeasure.init(rawValue:))
+        }
+        var streakMetric: StreakMetric? { StreakMetric(rawValue: metric) }
+        var streakCadence: StreakCadence { StreakCadence(rawValue: cadence) ?? .daily }
+
+        /// "Cycling" / "Steps" — falls back to the metric name if no workout type.
+        var displayName: String {
+            if let entry = workoutTypeEntry { return entry.displayName }
+            return streakMetric?.displayName ?? metric.capitalized
+        }
+        /// SF Symbol for the streak; uses the workout-type symbol when applicable.
+        var displaySymbol: String {
+            if let entry = workoutTypeEntry { return entry.symbol }
+            return streakMetric?.symbol ?? "flame.fill"
+        }
+        /// "20 min cycling" / "10k steps" — short label.
+        var thresholdLabel: String {
+            if let entry = workoutTypeEntry, let measure = workoutMeasureValue {
+                return Streak.workoutThresholdLabel(threshold, entry: entry, measure: measure)
+            }
+            return streakMetric?.thresholdLabel(threshold, cadence: streakCadence) ?? ""
+        }
     }
 
     let updated: Date
@@ -111,6 +143,11 @@ struct CustomStreak: Codable, Sendable, Identifiable, Hashable {
     var cadence: StreakCadence
     var threshold: Double
     var hourWindow: Int?
+    /// When set, the streak tracks a specific Apple workout activity type instead of all workouts.
+    /// Key matches `WorkoutTypeCatalog.Entry.key`.
+    var workoutType: String?
+    /// What we measure when `workoutType` is set: session count, total minutes, or total miles.
+    var workoutMeasure: WorkoutMeasure?
 
     var trackingKey: String { "custom-\(id)" }
 }
@@ -222,6 +259,13 @@ final class StreakSettings: ObservableObject {
         }
     }
 
+    /// Last-known `current` for each tracked streak, persisted between launches so we can
+    /// detect breaks even after a cold start (when the in-memory `previous` array is empty).
+    /// Keyed by `Streak.trackingKey`.
+    @Published var lastKnownStreakLengths: [String: Int] {
+        didSet { saveCodable(lastKnownStreakLengths, key: "lastKnownStreakLengths") }
+    }
+
     nonisolated static func streakKey(metric: StreakMetric, cadence: StreakCadence, window: HourWindow? = nil) -> String {
         if let w = window {
             return "\(metric.rawValue)-\(cadence.rawValue)-h\(w.startHour)"
@@ -270,6 +314,7 @@ final class StreakSettings: ObservableObject {
         self.recentlyBroken = Self.loadCodable([BrokenStreak].self, key: "recentlyBroken", defaults: defaults) ?? []
         self.gracePreservations = Self.loadCodable([String: GracePreservation].self, key: "gracePreservations", defaults: defaults) ?? [:]
         self.manualStreakOrder = Self.loadCodable([String].self, key: "manualStreakOrder", defaults: defaults) ?? []
+        self.lastKnownStreakLengths = Self.loadCodable([String: Int].self, key: "lastKnownStreakLengths", defaults: defaults) ?? [:]
     }
 
     func isHidden(_ metric: StreakMetric) -> Bool { hiddenMetrics.contains(metric) }

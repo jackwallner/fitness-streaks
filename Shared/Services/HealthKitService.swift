@@ -107,7 +107,7 @@ final class HealthKitService: ObservableObject {
         async let energy = quantityDaily(.activeEnergyBurned, unit: .kilocalorie(), start: start, end: end)
         async let distance = quantityDaily(.distanceWalkingRunning, unit: .mile(), start: start, end: end)
         async let flights = quantityDaily(.flightsClimbed, unit: .count(), start: start, end: end)
-        async let workouts = workoutCounts(start: start, end: end)
+        async let workouts = workoutBreakdown(start: start, end: end)
         async let mindful = categoryMinutes(.mindfulSession, start: start, end: end)
         async let sleep = sleepHoursByDay(start: start, end: end)
         async let hr = heartRateMinutesAbove(thresholdBPM: 100, start: start, end: end)
@@ -124,13 +124,14 @@ final class HealthKitService: ObservableObject {
                 exerciseMinutes: ex[key] ?? 0,
                 standHours: sh[key] ?? 0,
                 activeEnergy: en[key] ?? 0,
-                workoutCount: wo[key] ?? 0,
+                workoutCount: wo.totals[key] ?? 0,
                 mindfulMinutes: mi[key] ?? 0,
                 sleepHours: sl[key] ?? 0,
                 distanceMiles: dist[key] ?? 0,
                 flightsClimbed: fl[key] ?? 0,
                 earlySteps: 0,
-                heartRateMinutes: hrm[key] ?? 0
+                heartRateMinutes: hrm[key] ?? 0,
+                workoutDetails: wo.details[key] ?? [:]
             ))
             cursor = DateHelpers.addDays(1, to: cursor)
         }
@@ -216,7 +217,8 @@ final class HealthKitService: ObservableObject {
 
     // MARK: - Workouts
 
-    private func workoutCounts(start: Date, end: Date) async throws -> [Date: Double] {
+    /// Returns total workout count per day plus a per-type breakdown (count, minutes, miles).
+    private func workoutBreakdown(start: Date, end: Date) async throws -> (totals: [Date: Double], details: [Date: [String: WorkoutDailyStat]]) {
         let predicate = HKQuery.predicateForSamples(withStart: start, end: end, options: .strictStartDate)
         let samples: [HKWorkout] = try await withCheckedThrowingContinuation { continuation in
             let query = HKSampleQuery(
@@ -234,12 +236,25 @@ final class HealthKitService: ObservableObject {
             store.execute(query)
         }
 
-        var out: [Date: Double] = [:]
-        for w in samples {
-            let key = DateHelpers.startOfDay(w.startDate)
-            out[key, default: 0] += 1
+        var totals: [Date: Double] = [:]
+        var details: [Date: [String: WorkoutDailyStat]] = [:]
+        for workout in samples {
+            let day = DateHelpers.startOfDay(workout.startDate)
+            totals[day, default: 0] += 1
+
+            guard let entry = WorkoutTypeCatalog.entry(forActivityRaw: workout.workoutActivityType.rawValue) else { continue }
+            let minutes = workout.duration / 60.0
+            let miles = workout.totalDistance?.doubleValue(for: .mile()) ?? 0
+
+            var byType = details[day] ?? [:]
+            var stat = byType[entry.key] ?? .zero
+            stat.count += 1
+            stat.minutes += minutes
+            stat.miles += miles
+            byType[entry.key] = stat
+            details[day] = byType
         }
-        return out
+        return (totals, details)
     }
 
     // MARK: - Category (mindful minutes)
@@ -469,6 +484,7 @@ final class HealthKitService: ObservableObject {
                 existing.flightsClimbed = day.flightsClimbed
                 existing.earlySteps = day.earlySteps
                 existing.heartRateMinutes = day.heartRateMinutes
+                existing.workoutDetails = day.workoutDetails
                 existing.lastUpdated = Date()
             } else {
                 let record = DailyActivity(
@@ -483,7 +499,8 @@ final class HealthKitService: ObservableObject {
                     distanceMiles: day.distanceMiles,
                     flightsClimbed: day.flightsClimbed,
                     earlySteps: day.earlySteps,
-                    heartRateMinutes: day.heartRateMinutes
+                    heartRateMinutes: day.heartRateMinutes,
+                    workoutDetails: day.workoutDetails
                 )
                 context.insert(record)
             }

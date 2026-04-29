@@ -185,6 +185,70 @@ final class StreakEngineTests: XCTestCase {
         XCTAssertNil(NotificationService.bestReminderCandidate(from: [newStreak]))
     }
 
+    func testWorkoutTypeCustomStreakUsesPerTypeMinutes() {
+        let today = day(2026, 4, 26)
+        let history = (0..<3).map { offset -> ActivityDay in
+            ActivityDay(
+                date: DateHelpers.addDays(-offset, to: today),
+                workoutCount: 1,
+                workoutDetails: ["cycling": WorkoutDailyStat(count: 1, minutes: 25, miles: 5)]
+            )
+        }
+        let custom = CustomStreak(
+            id: "ride",
+            metric: .workouts,
+            cadence: .daily,
+            threshold: 20,
+            hourWindow: nil,
+            workoutType: "cycling",
+            workoutMeasure: .minutes
+        )
+
+        let streaks = StreakEngine.discover(history: history, customStreaks: [custom], now: today)
+        let cycling = streaks.first { $0.customID == "ride" }
+        XCTAssertNotNil(cycling)
+        XCTAssertEqual(cycling?.current, 3)
+        XCTAssertEqual(cycling?.workoutType, "cycling")
+        XCTAssertEqual(cycling?.workoutMeasure, .minutes)
+        XCTAssertEqual(cycling?.currentUnitValue ?? 0, 25, accuracy: 0.001)
+    }
+
+    func testWorkoutTypeCustomStreakBreaksWhenMeasureBelowThreshold() {
+        let today = day(2026, 4, 26)
+        let history = [
+            ActivityDay(
+                date: today,
+                workoutCount: 1,
+                workoutDetails: ["running": WorkoutDailyStat(count: 1, minutes: 5, miles: 0.5)]
+            ),
+            ActivityDay(
+                date: DateHelpers.addDays(-1, to: today),
+                workoutCount: 1,
+                workoutDetails: ["running": WorkoutDailyStat(count: 1, minutes: 15, miles: 1.5)]
+            ),
+            ActivityDay(
+                date: DateHelpers.addDays(-2, to: today),
+                workoutCount: 1,
+                workoutDetails: ["running": WorkoutDailyStat(count: 1, minutes: 15, miles: 1.5)]
+            ),
+        ]
+        let custom = CustomStreak(
+            id: "run10",
+            metric: .workouts,
+            cadence: .daily,
+            threshold: 10,
+            hourWindow: nil,
+            workoutType: "running",
+            workoutMeasure: .minutes
+        )
+
+        let streaks = StreakEngine.discover(history: history, customStreaks: [custom], now: today)
+        let s = streaks.first { $0.customID == "run10" }
+        XCTAssertNotNil(s)
+        XCTAssertEqual(s?.current, 2)
+        XCTAssertFalse(s?.currentUnitCompleted ?? true)
+    }
+
     func testSleepHoursMergeOverlappingIntervals() {
         let sleepDay = day(2026, 4, 26)
         let previousNight = DateHelpers.addDays(-1, to: sleepDay)

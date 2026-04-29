@@ -31,6 +31,12 @@ struct Streak: Identifiable, Hashable, Sendable {
     /// If non-nil, this streak is about activity within a specific hour of the day.
     /// Nil = whole-day/whole-week streak.
     var window: HourWindow? = nil
+    /// When set with `metric == .workouts`, the streak tracks a specific HK workout activity type.
+    /// Key matches `WorkoutTypeCatalog.Entry.key`.
+    var workoutType: String? = nil
+    /// What measure of the workout type we count: sessions, minutes, or miles.
+    /// Required when `workoutType` is set.
+    var workoutMeasure: WorkoutMeasure? = nil
 
     /// Consecutive units meeting threshold, including the current unit if it already met it.
     let current: Int
@@ -88,6 +94,8 @@ struct Streak: Identifiable, Hashable, Sendable {
         cadence: StreakCadence,
         threshold: Double,
         window: HourWindow? = nil,
+        workoutType: String? = nil,
+        workoutMeasure: WorkoutMeasure? = nil,
         current: Int,
         best: Int,
         startDate: Date?,
@@ -103,6 +111,8 @@ struct Streak: Identifiable, Hashable, Sendable {
         self.cadence = cadence
         self.threshold = threshold
         self.window = window
+        self.workoutType = workoutType
+        self.workoutMeasure = workoutMeasure
         self.current = current
         self.best = best
         self.startDate = startDate
@@ -112,6 +122,84 @@ struct Streak: Identifiable, Hashable, Sendable {
         self.currentUnitValue = currentUnitValue
         self.completionRate = completionRate
         self.lookbackDays = lookbackDays
+    }
+
+    /// Catalog entry for the workout type, when this is a per-type streak.
+    var workoutTypeEntry: WorkoutTypeCatalog.Entry? {
+        workoutType.flatMap(WorkoutTypeCatalog.entry(forKey:))
+    }
+
+    /// Best display name for this streak — uses workout type when set, else metric.
+    var displayName: String {
+        if let entry = workoutTypeEntry { return entry.displayName }
+        return metric.displayName
+    }
+
+    /// Best symbol for this streak — uses workout type when set, else metric.
+    var displaySymbol: String {
+        if let entry = workoutTypeEntry { return entry.symbol }
+        return metric.symbol
+    }
+
+    /// "20 min cycling" / "10k steps" / "any workout" — short label for cards and pickers.
+    var thresholdLabel: String {
+        if let entry = workoutTypeEntry, let measure = workoutMeasure {
+            return Self.workoutThresholdLabel(threshold, entry: entry, measure: measure)
+        }
+        return metric.thresholdLabel(threshold, cadence: cadence)
+    }
+
+    /// "10,000+ steps every day" — long-form description used in detail headers.
+    var prose: String {
+        if let entry = workoutTypeEntry, let measure = workoutMeasure {
+            return Self.workoutProse(threshold, entry: entry, measure: measure)
+        }
+        return metric.prose(threshold, cadence: cadence)
+    }
+
+    /// Format a raw current-unit value for the hero charge readout.
+    func format(currentUnitValue: Double) -> String {
+        if let measure = workoutMeasure {
+            switch measure {
+            case .count: return "\(Int(currentUnitValue.rounded()))"
+            case .minutes: return "\(Int(currentUnitValue.rounded()))"
+            case .miles: return String(format: currentUnitValue < 10 ? "%.1f" : "%.0f", currentUnitValue)
+            }
+        }
+        return metric.format(value: currentUnitValue)
+    }
+
+    var unitLabel: String {
+        if let measure = workoutMeasure { return measure.unit }
+        return metric.unitLabel
+    }
+
+    static func workoutThresholdLabel(_ threshold: Double, entry: WorkoutTypeCatalog.Entry, measure: WorkoutMeasure) -> String {
+        let name = entry.displayName.lowercased()
+        switch measure {
+        case .count:
+            let n = Int(threshold.rounded())
+            return n <= 1 ? "1 \(name) session" : "\(n) \(name) sessions"
+        case .minutes:
+            return "\(Int(threshold.rounded())) min \(name)"
+        case .miles:
+            let formatted = threshold < 10 ? String(format: "%.1f", threshold) : String(format: "%.0f", threshold)
+            return "\(formatted) mi \(name)"
+        }
+    }
+
+    static func workoutProse(_ threshold: Double, entry: WorkoutTypeCatalog.Entry, measure: WorkoutMeasure) -> String {
+        let name = entry.displayName.lowercased()
+        switch measure {
+        case .count:
+            let n = Int(threshold.rounded())
+            return n <= 1 ? "A \(name) session every day" : "\(n)+ \(name) sessions every day"
+        case .minutes:
+            return "\(Int(threshold.rounded()))+ min of \(name) every day"
+        case .miles:
+            let formatted = threshold < 10 ? String(format: "%.1f", threshold) : String(format: "%.0f", threshold)
+            return "\(formatted)+ mi of \(name) every day"
+        }
     }
 }
 
@@ -129,6 +217,39 @@ struct ActivityDay: Hashable, Sendable {
     let flightsClimbed: Double
     let earlySteps: Double
     let heartRateMinutes: Double
+    /// Per-workout-type aggregate for the day (count, minutes, miles).
+    /// Keys are `WorkoutTypeCatalog` keys (e.g. "running", "cycling").
+    var workoutDetails: [String: WorkoutDailyStat]
+
+    init(
+        date: Date,
+        steps: Double = 0,
+        exerciseMinutes: Double = 0,
+        standHours: Double = 0,
+        activeEnergy: Double = 0,
+        workoutCount: Double = 0,
+        mindfulMinutes: Double = 0,
+        sleepHours: Double = 0,
+        distanceMiles: Double = 0,
+        flightsClimbed: Double = 0,
+        earlySteps: Double = 0,
+        heartRateMinutes: Double = 0,
+        workoutDetails: [String: WorkoutDailyStat] = [:]
+    ) {
+        self.date = date
+        self.steps = steps
+        self.exerciseMinutes = exerciseMinutes
+        self.standHours = standHours
+        self.activeEnergy = activeEnergy
+        self.workoutCount = workoutCount
+        self.mindfulMinutes = mindfulMinutes
+        self.sleepHours = sleepHours
+        self.distanceMiles = distanceMiles
+        self.flightsClimbed = flightsClimbed
+        self.earlySteps = earlySteps
+        self.heartRateMinutes = heartRateMinutes
+        self.workoutDetails = workoutDetails
+    }
 
     func value(for metric: StreakMetric) -> Double {
         switch metric {

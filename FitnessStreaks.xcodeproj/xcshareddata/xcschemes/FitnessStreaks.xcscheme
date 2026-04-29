@@ -35,20 +35,6 @@
                ReferencedContainer = "container:FitnessStreaks.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4B86BF423E3FAC2740024275"
-               BuildableName = "FitnessStreaksWatch.app"
-               BlueprintName = "FitnessStreaksWatch"
-               ReferencedContainer = "container:FitnessStreaks.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction

@@ -94,9 +94,9 @@ struct StreakDetailView: View {
 
     private var toolbarTitle: String {
         if let w = streak.window {
-            return "\(streak.metric.displayName.uppercased()) · \(w.label.uppercased())"
+            return "\(streak.displayName.uppercased()) · \(w.label.uppercased())"
         }
-        return streak.metric.displayName.uppercased()
+        return streak.displayName.uppercased()
     }
 
     private var headerProse: String {
@@ -104,7 +104,7 @@ struct StreakDetailView: View {
             let t = streak.metric.format(value: streak.threshold)
             return "\(t)+ \(streak.metric.unitLabel) every day between \(w.label)"
         }
-        return streak.metric.prose(streak.threshold, cadence: streak.cadence)
+        return streak.prose
     }
 
     // MARK: - Hour-window explainer
@@ -253,9 +253,9 @@ struct StreakDetailView: View {
 
     private var recalibrationPreview: String {
         guard let suggested = suggestedThreshold else {
-            return "Currently \(streak.metric.thresholdLabel(streak.threshold, cadence: streak.cadence))"
+            return "Currently \(streak.thresholdLabel)"
         }
-        return "Currently \(streak.metric.thresholdLabel(streak.threshold, cadence: streak.cadence)) → suggests \(streak.metric.thresholdLabel(suggested, cadence: streak.cadence))"
+        return "Currently \(streak.thresholdLabel) → suggests \(streak.metric.thresholdLabel(suggested, cadence: streak.cadence))"
     }
 
     private var suggestedThreshold: Double? {

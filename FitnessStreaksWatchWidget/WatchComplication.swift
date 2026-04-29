@@ -28,13 +28,33 @@ struct WatchStreakProvider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping @Sendable (Timeline<WatchStreakEntry>) -> Void) {
-        let entry = currentEntry()
-        let next = Calendar.current.date(byAdding: .minute, value: 15, to: .now) ?? .now.addingTimeInterval(900)
-        completion(Timeline(entries: [entry], policy: .after(next)))
+        let now = Date.now
+        let tomorrow = Calendar.current.startOfDay(for: Calendar.current.date(byAdding: .day, value: 1, to: now) ?? now)
+        let snap = SnapshotStore.load()
+        let nowEntry = WatchStreakEntry(date: now, hero: snap?.hero)
+        let midnightEntry = WatchStreakEntry(date: tomorrow, hero: snap?.hero.map(Self.resetForNewDay))
+        completion(Timeline(entries: [nowEntry, midnightEntry], policy: .after(tomorrow)))
     }
 
     private func currentEntry() -> WatchStreakEntry {
         WatchStreakEntry(date: .now, hero: SnapshotStore.load()?.hero)
+    }
+
+    static func resetForNewDay(_ item: StreakSnapshot.Item) -> StreakSnapshot.Item {
+        StreakSnapshot.Item(
+            metric: item.metric,
+            cadence: item.cadence,
+            threshold: item.threshold,
+            current: item.current,
+            best: item.best,
+            currentUnitCompleted: false,
+            currentUnitProgress: 0,
+            currentUnitValue: 0,
+            hourWindow: item.hourWindow,
+            customID: item.customID,
+            workoutType: item.workoutType,
+            workoutMeasure: item.workoutMeasure
+        )
     }
 }
 
@@ -47,20 +67,17 @@ struct WatchComplicationView: View {
         case .accessoryInline: inline
         case .accessoryCircular: circular
         case .accessoryRectangular: rectangular
+        #if os(watchOS)
         case .accessoryCorner: corner
+        #endif
         default: circular
         }
     }
 
-    private var metric: StreakMetric? {
-        guard let raw = entry.hero?.metric else { return nil }
-        return StreakMetric(rawValue: raw)
-    }
-
     private var inline: some View {
         Group {
-            if let hero = entry.hero, let m = metric {
-                Text("\(Image(systemName: m.symbol)) \(hero.current) \(hero.cadence == "daily" ? "d" : "w")")
+            if let hero = entry.hero {
+                Text("\(Image(systemName: hero.displaySymbol)) \(hero.current) \(hero.cadence == "daily" ? "d" : "w")")
             } else {
                 Text("No streak yet — open app")
             }
@@ -89,10 +106,10 @@ struct WatchComplicationView: View {
 
     private var rectangular: some View {
         VStack(alignment: .leading, spacing: 1) {
-            if let hero = entry.hero, let m = metric {
+            if let hero = entry.hero {
                 HStack(spacing: 4) {
-                    Image(systemName: m.symbol).font(.system(size: 10, weight: .semibold))
-                    Text(m.displayName).font(.system(size: 11, weight: .semibold, design: .rounded))
+                    Image(systemName: hero.displaySymbol).font(.system(size: 10, weight: .semibold))
+                    Text(hero.displayName).font(.system(size: 11, weight: .semibold, design: .rounded))
                 }
                 HStack(alignment: .firstTextBaseline, spacing: 3) {
                     Text("\(hero.current)")
@@ -101,7 +118,7 @@ struct WatchComplicationView: View {
                     Text(hero.cadence == "daily" ? "days" : "weeks")
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
                 }
-                Text(m.thresholdLabel(hero.threshold, cadence: StreakCadence(rawValue: hero.cadence) ?? .daily))
+                Text(hero.thresholdLabel)
                     .font(.system(size: 9, weight: .medium, design: .rounded))
                     .lineLimit(1)
             } else {
@@ -118,7 +135,7 @@ struct WatchComplicationView: View {
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .widgetCurvesContent()
                     .widgetLabel {
-                        Text(metric?.displayName ?? "Streak")
+                        Text(hero.displayName)
                     }
             } else {
                 Image(systemName: "figure.run").widgetLabel("No streak yet — open app")
@@ -135,6 +152,14 @@ struct FitnessStreaksWatchWidgets: WidgetBundle {
     }
 }
 
+private let supportedFamilies: [WidgetFamily] = {
+    var families: [WidgetFamily] = [.accessoryInline, .accessoryCircular, .accessoryRectangular]
+    #if os(watchOS)
+    families.append(.accessoryCorner)
+    #endif
+    return families
+}()
+
 struct FitnessStreaksWatchComplication: Widget {
     let kind: String = "FitnessStreaksWatchComplication"
 
@@ -144,11 +169,6 @@ struct FitnessStreaksWatchComplication: Widget {
         }
         .configurationDisplayName("Streak")
         .description("Your hottest streak on your wrist.")
-        .supportedFamilies([
-            .accessoryInline,
-            .accessoryCircular,
-            .accessoryRectangular,
-            .accessoryCorner
-        ])
+        .supportedFamilies(supportedFamilies)
     }
 }

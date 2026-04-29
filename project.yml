@@ -21,7 +21,6 @@ schemes:
     build:
       targets:
         FitnessStreaks: all
-        FitnessStreaksWatch: all
         FitnessStreaksTests: [test]
     test:
       targets:

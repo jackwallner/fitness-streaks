@@ -379,16 +379,16 @@ struct OnboardingView: View {
             primaryStreakKey = streak.trackingKey
         } label: {
             HStack(spacing: 12) {
-                Image(systemName: streak.metric.symbol)
+                Image(systemName: streak.displaySymbol)
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(streak.metric.accent)
                     .frame(width: 28)
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(streak.metric.displayName.uppercased())
+                    Text(streak.displayName.uppercased())
                         .font(RetroFont.mono(12, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(selected ? streak.metric.accent : Theme.retroInk)
-                    Text(streak.metric.thresholdLabel(streak.threshold, cadence: streak.cadence))
+                    Text(streak.thresholdLabel)
                         .font(RetroFont.mono(10))
                         .foregroundStyle(Theme.retroInkDim)
                 }

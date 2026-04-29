@@ -34,7 +34,7 @@ struct StreakPickerList: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 6) {
-                        Text(streak.metric.displayName.uppercased())
+                        Text(streak.displayName.uppercased())
                             .font(RetroFont.mono(11, weight: .bold))
                             .tracking(1)
                             .foregroundStyle(Theme.retroInk)
@@ -73,7 +73,7 @@ struct StreakPickerList: View {
     }
 
     private func subtitle(for streak: Streak) -> String {
-        let label = streak.metric.thresholdLabel(streak.threshold, cadence: streak.cadence)
+        let label = streak.thresholdLabel
         if let window = streak.window {
             return "\(streak.current) \(streak.cadence.pluralLabel) in a row · \(label) between \(window.label)"
         }
@@ -210,8 +210,18 @@ struct CustomStreakBuilderSheet: View {
     @State private var threshold: Double = 3_000
     @State private var usesHourWindow = false
     @State private var hour = 10
+    @State private var usesWorkoutType = false
+    @State private var workoutTypeKey: String = WorkoutTypeCatalog.all.first?.key ?? "running"
+    @State private var workoutMeasure: WorkoutMeasure = .minutes
+
+    private var workoutEntry: WorkoutTypeCatalog.Entry? {
+        WorkoutTypeCatalog.entry(forKey: workoutTypeKey)
+    }
 
     private var allowsFractionalThreshold: Bool {
+        if metric == .workouts && usesWorkoutType {
+            return workoutMeasure == .miles
+        }
         switch metric {
         case .sleepHours, .distanceMiles, .intensityRatio:
             return true
@@ -221,7 +231,8 @@ struct CustomStreakBuilderSheet: View {
     }
 
     private var sanitizedThreshold: Double {
-        metric == .workouts ? 1 : threshold
+        if metric == .workouts && !usesWorkoutType { return 1 }
+        return threshold
     }
 
     private var thresholdIsValid: Bool {
@@ -251,6 +262,11 @@ struct CustomStreakBuilderSheet: View {
                             if newMetric == .workouts {
                                 threshold = 1
                                 usesHourWindow = false
+                                if usesWorkoutType {
+                                    threshold = defaultThreshold(for: workoutMeasure)
+                                }
+                            } else {
+                                usesWorkoutType = false
                             }
                         }
 
@@ -310,6 +326,66 @@ struct CustomStreakBuilderSheet: View {
                             .pickerStyle(.wheel)
                             .frame(height: 120)
                         }
+
+                        if metric == .workouts {
+                            Rectangle()
+                                .fill(Theme.retroInkFaint)
+                                .frame(height: 1)
+                                .padding(.horizontal, 14)
+
+                            HStack {
+                                Text("PICK ACTIVITY TYPE")
+                                    .font(RetroFont.mono(10, weight: .bold))
+                                    .foregroundStyle(Theme.retroInk)
+                                Spacer()
+                                PixelToggle(isOn: Binding(
+                                    get: { usesWorkoutType },
+                                    set: { newValue in
+                                        usesWorkoutType = newValue
+                                        if newValue {
+                                            threshold = defaultThreshold(for: workoutMeasure)
+                                        } else {
+                                            threshold = 1
+                                        }
+                                    }
+                                ), accent: Theme.retroAmber)
+                            }
+                            .padding(14)
+
+                            if usesWorkoutType {
+                                Picker("Activity", selection: $workoutTypeKey) {
+                                    ForEach(WorkoutTypeCatalog.all) { entry in
+                                        Text(entry.displayName).tag(entry.key)
+                                    }
+                                }
+                                .pickerStyle(.navigationLink)
+                                .padding(14)
+                                .onChange(of: workoutTypeKey) { _, _ in
+                                    if let entry = workoutEntry, !entry.supportsDistance, workoutMeasure == .miles {
+                                        workoutMeasure = .minutes
+                                        threshold = defaultThreshold(for: .minutes)
+                                    }
+                                }
+
+                                HStack {
+                                    Text("MEASURE")
+                                        .font(RetroFont.mono(10, weight: .bold))
+                                        .foregroundStyle(Theme.retroInk)
+                                    Spacer()
+                                    Picker("", selection: $workoutMeasure) {
+                                        ForEach(availableMeasures(), id: \.self) { measure in
+                                            Text(measure.label).tag(measure)
+                                        }
+                                    }
+                                    .pickerStyle(.segmented)
+                                    .frame(width: 200)
+                                    .onChange(of: workoutMeasure) { _, newValue in
+                                        threshold = defaultThreshold(for: newValue)
+                                    }
+                                }
+                                .padding(14)
+                            }
+                        }
                     }
                     .pixelPanel(color: Theme.retroInkFaint)
                     .padding(.horizontal, 14)
@@ -334,12 +410,15 @@ struct CustomStreakBuilderSheet: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
+                        let attachWorkoutType = metric == .workouts && usesWorkoutType
                         onSave(CustomStreak(
                             id: UUID().uuidString,
                             metric: metric,
                             cadence: .daily,
                             threshold: sanitizedThreshold,
-                            hourWindow: usesHourWindow && metric == .steps ? hour : nil
+                            hourWindow: usesHourWindow && metric == .steps ? hour : nil,
+                            workoutType: attachWorkoutType ? workoutTypeKey : nil,
+                            workoutMeasure: attachWorkoutType ? workoutMeasure : nil
                         ))
                         dismiss()
                     } label: {
@@ -352,6 +431,19 @@ struct CustomStreakBuilderSheet: View {
             }
             .toolbarBackground(Theme.retroBg, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
+        }
+    }
+
+    private func availableMeasures() -> [WorkoutMeasure] {
+        guard let entry = workoutEntry else { return [.count, .minutes] }
+        return entry.supportsDistance ? WorkoutMeasure.allCases : [.count, .minutes]
+    }
+
+    private func defaultThreshold(for measure: WorkoutMeasure) -> Double {
+        switch measure {
+        case .count: return 1
+        case .minutes: return 20
+        case .miles: return 1
         }
     }
 }

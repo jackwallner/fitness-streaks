@@ -66,13 +66,13 @@ struct StreakHero: View {
             let t = streak.metric.format(value: streak.threshold)
             return "\(t)+ \(streak.metric.unitLabel) between \(w.label)"
         }
-        return streak.metric.prose(streak.threshold, cadence: streak.cadence)
+        return streak.prose
     }
 
     private var chargeLabel: String {
-        let v = streak.metric.format(value: streak.currentUnitValue)
-        let t = streak.metric.format(value: streak.threshold)
-        return "\(v)/\(t) \(streak.metric.unitLabel.uppercased())"
+        let v = streak.format(currentUnitValue: streak.currentUnitValue)
+        let t = streak.format(currentUnitValue: streak.threshold)
+        return "\(v)/\(t) \(streak.unitLabel.uppercased())"
     }
 
     private var progressTitle: String {
