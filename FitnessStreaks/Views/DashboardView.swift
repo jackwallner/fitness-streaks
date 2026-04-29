@@ -10,7 +10,7 @@ struct DashboardView: View {
     @State private var showPicker = false
     @State private var selectedBroken: BrokenStreak? = nil
 
-    private let grid = [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)]
+    private let grid = [GridItem(.flexible(), spacing: 8)]
     private static let relativeFormatter: RelativeDateTimeFormatter = {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .short

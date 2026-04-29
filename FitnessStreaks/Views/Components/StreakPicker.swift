@@ -101,7 +101,7 @@ struct StreakPickerSheet: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 14) {
-                    Text("Pick the streaks you want on your dashboard. ★ are the most interesting for your current vibe.")
+                    Text("Pick the streaks you want on your dashboard.")
                         .font(RetroFont.mono(11))
                         .foregroundStyle(Theme.retroInkDim)
                         .lineSpacing(2)

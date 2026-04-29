@@ -111,6 +111,19 @@ enum StreakEngine {
         )
     }
 
+    private static func roundThreshold(_ value: Double, for metric: StreakMetric) -> Double {
+        switch metric {
+        case .steps:
+            return (value / 100).rounded(.down) * 100
+        case .activeEnergy:
+            return (value / 10).rounded(.down) * 10
+        case .distanceMiles:
+            return (value * 10).rounded(.down) / 10
+        default:
+            return value.rounded(.down)
+        }
+    }
+
     // MARK: - Smart threshold discovery
 
     /// For a given metric, test every unique value seen in the lookback window as a threshold,

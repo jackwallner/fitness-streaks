@@ -6,7 +6,11 @@ struct StreakHero: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .center, spacing: 12) {
-                PixelFlame(size: 48, intensity: intensity, tint: Theme.retroMagenta)
+                Image(systemName: streak.displaySymbol)
+                    .font(.system(size: 48, weight: .semibold))
+                    .foregroundStyle(streak.metric.accent)
+                    .retroGlow(streak.metric.accent)
+                    .frame(width: 48, height: 48)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("PRIMARY STREAK")

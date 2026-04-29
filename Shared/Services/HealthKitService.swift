@@ -21,22 +21,14 @@ final class HealthKitService: ObservableObject {
         .stepCount,
         .appleExerciseTime,
         .activeEnergyBurned,
-        .distanceWalkingRunning,
-        .flightsClimbed,
-        .heartRate,
+        .distanceWalkingRunning
     ]
 
     /// Category types (mindful session, sleep analysis) + workout type.
     private var categoryReadTypes: Set<HKObjectType> {
         var set: Set<HKObjectType> = [HKObjectType.workoutType()]
-        if let mindful = HKObjectType.categoryType(forIdentifier: .mindfulSession) {
-            set.insert(mindful)
-        }
         if let sleep = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) {
             set.insert(sleep)
-        }
-        if let standHour = HKObjectType.categoryType(forIdentifier: .appleStandHour) {
-            set.insert(standHour)
         }
         return set
     }

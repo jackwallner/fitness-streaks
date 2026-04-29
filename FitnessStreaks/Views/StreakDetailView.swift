@@ -7,6 +7,9 @@ struct StreakDetailView: View {
     @EnvironmentObject var settings: StreakSettings
     @State private var actionMessage: String? = nil
 
+    @State private var showingRecalibrateConfirm = false
+    @State private var showingCustomBuilder = false
+
     var isHero: Bool { store.hero?.id == streak.id }
 
     var body: some View {
@@ -185,9 +188,7 @@ struct StreakDetailView: View {
                 }
                 Spacer()
                 Button {
-                    settings.clearCommittedThreshold(for: streak.trackingKey)
-                    Task { await store.load() }
-                    actionMessage = "Recalibrating from Apple Health..."
+                    showingRecalibrateConfirm = true
                 } label: {
                     Text("RECALIBRATE")
                         .font(RetroFont.mono(10, weight: .bold))
@@ -199,6 +200,16 @@ struct StreakDetailView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Recalibrate threshold from Apple Health")
+                .alert("Recalibrate Goal?", isPresented: $showingRecalibrateConfirm) {
+                    Button("Recalibrate (Apple Health)", role: .destructive) {
+                        settings.clearCommittedThreshold(for: streak.trackingKey)
+                        Task { await store.load() }
+                        actionMessage = "Recalibrating from Apple Health..."
+                    }
+                    Button("Cancel", role: .cancel) {}
+                } message: {
+                    Text("Are you sure? This will update your goal based on recent activity. If the new goal is higher, you might lose your streak.")
+                }
             }
         }
         .padding(14)

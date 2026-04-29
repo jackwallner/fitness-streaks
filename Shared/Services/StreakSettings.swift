@@ -45,9 +45,9 @@ enum DiscoveryVibe: Int, CaseIterable, Codable, Sendable {
 }
 
 enum AppAppearance: Int, CaseIterable {
-    case system = 0
-    case light = 1
-    case dark = 2
+    case light = 0
+    case dark = 1
+    case system = 2
 
     var label: String {
         switch self {

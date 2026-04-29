@@ -260,13 +260,14 @@ enum RetroFont {
     }
 
     static func mono(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
+        let scaledSize = size * 1.25
         let name: String
         switch weight {
         case .bold, .heavy, .black: name = "JetBrainsMono-Bold"
         case .medium, .semibold:    name = "JetBrainsMono-Medium"
         default:                    name = "JetBrainsMono-Regular"
         }
-        return .custom(name, size: size)
+        return .custom(name, size: scaledSize)
     }
 }
 

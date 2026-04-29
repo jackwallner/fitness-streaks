@@ -13,15 +13,34 @@ struct CalendarHeatmap: View {
         let weeks = groupByWeek(entries)
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .top, spacing: gap) {
-                    ForEach(Array(weeks.enumerated()), id: \.offset) { item in
-                        VStack(spacing: gap) {
-                            ForEach(0..<7, id: \.self) { wd in
-                                let day = item.element.first { weekdayOrdinal($0.date) == wd }
-                                cellView(day: day)
+                VStack(alignment: .leading, spacing: 4) {
+                    // Month labels
+                    HStack(alignment: .top, spacing: gap) {
+                        ForEach(Array(weeks.enumerated()), id: \.offset) { item in
+                            let firstDay = item.element.first?.date ?? Date()
+                            let isFirstWeekOfMonth = DateHelpers.gregorian.component(.day, from: firstDay) <= 7
+                            if isFirstWeekOfMonth {
+                                Text(monthName(for: firstDay))
+                                    .font(RetroFont.pixel(8))
+                                    .foregroundStyle(Theme.retroInkDim)
+                                    .frame(width: cell, alignment: .leading)
+                            } else {
+                                Color.clear.frame(width: cell)
                             }
                         }
-                        .id(item.offset)
+                    }
+                    
+                    // Heatmap cells
+                    HStack(alignment: .top, spacing: gap) {
+                        ForEach(Array(weeks.enumerated()), id: \.offset) { item in
+                            VStack(spacing: gap) {
+                                ForEach(0..<7, id: \.self) { wd in
+                                    let day = item.element.first { weekdayOrdinal($0.date) == wd }
+                                    cellView(day: day)
+                                }
+                            }
+                            .id(item.offset)
+                        }
                     }
                 }
                 .padding(.vertical, 2)
@@ -30,6 +49,12 @@ struct CalendarHeatmap: View {
                 proxy.scrollTo(weeks.count - 1, anchor: .trailing)
             }
         }
+    }
+
+    private func monthName(for date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM"
+        return formatter.string(from: date).uppercased()
     }
 
     @ViewBuilder
