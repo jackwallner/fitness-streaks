@@ -6,6 +6,24 @@ import SwiftUI
 final class StreakStore: ObservableObject {
     static let shared = StreakStore()
 
+    enum LoadStage: Equatable {
+        case idle
+        case readingHistory
+        case analyzingPatterns
+        case discoveringStreaks
+        case finalizing
+
+        var label: String {
+            switch self {
+            case .idle: ""
+            case .readingHistory: "READING ACTIVITY HISTORY"
+            case .analyzingPatterns: "ANALYZING TIME-OF-DAY PATTERNS"
+            case .discoveringStreaks: "DISCOVERING STREAKS"
+            case .finalizing: "FINALIZING"
+            }
+        }
+    }
+
     @Published var streaks: [Streak] = []
     /// Every streak the engine surfaced — unfiltered by the user's tracked-set.
     /// Used by the streak-selection picker so the user can opt streaks in/out.
@@ -13,6 +31,8 @@ final class StreakStore: ObservableObject {
     @Published var history: [ActivityDay] = []
     @Published var hourlySteps: [Date: [Int: Double]] = [:]
     @Published var isLoading: Bool = false
+    @Published var loadProgress: Double = 0
+    @Published var loadStage: LoadStage = .idle
     @Published var lastUpdated: Date? = nil
 
     var hero: Streak? { streaks.first }
@@ -61,12 +81,30 @@ final class StreakStore: ObservableObject {
     /// Fetches fresh history from HealthKit, runs the engine, updates published state + widget snapshot.
     func load() async {
         isLoading = true
-        defer { isLoading = false }
+        withAnimation(.linear(duration: 0.2)) {
+            loadStage = .readingHistory
+            loadProgress = 0.05
+        }
+        defer {
+            isLoading = false
+            withAnimation(.linear(duration: 0.2)) {
+                loadStage = .idle
+                loadProgress = 0
+            }
+        }
         do {
             let previous = self.streaks
             let fresh = try await HealthKitService.shared.fetchHistory(days: 400)
+            withAnimation(.linear(duration: 0.25)) {
+                loadProgress = 0.5
+                loadStage = .analyzingPatterns
+            }
             // 90 days is enough to detect a real time-of-day rhythm without blowing up query cost.
             let hourly = (try? await HealthKitService.shared.fetchHourlySteps(days: 90)) ?? [:]
+            withAnimation(.linear(duration: 0.25)) {
+                loadProgress = 0.78
+                loadStage = .discoveringStreaks
+            }
             // Compute early steps (0–8am) from hourly data so the engine can evaluate .earlySteps streaks.
             var enriched = fresh
             if !hourly.isEmpty {
@@ -128,8 +166,15 @@ final class StreakStore: ObservableObject {
             persistCurrentSnapshot()
             recordLastKnownLengths()
             self.lastUpdated = .now
+            withAnimation(.linear(duration: 0.25)) {
+                loadProgress = 0.95
+                loadStage = .finalizing
+            }
 
             await NotificationService.scheduleDailyReminder(for: self.streaks)
+            withAnimation(.linear(duration: 0.2)) {
+                loadProgress = 1.0
+            }
         } catch {
             print("StreakStore load error: \(error)")
             // Fall back to cached snapshot values if HK read failed
