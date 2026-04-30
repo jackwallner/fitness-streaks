@@ -70,10 +70,10 @@ struct StreakDetailView: View {
                 }
             }
             ToolbarItem(placement: .principal) {
-                Text(toolbarTitle)
-                    .font(RetroFont.pixel(10))
-                    .tracking(2)
-                    .foregroundStyle(Theme.retroInkDim)
+                Text("DETAIL")
+                    .font(RetroFont.pixel(9))
+                    .tracking(3)
+                    .foregroundStyle(Theme.retroInkFaint)
             }
         }
         .toolbarBackground(Theme.retroBg, for: .navigationBar)
@@ -106,8 +106,8 @@ struct StreakDetailView: View {
                     .frame(width: 36, height: 36)
             }
 
-            HStack(alignment: .center, spacing: 10) {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
+            HStack(alignment: .lastTextBaseline, spacing: 10) {
+                HStack(alignment: .lastTextBaseline, spacing: 8) {
                     Text(streak.format(currentUnitValue: streak.currentUnitValue))
                         .font(RetroFont.mono(42, weight: .bold))
                         .foregroundStyle(streak.currentUnitCompleted ? Theme.retroLime : streak.metric.accent)
@@ -115,7 +115,7 @@ struct StreakDetailView: View {
                         .minimumScaleFactor(0.45)
                         .lineLimit(1)
                     Text(streak.unitLabel.uppercased())
-                        .font(RetroFont.mono(10, weight: .bold))
+                        .font(RetroFont.mono(11, weight: .bold))
                         .foregroundStyle(Theme.retroInkDim)
                 }
                 .layoutPriority(1)
@@ -128,8 +128,8 @@ struct StreakDetailView: View {
                         .tracking(1)
                         .foregroundStyle(Theme.retroInkDim)
                     Text(headerGoalValue.uppercased())
-                        .font(RetroFont.mono(10, weight: .bold))
-                        .foregroundStyle(Theme.retroInk)
+                        .font(RetroFont.mono(11, weight: .bold))
+                        .foregroundStyle(streak.metric.accent)
                         .lineLimit(1)
                         .minimumScaleFactor(0.65)
                 }
@@ -137,12 +137,12 @@ struct StreakDetailView: View {
 
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 8) {
-                    Text("TODAY")
+                    Text(streak.cadence == .daily ? "TODAY" : "THIS WEEK")
                         .font(RetroFont.mono(10, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(Theme.retroInkDim)
                     Spacer(minLength: 0)
-                    Text(streak.currentUnitCompleted ? "LOCKED" : "\(Int(min(1, streak.currentUnitProgress) * 100))%")
+                    Text(streak.currentUnitCompleted ? "DONE" : "\(Int(min(1, streak.currentUnitProgress) * 100))%")
                         .font(RetroFont.mono(10, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(streak.currentUnitCompleted ? Theme.retroLime : Theme.retroAmber)
@@ -247,7 +247,7 @@ struct StreakDetailView: View {
                     .foregroundStyle(Theme.retroInkDim)
                 Spacer()
                 if streak.currentUnitCompleted {
-                    Text("✓ LOCKED")
+                    Text("✓ DONE")
                         .font(RetroFont.pixel(9))
                         .foregroundStyle(Theme.retroLime)
                 } else {
@@ -262,7 +262,7 @@ struct StreakDetailView: View {
         .padding(14)
         .pixelPanel(color: Theme.retroAmber)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Today's progress: \(Int(min(1, streak.currentUnitProgress) * 100)) percent. \(streak.currentUnitCompleted ? "Goal locked in." : "Goal not yet locked in.")")
+        .accessibilityLabel("Today's progress: \(Int(min(1, streak.currentUnitProgress) * 100)) percent. \(streak.currentUnitCompleted ? "Goal complete." : "Goal not yet complete.")")
     }
 
     private func statusCard(_ text: String) -> some View {

@@ -72,11 +72,11 @@ enum Theme {
         #if os(iOS)
         Color(UIColor { trait in
             trait.userInterfaceStyle == .light
-                ? UIColor(Color(hex: 0x6b5b8a))
-                : UIColor(Color(hex: 0x8b7cad))
+                ? UIColor(Color(hex: 0x554670))
+                : UIColor(Color(hex: 0xa395c0))
         })
         #else
-        Color(hex: 0x8b7cad)
+        Color(hex: 0xa395c0)
         #endif
     }
     static var retroInkFaint: Color {
@@ -188,7 +188,17 @@ enum Theme {
         Color(hex: 0xff7a00)
         #endif
     }
-    static let accentWorkout = retroRed
+    static var accentWorkout: Color {
+        #if os(iOS)
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .light
+                ? UIColor(Color(hex: 0xc44a3c))
+                : UIColor(Color(hex: 0xff8866))
+        })
+        #else
+        Color(hex: 0xff8866)
+        #endif
+    }
     static var accentMindful: Color {
         #if os(iOS)
         Color(UIColor { trait in

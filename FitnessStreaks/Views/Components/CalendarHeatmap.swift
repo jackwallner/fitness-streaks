@@ -121,7 +121,9 @@ struct CalendarHeatmap: View {
     private func grid(weeks: [[HeatmapDay]], cell: CGFloat) -> some View {
         let width = CGFloat(weeks.count) * cell + CGFloat(max(0, weeks.count - 1)) * gap
         VStack(alignment: .leading, spacing: 4) {
-            HStack(alignment: .top, spacing: gap) {
+            ZStack(alignment: .topLeading) {
+                // Reserve a row for month labels.
+                Color.clear.frame(height: 12)
                 ForEach(Array(weeks.enumerated()), id: \.offset) { item in
                     let firstDay = item.element.first?.date ?? Date()
                     let isFirstWeekOfMonth = DateHelpers.gregorian.component(.day, from: firstDay) <= 7
@@ -129,9 +131,8 @@ struct CalendarHeatmap: View {
                         Text(monthName(for: firstDay))
                             .font(RetroFont.pixel(8))
                             .foregroundStyle(Theme.retroInkDim)
-                            .frame(width: cell, alignment: .leading)
-                    } else {
-                        Color.clear.frame(width: cell)
+                            .fixedSize()
+                            .offset(x: CGFloat(item.offset) * (cell + gap))
                     }
                 }
             }
@@ -149,7 +150,8 @@ struct CalendarHeatmap: View {
             }
         }
         .padding(.vertical, 2)
-        .frame(width: width, alignment: .leading)
+        .padding(.trailing, 24) // leave room for the rightmost month label to extend past the last column
+        .frame(width: width + 24, alignment: .leading)
     }
 
     private func cellSize(for weekCount: Int, available: CGFloat) -> CGFloat {

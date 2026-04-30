@@ -66,7 +66,7 @@ struct StreakBadgeCard: View {
                         .foregroundStyle(Theme.retroInkDim)
                     Text(goalValueLine.uppercased())
                         .font(RetroFont.mono(TypeScale.goalValue, weight: .bold))
-                        .foregroundStyle(Theme.retroInk)
+                        .foregroundStyle(streak.metric.accent)
                         .lineLimit(1)
                         .minimumScaleFactor(0.55)
                 }
@@ -112,7 +112,7 @@ struct StreakBadgeCard: View {
         let t = streak.format(currentUnitValue: streak.threshold)
         let unit = streak.current == 1 ? streak.cadence.label : streak.cadence.pluralLabel
         if streak.currentUnitCompleted {
-            return "\(streak.current) \(unit) · LOCKED"
+            return "\(streak.current) \(unit) · DONE"
         } else {
             let pct = Int(min(1, streak.currentUnitProgress) * 100)
             return "\(pct)% · \(streak.current) \(unit)"

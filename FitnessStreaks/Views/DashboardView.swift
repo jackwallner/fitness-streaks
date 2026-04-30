@@ -121,7 +121,7 @@ struct DashboardView: View {
                     .tracking(1)
                     .foregroundStyle(Theme.retroMagenta)
                 if let updated = store.lastUpdated {
-                    Text("updated \(relative(updated)) · apple health")
+                    Text("\(relative(updated)) · apple health")
                         .font(RetroFont.mono(10))
                         .foregroundStyle(Theme.retroInkDim)
                 } else {
@@ -182,9 +182,9 @@ struct DashboardView: View {
         let v = streak.metric.format(value: remaining)
         let unit = streak.metric.unitLabel
         if let window = streak.window {
-            return "\(v) \(unit) between \(window.label) to lock today in"
+            return "\(v) \(unit) between \(window.label) to finish today"
         }
-        return "\(v) \(unit) to lock today in"
+        return "\(v) \(unit) to finish today"
     }
 
     private func brokenBanner(_ broken: BrokenStreak) -> some View {

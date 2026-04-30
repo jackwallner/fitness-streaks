@@ -75,7 +75,7 @@ struct StreakHero: View {
                         .foregroundStyle(Theme.retroInkDim)
                     Text(goalLine.uppercased())
                         .font(RetroFont.mono(TypeScale.goalValue, weight: .bold))
-                        .foregroundStyle(Theme.retroInk)
+                        .foregroundStyle(streak.metric.accent)
                         .lineLimit(1)
                         .minimumScaleFactor(0.65)
                 }
@@ -134,6 +134,6 @@ struct StreakHero: View {
     }
 
     private var statusText: String {
-        streak.currentUnitCompleted ? "LOCKED" : "\(Int(min(1, streak.currentUnitProgress) * 100))%"
+        streak.currentUnitCompleted ? "DONE" : "\(Int(min(1, streak.currentUnitProgress) * 100))%"
     }
 }
