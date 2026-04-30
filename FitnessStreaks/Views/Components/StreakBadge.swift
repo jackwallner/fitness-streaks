@@ -9,16 +9,25 @@ struct StreakBadgeRow: View {
 struct StreakBadgeCard: View {
     let streak: Streak
 
+    private enum TypeScale {
+        static let title: CGFloat = 9
+        static let value: CGFloat = 22
+        static let unit: CGFloat = 8.5
+        static let goalLabel: CGFloat = 7
+        static let goalValue: CGFloat = 8.5
+        static let meta: CGFloat = 8.5
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .center, spacing: 6) {
                 Image(systemName: streak.displaySymbol)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(streak.metric.accent)
                     .retroGlow(streak.metric.accent, radius: 6)
                     .frame(width: 18, height: 18)
                 Text(titleText)
-                    .font(RetroFont.mono(9, weight: .bold))
+                    .font(RetroFont.mono(TypeScale.title, weight: .bold))
                     .tracking(1)
                     .foregroundStyle(Theme.retroInkDim)
                     .lineLimit(1)
@@ -26,24 +35,41 @@ struct StreakBadgeCard: View {
                 Spacer(minLength: 0)
                 if streak.currentUnitCompleted {
                     Text("✓")
-                        .font(RetroFont.mono(14, weight: .bold))
+                        .font(RetroFont.mono(13, weight: .bold))
                         .foregroundStyle(Theme.retroLime)
                         .shadow(color: Theme.retroLime.opacity(0.8), radius: 4)
                 }
             }
 
-            HStack(alignment: .firstTextBaseline, spacing: 4) {
-                Text(currentValue)
-                    .font(RetroFont.mono(24, weight: .bold))
-                    .foregroundStyle(streak.metric.accent)
-                    .retroGlow(streak.metric.accent, radius: 6)
-                    .minimumScaleFactor(0.5)
-                    .lineLimit(1)
-                Text(streak.unitLabel.uppercased())
-                    .font(RetroFont.mono(9, weight: .bold))
-                    .foregroundStyle(Theme.retroInkDim)
-                    .lineLimit(1)
-                Spacer(minLength: 0)
+            HStack(alignment: .center, spacing: 6) {
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                    Text(currentValue)
+                        .font(RetroFont.mono(TypeScale.value, weight: .bold))
+                        .foregroundStyle(streak.metric.accent)
+                        .retroGlow(streak.metric.accent, radius: 6)
+                        .minimumScaleFactor(0.45)
+                        .lineLimit(1)
+                    Text(streak.unitLabel.uppercased())
+                        .font(RetroFont.mono(TypeScale.unit, weight: .bold))
+                        .foregroundStyle(Theme.retroInkDim)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
+                .layoutPriority(1)
+
+                Spacer(minLength: 2)
+
+                VStack(alignment: .trailing, spacing: 1) {
+                    Text("GOAL")
+                        .font(RetroFont.mono(TypeScale.goalLabel, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(Theme.retroInkDim)
+                    Text(goalValueLine.uppercased())
+                        .font(RetroFont.mono(TypeScale.goalValue, weight: .bold))
+                        .foregroundStyle(Theme.retroInk)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.55)
+                }
             }
 
             PixelProgressBar(progress: streak.currentUnitProgress,
@@ -52,14 +78,8 @@ struct StreakBadgeCard: View {
                              height: 8)
 
             HStack(spacing: 4) {
-                Text(goalLabel)
-                    .font(RetroFont.mono(9, weight: .bold))
-                    .foregroundStyle(Theme.retroInkDim)
-                Text("·")
-                    .font(RetroFont.mono(9, weight: .bold))
-                    .foregroundStyle(Theme.retroInkFaint)
                 Text(chargeLabel)
-                    .font(RetroFont.mono(9, weight: .bold))
+                    .font(RetroFont.mono(TypeScale.meta, weight: .bold))
                     .foregroundStyle(streak.currentUnitCompleted ? Theme.retroLime : streak.metric.accent)
                 Spacer(minLength: 0)
             }
@@ -83,9 +103,9 @@ struct StreakBadgeCard: View {
         return streak.displayName.uppercased()
     }
 
-    private var goalLabel: String {
+    private var goalValueLine: String {
         let target = streak.format(currentUnitValue: streak.threshold)
-        return "Goal: \(target) \(streak.unitLabel)"
+        return "\(target) \(streak.unitLabel)"
     }
 
     private var chargeLabel: String {

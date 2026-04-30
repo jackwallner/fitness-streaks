@@ -294,10 +294,8 @@ struct DashboardView: View {
                 .overlay(Rectangle().stroke(Theme.retroLime, lineWidth: 2))
                 .accessibilityLabel("Refresh streaks from Apple Health")
 
-                Button("HEALTH ACCESS") {
-                    if let url = URL(string: "x-apple-health://"), UIApplication.shared.canOpenURL(url) {
-                        UIApplication.shared.open(url)
-                    } else if let url = URL(string: UIApplication.openSettingsURLString) {
+                Button("HEALTH SETTINGS") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
                         UIApplication.shared.open(url)
                     }
                 }

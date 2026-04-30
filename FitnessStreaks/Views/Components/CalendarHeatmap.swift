@@ -36,10 +36,12 @@ enum HeatmapDateRange: String, CaseIterable {
     }
 }
 
+typealias HeatmapDay = (date: Date, value: Double, met: Bool)
+
 /// Pixel calendar heatmap. Columns = weeks, rows = weekdays (Mon–Sun).
 /// Sharp square cells, no corner radius. Binary colors for pass/fail goals.
 struct CalendarHeatmap: View {
-    let entries: [(date: Date, value: Double, met: Bool)]
+    let entries: [HeatmapDay]
     let accent: Color
     @Binding var selectedRange: HeatmapDateRange
 
@@ -47,14 +49,44 @@ struct CalendarHeatmap: View {
     private let minCell: CGFloat = 6
     private let maxCell: CGFloat = 18
 
-    /// Filter entries based on selected date range
-    private var filteredEntries: [(date: Date, value: Double, met: Bool)] {
-        let cutoff = DateHelpers.addDays(-selectedRange.days, to: DateHelpers.startOfDay())
-        return entries.filter { $0.date >= cutoff }
+    /// Build a complete calendar grid for the selected range. Missing Health rows
+    /// still get a cell so longer ranges don't collapse into sparse columns.
+    private var calendarWeeks: [[HeatmapDay]] {
+        let today = DateHelpers.startOfDay()
+        let firstVisibleDay = DateHelpers.addDays(-(selectedRange.days - 1), to: today)
+        let firstWeekStart = DateHelpers.startOfWeek(firstVisibleDay)
+        let entryByDay = Dictionary(entries.map { (DateHelpers.startOfDay($0.date), $0) },
+                                    uniquingKeysWith: { _, latest in latest })
+
+        var weeks: [[HeatmapDay]] = []
+        var week: [HeatmapDay] = []
+        var day = firstWeekStart
+
+        while day <= today {
+            let normalized = DateHelpers.startOfDay(day)
+            let entry = entryByDay[normalized] ?? (date: normalized, value: 0, met: false)
+            week.append(entry)
+
+            if week.count == 7 {
+                weeks.append(week)
+                week = []
+            }
+
+            guard let nextDay = DateHelpers.gregorian.date(byAdding: .day, value: 1, to: day) else {
+                break
+            }
+            day = nextDay
+        }
+
+        if !week.isEmpty {
+            weeks.append(week)
+        }
+
+        return weeks
     }
 
     var body: some View {
-        let weeks = groupByWeek(filteredEntries)
+        let weeks = calendarWeeks
         GeometryReader { geo in
             let cell = cellSize(for: weeks.count, available: geo.size.width)
             let needsScroll = cell <= minCell + 0.1
@@ -82,10 +114,12 @@ struct CalendarHeatmap: View {
             }
             .frame(height: height)
         }
+        .frame(height: maxHeight)
     }
 
     @ViewBuilder
-    private func grid(weeks: [[(date: Date, value: Double, met: Bool)]], cell: CGFloat) -> some View {
+    private func grid(weeks: [[HeatmapDay]], cell: CGFloat) -> some View {
+        let width = CGFloat(weeks.count) * cell + CGFloat(max(0, weeks.count - 1)) * gap
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .top, spacing: gap) {
                 ForEach(Array(weeks.enumerated()), id: \.offset) { item in
@@ -115,6 +149,7 @@ struct CalendarHeatmap: View {
             }
         }
         .padding(.vertical, 2)
+        .frame(width: width, alignment: .leading)
     }
 
     private func cellSize(for weekCount: Int, available: CGFloat) -> CGFloat {
@@ -124,6 +159,10 @@ struct CalendarHeatmap: View {
         return max(minCell, min(maxCell, raw))
     }
 
+    private var maxHeight: CGFloat {
+        CGFloat(7) * maxCell + CGFloat(6) * gap + 16
+    }
+
     private func monthName(for date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMM"
@@ -131,14 +170,14 @@ struct CalendarHeatmap: View {
     }
 
     @ViewBuilder
-    private func cellView(day: (date: Date, value: Double, met: Bool)?, size: CGFloat) -> some View {
+    private func cellView(day: HeatmapDay?, size: CGFloat) -> some View {
         Rectangle()
             .fill(color(for: day))
             .frame(width: size, height: size)
     }
 
     /// Binary color scheme: met = accent, not met but has data = faint accent, no data = background
-    private func color(for day: (date: Date, value: Double, met: Bool)?) -> Color {
+    private func color(for day: HeatmapDay?) -> Color {
         guard let day else { return Theme.retroInkFaint.opacity(0.5) }
         if day.met { return accent }
         if day.value > 0 { return Theme.retroInkFaint.opacity(0.5) }
@@ -150,23 +189,6 @@ struct CalendarHeatmap: View {
         return (wd + 5) % 7
     }
 
-    private func groupByWeek(_ entries: [(date: Date, value: Double, met: Bool)]) -> [[(date: Date, value: Double, met: Bool)]] {
-        let sorted = entries.sorted { $0.date < $1.date }
-        var result: [[(date: Date, value: Double, met: Bool)]] = []
-        var currentWeek: Date? = nil
-        var bucket: [(date: Date, value: Double, met: Bool)] = []
-        for entry in sorted {
-            let w = DateHelpers.startOfWeek(entry.date)
-            if w != currentWeek {
-                if !bucket.isEmpty { result.append(bucket) }
-                bucket = []
-                currentWeek = w
-            }
-            bucket.append(entry)
-        }
-        if !bucket.isEmpty { result.append(bucket) }
-        return result
-    }
 }
 
 /// Date range picker for heatmap

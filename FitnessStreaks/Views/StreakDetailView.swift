@@ -106,24 +106,41 @@ struct StreakDetailView: View {
                     .frame(width: 36, height: 36)
             }
 
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(streak.format(currentUnitValue: streak.currentUnitValue))
-                    .font(RetroFont.mono(42, weight: .bold))
-                    .foregroundStyle(streak.currentUnitCompleted ? Theme.retroLime : streak.metric.accent)
-                    .retroGlow(streak.currentUnitCompleted ? Theme.retroLime : streak.metric.accent)
-                    .minimumScaleFactor(0.45)
-                    .lineLimit(1)
-                Text(streak.unitLabel.uppercased())
-                    .font(RetroFont.mono(11, weight: .bold))
-                    .foregroundStyle(Theme.retroInkDim)
-                Spacer(minLength: 0)
+            HStack(alignment: .center, spacing: 10) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(streak.format(currentUnitValue: streak.currentUnitValue))
+                        .font(RetroFont.mono(42, weight: .bold))
+                        .foregroundStyle(streak.currentUnitCompleted ? Theme.retroLime : streak.metric.accent)
+                        .retroGlow(streak.currentUnitCompleted ? Theme.retroLime : streak.metric.accent)
+                        .minimumScaleFactor(0.45)
+                        .lineLimit(1)
+                    Text(streak.unitLabel.uppercased())
+                        .font(RetroFont.mono(10, weight: .bold))
+                        .foregroundStyle(Theme.retroInkDim)
+                }
+                .layoutPriority(1)
+
+                Spacer(minLength: 4)
+
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("GOAL")
+                        .font(RetroFont.mono(8, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(Theme.retroInkDim)
+                    Text(headerGoalValue.uppercased())
+                        .font(RetroFont.mono(10, weight: .bold))
+                        .foregroundStyle(Theme.retroInk)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.65)
+                }
             }
 
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 8) {
-                    Text("Goal: \(streak.format(currentUnitValue: streak.threshold)) \(streak.unitLabel)")
-                        .font(RetroFont.mono(12, weight: .medium))
-                        .foregroundStyle(Theme.retroInk)
+                    Text("TODAY")
+                        .font(RetroFont.mono(10, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(Theme.retroInkDim)
                     Spacer(minLength: 0)
                     Text(streak.currentUnitCompleted ? "LOCKED" : "\(Int(min(1, streak.currentUnitProgress) * 100))%")
                         .font(RetroFont.mono(10, weight: .bold))
@@ -191,6 +208,10 @@ struct StreakDetailView: View {
             return "\(t)+ \(streak.metric.unitLabel) every day between \(w.label)"
         }
         return streak.prose
+    }
+
+    private var headerGoalValue: String {
+        "\(streak.format(currentUnitValue: streak.threshold)) \(streak.unitLabel)"
     }
 
     // MARK: - Hour-window explainer

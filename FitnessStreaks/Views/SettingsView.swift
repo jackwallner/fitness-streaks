@@ -481,7 +481,7 @@ struct SettingsView: View {
                             .font(.system(.headline, design: .rounded, weight: .bold))
                             .foregroundStyle(coachTitleColor)
 
-                        Text("Virtual personal training and nutrition coaching with Elsa.")
+                        Text("Live 1-on-1 virtual personal training and nutrition coaching with Elsa.")
                             .font(.system(.subheadline, design: .rounded))
                             .foregroundStyle(coachSecondaryColor)
                             .fixedSize(horizontal: false, vertical: true)
@@ -491,12 +491,12 @@ struct SettingsView: View {
 
                 ViewThatFits(in: .horizontal) {
                     HStack(spacing: 8) {
-                        coachTag(title: "Virtual sessions", systemImage: "video.fill", tint: CoachBrand.aquamarine)
+                        coachTag(title: "1-on-1 live", systemImage: "video.fill", tint: CoachBrand.aquamarine)
                         coachTag(title: "Custom plans", systemImage: "checklist", tint: CoachBrand.dustyRose)
                     }
 
                     VStack(alignment: .leading, spacing: 8) {
-                        coachTag(title: "Virtual sessions", systemImage: "video.fill", tint: CoachBrand.aquamarine)
+                        coachTag(title: "1-on-1 live", systemImage: "video.fill", tint: CoachBrand.aquamarine)
                         coachTag(title: "Custom plans", systemImage: "checklist", tint: CoachBrand.dustyRose)
                     }
                 }
@@ -521,7 +521,7 @@ struct SettingsView: View {
                     .strokeBorder(coachBorderColor, lineWidth: 1)
             }
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("Need a coach? Virtual personal training and nutrition coaching with Elsa.")
+            .accessibilityLabel("Need a coach? Live one-on-one virtual personal training and nutrition coaching with Elsa.")
         }
     }
 

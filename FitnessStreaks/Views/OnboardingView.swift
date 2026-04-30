@@ -29,6 +29,7 @@ struct OnboardingView: View {
         "Add the widget for a glanceable streak count on your home screen.",
         "Per-workout-type streaks let you track yoga, runs, and lifts separately."
     ]
+    private static let privacyPolicyURL = URL(string: "https://jackwallner.github.io/fitness-streaks/privacy-policy.html")!
 
     private let tipTimer = Timer.publish(every: 3.5, on: .main, in: .common).autoconnect()
 
@@ -104,18 +105,30 @@ struct OnboardingView: View {
     }
 
     private var privacyPanel: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: "lock.shield.fill")
-                .font(.system(size: 24))
-                .foregroundStyle(Theme.retroLime)
-            VStack(alignment: .leading, spacing: 4) {
-                Text("PRIVATE & SECURE")
-                    .font(RetroFont.mono(12, weight: .bold))
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: "lock.shield.fill")
+                    .font(.system(size: 24))
                     .foregroundStyle(Theme.retroLime)
-                Text("Read-only access to Apple Health. Everything stays on your device — no networks, no tracking.")
-                    .font(RetroFont.mono(11))
-                    .foregroundStyle(Theme.retroInkDim)
-                    .lineSpacing(2)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("PRIVATE & SECURE")
+                        .font(RetroFont.mono(12, weight: .bold))
+                        .foregroundStyle(Theme.retroLime)
+                    Text("Read-only access to Apple Health. Everything stays on your device — no networks, no tracking.")
+                        .font(RetroFont.mono(11))
+                        .foregroundStyle(Theme.retroInkDim)
+                        .lineSpacing(2)
+                }
+            }
+
+            Link(destination: Self.privacyPolicyURL) {
+                HStack(spacing: 6) {
+                    Text("PRIVACY POLICY")
+                    Text("↗")
+                }
+                .font(RetroFont.mono(10, weight: .bold))
+                .tracking(1)
+                .foregroundStyle(Theme.retroCyan)
             }
         }
         .padding(14)
@@ -148,7 +161,7 @@ struct OnboardingView: View {
                 Button {
                     openHealthAccess()
                 } label: {
-                    Text("OPEN HEALTH")
+                    Text("OPEN SETTINGS")
                         .font(RetroFont.mono(11, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(Theme.retroCyan)
@@ -496,14 +509,12 @@ struct OnboardingView: View {
         do {
             try await healthKit.requestAuthorization()
         } catch {
-            errorText = "Couldn't connect. Open Health → Sharing → Apps → Streak Finder and turn on access."
+            errorText = "Couldn't connect. Open iOS Settings and turn on Streak Finder's Health access."
         }
     }
 
     private func openHealthAccess() {
-        if let url = URL(string: "x-apple-health://"), UIApplication.shared.canOpenURL(url) {
-            UIApplication.shared.open(url)
-        } else if let url = URL(string: UIApplication.openSettingsURLString) {
+        if let url = URL(string: UIApplication.openSettingsURLString) {
             UIApplication.shared.open(url)
         }
     }

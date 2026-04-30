@@ -3,6 +3,16 @@ import SwiftUI
 struct StreakHero: View {
     let streak: Streak
 
+    private enum TypeScale {
+        static let title: CGFloat = 16
+        static let context: CGFloat = 9.5
+        static let value: CGFloat = 42
+        static let unit: CGFloat = 10
+        static let goalLabel: CGFloat = 8
+        static let goalValue: CGFloat = 10
+        static let meta: CGFloat = 10
+    }
+
     private var valueColor: Color {
         streak.currentUnitCompleted ? Theme.retroLime : streak.metric.accent
     }
@@ -16,14 +26,14 @@ struct StreakHero: View {
             HStack(alignment: .top, spacing: 12) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(titleText)
-                        .font(RetroFont.mono(17, weight: .bold))
+                        .font(RetroFont.mono(TypeScale.title, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(streak.metric.accent)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
 
                     Text(goalContext.uppercased())
-                        .font(RetroFont.mono(10, weight: .bold))
+                        .font(RetroFont.mono(TypeScale.context, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(Theme.retroInkDim)
                         .lineLimit(1)
@@ -33,7 +43,7 @@ struct StreakHero: View {
                 Spacer(minLength: 0)
 
                 Image(systemName: streak.displaySymbol)
-                    .font(.system(size: 28, weight: .semibold))
+                    .font(.system(size: 27, weight: .semibold))
                     .foregroundStyle(streak.metric.accent)
                     .retroGlow(streak.metric.accent)
                     .frame(width: 34, height: 34)
@@ -41,23 +51,34 @@ struct StreakHero: View {
 
             Spacer(minLength: 2)
 
-            HStack(alignment: .firstTextBaseline, spacing: 6) {
-                Text(currentValue)
-                    .font(RetroFont.mono(44, weight: .bold))
-                    .foregroundStyle(valueColor)
-                    .retroGlow(valueColor)
-                    .minimumScaleFactor(0.45)
-                    .lineLimit(1)
-                Text(streak.unitLabel.uppercased())
-                    .font(RetroFont.mono(11, weight: .bold))
-                    .foregroundStyle(Theme.retroInkDim)
-                    .lineLimit(1)
-                Spacer(minLength: 8)
-                Text(goalLine)
-                    .font(RetroFont.mono(12, weight: .medium))
-                    .foregroundStyle(Theme.retroInk)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.75)
+            HStack(alignment: .center, spacing: 10) {
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text(currentValue)
+                        .font(RetroFont.mono(TypeScale.value, weight: .bold))
+                        .foregroundStyle(valueColor)
+                        .retroGlow(valueColor)
+                        .minimumScaleFactor(0.45)
+                        .lineLimit(1)
+                    Text(streak.unitLabel.uppercased())
+                        .font(RetroFont.mono(TypeScale.unit, weight: .bold))
+                        .foregroundStyle(Theme.retroInkDim)
+                        .lineLimit(1)
+                }
+                .layoutPriority(1)
+
+                Spacer(minLength: 4)
+
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("GOAL")
+                        .font(RetroFont.mono(TypeScale.goalLabel, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(Theme.retroInkDim)
+                    Text(goalLine.uppercased())
+                        .font(RetroFont.mono(TypeScale.goalValue, weight: .bold))
+                        .foregroundStyle(Theme.retroInk)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.65)
+                }
             }
 
             Spacer(minLength: 2)
@@ -65,11 +86,11 @@ struct StreakHero: View {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 8) {
                     Text(streakLine)
-                        .font(RetroFont.mono(11, weight: .bold))
+                        .font(RetroFont.mono(TypeScale.meta, weight: .bold))
                         .foregroundStyle(Theme.retroInk)
                     Spacer(minLength: 0)
                     Text(statusText)
-                        .font(RetroFont.mono(10, weight: .bold))
+                        .font(RetroFont.mono(TypeScale.meta, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(streak.currentUnitCompleted ? Theme.retroLime : Theme.retroAmber)
                 }
@@ -97,8 +118,7 @@ struct StreakHero: View {
 
     private var goalLine: String {
         let target = streak.format(currentUnitValue: streak.threshold)
-        let pct = Int(min(1, streak.currentUnitProgress) * 100)
-        return "\(target) \(streak.unitLabel) · \(pct)%"
+        return "\(target) \(streak.unitLabel)"
     }
 
     private var goalContext: String {
@@ -114,6 +134,6 @@ struct StreakHero: View {
     }
 
     private var statusText: String {
-        streak.currentUnitCompleted ? "LOCKED" : ""
+        streak.currentUnitCompleted ? "LOCKED" : "\(Int(min(1, streak.currentUnitProgress) * 100))%"
     }
 }
