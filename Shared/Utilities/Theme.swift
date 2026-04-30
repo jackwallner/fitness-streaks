@@ -233,18 +233,6 @@ enum Theme {
         Color(hex: 0xff5a8f)
         #endif
     }
-    static var accentTotalCalories: Color {
-        #if os(iOS)
-        Color(UIColor { trait in
-            trait.userInterfaceStyle == .light
-                ? UIColor(Color(hex: 0x9944cc))
-                : UIColor(Color(hex: 0xd47aff))
-        })
-        #else
-        Color(hex: 0xd47aff)
-        #endif
-    }
-
     static let cardRadius: CGFloat = 0
     static let cardPadding: CGFloat = 16
 

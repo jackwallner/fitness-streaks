@@ -1,16 +1,54 @@
 import SwiftUI
 
+/// Date range options for the heatmap
+enum HeatmapDateRange: String, CaseIterable {
+    case last30Days = "30d"
+    case last90Days = "90d"
+    case last180Days = "6mo"
+    case lookbackPeriod = "LOOKBACK"
+    case fullYear = "1yr"
+
+    var label: String {
+        switch self {
+        case .last30Days: return "30d"
+        case .last90Days: return "90d"
+        case .last180Days: return "6mo"
+        case .lookbackPeriod: return "LOOKBACK"
+        case .fullYear: return "1yr"
+        }
+    }
+
+    func days(lookbackDays: Int) -> Int {
+        switch self {
+        case .last30Days: return 30
+        case .last90Days: return 90
+        case .last180Days: return 180
+        case .lookbackPeriod: return lookbackDays
+        case .fullYear: return 365
+        }
+    }
+}
+
 /// Pixel calendar heatmap. Columns = weeks, rows = weekdays (Mon–Sun).
-/// Sharp square cells, no corner radius. Met cells get a subtle inset highlight.
+/// Sharp square cells, no corner radius. Binary colors for pass/fail goals.
 struct CalendarHeatmap: View {
     let entries: [(date: Date, value: Double, met: Bool)]
     let accent: Color
+    @Binding var selectedRange: HeatmapDateRange
+    let lookbackDays: Int
 
     private let cell: CGFloat = 8
     private let gap: CGFloat = 2
 
+    /// Filter entries based on selected date range
+    private var filteredEntries: [(date: Date, value: Double, met: Bool)] {
+        let days = selectedRange.days(lookbackDays: lookbackDays)
+        let cutoff = DateHelpers.addDays(-days, to: DateHelpers.startOfDay())
+        return entries.filter { $0.date >= cutoff }
+    }
+
     var body: some View {
-        let weeks = groupByWeek(entries)
+        let weeks = groupByWeek(filteredEntries)
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 4) {
@@ -29,7 +67,7 @@ struct CalendarHeatmap: View {
                             }
                         }
                     }
-                    
+
                     // Heatmap cells
                     HStack(alignment: .top, spacing: gap) {
                         ForEach(Array(weeks.enumerated()), id: \.offset) { item in
@@ -48,6 +86,14 @@ struct CalendarHeatmap: View {
             .onAppear {
                 proxy.scrollTo(weeks.count - 1, anchor: .trailing)
             }
+            .onChange(of: selectedRange) { _, _ in
+                // Scroll to end when range changes
+                DispatchQueue.main.async {
+                    withAnimation {
+                        proxy.scrollTo(weeks.count - 1, anchor: .trailing)
+                    }
+                }
+            }
         }
     }
 
@@ -62,17 +108,14 @@ struct CalendarHeatmap: View {
         Rectangle()
             .fill(color(for: day))
             .frame(width: cell, height: cell)
-            .overlay(
-                Rectangle()
-                    .stroke(Color.white.opacity(day?.met == true ? 0.2 : 0), lineWidth: 1)
-            )
     }
 
+    /// Binary color scheme: met = accent, not met but has data = faint accent, no data = background
     private func color(for day: (date: Date, value: Double, met: Bool)?) -> Color {
         guard let day else { return Theme.retroInkFaint.opacity(0.5) }
         if day.met { return accent }
-        if day.value > 0 { return accent.opacity(0.25) }
-        return Theme.retroInkFaint.opacity(0.5)
+        if day.value > 0 { return Theme.retroInkFaint.opacity(0.5) }
+        return Theme.retroInkFaint.opacity(0.2)
     }
 
     private func weekdayOrdinal(_ date: Date) -> Int {
@@ -96,5 +139,29 @@ struct CalendarHeatmap: View {
         }
         if !bucket.isEmpty { result.append(bucket) }
         return result
+    }
+}
+
+/// Date range picker for heatmap
+struct HeatmapRangePicker: View {
+    @Binding var selectedRange: HeatmapDateRange
+    let lookbackDays: Int
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ForEach(HeatmapDateRange.allCases, id: \.rawValue) { range in
+                Button {
+                    selectedRange = range
+                } label: {
+                    Text(range.label)
+                        .font(RetroFont.mono(9, weight: .bold))
+                        .foregroundStyle(selectedRange == range ? Theme.retroBg : Theme.retroInkDim)
+                        .padding(.vertical, 4)
+                        .padding(.horizontal, 6)
+                        .background(selectedRange == range ? Theme.retroCyan : Color.clear)
+                }
+                .buttonStyle(.plain)
+            }
+        }
     }
 }

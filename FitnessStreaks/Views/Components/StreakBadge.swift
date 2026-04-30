@@ -26,8 +26,9 @@ struct StreakBadgeCard: View {
                 Spacer(minLength: 0)
                 if streak.currentUnitCompleted {
                     Text("✓")
-                        .font(RetroFont.mono(11, weight: .bold))
+                        .font(RetroFont.mono(14, weight: .bold))
                         .foregroundStyle(Theme.retroLime)
+                        .shadow(color: Theme.retroLime.opacity(0.8), radius: 4)
                 }
             }
 
@@ -60,6 +61,10 @@ struct StreakBadgeCard: View {
         .padding(.vertical, 10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .pixelPanel(color: streak.currentUnitCompleted ? streak.metric.accent : Theme.retroInkFaint)
+        .background(
+            streak.currentUnitCompleted ?
+            Theme.retroLime.opacity(0.08) : Color.clear
+        )
     }
 
     private var titleText: String {
@@ -72,7 +77,12 @@ struct StreakBadgeCard: View {
     private var chargeLabel: String {
         let t = streak.format(currentUnitValue: streak.threshold)
         let unit = streak.current == 1 ? streak.cadence.label : streak.cadence.pluralLabel
-        return "of \(t) goal · \(streak.current) \(unit)"
+        if streak.currentUnitCompleted {
+            return "\(streak.current) \(unit) · LOCKED"
+        } else {
+            let pct = Int(min(1, streak.currentUnitProgress) * 100)
+            return "\(pct)% · \(streak.current) \(unit)"
+        }
     }
 
     private var currentValue: String {

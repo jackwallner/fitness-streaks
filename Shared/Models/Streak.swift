@@ -46,6 +46,8 @@ struct Streak: Identifiable, Hashable, Sendable {
     let startDate: Date?
     /// The unit that closed most recently (yesterday for daily, last-week-end for weekly); used to show "last hit".
     let lastHitDate: Date?
+    /// The most recent day that did NOT meet the threshold before the streak started.
+    let lastMissedDate: Date?
     /// Whether the current unit (today / this week) has already hit the threshold.
     let currentUnitCompleted: Bool
     /// Progress of the current unit toward threshold, in [0, 1+]. >1 means exceeded.
@@ -100,6 +102,7 @@ struct Streak: Identifiable, Hashable, Sendable {
         best: Int,
         startDate: Date?,
         lastHitDate: Date?,
+        lastMissedDate: Date? = nil,
         currentUnitCompleted: Bool,
         currentUnitProgress: Double,
         currentUnitValue: Double,
@@ -117,6 +120,7 @@ struct Streak: Identifiable, Hashable, Sendable {
         self.best = best
         self.startDate = startDate
         self.lastHitDate = lastHitDate
+        self.lastMissedDate = lastMissedDate
         self.currentUnitCompleted = currentUnitCompleted
         self.currentUnitProgress = currentUnitProgress
         self.currentUnitValue = currentUnitValue
@@ -270,15 +274,6 @@ struct ActivityDay: Hashable, Sendable {
         case .intensityRatio:
             return exerciseMinutes > 0 ? activeEnergy / exerciseMinutes : 0
         case .heartRateMinutes: return heartRateMinutes
-        case .totalCalories: return totalCalories
         }
-    }
-
-    /// Total calories = active energy + basal (resting) energy burned
-    var totalCalories: Double {
-        // For now, estimate basal as roughly 70% of active for users with Apple Watch
-        // or return activeEnergy * 1.4 as a reasonable estimate
-        // This will be refined when we fetch actual basal energy from HealthKit
-        activeEnergy * 1.4
     }
 }

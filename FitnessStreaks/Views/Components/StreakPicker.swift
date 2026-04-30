@@ -10,10 +10,31 @@ struct StreakPickerList: View {
     /// Highlight the top N as "recommended" — engine already sorted by vibe score.
     let recommendedCount: Int
 
+    /// Core metrics that appear first in the list
+    private let coreMetrics: [StreakMetric] = [.steps, .activeEnergy, .exerciseMinutes, .workouts]
+
+    /// Sorted candidates with core metrics first
+    private var sortedCandidates: [Streak] {
+        candidates.sorted { a, b in
+            let aIsCore = coreMetrics.contains(a.metric)
+            let bIsCore = coreMetrics.contains(b.metric)
+            if aIsCore != bIsCore {
+                return aIsCore // Core metrics come first
+            }
+            // Within same category, maintain original order (by vibe score)
+            guard let aIdx = candidates.firstIndex(where: { $0.id == a.id }),
+                  let bIdx = candidates.firstIndex(where: { $0.id == b.id }) else {
+                return false
+            }
+            return aIdx < bIdx
+        }
+    }
+
     var body: some View {
         VStack(spacing: 8) {
-            ForEach(Array(candidates.enumerated()), id: \.element.id) { idx, streak in
-                row(streak, recommended: idx < recommendedCount)
+            ForEach(Array(sortedCandidates.enumerated()), id: \.element.id) { idx, streak in
+                let isCore = coreMetrics.contains(streak.metric)
+                row(streak, recommended: isCore) // Core metrics get star
             }
         }
     }

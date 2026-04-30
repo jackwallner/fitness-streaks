@@ -458,8 +458,10 @@ struct OnboardingView: View {
             withAnimation { phase = .empty }
             return
         }
-        // Pre-select all discovered streaks; user can prune. Engine already ranked them by vibe.
-        selection = Set(store.allCandidates.map(\.trackingKey))
+        // Pre-select only "Core 4" metrics (steps, activeEnergy, exercise, workouts) for a better onboarding experience
+        let coreMetrics: [StreakMetric] = [.steps, .activeEnergy, .exerciseMinutes, .workouts]
+        let defaults = store.allCandidates.filter { coreMetrics.contains($0.metric) }
+        selection = Set(defaults.map(\.trackingKey))
         withAnimation { phase = .selecting }
     }
 

@@ -163,6 +163,10 @@ enum StreakEngine {
         switch metric {
         case .workouts, .mindfulMinutes:
             candidates = metric.dailyThresholds
+        case .steps:
+            // Round each unique value to nearest 100 first, then deduplicate
+            let rounded = Set(values.map { (($0 / 100).rounded(.down) * 100) })
+            candidates = Array(rounded).filter { $0 > 0 }.sorted()
         default:
             // Use every unique non-zero value in the lookback window as a candidate threshold.
             // Threshold of 0 causes computeDailyStreak's `while true` loop to never terminate
@@ -306,6 +310,7 @@ enum StreakEngine {
                         best: base.best,
                         startDate: base.startDate,
                         lastHitDate: base.lastHitDate,
+                        lastMissedDate: base.lastMissedDate,
                         currentUnitCompleted: base.currentUnitCompleted,
                         currentUnitProgress: base.currentUnitProgress,
                         currentUnitValue: base.currentUnitValue,
@@ -366,6 +371,7 @@ enum StreakEngine {
                 best: result.streak.best,
                 startDate: result.streak.startDate,
                 lastHitDate: result.streak.lastHitDate,
+                lastMissedDate: result.streak.lastMissedDate,
                 currentUnitCompleted: result.streak.currentUnitCompleted,
                 currentUnitProgress: result.streak.currentUnitProgress,
                 currentUnitValue: result.streak.currentUnitValue,
@@ -452,6 +458,20 @@ enum StreakEngine {
             back = DateHelpers.addDays(-1, to: back)
         }
 
+        // Find the most recent day before the streak started that did NOT meet the threshold
+        var lastMissed: Date? = nil
+        if let start = streakStart {
+            var missedCursor = DateHelpers.addDays(-1, to: start)
+            for _ in 0..<800 {
+                let value = byDayValues[missedCursor] ?? 0
+                if value < threshold {
+                    lastMissed = missedCursor
+                    break
+                }
+                missedCursor = DateHelpers.addDays(-1, to: missedCursor)
+            }
+        }
+
         let progress = threshold > 0 ? min(todayValue / threshold, 10) : 0
         return Streak(
             metric: metric,
@@ -461,6 +481,7 @@ enum StreakEngine {
             best: best,
             startDate: streakStart,
             lastHitDate: lastHit,
+            lastMissedDate: lastMissed,
             currentUnitCompleted: todayMet,
             currentUnitProgress: progress,
             currentUnitValue: todayValue
@@ -511,6 +532,7 @@ enum StreakEngine {
                 best: streak.best,
                 startDate: streak.startDate,
                 lastHitDate: streak.lastHitDate,
+                lastMissedDate: streak.lastMissedDate,
                 currentUnitCompleted: streak.currentUnitCompleted,
                 currentUnitProgress: streak.currentUnitProgress,
                 currentUnitValue: streak.currentUnitValue,
@@ -537,6 +559,7 @@ enum StreakEngine {
             best: max(streak.best, bridgedCurrent),
             startDate: bridgedStart,
             lastHitDate: streak.lastHitDate,
+            lastMissedDate: streak.lastMissedDate,
             currentUnitCompleted: streak.currentUnitCompleted,
             currentUnitProgress: streak.currentUnitProgress,
             currentUnitValue: streak.currentUnitValue,
@@ -609,6 +632,7 @@ enum StreakEngine {
             best: base.best,
             startDate: base.startDate,
             lastHitDate: base.lastHitDate,
+            lastMissedDate: base.lastMissedDate,
             currentUnitCompleted: base.currentUnitCompleted,
             currentUnitProgress: base.currentUnitProgress,
             currentUnitValue: base.currentUnitValue

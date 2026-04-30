@@ -10,6 +10,7 @@ struct StreakDetailView: View {
     @State private var showingRecalibrateConfirm = false
     @State private var showingCustomBuilder = false
     @State private var showingUntrackConfirm = false
+    @State private var selectedHeatmapRange: HeatmapDateRange = .lookbackPeriod
 
     var isHero: Bool { store.hero?.id == streak.id }
 
@@ -24,7 +25,7 @@ struct StreakDetailView: View {
                     hourWindowExplainer.padding(.horizontal, 14)
                     statsRow.padding(.horizontal, 14)
                 } else {
-                    PixelSectionHeader(title: "Last 365 Days")
+                    PixelSectionHeader(title: "HISTORY")
                         .padding(.top, 4)
 
                     heatmapCard.padding(.horizontal, 14)
@@ -117,6 +118,19 @@ struct StreakDetailView: View {
             HStack(spacing: 8) {
                 statPill(value: "\(streak.current)", label: streak.current == 1 ? "\(streak.cadence.label) streak" : "\(streak.cadence.pluralLabel) streak", color: streak.metric.accent)
                 statPill(value: "\(streak.best)", label: streak.best == 1 ? "best \(streak.cadence.label)" : "best \(streak.cadence.pluralLabel)", color: Theme.retroAmber)
+            }
+
+            if let lastMissed = streak.lastMissedDate {
+                HStack(spacing: 6) {
+                    Image(systemName: "calendar.badge.clock")
+                        .font(.system(size: 10))
+                        .foregroundStyle(Theme.retroInkDim)
+                    Text("Last missed: \(formatDate(lastMissed)) (\(formatDayOfWeek(lastMissed)))")
+                        .font(RetroFont.mono(10))
+                        .foregroundStyle(Theme.retroInkDim)
+                    Spacer()
+                }
+                .padding(.top, 4)
             }
         }
         .padding(.vertical, 16)
@@ -460,49 +474,60 @@ struct StreakDetailView: View {
     // MARK: - Heatmap
 
     private var heatmapCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
+            // Date range picker
+            HeatmapRangePicker(selectedRange: $selectedHeatmapRange, lookbackDays: settings.lookbackDays)
+                .padding(.bottom, 4)
+
             CalendarHeatmap(
                 entries: StreakEngine.dailyHistory(
                     for: streak.metric,
                     threshold: streak.threshold,
                     history: store.history
                 ),
-                accent: streak.metric.accent
+                accent: streak.metric.accent,
+                selectedRange: $selectedHeatmapRange,
+                lookbackDays: settings.lookbackDays
             )
-            legendRow
+
+            // Simplified binary legend
+            HStack(spacing: 12) {
+                HStack(spacing: 4) {
+                    Rectangle()
+                        .fill(streak.metric.accent)
+                        .frame(width: 10, height: 10)
+                    Text("MET")
+                        .font(RetroFont.pixel(8))
+                        .foregroundStyle(Theme.retroInkDim)
+                }
+
+                HStack(spacing: 4) {
+                    Rectangle()
+                        .fill(Theme.retroInkFaint.opacity(0.5))
+                        .frame(width: 10, height: 10)
+                    Text("MISSED")
+                        .font(RetroFont.pixel(8))
+                        .foregroundStyle(Theme.retroInkDim)
+                }
+
+                HStack(spacing: 4) {
+                    Rectangle()
+                        .fill(Theme.retroInkFaint.opacity(0.2))
+                        .frame(width: 10, height: 10)
+                    Text("NO DATA")
+                        .font(RetroFont.pixel(8))
+                        .foregroundStyle(Theme.retroInkDim)
+                }
+
+                Spacer()
+
+                Text("AVG \(String(format: "%.1f", avgHitsPerWeek)) HITS/WK")
+                    .font(RetroFont.pixel(8))
+                    .foregroundStyle(Theme.retroInkDim)
+            }
         }
         .padding(14)
         .pixelPanel(color: streak.metric.accent)
-    }
-
-    private var legendRow: some View {
-        HStack(spacing: 6) {
-            Text("LESS")
-                .font(RetroFont.pixel(8))
-                .foregroundStyle(Theme.retroInkDim)
-            ForEach(0..<4) { i in
-                Rectangle()
-                    .fill(swatchColor(i))
-                    .frame(width: 10, height: 10)
-            }
-            Text("MORE")
-                .font(RetroFont.pixel(8))
-                .foregroundStyle(Theme.retroInkDim)
-            Spacer()
-            Text("AVG \(String(format: "%.1f", avgHitsPerWeek)) HITS/WK")
-                .font(RetroFont.pixel(8))
-                .foregroundStyle(Theme.retroInkDim)
-        }
-    }
-
-    private func swatchColor(_ i: Int) -> Color {
-        let accent = streak.metric.accent
-        switch i {
-        case 0: return Theme.retroInkFaint.opacity(0.5)
-        case 1: return accent.opacity(0.3)
-        case 2: return accent.opacity(0.6)
-        default: return accent
-        }
     }
 
     private var avgHitsPerWeek: Double {
@@ -648,5 +673,20 @@ struct StreakDetailView: View {
         .padding(.vertical, 8)
         .padding(.horizontal, active ? 8 : 0)
         .background(active ? streak.metric.accent.opacity(0.1) : .clear)
+    }
+
+    // MARK: - Date formatting helpers
+
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        return formatter.string(from: date)
+    }
+
+    private func formatDayOfWeek(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE"
+        return formatter.string(from: date)
     }
 }
