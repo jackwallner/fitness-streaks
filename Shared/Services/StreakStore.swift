@@ -34,6 +34,7 @@ final class StreakStore: ObservableObject {
     @Published var loadProgress: Double = 0
     @Published var loadStage: LoadStage = .idle
     @Published var lastUpdated: Date? = nil
+    @Published var isRefreshing: Bool = false
 
     var hero: Streak? { streaks.first }
     var badges: [Streak] { Array(streaks.dropFirst()) }
@@ -78,9 +79,22 @@ final class StreakStore: ObservableObject {
         SnapshotStore.save(snapshot)
     }
 
+    func refreshIfNeeded(force: Bool = false) async {
+        if isLoading || isRefreshing { return }
+        let stale = lastUpdated.map { Date().timeIntervalSince($0) > 60 } ?? true
+        guard force || stale else { return }
+        isRefreshing = true
+        defer { isRefreshing = false }
+        await load(allowCachedSnapshot: !streaks.isEmpty)
+    }
+
     /// Fetches fresh history from HealthKit, runs the engine, updates published state + widget snapshot.
-    func load() async {
-        isLoading = true
+    func load(allowCachedSnapshot: Bool = false) async {
+        if isLoading { return }
+        if allowCachedSnapshot, streaks.isEmpty, let snapshot = SnapshotStore.load() {
+            restore(snapshot)
+        }
+        isLoading = streaks.isEmpty
         withAnimation(.linear(duration: 0.2)) {
             loadStage = .readingHistory
             loadProgress = 0.05
@@ -137,7 +151,7 @@ final class StreakStore: ObservableObject {
                 history: enriched,
                 hourlySteps: hourly,
                 hiddenMetrics: settings.hiddenMetrics,
-                vibe: settings.vibe,
+                intensity: settings.intensity,
                 lookbackDays: settings.lookbackDays,
                 committedThresholds: settings.committedThresholds,
                 customStreaks: settings.customStreaks,
@@ -150,7 +164,7 @@ final class StreakStore: ObservableObject {
                     history: enriched,
                     hourlySteps: hourly,
                     hiddenMetrics: settings.hiddenMetrics,
-                    vibe: settings.vibe,
+                    intensity: settings.intensity,
                     lookbackDays: settings.lookbackDays,
                     committedThresholds: settings.committedThresholds,
                     customStreaks: settings.customStreaks,
@@ -188,7 +202,7 @@ final class StreakStore: ObservableObject {
                     history: cached,
                     hourlySteps: hourly,
                     hiddenMetrics: settings.hiddenMetrics,
-                    vibe: settings.vibe,
+                    intensity: settings.intensity,
                     lookbackDays: settings.lookbackDays,
                     committedThresholds: settings.committedThresholds,
                     customStreaks: settings.customStreaks,
@@ -201,6 +215,33 @@ final class StreakStore: ObservableObject {
                 persistCurrentSnapshot()
             }
         }
+    }
+
+    private func restore(_ snapshot: StreakSnapshot) {
+        let restored = ([snapshot.hero].compactMap { $0 } + snapshot.badges).compactMap { item -> Streak? in
+            guard let metric = item.streakMetric else { return nil }
+            let workoutMeasure = item.workoutMeasureValue
+            return Streak(
+                customID: item.customID,
+                metric: metric,
+                cadence: item.streakCadence,
+                threshold: item.threshold,
+                window: item.hourWindow.map { HourWindow(startHour: $0) },
+                workoutType: item.workoutType,
+                workoutMeasure: workoutMeasure,
+                current: item.current,
+                best: item.best,
+                startDate: nil,
+                lastHitDate: nil,
+                currentUnitCompleted: item.currentUnitCompleted,
+                currentUnitProgress: item.currentUnitProgress,
+                currentUnitValue: item.currentUnitValue
+            )
+        }
+        guard !restored.isEmpty else { return }
+        streaks = restored
+        allCandidates = restored
+        lastUpdated = snapshot.updated
     }
 
     private func handleBreaks(

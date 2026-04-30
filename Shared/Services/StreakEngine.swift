@@ -8,7 +8,7 @@ import Foundation
 ///   3. For each candidate, compute the daily completion rate and current streak.
 ///   4. Pick the threshold whose completion rate is CLOSEST to vibe.targetCompletionRate.
 ///   5. Only surface the metric if the best completion rate is within ±10pp of target.
-///   6. Rank all surviving streaks by `vibeScore`.
+///   6. Rank all surviving streaks by `intensityScore`.
 ///   7. The top-scoring streak becomes the hero; the next N are badges.
 ///
 /// "Current" counts today only if it already met the threshold.
@@ -35,7 +35,7 @@ enum StreakEngine {
         history: [ActivityDay],
         hourlySteps: [Date: [Int: Double]] = [:],
         hiddenMetrics: Set<StreakMetric> = [],
-        vibe: DiscoveryVibe = .challenging,
+        intensity: DiscoveryIntensity = .challenging,
         lookbackDays: Int = 30,
         committedThresholds: [String: Double] = [:],
         customStreaks: [CustomStreak] = [],
@@ -59,7 +59,7 @@ enum StreakEngine {
                 recentHistory: recentHistory,
                 byDay: byDay,
                 today: today,
-                target: vibe.targetCompletionRate,
+                target: intensity.targetCompletionRate,
                 tolerance: completionTolerance,
                 committedThresholds: committedThresholds,
                 gracePreservations: gracePreservations,
@@ -85,7 +85,7 @@ enum StreakEngine {
             }
         found.append(contentsOf: custom)
 
-        return found.sorted { vibeScore($0, vibe: vibe) > vibeScore($1, vibe: vibe) }
+        return found.sorted { intensityScore($0, intensity: intensity) > intensityScore($1, intensity: intensity) }
     }
 
     static func snapshot(from streaks: [Streak]) -> StreakSnapshot {
@@ -233,11 +233,11 @@ enum StreakEngine {
         return nil
     }
 
-    /// Score tuned per vibe — drives which streak becomes hero and badge ordering.
-    /// Since smart discovery already targets the vibe's completion rate, the score
+    /// Score tuned per intensity — drives which streak becomes hero and badge ordering.
+    /// Since smart discovery already targets the intensity's completion rate, the score
     /// mainly differentiates by streak length and metric weight, with a small
     /// bonus for lower completion rates (harder thresholds).
-    static func vibeScore(_ s: Streak, vibe: DiscoveryVibe) -> Double {
+    static func intensityScore(_ s: Streak, intensity: DiscoveryIntensity) -> Double {
         let len = Double(s.current)
         let weight = s.metric.weight
         let difficulty = 1.0 + (1.0 - s.completionRate) * 0.5
@@ -267,12 +267,12 @@ enum StreakEngine {
     static func discoverHourWindows(
         hourlySteps: [Date: [Int: Double]],
         today: Date,
-        vibe: DiscoveryVibe,
+        intensity: DiscoveryIntensity,
         committedThresholds: [String: Double] = [:],
         gracePreservations: [String: GracePreservation] = [:]
     ) -> [Streak] {
         var perHourBest: [(Int, Streak)] = []
-        let target = vibe.targetCompletionRate
+        let target = intensity.targetCompletionRate
 
         for hour in 0..<24 {
             let window = HourWindow(startHour: hour)
@@ -375,9 +375,9 @@ enum StreakEngine {
             perHourBest.append((hour, streak))
         }
 
-        // Sort hours by vibe score, then pick up to 3 non-adjacent hours so we don't
+        // Sort hours by intensity score, then pick up to 3 non-adjacent hours so we don't
         // show "4–5pm" and "5–6pm" both (same walk, different slicing).
-        let ranked = perHourBest.sorted { vibeScore($0.1, vibe: vibe) > vibeScore($1.1, vibe: vibe) }
+        let ranked = perHourBest.sorted { intensityScore($0.1, intensity: intensity) > intensityScore($1.1, intensity: intensity) }
 
         var picked: [(Int, Streak)] = []
         for candidate in ranked {

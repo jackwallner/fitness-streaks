@@ -158,15 +158,19 @@ struct Streak: Identifiable, Hashable, Sendable {
     }
 
     /// Format a raw current-unit value for the hero charge readout.
+    /// Truncates (floors) on display so the user never sees "3.8/3.8" or "10k/10k"
+    /// while still short — rounding up would imply the goal is met when it isn't.
     func format(currentUnitValue: Double) -> String {
         if let measure = workoutMeasure {
             switch measure {
-            case .count: return "\(Int(currentUnitValue.rounded()))"
-            case .minutes: return "\(Int(currentUnitValue.rounded()))"
-            case .miles: return String(format: currentUnitValue < 10 ? "%.1f" : "%.0f", currentUnitValue)
+            case .count: return "\(Int(currentUnitValue))"
+            case .minutes: return "\(Int(currentUnitValue))"
+            case .miles:
+                let truncated = floor(currentUnitValue * 10) / 10
+                return String(format: truncated < 10 ? "%.1f" : "%.0f", truncated)
             }
         }
-        return metric.format(value: currentUnitValue)
+        return metric.formatTruncating(value: currentUnitValue)
     }
 
     var unitLabel: String {

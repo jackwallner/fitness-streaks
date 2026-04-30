@@ -129,14 +129,33 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
         }
     }
 
+    /// Truncating (floor) variant — used for live "current value" displays so users
+    /// never see "10k/10k" while still under the threshold. Round-up rendering of
+    /// progress is misleading.
+    func formatTruncating(value: Double) -> String {
+        switch self {
+        case .steps, .activeEnergy, .totalCalories, .earlySteps:
+            return "\(Int(floor(value)))"
+        case .exerciseMinutes, .standHours, .flightsClimbed, .mindfulMinutes, .heartRateMinutes:
+            return "\(Int(floor(value)))"
+        case .workouts:
+            return value >= 1 ? "\(Int(floor(value)))" : "0"
+        case .sleepHours:
+            let truncated = floor(value * 10) / 10
+            return String(format: "%.1f", truncated)
+        case .distanceMiles:
+            let truncated = floor(value * 10) / 10
+            return String(format: truncated < 10 ? "%.1f" : "%.0f", truncated)
+        case .intensityRatio:
+            let truncated = floor(value * 10) / 10
+            return String(format: "%.1f", truncated)
+        }
+    }
+
     func format(value: Double) -> String {
         switch self {
         case .steps, .activeEnergy:
             let v = Int(value.rounded())
-            if v >= 1000 {
-                let k = Double(v) / 1000.0
-                return String(format: k.truncatingRemainder(dividingBy: 1) == 0 ? "%.0fk" : "%.1fk", k)
-            }
             return "\(v)"
         case .exerciseMinutes, .standHours, .flightsClimbed, .mindfulMinutes:
             return "\(Int(value.rounded()))"
@@ -148,10 +167,6 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
             return String(format: value < 10 ? "%.1f" : "%.0f", value)
         case .earlySteps:
             let v = Int(value.rounded())
-            if v >= 1000 {
-                let k = Double(v) / 1000.0
-                return String(format: k.truncatingRemainder(dividingBy: 1) == 0 ? "%.0fk" : "%.1fk", k)
-            }
             return "\(v)"
         case .intensityRatio:
             return String(format: "%.1f", value)
@@ -159,10 +174,6 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
             return "\(Int(value.rounded()))"
         case .totalCalories:
             let v = Int(value.rounded())
-            if v >= 1000 {
-                let k = Double(v) / 1000.0
-                return String(format: k.truncatingRemainder(dividingBy: 1) == 0 ? "%.0fk" : "%.1fk", k)
-            }
             return "\(v)"
         }
     }

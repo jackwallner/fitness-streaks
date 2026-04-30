@@ -44,24 +44,24 @@ final class StreakEngineTests: XCTestCase {
         let discovered = StreakEngine.discover(
             history: history,
             hiddenMetrics: [.steps],
-            vibe: .challenging,
+            intensity: .challenging,
             now: today
         )
 
         XCTAssertFalse(discovered.contains { $0.metric == .steps })
     }
 
-    func testHourWindowVibeScoreUsesHourlyThresholdTiers() {
+    func testHourWindowIntensityScoreUsesHourlyThresholdTiers() {
         let low = streak(metric: .steps, cadence: .daily, threshold: 250, current: 6, window: HourWindow(startHour: 10))
         let high = streak(metric: .steps, cadence: .daily, threshold: 3_000, current: 6, window: HourWindow(startHour: 11))
 
         XCTAssertGreaterThan(
-            StreakEngine.vibeScore(high, vibe: .lifeChanging),
-            StreakEngine.vibeScore(low, vibe: .lifeChanging)
+            StreakEngine.intensityScore(high, intensity: .lifeChanging),
+            StreakEngine.intensityScore(low, intensity: .lifeChanging)
         )
     }
 
-    func testCompletionRatePicksThresholdMatchingVibe() {
+    func testCompletionRatePicksThresholdMatchingIntensity() {
         let today = day(2026, 4, 26)
 
         // Sustainable test data: 8 of 10 days at 10k (today included), last 2 at 2k.
@@ -70,7 +70,7 @@ final class StreakEngineTests: XCTestCase {
             let steps: Double = offset < 8 ? 10_000 : 2_000
             return activity(DateHelpers.addDays(-offset, to: today), steps: steps)
         }
-        let sustainable = StreakEngine.discover(history: historySust, vibe: .sustainable, now: today)
+        let sustainable = StreakEngine.discover(history: historySust, intensity: .sustainable, now: today)
         let sSust = sustainable.first { $0.metric == .steps }
         XCTAssertEqual(sSust?.threshold, 10_000)
         XCTAssertEqual(sSust?.completionRate ?? 0, 0.80, accuracy: 0.001)
@@ -81,7 +81,7 @@ final class StreakEngineTests: XCTestCase {
             let steps: Double = offset < 5 ? 15_000 : 1_000
             return activity(DateHelpers.addDays(-offset, to: today), steps: steps)
         }
-        let lifeChanging = StreakEngine.discover(history: historyLife, vibe: .lifeChanging, now: today)
+        let lifeChanging = StreakEngine.discover(history: historyLife, intensity: .lifeChanging, now: today)
         let sLife = lifeChanging.first { $0.metric == .steps }
         XCTAssertEqual(sLife?.threshold, 15_000)
         XCTAssertEqual(sLife?.completionRate ?? 0, 0.50, accuracy: 0.001)
@@ -96,7 +96,7 @@ final class StreakEngineTests: XCTestCase {
             activity(DateHelpers.addDays(-2, to: today), exerciseMinutes: 30, activeEnergy: 180), // 6.0
         ]
 
-        let discovered = StreakEngine.discover(history: history, vibe: .challenging, now: today)
+        let discovered = StreakEngine.discover(history: history, intensity: .challenging, now: today)
         let intensity = discovered.first { $0.metric == StreakMetric.intensityRatio }
         XCTAssertNotNil(intensity)
         XCTAssertEqual(intensity?.currentUnitValue ?? 0, 10.0, accuracy: 0.001)
@@ -111,7 +111,7 @@ final class StreakEngineTests: XCTestCase {
             return activity(DateHelpers.addDays(-offset, to: today), heartRateMinutes: hr)
         }
 
-        let discovered = StreakEngine.discover(history: history, vibe: .challenging, now: today)
+        let discovered = StreakEngine.discover(history: history, intensity: .challenging, now: today)
         let hr = discovered.first { $0.metric == StreakMetric.heartRateMinutes }
         XCTAssertNotNil(hr)
         XCTAssertEqual(hr?.current ?? 0, 5)

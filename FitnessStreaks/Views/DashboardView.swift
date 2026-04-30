@@ -24,8 +24,8 @@ struct DashboardView: View {
                     topBar
                         .padding(.top, 4)
 
-                    if !settings.recentlyBroken.isEmpty {
-                        ForEach(settings.recentlyBroken.prefix(3)) { broken in
+                    if !visibleBrokenStreaks.isEmpty {
+                        ForEach(visibleBrokenStreaks.prefix(3)) { broken in
                             brokenBanner(broken)
                                 .padding(.horizontal, 6)
                         }
@@ -90,6 +90,19 @@ struct DashboardView: View {
 
     private var visibleBadges: [Streak] {
         store.badges
+    }
+
+    /// Hide broken-streak banners for metrics the user has turned off in Settings,
+    /// or that are no longer in the tracked-set — keeping a "STREAK ENDED" banner
+    /// for a metric the user already disabled would be confusing.
+    private var visibleBrokenStreaks: [BrokenStreak] {
+        settings.recentlyBroken.filter { broken in
+            guard !settings.isHidden(broken.metric) else { return false }
+            if let tracked = settings.trackedStreaks {
+                return tracked.contains(broken.key)
+            }
+            return true
+        }
     }
 
     private var shouldShowAtRisk: Bool {

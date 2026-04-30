@@ -57,13 +57,13 @@ struct FitnessStreaksApp: App {
                 .environmentObject(store)
                 .task {
                     await healthKit.synchronizeAuthorization()
-                    await store.load()
+                    await store.load(allowCachedSnapshot: true)
                 }
                 .onChange(of: scenePhase) { _, phase in
                     guard phase == .active else { return }
-                    let stale = store.lastUpdated.map { Date().timeIntervalSince($0) > 60 } ?? true
-                    guard stale else { return }
-                    Task { await store.load() }
+                    Task(priority: .utility) {
+                        await store.refreshIfNeeded()
+                    }
                 }
         }
         .modelContainer(DataService.sharedModelContainer)
@@ -79,7 +79,7 @@ struct FitnessStreaksApp: App {
     private static func handleAppRefresh(_ task: BGAppRefreshTask) {
         scheduleAppRefresh()
         let work = Task { @MainActor in
-            await StreakStore.shared.load()
+            await StreakStore.shared.refreshIfNeeded(force: true)
             return true
         }
         task.expirationHandler = { work.cancel() }

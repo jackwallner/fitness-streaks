@@ -6,19 +6,26 @@ struct SettingsView: View {
     @EnvironmentObject var store: StreakStore
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     @State private var showingPicker = false
     @State private var notificationsBlockedBySystem = false
+    @State private var showingRecalibrateAllConfirm = false
+    @State private var recalibrateAllMessage: String? = nil
+
+    private static let lookbackOptions: [Int] = [7, 30, 90, 180, 365]
+    private static let coachServicesURL = URL(string: "https://www.e3fit.me/#services")!
+    private static let coachContactURL = URL(string: "https://www.e3fit.me/#contact")!
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     appearanceSection
-                    vibeSection
+                    intensitySection
                     notificationsSection
-                    graceSection
                     metricsSection
                     dataSection
+                    coachSection
                     aboutSection
 
                     Text("Changes save automatically.")
@@ -27,7 +34,7 @@ struct SettingsView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.top, 8)
 
-                    Text("READ-ONLY · LOCAL-ONLY · NO NETWORK")
+                    Text("READ-ONLY · HEALTH DATA LOCAL-ONLY")
                         .font(RetroFont.pixel(8))
                         .tracking(2)
                         .foregroundStyle(Theme.retroInkFaint)
@@ -63,6 +70,9 @@ struct SettingsView: View {
                     .environmentObject(settings)
                     .environmentObject(store)
             }
+            .onChange(of: store.isLoading) { _, isLoading in
+                if !isLoading { recalibrateAllMessage = nil }
+            }
         }
     }
 
@@ -90,33 +100,66 @@ struct SettingsView: View {
         }
     }
 
-    // MARK: - Vibe
+    // MARK: - Intensity
 
-    private var vibeSection: some View {
+    private var intensitySection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Streak Vibe")
+            PixelSectionHeader(title: "Intensity")
             HStack(spacing: 0) {
-                ForEach(DiscoveryVibe.allCases, id: \.rawValue) { v in
+                ForEach(DiscoveryIntensity.allCases, id: \.rawValue) { v in
                     Button {
-                        settings.vibe = v
+                        settings.intensity = v
                         Task { await store.load() }
                     } label: {
                         Text(v.short.uppercased())
                             .font(RetroFont.mono(9, weight: .bold))
-                            .foregroundStyle(settings.vibe == v ? Theme.retroBg : Theme.retroInk)
+                            .foregroundStyle(settings.intensity == v ? Theme.retroBg : Theme.retroInk)
                             .padding(.vertical, 10)
                             .padding(.horizontal, 4)
                             .frame(maxWidth: .infinity)
-                            .background(settings.vibe == v ? Theme.retroMagenta : Color.clear)
-                            .overlay(Rectangle().stroke(settings.vibe == v ? Theme.retroMagenta : Theme.retroInkFaint, lineWidth: 2))
+                            .background(settings.intensity == v ? Theme.retroMagenta : Color.clear)
+                            .overlay(Rectangle().stroke(settings.intensity == v ? Theme.retroMagenta : Theme.retroInkFaint, lineWidth: 2))
                     }
                     .buttonStyle(.plain)
                 }
             }
-            Text(settings.vibe.tagline)
+            Text(settings.intensity.tagline)
                 .font(RetroFont.mono(10))
                 .foregroundStyle(Theme.retroInkDim)
                 .padding(.horizontal, 6)
+
+            Button {
+                showingRecalibrateAllConfirm = true
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "arrow.triangle.2.circlepath")
+                    Text("RECALIBRATE ALL GOALS")
+                        .font(RetroFont.mono(10, weight: .bold))
+                        .tracking(1)
+                    Spacer()
+                    if recalibrateAllMessage != nil {
+                        Text(recalibrateAllMessage ?? "")
+                            .font(RetroFont.mono(9))
+                            .foregroundStyle(Theme.retroInkDim)
+                            .lineLimit(1)
+                    }
+                }
+                .foregroundStyle(Theme.retroCyan)
+                .padding(14)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .buttonStyle(.plain)
+            .pixelPanel(color: Theme.retroCyan)
+            .alert("Recalibrate All Goals?", isPresented: $showingRecalibrateAllConfirm) {
+                Button("Recalibrate (Apple Health)", role: .destructive) {
+                    settings.committedThresholds = [:]
+                    recalibrateAllMessage = "RECALIBRATING…"
+                    Task { await store.load() }
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This re-derives every goal from your recent Apple Health activity. If new goals are higher than current ones, you may lose those streaks.")
+            }
 
             Button {
                 showingPicker = true
@@ -138,32 +181,40 @@ struct SettingsView: View {
             .buttonStyle(.plain)
             .pixelPanel(color: Theme.retroInkFaint)
 
-            HStack {
-                Text("DISCOVERY WINDOW")
-                    .font(RetroFont.mono(10, weight: .bold))
-                    .foregroundStyle(Theme.retroInk)
-                Spacer()
-                Text("\(settings.lookbackDays) days")
-                    .font(RetroFont.mono(11, weight: .bold))
-                    .foregroundStyle(Theme.retroMagenta)
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("DISCOVERY WINDOW")
+                        .font(RetroFont.mono(10, weight: .bold))
+                        .foregroundStyle(Theme.retroInk)
+                    Spacer()
+                    Text("\(settings.lookbackDays) DAYS")
+                        .font(RetroFont.mono(11, weight: .bold))
+                        .foregroundStyle(Theme.retroMagenta)
+                }
+                HStack(spacing: 6) {
+                    ForEach(Self.lookbackOptions, id: \.self) { value in
+                        Button {
+                            guard settings.lookbackDays != value else { return }
+                            settings.lookbackDays = value
+                            Task { await store.load() }
+                        } label: {
+                            Text("\(value)")
+                                .font(RetroFont.mono(10, weight: .bold))
+                                .foregroundStyle(settings.lookbackDays == value ? Theme.retroBg : Theme.retroInk)
+                                .padding(.vertical, 8)
+                                .frame(maxWidth: .infinity)
+                                .background(settings.lookbackDays == value ? Theme.retroMagenta : Color.clear)
+                                .overlay(Rectangle().stroke(settings.lookbackDays == value ? Theme.retroMagenta : Theme.retroInkFaint, lineWidth: 2))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                Text("How many days of history we use when suggesting new goals. Existing streaks stay locked at their committed value.")
+                    .font(RetroFont.mono(10))
+                    .foregroundStyle(Theme.retroInkDim)
             }
-            .padding(.horizontal, 14)
+            .padding(.horizontal, 6)
             .padding(.top, 4)
-
-            Slider(value: Binding(
-                get: { Double(settings.lookbackDays) },
-                set: { settings.lookbackDays = Int($0.rounded()) }
-            ), in: 7...365, step: 1)
-            .tint(Theme.retroMagenta)
-            .padding(.horizontal, 14)
-            .onChange(of: settings.lookbackDays) { _, _ in
-                Task { await store.load() }
-            }
-
-            Text("How many days of history we use when suggesting new streak thresholds. Existing streaks stay locked at their committed value.")
-                .font(RetroFont.mono(10))
-                .foregroundStyle(Theme.retroInkDim)
-                .padding(.horizontal, 14)
         }
     }
 
@@ -282,7 +333,6 @@ struct SettingsView: View {
         case .granted:
             settings.notificationsEnabled = true
             notificationsBlockedBySystem = false
-            // Don't wait for the next refresh — schedule using the current streaks immediately.
             await NotificationService.scheduleDailyReminder(for: store.streaks)
         case .denied:
             settings.notificationsEnabled = false
@@ -293,38 +343,14 @@ struct SettingsView: View {
         }
     }
 
-    private var graceSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Streak Protection")
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("EARN GRACE DAYS")
-                        .font(RetroFont.pixel(10))
-                        .foregroundStyle(Theme.retroInk)
-                    Text("\(settings.earnedGraceDays) banked · +1 every 30 days")
-                        .font(RetroFont.mono(10))
-                        .foregroundStyle(Theme.retroInkDim)
-                }
-                Spacer()
-                PixelToggle(isOn: $settings.graceDaysEnabled, accent: Theme.retroLime)
-            }
-            .padding(14)
-            .pixelPanel(color: Theme.retroInkFaint)
-
-            Text("When enabled, each 30-day run earns one grace day that can automatically preserve a streak after one missed day.")
-                .font(RetroFont.mono(10))
-                .foregroundStyle(Theme.retroInkDim)
-                .padding(.horizontal, 6)
-        }
-    }
-
     // MARK: - Metrics
 
     private var metricsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             PixelSectionHeader(title: "Metrics Tracked")
             VStack(spacing: 0) {
-                ForEach(Array(StreakMetric.allCases.enumerated()), id: \.offset) { idx, metric in
+                let visibleMetrics = StreakMetric.allCases.filter { $0 != .earlySteps }
+                ForEach(Array(visibleMetrics.enumerated()), id: \.offset) { idx, metric in
                     HStack(spacing: 10) {
                         Image(systemName: metric.symbol)
                             .font(.system(size: 16, weight: .semibold))
@@ -338,8 +364,12 @@ struct SettingsView: View {
                         PixelToggle(isOn: Binding(
                             get: { !settings.isHidden(metric) },
                             set: { on in
-                                if on { settings.hiddenMetrics.remove(metric) }
-                                else { settings.hiddenMetrics.insert(metric) }
+                                if on {
+                                    settings.hiddenMetrics.remove(metric)
+                                } else {
+                                    settings.hiddenMetrics.insert(metric)
+                                    untrackStreaks(for: metric)
+                                }
                                 Task { await store.load() }
                             }
                         ), accent: metric.accent)
@@ -349,12 +379,28 @@ struct SettingsView: View {
                     .accessibilityElement(children: .combine)
                     .accessibilityLabel("\(metric.displayName) tracking")
                     .accessibilityValue(!settings.isHidden(metric) ? "On" : "Off")
-                    if idx < StreakMetric.allCases.count - 1 {
+                    if idx < visibleMetrics.count - 1 {
                         dashedLine
                     }
                 }
             }
             .pixelPanel(color: Theme.retroInkFaint)
+        }
+    }
+
+    /// When the user hides a metric, drop any tracked streaks that depend on it
+    /// so the broken-streak banner doesn't surface for a metric they've turned off.
+    private func untrackStreaks(for metric: StreakMetric) {
+        let keysToRemove = store.allCandidates
+            .filter { $0.metric == metric }
+            .map(\.trackingKey)
+        guard !keysToRemove.isEmpty else { return }
+        var tracked = settings.trackedStreaks ?? Set(store.allCandidates.map(\.trackingKey))
+        for key in keysToRemove { tracked.remove(key) }
+        settings.trackedStreaks = tracked
+        for key in keysToRemove {
+            settings.recentlyBroken.removeAll { $0.key == key }
+            settings.committedThresholds.removeValue(forKey: key)
         }
     }
 
@@ -387,6 +433,146 @@ struct SettingsView: View {
             .buttonStyle(.plain)
             .pixelPanel(color: Theme.retroInkFaint)
         }
+    }
+
+    // MARK: - Coach (Elsa)
+
+    private var coachSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            PixelSectionHeader(title: "Coaching")
+
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .top, spacing: 12) {
+                    Image("ElsaCoach")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 62, height: 78)
+                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                .strokeBorder(Color.white.opacity(colorScheme == .dark ? 0.08 : 0.45), lineWidth: 1)
+                        }
+                        .accessibilityHidden(true)
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Need a coach?")
+                            .font(.system(.headline, design: .rounded, weight: .bold))
+                            .foregroundStyle(coachTitleColor)
+
+                        Text("Virtual personal training and nutrition coaching with Elsa.")
+                            .font(.system(.subheadline, design: .rounded))
+                            .foregroundStyle(coachSecondaryColor)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Spacer(minLength: 0)
+                }
+
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 8) {
+                        coachTag(title: "Virtual sessions", systemImage: "video.fill", tint: CoachBrand.aquamarine)
+                        coachTag(title: "Custom plans", systemImage: "checklist", tint: CoachBrand.dustyRose)
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        coachTag(title: "Virtual sessions", systemImage: "video.fill", tint: CoachBrand.aquamarine)
+                        coachTag(title: "Custom plans", systemImage: "checklist", tint: CoachBrand.dustyRose)
+                    }
+                }
+
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 10) {
+                        coachLinkButton(title: "Contact Elsa", systemImage: "arrow.up.right", destination: Self.coachContactURL, prominent: true)
+                        coachLinkButton(title: "View services", systemImage: "list.bullet.clipboard", destination: Self.coachServicesURL, prominent: false)
+                    }
+
+                    VStack(spacing: 10) {
+                        coachLinkButton(title: "Contact Elsa", systemImage: "arrow.up.right", destination: Self.coachContactURL, prominent: true)
+                        coachLinkButton(title: "View services", systemImage: "list.bullet.clipboard", destination: Self.coachServicesURL, prominent: false)
+                    }
+                }
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(coachBackgroundGradient, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .strokeBorder(coachBorderColor, lineWidth: 1)
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Need a coach? Virtual personal training and nutrition coaching with Elsa.")
+        }
+    }
+
+    private var coachBackgroundGradient: LinearGradient {
+        LinearGradient(
+            colors: colorScheme == .dark
+                ? [CoachBrand.nearBlack, CoachBrand.nearBlack.opacity(0.88)]
+                : [CoachBrand.coconutCream, .white],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    private var coachTitleColor: Color {
+        colorScheme == .dark ? CoachBrand.coconutCream : CoachBrand.nearBlack
+    }
+
+    private var coachSecondaryColor: Color {
+        colorScheme == .dark ? CoachBrand.coconutCream.opacity(0.72) : CoachBrand.nearBlack.opacity(0.68)
+    }
+
+    private var coachBorderColor: Color {
+        colorScheme == .dark ? CoachBrand.aquamarine.opacity(0.24) : CoachBrand.dustyRose.opacity(0.18)
+    }
+
+    private func coachTag(title: String, systemImage: String, tint: Color) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: systemImage)
+                .font(.system(.caption, design: .rounded, weight: .bold))
+            Text(title)
+                .font(.system(.caption, design: .rounded, weight: .medium))
+        }
+        .foregroundStyle(coachTitleColor)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(tint.opacity(colorScheme == .dark ? 0.18 : 0.12), in: Capsule())
+    }
+
+    private func coachLinkButton(title: String, systemImage: String, destination: URL, prominent: Bool) -> some View {
+        Link(destination: destination) {
+            HStack(spacing: 8) {
+                Text(title)
+                Image(systemName: systemImage)
+                    .font(.system(.caption, design: .rounded, weight: .bold))
+            }
+            .font(.system(.subheadline, design: .rounded, weight: .semibold))
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .padding(.horizontal, 14)
+            .background(coachLinkBackground(prominent: prominent), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay {
+                if !prominent {
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .strokeBorder(coachLinkBorder, lineWidth: 1)
+                }
+            }
+            .foregroundStyle(coachLinkForeground(prominent: prominent))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func coachLinkBackground(prominent: Bool) -> Color {
+        if prominent { return CoachBrand.dustyRose }
+        return colorScheme == .dark ? CoachBrand.nearBlack.opacity(0.24) : .white.opacity(0.7)
+    }
+
+    private func coachLinkForeground(prominent: Bool) -> Color {
+        if prominent { return .white }
+        return coachTitleColor
+    }
+
+    private var coachLinkBorder: Color {
+        colorScheme == .dark ? CoachBrand.aquamarine.opacity(0.22) : CoachBrand.nearBlack.opacity(0.08)
     }
 
     // MARK: - About

@@ -9,17 +9,16 @@ struct StreakDetailView: View {
 
     @State private var showingRecalibrateConfirm = false
     @State private var showingCustomBuilder = false
+    @State private var showingUntrackConfirm = false
 
     var isHero: Bool { store.hero?.id == streak.id }
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
+            VStack(spacing: 12) {
                 headerCard.padding(.horizontal, 14)
-                todayCard.padding(.horizontal, 14)
                 if let actionMessage { statusCard(actionMessage).padding(.horizontal, 14) }
-                if canRecalibrate { recalibrateCard.padding(.horizontal, 14) }
-                if !isHero { makePrimaryCard.padding(.horizontal, 14) }
+                quickActionsCard.padding(.horizontal, 14)
 
                 if streak.window != nil {
                     hourWindowExplainer.padding(.horizontal, 14)
@@ -30,12 +29,14 @@ struct StreakDetailView: View {
 
                     heatmapCard.padding(.horizontal, 14)
                     statsRow.padding(.horizontal, 14)
-
-                    weekdayHistogram.padding(.horizontal, 14)
-                    thresholdLadder.padding(.horizontal, 14)
                 }
             }
             .padding(.vertical, 16)
+        }
+        .onChange(of: store.isLoading) { _, isLoading in
+            if !isLoading, actionMessage?.contains("Recalibrat") == true {
+                actionMessage = "Recalibrated."
+            }
         }
         .background(Theme.retroBg.ignoresSafeArea())
         .navigationBarTitleDisplayMode(.inline)
@@ -62,37 +63,86 @@ struct StreakDetailView: View {
     // MARK: - Header
 
     private var headerCard: some View {
-        VStack(spacing: 10) {
-            Image(systemName: streak.metric.symbol)
-                .font(.system(size: 28, weight: .semibold))
-                .foregroundStyle(streak.metric.accent)
-                .shadow(color: streak.metric.accent.opacity(0.6), radius: 10)
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .top, spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(toolbarTitle)
+                        .font(RetroFont.mono(18, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(streak.metric.accent)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                    Text(headerProse)
+                        .font(RetroFont.mono(11))
+                        .foregroundStyle(Theme.retroInkDim)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.8)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: streak.displaySymbol)
+                    .font(.system(size: 30, weight: .semibold))
+                    .foregroundStyle(streak.metric.accent)
+                    .shadow(color: streak.metric.accent.opacity(0.6), radius: 10)
+                    .frame(width: 36, height: 36)
+            }
 
-            Text("\(streak.current)")
-                .font(RetroFont.pixel(72))
-                .tracking(2)
-                .foregroundStyle(streak.metric.accent)
-                .retroGlow(streak.metric.accent)
-                .minimumScaleFactor(0.5)
-                .lineLimit(1)
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text(streak.format(currentUnitValue: streak.currentUnitValue))
+                    .font(RetroFont.mono(42, weight: .bold))
+                    .foregroundStyle(streak.currentUnitCompleted ? Theme.retroLime : streak.metric.accent)
+                    .retroGlow(streak.currentUnitCompleted ? Theme.retroLime : streak.metric.accent)
+                    .minimumScaleFactor(0.45)
+                    .lineLimit(1)
+                Text(streak.unitLabel.uppercased())
+                    .font(RetroFont.mono(11, weight: .bold))
+                    .foregroundStyle(Theme.retroInkDim)
+                Spacer(minLength: 0)
+            }
 
-            Text(streak.cadence == .daily ? "DAYS IN A ROW" : "WEEKS IN A ROW")
-                .font(RetroFont.pixel(11))
-                .tracking(2)
-                .foregroundStyle(Theme.retroInk)
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 8) {
+                    Text("of \(streak.format(currentUnitValue: streak.threshold)) \(streak.unitLabel) goal")
+                        .font(RetroFont.mono(12, weight: .medium))
+                        .foregroundStyle(Theme.retroInk)
+                    Spacer(minLength: 0)
+                    Text(streak.currentUnitCompleted ? "LOCKED" : "\(Int(min(1, streak.currentUnitProgress) * 100))%")
+                        .font(RetroFont.mono(10, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(streak.currentUnitCompleted ? Theme.retroLime : Theme.retroAmber)
+                }
+                PixelProgressBar(progress: streak.currentUnitProgress,
+                                 accent: streak.currentUnitCompleted ? Theme.retroLime : Theme.retroAmber)
+            }
 
-            Text(headerProse)
-                .font(RetroFont.mono(12))
-                .foregroundStyle(Theme.retroInkDim)
-                .multilineTextAlignment(.center)
-                .padding(.top, 6)
+            HStack(spacing: 8) {
+                statPill(value: "\(streak.current)", label: streak.current == 1 ? "\(streak.cadence.label) streak" : "\(streak.cadence.pluralLabel) streak", color: streak.metric.accent)
+                statPill(value: "\(streak.best)", label: streak.best == 1 ? "best \(streak.cadence.label)" : "best \(streak.cadence.pluralLabel)", color: Theme.retroAmber)
+            }
         }
-        .padding(.vertical, 22)
+        .padding(.vertical, 16)
         .padding(.horizontal, 16)
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .pixelPanel(color: streak.metric.accent)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(streak.metric.displayName) streak: \(streak.current) \(streak.cadence.pluralLabel) in a row, threshold \(Int(streak.threshold)) \(streak.metric.unitLabel)")
+    }
+
+    private func statPill(value: String, label: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(value)
+                .font(RetroFont.mono(18, weight: .bold))
+                .foregroundStyle(color)
+                .retroGlow(color, radius: 6)
+            Text(label.uppercased())
+                .font(RetroFont.mono(9, weight: .bold))
+                .foregroundStyle(Theme.retroInkDim)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Theme.retroBgCard)
     }
 
     private var toolbarTitle: String {
@@ -216,6 +266,81 @@ struct StreakDetailView: View {
         .pixelPanel(color: Theme.retroCyan)
     }
 
+    private var quickActionsCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("ACTIONS")
+                .font(RetroFont.mono(10, weight: .bold))
+                .tracking(1)
+                .foregroundStyle(Theme.retroInkDim)
+
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 8) {
+                    if !isHero {
+                        compactActionButton(title: "PRIMARY", color: Theme.retroMagenta) {
+                            makePrimary()
+                        }
+                    }
+                    if canRecalibrate {
+                        compactActionButton(title: "RECALIBRATE", color: Theme.retroCyan) {
+                            showingRecalibrateConfirm = true
+                        }
+                    }
+                    compactActionButton(title: "UNTRACK", color: Theme.retroRed) {
+                        showingUntrackConfirm = true
+                    }
+                }
+
+                VStack(spacing: 8) {
+                    if !isHero {
+                        compactActionButton(title: "MAKE PRIMARY", color: Theme.retroMagenta) {
+                            makePrimary()
+                        }
+                    }
+                    if canRecalibrate {
+                        compactActionButton(title: "RECALIBRATE", color: Theme.retroCyan) {
+                            showingRecalibrateConfirm = true
+                        }
+                    }
+                    compactActionButton(title: "UNTRACK", color: Theme.retroRed) {
+                        showingUntrackConfirm = true
+                    }
+                }
+            }
+            .alert("Recalibrate Goal?", isPresented: $showingRecalibrateConfirm) {
+                Button("Recalibrate (Apple Health)", role: .destructive) {
+                    settings.clearCommittedThreshold(for: streak.trackingKey)
+                    Task { await store.load() }
+                    actionMessage = "Recalibrating from Apple Health..."
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Are you sure? This will update your goal based on recent activity. If the new goal is higher, you might lose your streak.")
+            }
+            .alert("Untrack this streak?", isPresented: $showingUntrackConfirm) {
+                Button("Untrack", role: .destructive) { untrack() }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("It will disappear from your dashboard. Your Apple Health history is unchanged — you can re-add it from Settings → Tracked Streaks.")
+            }
+        }
+        .padding(14)
+        .pixelPanel(color: Theme.retroInkFaint)
+    }
+
+    private func compactActionButton(title: String, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(RetroFont.mono(10, weight: .bold))
+                .tracking(1)
+                .foregroundStyle(color)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 9)
+                .padding(.horizontal, 8)
+                .overlay(Rectangle().stroke(color, lineWidth: 2))
+        }
+        .buttonStyle(.plain)
+    }
+
     private var makePrimaryCard: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
@@ -248,6 +373,54 @@ struct StreakDetailView: View {
         .pixelPanel(color: Theme.retroMagenta)
     }
 
+    private var untrackCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("UNTRACK STREAK")
+                        .font(RetroFont.pixel(9))
+                        .tracking(2)
+                        .foregroundStyle(Theme.retroInkDim)
+                    Text("Remove from your dashboard")
+                        .font(RetroFont.mono(11))
+                        .foregroundStyle(Theme.retroInk)
+                }
+                Spacer()
+                Button {
+                    showingUntrackConfirm = true
+                } label: {
+                    Text("UNTRACK")
+                        .font(RetroFont.mono(10, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(Theme.retroRed)
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 10)
+                        .overlay(Rectangle().stroke(Theme.retroRed, lineWidth: 2))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Untrack this streak")
+                .alert("Untrack this streak?", isPresented: $showingUntrackConfirm) {
+                    Button("Untrack", role: .destructive) { untrack() }
+                    Button("Cancel", role: .cancel) {}
+                } message: {
+                    Text("It will disappear from your dashboard. Your Apple Health history is unchanged — you can re-add it from Settings → Tracked Streaks.")
+                }
+            }
+        }
+        .padding(14)
+        .pixelPanel(color: Theme.retroRed)
+    }
+
+    private func untrack() {
+        var tracked = settings.trackedStreaks ?? Set(store.allCandidates.map(\.trackingKey))
+        tracked.remove(streak.trackingKey)
+        settings.trackedStreaks = tracked
+        settings.manualStreakOrder.removeAll { $0 == streak.trackingKey }
+        settings.recentlyBroken.removeAll { $0.key == streak.trackingKey }
+        store.refilter()
+        dismiss()
+    }
+
     private func makePrimary() {
         // Move this streak to front of manual order
         var newOrder = settings.manualStreakOrder.filter { $0 != streak.trackingKey }
@@ -275,7 +448,7 @@ struct StreakDetailView: View {
             history: store.history,
             hourlySteps: store.hourlySteps,
             hiddenMetrics: settings.hiddenMetrics,
-            vibe: settings.vibe,
+            intensity: settings.intensity,
             lookbackDays: settings.lookbackDays,
             committedThresholds: settings.committedThresholds.filter { $0.key != streak.trackingKey },
             customStreaks: settings.customStreaks,
@@ -345,15 +518,15 @@ struct StreakDetailView: View {
         HStack(spacing: 8) {
             statCell(title: "CURRENT",
                      value: "\(streak.current)",
-                     unit: streak.cadence == .daily ? "DAYS" : "WEEKS",
+                     unit: "ACTIVE STREAK",
                      color: streak.metric.accent)
-            statCell(title: "BEST",
+            statCell(title: "RECORD",
                      value: "\(streak.best)",
-                     unit: streak.cadence == .daily ? "DAYS" : "WEEKS",
+                     unit: "BEST STREAK",
                      color: Theme.retroAmber)
             statCell(title: "RATE",
                      value: "\(Int(streak.completionRate * 100))%",
-                     unit: "\(streak.lookbackDays) DAY WINDOW",
+                     unit: "COMPLETION",
                      color: Theme.retroMagenta)
         }
     }

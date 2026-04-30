@@ -3,91 +3,104 @@ import SwiftUI
 struct StreakHero: View {
     let streak: Streak
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .center, spacing: 12) {
-                Image(systemName: streak.displaySymbol)
-                    .font(.system(size: 48, weight: .semibold))
-                    .foregroundStyle(streak.metric.accent)
-                    .retroGlow(streak.metric.accent)
-                    .frame(width: 48, height: 48)
+    private var accent: Color {
+        streak.currentUnitCompleted ? Theme.retroLime : Theme.retroMagenta
+    }
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("PRIMARY STREAK")
-                        .font(RetroFont.mono(9, weight: .bold))
-                        .tracking(2)
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .top, spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(titleText)
+                        .font(RetroFont.mono(17, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(streak.metric.accent)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+
+                    Text(goalContext.uppercased())
+                        .font(RetroFont.mono(10, weight: .bold))
+                        .tracking(1)
                         .foregroundStyle(Theme.retroInkDim)
-                    HStack(alignment: .firstTextBaseline, spacing: 6) {
-                        Text("\(streak.current)")
-                            .font(RetroFont.mono(36, weight: .bold))
-                            .foregroundStyle(Theme.retroMagenta)
-                            .retroGlow(Theme.retroMagenta)
-                            .minimumScaleFactor(0.6)
-                            .lineLimit(1)
-                        Text(streak.cadence == .daily ? "DAYS" : "WKS")
-                            .font(RetroFont.mono(11, weight: .bold))
-                            .foregroundStyle(Theme.retroInk)
-                    }
-                    Text(heroProse)
-                        .font(RetroFont.mono(11))
-                        .foregroundStyle(Theme.retroInk)
                         .lineLimit(1)
                         .minimumScaleFactor(0.75)
                 }
+
+                Spacer(minLength: 0)
+
+                Image(systemName: streak.displaySymbol)
+                    .font(.system(size: 28, weight: .semibold))
+                    .foregroundStyle(streak.metric.accent)
+                    .retroGlow(streak.metric.accent)
+                    .frame(width: 34, height: 34)
             }
 
-            HStack {
-                Text(progressTitle)
-                    .font(RetroFont.mono(9, weight: .bold))
-                    .tracking(2)
-                    .foregroundStyle(Theme.retroInkDim)
-                Spacer()
-                Text(chargeLabel)
-                    .font(RetroFont.mono(9, weight: .bold))
-                    .foregroundStyle(streak.currentUnitCompleted ? Theme.retroLime : Theme.retroAmber)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(currentValue)
+                    .font(RetroFont.mono(44, weight: .bold))
+                    .foregroundStyle(accent)
+                    .retroGlow(accent)
+                    .minimumScaleFactor(0.45)
+                    .lineLimit(1)
+
+                Text(goalLine)
+                    .font(RetroFont.mono(12, weight: .medium))
+                    .foregroundStyle(Theme.retroInk)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
             }
 
-            PixelProgressBar(progress: streak.currentUnitProgress,
-                             accent: streak.currentUnitCompleted ? Theme.retroLime : Theme.retroAmber)
-
-            HStack(spacing: 4) {
-                Text("best \(streak.best) in \(streak.lookbackDays)d")
-                if let s = streak.startDate {
-                    Text("· since \(DateHelpers.shortDate(s).lowercased())")
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 8) {
+                    Text(streakLine)
+                        .font(RetroFont.mono(11, weight: .bold))
+                        .foregroundStyle(Theme.retroInk)
+                    Spacer(minLength: 0)
+                    Text(statusText)
+                        .font(RetroFont.mono(10, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(streak.currentUnitCompleted ? Theme.retroLime : Theme.retroAmber)
                 }
+
+                PixelProgressBar(progress: streak.currentUnitProgress,
+                                 accent: streak.currentUnitCompleted ? Theme.retroLime : Theme.retroAmber)
             }
-            .font(RetroFont.mono(10))
-            .foregroundStyle(Theme.retroInkDim)
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, 14)
+        .padding(.vertical, 16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .pixelPanel(color: Theme.retroMagenta)
+        .pixelPanel(color: accent)
     }
 
-    private var heroProse: String {
+    private var titleText: String {
         if let w = streak.window {
-            let t = streak.metric.format(value: streak.threshold)
-            return "\(t)+ \(streak.metric.unitLabel) between \(w.label)"
+            return "\(streak.displayName.uppercased()) · \(w.label.uppercased())"
         }
-        return streak.prose
+        return streak.displayName.uppercased()
     }
 
-    private var chargeLabel: String {
-        let v = streak.format(currentUnitValue: streak.currentUnitValue)
-        let t = streak.format(currentUnitValue: streak.threshold)
-        return "\(v)/\(t) \(streak.unitLabel.uppercased())"
+    private var currentValue: String {
+        streak.format(currentUnitValue: streak.currentUnitValue)
     }
 
-    private var progressTitle: String {
+    private var goalLine: String {
+        "of \(streak.format(currentUnitValue: streak.threshold)) \(streak.unitLabel) goal"
+    }
+
+    private var goalContext: String {
         if let w = streak.window {
-            return "\(w.label.uppercased()) PROGRESS"
+            return "\(w.label) goal"
         }
-        return "TODAY'S PROGRESS"
+        return streak.cadence == .daily ? "today's goal" : "this week's goal"
     }
 
-    private var intensity: CGFloat {
-        let cap: Double = 30
-        return CGFloat(min(1.0, 0.4 + Double(streak.current) / cap * 0.6))
+    private var streakLine: String {
+        let unit = streak.current == 1 ? streak.cadence.label : streak.cadence.pluralLabel
+        return "\(streak.current) \(unit) streak"
+    }
+
+    private var statusText: String {
+        if streak.currentUnitCompleted { return "LOCKED" }
+        return "\(Int(min(1, streak.currentUnitProgress) * 100))% COMPLETE"
     }
 }

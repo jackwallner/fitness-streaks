@@ -32,15 +32,16 @@ struct StreakBadgeCard: View {
             }
 
             HStack(alignment: .firstTextBaseline, spacing: 4) {
-                Text("\(streak.current)")
-                    .font(RetroFont.mono(26, weight: .bold))
+                Text(currentValue)
+                    .font(RetroFont.mono(24, weight: .bold))
                     .foregroundStyle(streak.metric.accent)
                     .retroGlow(streak.metric.accent, radius: 6)
-                    .minimumScaleFactor(0.6)
+                    .minimumScaleFactor(0.5)
                     .lineLimit(1)
-                Text(streak.cadence == .daily ? "DAYS" : "WKS")
-                    .font(RetroFont.mono(10, weight: .bold))
-                    .foregroundStyle(Theme.retroInk)
+                Text(streak.unitLabel.uppercased())
+                    .font(RetroFont.mono(9, weight: .bold))
+                    .foregroundStyle(Theme.retroInkDim)
+                    .lineLimit(1)
                 Spacer(minLength: 0)
             }
 
@@ -69,15 +70,12 @@ struct StreakBadgeCard: View {
     }
 
     private var chargeLabel: String {
-        let v = streak.format(currentUnitValue: streak.currentUnitValue)
         let t = streak.format(currentUnitValue: streak.threshold)
-        return "\(v)/\(t) \(streak.unitLabel.uppercased())"
+        let unit = streak.current == 1 ? streak.cadence.label : streak.cadence.pluralLabel
+        return "of \(t) goal · \(streak.current) \(unit)"
     }
 
-    private var progressTitle: String {
-        if let w = streak.window {
-            return "\(w.label.uppercased())"
-        }
-        return streak.cadence == .daily ? "TODAY" : "THIS WK"
+    private var currentValue: String {
+        streak.format(currentUnitValue: streak.currentUnitValue)
     }
 }

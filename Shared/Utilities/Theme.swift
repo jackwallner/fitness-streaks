@@ -261,6 +261,15 @@ enum Theme {
     }
 }
 
+// MARK: - Coach Brand Colors (Elsa)
+
+enum CoachBrand {
+    static let nearBlack = Color(hex: 0x1a1a1a)
+    static let coconutCream = Color(hex: 0xf5f5f0)
+    static let dustyRose = Color(hex: 0xc45d75)
+    static let aquamarine = Color(hex: 0x5d9a8c)
+}
+
 // MARK: - Retro typography
 
 enum RetroFont {

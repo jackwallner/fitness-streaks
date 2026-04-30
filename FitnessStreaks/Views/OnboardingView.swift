@@ -7,7 +7,7 @@ struct OnboardingView: View {
 
     enum Phase {
         case intro       // welcome + privacy + Connect Health
-        case vibe        // pick discovery vibe (after auth)
+        case intensity   // pick discovery intensity (after auth)
         case loading     // running discovery
         case selecting   // pick which discovered streaks to track
         case empty       // no streaks discovered
@@ -38,7 +38,7 @@ struct OnboardingView: View {
 
             switch phase {
             case .intro:     introScreen
-            case .vibe:      vibeScreen
+            case .intensity: intensityScreen
             case .loading:   loadingScreen
             case .selecting: selectingScreen
             case .empty:     emptyScreen
@@ -174,12 +174,12 @@ struct OnboardingView: View {
         .padding(.horizontal, 24)
     }
 
-    // MARK: - Vibe
+    // MARK: - Intensity
 
-    private var vibeScreen: some View {
+    private var intensityScreen: some View {
         VStack(spacing: 20) {
             VStack(spacing: 8) {
-                Text("PICK YOUR VIBE")
+                Text("PICK YOUR INTENSITY")
                     .font(RetroFont.mono(22, weight: .bold))
                     .tracking(2)
                     .foregroundStyle(Theme.retroMagenta)
@@ -192,8 +192,8 @@ struct OnboardingView: View {
             .padding(.top, 24)
 
             VStack(spacing: 10) {
-                ForEach(DiscoveryVibe.allCases, id: \.rawValue) { vibe in
-                    vibeRow(vibe)
+                ForEach(DiscoveryIntensity.allCases, id: \.rawValue) { intensity in
+                    intensityRow(intensity)
                 }
             }
             .padding(.horizontal, 20)
@@ -216,21 +216,21 @@ struct OnboardingView: View {
         }
     }
 
-    private func vibeRow(_ vibe: DiscoveryVibe) -> some View {
-        let selected = settings.vibe == vibe
+    private func intensityRow(_ intensity: DiscoveryIntensity) -> some View {
+        let selected = settings.intensity == intensity
         return Button {
-            settings.vibe = vibe
+            settings.intensity = intensity
         } label: {
             HStack(alignment: .top, spacing: 12) {
                 Text(selected ? "▶" : " ")
                     .font(RetroFont.mono(14, weight: .bold))
                     .foregroundStyle(Theme.retroLime)
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(vibe.label.uppercased())
+                    Text(intensity.label.uppercased())
                         .font(RetroFont.mono(13, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(selected ? Theme.retroLime : Theme.retroInk)
-                    Text(vibe.tagline)
+                    Text(intensity.tagline)
                         .font(RetroFont.mono(11))
                         .foregroundStyle(Theme.retroInkDim)
                         .multilineTextAlignment(.leading)
@@ -441,7 +441,7 @@ struct OnboardingView: View {
         errorText = nil
         await requestAuth()
         guard errorText == nil else { return }
-        withAnimation { phase = .vibe }
+        withAnimation { phase = .intensity }
     }
 
     private func startDiscovery() {
@@ -466,10 +466,18 @@ struct OnboardingView: View {
     private func finishWithSelection() {
         guard !selection.isEmpty else { return }
         settings.trackedStreaks = selection
-        // Manual order = engine order, filtered to selection (preserves vibe ranking).
-        settings.manualStreakOrder = store.allCandidates
+        // Manual order = engine order, filtered to selection (preserves intensity ranking).
+        // Then prefer steps-daily as the primary if it's in the selected set — most users
+        // expect their step streak to be the headline, not whatever the engine ranked first.
+        var order = store.allCandidates
             .map(\.trackingKey)
             .filter { selection.contains($0) }
+        let stepsKey = StreakSettings.streakKey(metric: .steps, cadence: .daily)
+        if let idx = order.firstIndex(of: stepsKey), idx != 0 {
+            order.remove(at: idx)
+            order.insert(stepsKey, at: 0)
+        }
+        settings.manualStreakOrder = order
         store.refilter()
         withAnimation { settings.hasCompletedSetup = true }
     }

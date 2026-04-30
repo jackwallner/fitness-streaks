@@ -5,16 +5,16 @@ import WidgetKit
 
 /// How aggressive the user wants the discovered streaks to feel.
 /// Drives StreakEngine ranking and hero selection.
-enum DiscoveryVibe: Int, CaseIterable, Codable, Sendable {
+enum DiscoveryIntensity: Int, CaseIterable, Codable, Sendable {
     case sustainable = 0     // ~80% historical daily completion — easy to maintain
     case challenging = 1     // ~65% historical daily completion — stretch to daily
     case lifeChanging = 2    // ~50% historical daily completion — transformative if daily
 
     var label: String {
         switch self {
-        case .sustainable: "Sustainable"
+        case .sustainable: "Sustained"
         case .challenging: "Challenging"
-        case .lifeChanging: "Life-changing"
+        case .lifeChanging: "Life Changing"
         }
     }
 
@@ -28,13 +28,13 @@ enum DiscoveryVibe: Int, CaseIterable, Codable, Sendable {
 
     var short: String {
         switch self {
-        case .sustainable: "already doing"
-        case .challenging: "push a little"
-        case .lifeChanging: "go big"
+        case .sustainable: "sustained"
+        case .challenging: "challenging"
+        case .lifeChanging: "life changing"
         }
     }
 
-    /// Minimum historical daily completion rate used to select a threshold for this vibe.
+    /// Minimum historical daily completion rate used to select a threshold for this intensity.
     var targetCompletionRate: Double {
         switch self {
         case .sustainable: 0.80
@@ -190,9 +190,9 @@ final class StreakSettings: ObservableObject {
         didSet { defaults.set(graceAwardTier, forKey: "graceAwardTier") }
     }
 
-    @Published var vibe: DiscoveryVibe {
+    @Published var intensity: DiscoveryIntensity {
         didSet {
-            defaults.set(vibe.rawValue, forKey: "discoveryVibe")
+            defaults.set(intensity.rawValue, forKey: "discoveryVibe")
             WidgetCenter.shared.reloadAllTimelines()
         }
     }
@@ -292,10 +292,10 @@ final class StreakSettings: ObservableObject {
         self.earnedGraceDays = defaults.object(forKey: "earnedGraceDays") as? Int ?? 0
         self.graceAwardTier = defaults.object(forKey: "graceAwardTier") as? Int ?? 0
         if let stored = defaults.object(forKey: "discoveryVibe") as? Int,
-           let v = DiscoveryVibe(rawValue: stored) {
-            self.vibe = v
+           let v = DiscoveryIntensity(rawValue: stored) {
+            self.intensity = v
         } else {
-            self.vibe = .challenging
+            self.intensity = .challenging
         }
         // Migration: ignore old minStreakLength semantics; default to 30-day lookback.
         let raw = defaults.object(forKey: "lookbackDays") as? Int
