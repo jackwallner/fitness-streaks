@@ -10,8 +10,12 @@ struct StreakPickerList: View {
     /// Highlight the top N as "recommended" — engine already sorted by vibe score.
     let recommendedCount: Int
 
-    /// Core metrics that appear first in the list
-    private let coreMetrics: [StreakMetric] = [.steps, .activeEnergy, .exerciseMinutes, .workouts]
+    /// Core metrics that appear first in the list, ordered to mirror Apple's Activity rings.
+    private let coreMetrics: [StreakMetric] = [.steps, .exerciseMinutes, .standHours, .activeEnergy, .workouts]
+
+    private func coreOrder(_ metric: StreakMetric) -> Int {
+        coreMetrics.firstIndex(of: metric) ?? Int.max
+    }
 
     /// Sorted candidates with core metrics first
     private var sortedCandidates: [Streak] {
@@ -20,6 +24,11 @@ struct StreakPickerList: View {
             let bIsCore = coreMetrics.contains(b.metric)
             if aIsCore != bIsCore {
                 return aIsCore // Core metrics come first
+            }
+            if aIsCore && bIsCore {
+                let ai = coreOrder(a.metric)
+                let bi = coreOrder(b.metric)
+                if ai != bi { return ai < bi }
             }
             // Within same category, maintain original order (by vibe score)
             guard let aIdx = candidates.firstIndex(where: { $0.id == a.id }),

@@ -458,8 +458,8 @@ struct OnboardingView: View {
             withAnimation { phase = .empty }
             return
         }
-        // Pre-select only "Core 4" metrics (steps, activeEnergy, exercise, workouts) for a better onboarding experience
-        let coreMetrics: [StreakMetric] = [.steps, .activeEnergy, .exerciseMinutes, .workouts]
+        // Pre-select Apple's Activity-ring core metrics for a familiar onboarding experience.
+        let coreMetrics: [StreakMetric] = [.steps, .exerciseMinutes, .standHours, .activeEnergy, .workouts]
         let defaults = store.allCandidates.filter { coreMetrics.contains($0.metric) }
         selection = Set(defaults.map(\.trackingKey))
         withAnimation { phase = .selecting }

@@ -1,16 +1,30 @@
 import SwiftUI
 
 struct StreakDetailView: View {
-    let streak: Streak
+    let initialStreak: Streak
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var store: StreakStore
     @EnvironmentObject var settings: StreakSettings
     @State private var actionMessage: String? = nil
+    @State private var isRecalibrating = false
 
     @State private var showingRecalibrateConfirm = false
     @State private var showingCustomBuilder = false
     @State private var showingUntrackConfirm = false
-    @State private var selectedHeatmapRange: HeatmapDateRange = .lookbackPeriod
+    @State private var selectedHeatmapRange: HeatmapDateRange
+
+    init(streak: Streak) {
+        self.initialStreak = streak
+        // Pick a heatmap range that comfortably covers the user's recent history.
+        // We can't read settings here, so default to 90d — refined onAppear.
+        _selectedHeatmapRange = State(initialValue: .last90Days)
+    }
+
+    /// Always render against the freshest version of the streak from the store
+    /// so recalibration / threshold changes update the UI immediately.
+    private var streak: Streak {
+        store.streaks.first { $0.trackingKey == initialStreak.trackingKey } ?? initialStreak
+    }
 
     var isHero: Bool { store.hero?.id == streak.id }
 
@@ -34,9 +48,14 @@ struct StreakDetailView: View {
             }
             .padding(.vertical, 16)
         }
+        .onAppear {
+            selectedHeatmapRange = HeatmapDateRange.defaultFor(lookbackDays: settings.lookbackDays)
+        }
         .onChange(of: store.isLoading) { _, isLoading in
-            if !isLoading, actionMessage?.contains("Recalibrat") == true {
-                actionMessage = "Recalibrated."
+            if !isLoading, isRecalibrating {
+                isRecalibrating = false
+                let refreshed = store.streaks.first { $0.trackingKey == initialStreak.trackingKey } ?? initialStreak
+                actionMessage = "Recalibration complete. New goal: \(refreshed.thresholdLabel)."
             }
         }
         .background(Theme.retroBg.ignoresSafeArea())
@@ -102,7 +121,7 @@ struct StreakDetailView: View {
 
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 8) {
-                    Text("of \(streak.format(currentUnitValue: streak.threshold)) \(streak.unitLabel) goal")
+                    Text("Goal: \(streak.format(currentUnitValue: streak.threshold)) \(streak.unitLabel)")
                         .font(RetroFont.mono(12, weight: .medium))
                         .foregroundStyle(Theme.retroInk)
                     Spacer(minLength: 0)
@@ -267,8 +286,9 @@ struct StreakDetailView: View {
                 .alert("Recalibrate Goal?", isPresented: $showingRecalibrateConfirm) {
                     Button("Recalibrate (Apple Health)", role: .destructive) {
                         settings.clearCommittedThreshold(for: streak.trackingKey)
-                        Task { await store.load() }
+                        isRecalibrating = true
                         actionMessage = "Recalibrating from Apple Health..."
+                        Task { await store.load() }
                     }
                     Button("Cancel", role: .cancel) {}
                 } message: {
@@ -328,7 +348,7 @@ struct StreakDetailView: View {
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("Are you sure? This will update your goal based on recent activity. If the new goal is higher, you might lose your streak.")
+                Text("This re-analyzes your last \(settings.lookbackDays) days of activity and may suggest a different goal than your current \(streak.thresholdLabel). If the new goal is higher than your recent activity, your streak may break.")
             }
             .alert("Untrack this streak?", isPresented: $showingUntrackConfirm) {
                 Button("Untrack", role: .destructive) { untrack() }
@@ -475,8 +495,7 @@ struct StreakDetailView: View {
 
     private var heatmapCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Date range picker
-            HeatmapRangePicker(selectedRange: $selectedHeatmapRange, lookbackDays: settings.lookbackDays)
+            HeatmapRangePicker(selectedRange: $selectedHeatmapRange)
                 .padding(.bottom, 4)
 
             CalendarHeatmap(
@@ -486,8 +505,7 @@ struct StreakDetailView: View {
                     history: store.history
                 ),
                 accent: streak.metric.accent,
-                selectedRange: $selectedHeatmapRange,
-                lookbackDays: settings.lookbackDays
+                selectedRange: $selectedHeatmapRange
             )
 
             // Simplified binary legend

@@ -3,14 +3,18 @@ import SwiftUI
 struct StreakHero: View {
     let streak: Streak
 
-    private var accent: Color {
-        streak.currentUnitCompleted ? Theme.retroLime : Theme.retroMagenta
+    private var valueColor: Color {
+        streak.currentUnitCompleted ? Theme.retroLime : streak.metric.accent
+    }
+
+    private var panelColor: Color {
+        streak.currentUnitCompleted ? Theme.retroLime : streak.metric.accent
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .top, spacing: 12) {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 2) {
                     Text(titleText)
                         .font(RetroFont.mono(17, weight: .bold))
                         .tracking(1)
@@ -35,13 +39,21 @@ struct StreakHero: View {
                     .frame(width: 34, height: 34)
             }
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(currentValue)
-                    .font(RetroFont.mono(44, weight: .bold))
-                    .foregroundStyle(accent)
-                    .retroGlow(accent)
-                    .minimumScaleFactor(0.45)
-                    .lineLimit(1)
+            Spacer(minLength: 2)
+
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text(currentValue)
+                        .font(RetroFont.mono(44, weight: .bold))
+                        .foregroundStyle(valueColor)
+                        .retroGlow(valueColor)
+                        .minimumScaleFactor(0.45)
+                        .lineLimit(1)
+                    Text(streak.unitLabel.uppercased())
+                        .font(RetroFont.mono(11, weight: .bold))
+                        .foregroundStyle(Theme.retroInkDim)
+                        .lineLimit(1)
+                }
 
                 Text(goalLine)
                     .font(RetroFont.mono(12, weight: .medium))
@@ -49,6 +61,8 @@ struct StreakHero: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.75)
             }
+
+            Spacer(minLength: 2)
 
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 8) {
@@ -67,9 +81,9 @@ struct StreakHero: View {
             }
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, 16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .pixelPanel(color: accent)
+        .padding(.vertical, 14)
+        .frame(maxWidth: .infinity, minHeight: 196, alignment: .leading)
+        .pixelPanel(color: panelColor)
     }
 
     private var titleText: String {
@@ -84,14 +98,15 @@ struct StreakHero: View {
     }
 
     private var goalLine: String {
-        "of \(streak.format(currentUnitValue: streak.threshold)) \(streak.unitLabel) goal"
+        let target = streak.format(currentUnitValue: streak.threshold)
+        return "Goal: \(target) \(streak.unitLabel)"
     }
 
     private var goalContext: String {
         if let w = streak.window {
-            return "\(w.label) goal"
+            return "\(w.label) target"
         }
-        return streak.cadence == .daily ? "today's goal" : "this week's goal"
+        return streak.cadence == .daily ? "today" : "this week"
     }
 
     private var streakLine: String {
@@ -101,6 +116,6 @@ struct StreakHero: View {
 
     private var statusText: String {
         if streak.currentUnitCompleted { return "LOCKED" }
-        return "\(Int(min(1, streak.currentUnitProgress) * 100))% COMPLETE"
+        return "\(Int(min(1, streak.currentUnitProgress) * 100))%"
     }
 }
