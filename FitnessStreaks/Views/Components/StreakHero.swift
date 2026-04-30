@@ -41,20 +41,18 @@ struct StreakHero: View {
 
             Spacer(minLength: 2)
 
-            VStack(alignment: .leading, spacing: 2) {
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text(currentValue)
-                        .font(RetroFont.mono(44, weight: .bold))
-                        .foregroundStyle(valueColor)
-                        .retroGlow(valueColor)
-                        .minimumScaleFactor(0.45)
-                        .lineLimit(1)
-                    Text(streak.unitLabel.uppercased())
-                        .font(RetroFont.mono(11, weight: .bold))
-                        .foregroundStyle(Theme.retroInkDim)
-                        .lineLimit(1)
-                }
-
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text(currentValue)
+                    .font(RetroFont.mono(44, weight: .bold))
+                    .foregroundStyle(valueColor)
+                    .retroGlow(valueColor)
+                    .minimumScaleFactor(0.45)
+                    .lineLimit(1)
+                Text(streak.unitLabel.uppercased())
+                    .font(RetroFont.mono(11, weight: .bold))
+                    .foregroundStyle(Theme.retroInkDim)
+                    .lineLimit(1)
+                Spacer(minLength: 8)
                 Text(goalLine)
                     .font(RetroFont.mono(12, weight: .medium))
                     .foregroundStyle(Theme.retroInk)
@@ -99,7 +97,8 @@ struct StreakHero: View {
 
     private var goalLine: String {
         let target = streak.format(currentUnitValue: streak.threshold)
-        return "Goal: \(target) \(streak.unitLabel)"
+        let pct = Int(min(1, streak.currentUnitProgress) * 100)
+        return "\(target) \(streak.unitLabel) · \(pct)%"
     }
 
     private var goalContext: String {
@@ -115,7 +114,6 @@ struct StreakHero: View {
     }
 
     private var statusText: String {
-        if streak.currentUnitCompleted { return "LOCKED" }
-        return "\(Int(min(1, streak.currentUnitProgress) * 100))%"
+        streak.currentUnitCompleted ? "LOCKED" : ""
     }
 }

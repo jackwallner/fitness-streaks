@@ -58,6 +58,7 @@ struct CalendarHeatmap: View {
         GeometryReader { geo in
             let cell = cellSize(for: weeks.count, available: geo.size.width)
             let needsScroll = cell <= minCell + 0.1
+            let height = CGFloat(7) * cell + CGFloat(6) * gap + 16 // cells + gaps + month labels
 
             Group {
                 if needsScroll {
@@ -79,8 +80,8 @@ struct CalendarHeatmap: View {
                         .frame(maxWidth: .infinity, alignment: .trailing)
                 }
             }
+            .frame(height: height)
         }
-        .frame(height: 7 * 12 + 6 * 2 + 16)
     }
 
     @ViewBuilder

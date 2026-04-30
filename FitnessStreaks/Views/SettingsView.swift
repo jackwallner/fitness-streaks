@@ -11,6 +11,8 @@ struct SettingsView: View {
     @State private var notificationsBlockedBySystem = false
     @State private var showingRecalibrateAllConfirm = false
     @State private var recalibrateAllMessage: String? = nil
+    @State private var showingLookbackRecalibratePrompt = false
+    @State private var pendingLookbackDays: Int? = nil
 
     private static let lookbackOptions: [Int] = [7, 30, 90, 180, 365]
     private static let coachServicesURL = URL(string: "https://www.e3fit.me/#services")!
@@ -72,6 +74,26 @@ struct SettingsView: View {
             }
             .onChange(of: store.isLoading) { _, isLoading in
                 if !isLoading { recalibrateAllMessage = nil }
+            }
+            .alert("Recalibrate Goals?", isPresented: $showingLookbackRecalibratePrompt) {
+                Button("Recalibrate All", role: .destructive) {
+                    if let days = pendingLookbackDays {
+                        settings.lookbackDays = days
+                        settings.committedThresholds = [:]
+                        recalibrateAllMessage = "RECALIBRATING…"
+                        Task { await store.load() }
+                    }
+                    pendingLookbackDays = nil
+                }
+                Button("Just Change Window", role: .cancel) {
+                    if let days = pendingLookbackDays {
+                        settings.lookbackDays = days
+                        Task { await store.load() }
+                    }
+                    pendingLookbackDays = nil
+                }
+            } message: {
+                Text("Would you like to recalibrate your goals based on this new lookback period? This will re-analyze your last \(pendingLookbackDays ?? 0) days and may suggest different goals.")
             }
         }
     }
@@ -195,8 +217,8 @@ struct SettingsView: View {
                     ForEach(Self.lookbackOptions, id: \.self) { value in
                         Button {
                             guard settings.lookbackDays != value else { return }
-                            settings.lookbackDays = value
-                            Task { await store.load() }
+                            pendingLookbackDays = value
+                            showingLookbackRecalibratePrompt = true
                         } label: {
                             Text("\(value)")
                                 .font(RetroFont.mono(10, weight: .bold))

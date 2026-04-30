@@ -51,11 +51,20 @@ struct StreakBadgeCard: View {
                              segments: 10,
                              height: 8)
 
-            Text(chargeLabel)
-                .font(RetroFont.mono(9, weight: .bold))
-                .foregroundStyle(streak.currentUnitCompleted ? Theme.retroLime : streak.metric.accent)
-                .lineLimit(1)
-                .minimumScaleFactor(0.6)
+            HStack(spacing: 4) {
+                Text(goalLabel)
+                    .font(RetroFont.mono(9, weight: .bold))
+                    .foregroundStyle(Theme.retroInkDim)
+                Text("·")
+                    .font(RetroFont.mono(9, weight: .bold))
+                    .foregroundStyle(Theme.retroInkFaint)
+                Text(chargeLabel)
+                    .font(RetroFont.mono(9, weight: .bold))
+                    .foregroundStyle(streak.currentUnitCompleted ? Theme.retroLime : streak.metric.accent)
+                Spacer(minLength: 0)
+            }
+            .lineLimit(1)
+            .minimumScaleFactor(0.6)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 10)
@@ -72,6 +81,11 @@ struct StreakBadgeCard: View {
             return "\(streak.displayName.uppercased()) · \(w.label.uppercased())"
         }
         return streak.displayName.uppercased()
+    }
+
+    private var goalLabel: String {
+        let target = streak.format(currentUnitValue: streak.threshold)
+        return "Goal: \(target) \(streak.unitLabel)"
     }
 
     private var chargeLabel: String {
