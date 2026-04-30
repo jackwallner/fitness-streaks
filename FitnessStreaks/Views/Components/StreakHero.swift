@@ -19,10 +19,10 @@ struct StreakHero: View {
                         .foregroundStyle(Theme.retroInkDim)
                     HStack(alignment: .firstTextBaseline, spacing: 6) {
                         Text("\(streak.current)")
-                            .font(RetroFont.mono(44, weight: .bold))
+                            .font(RetroFont.mono(36, weight: .bold))
                             .foregroundStyle(Theme.retroMagenta)
                             .retroGlow(Theme.retroMagenta)
-                            .minimumScaleFactor(0.5)
+                            .minimumScaleFactor(0.6)
                             .lineLimit(1)
                         Text(streak.cadence == .daily ? "DAYS" : "WKS")
                             .font(RetroFont.mono(11, weight: .bold))
@@ -32,7 +32,7 @@ struct StreakHero: View {
                         .font(RetroFont.mono(11))
                         .foregroundStyle(Theme.retroInk)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.7)
+                        .minimumScaleFactor(0.75)
                 }
             }
 

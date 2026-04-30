@@ -10,58 +10,55 @@ struct StreakBadgeCard: View {
     let streak: Streak
 
     var body: some View {
-        ZStack(alignment: .topTrailing) {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(spacing: 6) {
-                    Image(systemName: streak.metric.symbol)
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(streak.metric.accent)
-                        .shadow(color: streak.metric.accent.opacity(0.6), radius: 4)
-                    Text(titleText)
-                        .font(RetroFont.pixel(9))
-                        .foregroundStyle(Theme.retroInk)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
-                }
-
-                HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text("\(streak.current)")
-                        .font(RetroFont.pixel(26))
-                        .foregroundStyle(streak.metric.accent)
-                        .retroGlow(streak.metric.accent, radius: 10)
-                        .minimumScaleFactor(0.5)
-                        .lineLimit(1)
-                    Text(streak.cadence == .daily ? "DAYS" : "WKS")
-                        .font(RetroFont.pixel(9))
-                        .foregroundStyle(Theme.retroInkDim)
-                }
-
-                Text(subtitle)
-                    .font(RetroFont.mono(10))
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .center, spacing: 6) {
+                Image(systemName: streak.displaySymbol)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(streak.metric.accent)
+                    .retroGlow(streak.metric.accent, radius: 6)
+                    .frame(width: 18, height: 18)
+                Text(titleText)
+                    .font(RetroFont.mono(9, weight: .bold))
+                    .tracking(1)
                     .foregroundStyle(Theme.retroInkDim)
                     .lineLimit(1)
-
-                PixelBarThin(progress: streak.currentUnitProgress, accent: streak.metric.accent)
-                    .padding(.top, 2)
+                    .minimumScaleFactor(0.7)
+                Spacer(minLength: 0)
+                if streak.currentUnitCompleted {
+                    Text("✓")
+                        .font(RetroFont.mono(11, weight: .bold))
+                        .foregroundStyle(Theme.retroLime)
+                }
             }
-            .padding(10)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .pixelPanel(color: streak.currentUnitCompleted ? streak.metric.accent : Theme.retroInkFaint)
 
-            if streak.currentUnitCompleted {
-                Text("✓")
-                    .font(RetroFont.pixel(8))
-                    .foregroundStyle(Theme.retroBg)
-                    .padding(.horizontal, 5)
-                    .padding(.vertical, 2)
-                    .background(streak.metric.accent)
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Text("\(streak.current)")
+                    .font(RetroFont.mono(26, weight: .bold))
+                    .foregroundStyle(streak.metric.accent)
+                    .retroGlow(streak.metric.accent, radius: 6)
+                    .minimumScaleFactor(0.6)
+                    .lineLimit(1)
+                Text(streak.cadence == .daily ? "DAYS" : "WKS")
+                    .font(RetroFont.mono(10, weight: .bold))
+                    .foregroundStyle(Theme.retroInk)
+                Spacer(minLength: 0)
             }
+
+            PixelProgressBar(progress: streak.currentUnitProgress,
+                             accent: streak.currentUnitCompleted ? Theme.retroLime : streak.metric.accent,
+                             segments: 10,
+                             height: 8)
+
+            Text(chargeLabel)
+                .font(RetroFont.mono(9, weight: .bold))
+                .foregroundStyle(streak.currentUnitCompleted ? Theme.retroLime : streak.metric.accent)
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
         }
-    }
-
-    private var subtitle: String {
-        let label = streak.thresholdLabel
-        return "\(label) · best \(streak.best) in \(streak.lookbackDays)d"
+        .padding(.horizontal, 10)
+        .padding(.vertical, 10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .pixelPanel(color: streak.currentUnitCompleted ? streak.metric.accent : Theme.retroInkFaint)
     }
 
     private var titleText: String {
@@ -69,5 +66,18 @@ struct StreakBadgeCard: View {
             return "\(streak.displayName.uppercased()) · \(w.label.uppercased())"
         }
         return streak.displayName.uppercased()
+    }
+
+    private var chargeLabel: String {
+        let v = streak.format(currentUnitValue: streak.currentUnitValue)
+        let t = streak.format(currentUnitValue: streak.threshold)
+        return "\(v)/\(t) \(streak.unitLabel.uppercased())"
+    }
+
+    private var progressTitle: String {
+        if let w = streak.window {
+            return "\(w.label.uppercased())"
+        }
+        return streak.cadence == .daily ? "TODAY" : "THIS WK"
     }
 }

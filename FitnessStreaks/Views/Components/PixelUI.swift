@@ -1,34 +1,49 @@
 import SwiftUI
 
 // MARK: - PixelFlame
-// 8×8 sprite rendered via Canvas. Intensity controls glow radius.
+// 16x16 sprite rendered via Canvas. Intensity controls glow radius.
 struct PixelFlame: View {
     var size: CGFloat = 56
     var intensity: CGFloat = 1.0
-    var tint: Color = Theme.retroMagenta
+    var tint: Color = Theme.retroMagenta // Base color if needed, but we'll use actual fire colors
 
-    // X = tint, W = white hot core, . = transparent
+    // R = Red, D = Dark Red, O = Orange, Y = Yellow, W = White, . = transparent
     private static let grid: [[Character]] = [
-        [".", ".", ".", "X", "X", ".", ".", "."],
-        [".", ".", "X", "X", "X", "X", ".", "."],
-        [".", "X", "X", "W", "X", "X", "X", "."],
-        ["X", "X", "W", "W", "W", "X", "X", "X"],
-        ["X", "W", "W", "W", "W", "W", "X", "X"],
-        ["X", "X", "W", "W", "W", "X", "X", "X"],
-        [".", "X", "X", "X", "X", "X", "X", "."],
-        [".", ".", "X", "X", "X", "X", ".", "."]
+        [".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
+        [".", ".", ".", ".", ".", ".", ".", "D", ".", ".", ".", ".", ".", ".", ".", "."],
+        [".", ".", ".", ".", ".", ".", "D", "R", "D", ".", ".", ".", ".", ".", ".", "."],
+        [".", ".", ".", ".", ".", ".", "R", "O", "R", ".", ".", ".", ".", ".", ".", "."],
+        [".", ".", ".", ".", ".", "D", "O", "Y", "O", "D", ".", ".", "D", ".", ".", "."],
+        [".", ".", ".", ".", "D", "R", "Y", "W", "Y", "R", "D", ".", "R", "D", ".", "."],
+        [".", ".", ".", ".", "R", "O", "W", "W", "W", "O", "R", ".", "O", "R", ".", "."],
+        [".", ".", ".", "D", "O", "Y", "W", "W", "W", "Y", "O", "D", "Y", "O", "D", "."],
+        [".", ".", ".", "R", "Y", "W", "W", "W", "W", "W", "Y", "R", "W", "Y", "R", "."],
+        [".", ".", "D", "O", "W", "W", "W", "W", "W", "W", "W", "O", "W", "W", "O", "D"],
+        [".", ".", "R", "Y", "W", "W", "W", "W", "W", "W", "W", "Y", "W", "W", "Y", "R"],
+        [".", ".", "D", "O", "W", "W", "W", "W", "W", "W", "W", "Y", "Y", "O", "O", "D"],
+        [".", ".", ".", "R", "Y", "W", "W", "W", "W", "W", "W", "Y", "Y", "O", "R", "."],
+        [".", ".", ".", ".", "D", "O", "Y", "W", "W", "Y", "O", "R", "R", "D", ".", "."],
+        [".", ".", ".", ".", ".", "D", "R", "O", "O", "R", "D", "D", ".", ".", ".", "."],
+        [".", ".", ".", ".", ".", ".", ".", "D", "D", "D", ".", ".", ".", ".", ".", "."]
     ]
 
     var body: some View {
-        let cell = size / 8
+        let cell = size / 16
         Canvas { ctx, _ in
             for (r, row) in Self.grid.enumerated() {
                 for (c, ch) in row.enumerated() {
                     let rect = CGRect(x: CGFloat(c) * cell, y: CGFloat(r) * cell, width: cell, height: cell)
+                    var color: Color? = nil
                     switch ch {
-                    case "X": ctx.fill(Path(rect), with: .color(tint))
-                    case "W": ctx.fill(Path(rect), with: .color(.white))
+                    case "W": color = .white
+                    case "Y": color = Color(red: 1.0, green: 0.82, blue: 0.27) // Yellow
+                    case "O": color = Color(red: 0.99, green: 0.58, blue: 0.13) // Orange
+                    case "R": color = Color(red: 0.92, green: 0.32, blue: 0.13) // Red
+                    case "D": color = Color(red: 0.75, green: 0.15, blue: 0.16) // Dark Red
                     default: continue
+                    }
+                    if let color = color {
+                        ctx.fill(Path(rect), with: .color(color))
                     }
                 }
             }

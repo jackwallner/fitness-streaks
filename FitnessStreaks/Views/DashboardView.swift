@@ -10,7 +10,7 @@ struct DashboardView: View {
     @State private var showPicker = false
     @State private var selectedBroken: BrokenStreak? = nil
 
-    private let grid = [GridItem(.flexible(), spacing: 8)]
+    private let grid = [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)]
     private static let relativeFormatter: RelativeDateTimeFormatter = {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .short
@@ -19,53 +19,51 @@ struct DashboardView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 10) {
-                topBar
-                    .padding(.top, 4)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 10) {
+                    topBar
+                        .padding(.top, 4)
 
-                if !settings.recentlyBroken.isEmpty {
-                    ForEach(settings.recentlyBroken.prefix(3)) { broken in
-                        brokenBanner(broken)
-                            .padding(.horizontal, 6)
-                    }
-                }
-
-                if let hero = store.hero {
-                    Button { selectedStreak = hero } label: {
-                        StreakHero(streak: hero)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("\(hero.metric.displayName) streak: \(hero.current) \(hero.cadence.pluralLabel), threshold \(Int(hero.threshold)) \(hero.metric.unitLabel)")
-                    .accessibilityHint("View streak details")
-                    .padding(.horizontal, 6)
-
-                    if shouldShowAtRisk, let hero = store.hero, !hero.currentUnitCompleted, hero.current >= 2 {
-                        atRiskBanner(for: hero)
-                            .padding(.horizontal, 6)
+                    if !settings.recentlyBroken.isEmpty {
+                        ForEach(settings.recentlyBroken.prefix(3)) { broken in
+                            brokenBanner(broken)
+                                .padding(.horizontal, 6)
+                        }
                     }
 
-                    if !visibleBadges.isEmpty {
-                        PixelSectionHeader(title: "Other Streaks · \(store.badges.count) Active")
-                            .padding(.top, 2)
-
-                        badgeGrid
-                            .padding(.horizontal, 6)
-                    }
-
-                    findMoreButton
+                    if let hero = store.hero {
+                        Button { selectedStreak = hero } label: {
+                            StreakHero(streak: hero)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("\(hero.metric.displayName) streak: \(hero.current) \(hero.cadence.pluralLabel), threshold \(Int(hero.threshold)) \(hero.metric.unitLabel)")
+                        .accessibilityHint("View streak details")
                         .padding(.horizontal, 6)
 
-                    Spacer(minLength: 0)
-                } else if store.isLoading {
-                    loadingState
-                    Spacer(minLength: 0)
-                } else {
-                    emptyState
-                    Spacer(minLength: 0)
+                        if shouldShowAtRisk, let hero = store.hero, !hero.currentUnitCompleted, hero.current >= 2 {
+                            atRiskBanner(for: hero)
+                                .padding(.horizontal, 6)
+                        }
+
+                        if !visibleBadges.isEmpty {
+                            PixelSectionHeader(title: "Other Streaks · \(store.badges.count) Active")
+                                .padding(.top, 2)
+
+                            badgeGrid
+                                .padding(.horizontal, 6)
+                        }
+
+                        findMoreButton
+                            .padding(.horizontal, 6)
+                    } else if store.isLoading {
+                        loadingState
+                    } else {
+                        emptyState
+                    }
                 }
+                .padding(.bottom, 16)
+                .frame(maxWidth: .infinity, alignment: .top)
             }
-            .padding(.bottom, 8)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background(Theme.retroBg.ignoresSafeArea())
             .navigationDestination(item: $selectedStreak) { streak in
                 StreakDetailView(streak: streak)

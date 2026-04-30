@@ -291,7 +291,12 @@ final class StreakSettings: ObservableObject {
         self.graceDaysEnabled = defaults.object(forKey: "graceDaysEnabled") as? Bool ?? false
         self.earnedGraceDays = defaults.object(forKey: "earnedGraceDays") as? Int ?? 0
         self.graceAwardTier = defaults.object(forKey: "graceAwardTier") as? Int ?? 0
-        self.vibe = DiscoveryVibe(rawValue: defaults.integer(forKey: "discoveryVibe")) ?? .challenging
+        if let stored = defaults.object(forKey: "discoveryVibe") as? Int,
+           let v = DiscoveryVibe(rawValue: stored) {
+            self.vibe = v
+        } else {
+            self.vibe = .challenging
+        }
         // Migration: ignore old minStreakLength semantics; default to 30-day lookback.
         let raw = defaults.object(forKey: "lookbackDays") as? Int
             ?? defaults.object(forKey: "minStreakLength") as? Int

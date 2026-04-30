@@ -15,6 +15,7 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
     case earlySteps
     case intensityRatio
     case heartRateMinutes
+    case totalCalories
 
     var id: String { rawValue }
 
@@ -32,6 +33,7 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
         case .earlySteps: "Early Steps"
         case .intensityRatio: "Intensity"
         case .heartRateMinutes: "Cardio Minutes"
+        case .totalCalories: "Total Calories"
         }
     }
 
@@ -49,6 +51,7 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
         case .earlySteps: "sunrise.fill"
         case .intensityRatio: "bolt.heart.fill"
         case .heartRateMinutes: "heart.fill"
+        case .totalCalories: "flame.circle.fill"
         }
     }
 
@@ -66,6 +69,7 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
         case .earlySteps: Theme.accentEarly
         case .intensityRatio: Theme.accentIntensity
         case .heartRateMinutes: Theme.accentHeartRate
+        case .totalCalories: Theme.accentTotalCalories
         }
     }
 
@@ -84,6 +88,7 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
         case .earlySteps: 1.0
         case .intensityRatio: 1.1
         case .heartRateMinutes: 1.15
+        case .totalCalories: 1.0
         }
     }
 
@@ -102,6 +107,7 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
         case .earlySteps: [500, 1_000, 2_000, 3_000, 5_000]
         case .intensityRatio: [5, 8, 10, 12, 15, 20]
         case .heartRateMinutes: [3, 5, 10, 15, 20, 30]
+        case .totalCalories: [1_500, 2_000, 2_500, 3_000, 3_500, 4_000]
         }
     }
 
@@ -119,6 +125,7 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
         case .earlySteps: "early steps"
         case .intensityRatio: "kcal/min"
         case .heartRateMinutes: "min cardio"
+        case .totalCalories: "kcal"
         }
     }
 
@@ -150,6 +157,13 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
             return String(format: "%.1f", value)
         case .heartRateMinutes:
             return "\(Int(value.rounded()))"
+        case .totalCalories:
+            let v = Int(value.rounded())
+            if v >= 1000 {
+                let k = Double(v) / 1000.0
+                return String(format: k.truncatingRemainder(dividingBy: 1) == 0 ? "%.0fk" : "%.1fk", k)
+            }
+            return "\(v)"
         }
     }
 

@@ -266,6 +266,15 @@ struct ActivityDay: Hashable, Sendable {
         case .intensityRatio:
             return exerciseMinutes > 0 ? activeEnergy / exerciseMinutes : 0
         case .heartRateMinutes: return heartRateMinutes
+        case .totalCalories: return totalCalories
         }
+    }
+
+    /// Total calories = active energy + basal (resting) energy burned
+    var totalCalories: Double {
+        // For now, estimate basal as roughly 70% of active for users with Apple Watch
+        // or return activeEnergy * 1.4 as a reasonable estimate
+        // This will be refined when we fetch actual basal energy from HealthKit
+        activeEnergy * 1.4
     }
 }
