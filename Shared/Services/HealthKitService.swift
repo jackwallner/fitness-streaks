@@ -10,10 +10,8 @@ import WatchKit
 private let log = Logger(subsystem: "com.jackwallner.streaks", category: "HealthKit")
 
 enum HealthKitError: Error {
-    case timeout
     case unavailable
     case noReadTypes
-    case requestUnsuccessful
 }
 
 @MainActor
@@ -90,57 +88,10 @@ final class HealthKitService: ObservableObject {
             log.error("Aborting HealthKit authorization because read type set is empty")
             throw HealthKitError.noReadTypes
         }
-        logAuthorizationStatuses(prefix: "pre-request")
-
-        // Use closure-based API with continuation - more reliable for UI presentation
-        let store = self.store
-
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
-            let lock = NSLock()
-            var didResume = false
-
-            func resumeOnce(_ action: () -> Void) {
-                lock.lock()
-                defer { lock.unlock() }
-                guard !didResume else { return }
-                didResume = true
-                action()
-            }
-
-            // Set up a timeout
-            let task = Task {
-                try? await Task.sleep(nanoseconds: 15_000_000_000) // 15 seconds
-                if !Task.isCancelled {
-                    log.warning("Authorization request timed out")
-                    resumeOnce {
-                        continuation.resume(throwing: HealthKitError.timeout)
-                    }
-                }
-            }
-
-            store.requestAuthorization(toShare: [], read: types) { success, error in
-                task.cancel()
-                resumeOnce {
-                    if let error = error {
-                        log.error("Authorization request failed: \(String(describing: error))")
-                        continuation.resume(throwing: error)
-                    } else {
-                        log.info("Authorization request completed (success=\(success))")
-                        if success {
-                            continuation.resume()
-                        } else {
-                            // Rare but important: HealthKit can callback with success=false and nil error.
-                            continuation.resume(throwing: HealthKitError.requestUnsuccessful)
-                        }
-                    }
-                }
-            }
-        }
-
-        await synchronizeAuthorization()
-        let post = await authorizationRequestStatus()
+        try await store.requestAuthorization(toShare: [], read: types)
+        hasRequestedAuthorization = true
+        log.info("HealthKit authorization request finished")
         logAuthorizationStatuses(prefix: "post-request")
-        log.info("HealthKit authorization flow finished (postStatus=\(String(describing: post)), hasRequestedAuthorization=\(self.hasRequestedAuthorization))")
     }
 
     func authorizationRequestStatus() async -> HKAuthorizationRequestStatus? {

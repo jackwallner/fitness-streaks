@@ -327,7 +327,9 @@ struct DashboardView: View {
                 .accessibilityLabel("Request Health access")
 
                 Button("HEALTH SETTINGS") {
-                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                    if let url = URL(string: "x-apple-health://"), UIApplication.shared.canOpenURL(url) {
+                        UIApplication.shared.open(url)
+                    } else if let url = URL(string: UIApplication.openSettingsURLString) {
                         UIApplication.shared.open(url)
                     }
                 }
@@ -372,8 +374,8 @@ struct DashboardView: View {
             log.info("Manual health access request finished (postStatus=\(String(describing: postStatus)), hasRequestedAuthorization=\(self.healthKit.hasRequestedAuthorization))")
             await store.load()
         } catch is HealthKitError {
-            log.error("Manual health access request timed out")
-            healthAccessErrorText = "Health access request timed out. Try again, then open Settings if the prompt does not appear."
+            log.error("Manual health access request failed with HealthKitError")
+            healthAccessErrorText = "Could not request Health access from iOS. If the prompt does not appear, open Health or Settings and enable access for Streak Finder."
         } catch {
             log.error("Manual health access request failed: \(String(describing: error))")
             healthAccessErrorText = "Could not request Health access from iOS. Open Settings and enable Health access for Streak Finder."
