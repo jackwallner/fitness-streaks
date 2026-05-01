@@ -1,54 +1,68 @@
 #!/usr/bin/env python3
-"""Generate the chunky pixel-fire app icon for iOS + watchOS."""
+"""Generate the retro pixel flame app icon for iOS + watchOS.
+
+Style: single white silhouette on a cyan→purple gradient — Apple Health
+symptom-icon look — but the silhouette is a recognizable 8-bit flame
+(two tongues + curl) so it reads as fire, not a blob.
+"""
 from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-GRID = 64          # low-res canvas → chunky pixels when upscaled
-OUT = 1024         # icon resolution
+GRID = 64          # 32×32 sprite, 2× upscale for chunky pixels
+OUT = 1024
 ROOT = Path(__file__).resolve().parent.parent
 TARGETS = [
     ROOT / "FitnessStreaks/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png",
     ROOT / "FitnessStreaksWatch/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png",
 ]
 
-BG_TOP = (18, 14, 36)
-BG_BOT = (40, 18, 58)
+BG_TOP = (80, 210, 255)   # bright cyan
+BG_BOT = (160, 70, 255)   # vivid purple
 
-# 16x16 pixel art flame
-FIRE_SPRITE = [
-    "                ",
-    "       1        ",
-    "      121       ",
-    "      232       ",
-    "     13431  1   ",
-    "    1245421 21  ",
-    "    2356532 32  ",
-    "   134666431431 ",
-    "   245666542542 ",
-    "  13566666536531",
-    "  24666666646542",
-    "  13566666545431",
-    "   245666554321 ",
-    "    1345543221  ",
-    "     1233211    ",
-    "       111      "
+# 32×32 retro flame sprite. Centered, symmetric body.
+# Two tongues at the top (taller on the right, shorter on the left) with a
+# clear notch between them — the unmistakable fire-emoji silhouette.
+FLAME_SPRITE = [
+    "                                ",  # 0
+    "                                ",  # 1
+    "                  1             ",  # 2   main tongue tip
+    "                 11             ",  # 3
+    "                 11             ",  # 4
+    "                111             ",  # 5
+    "           11   111             ",  # 6   side tongue appears + notch
+    "          111   1111            ",  # 7
+    "         1111   1111            ",  # 8
+    "         1111  11111            ",  # 9
+    "         11111111111            ",  # 10  tongues merge
+    "        1111111111111           ",  # 11
+    "       11111111111111           ",  # 12
+    "      111111111111111           ",  # 13
+    "      1111111111111111          ",  # 14
+    "     11111111111111111          ",  # 15
+    "     111111111111111111         ",  # 16
+    "    1111111111111111111         ",  # 17
+    "    11111111111111111111        ",  # 18
+    "    11111111111111111111        ",  # 19
+    "    11111111111111111111        ",  # 20
+    "    11111111111111111111        ",  # 21
+    "    11111111111111111111        ",  # 22
+    "    11111111111111111111        ",  # 23
+    "     111111111111111111         ",  # 24
+    "      1111111111111111          ",  # 25
+    "       11111111111111           ",  # 26
+    "         1111111111             ",  # 27
+    "                                ",  # 28
+    "                                ",  # 29
+    "                                ",  # 30
+    "                                ",  # 31
 ]
 
-COLORS = {
-    "1": (120,  22,  44),  # dark red rim
-    "2": (190,  38,  40),  # red
-    "3": (235,  82,  32),  # red-orange
-    "4": (252, 148,  34),  # orange
-    "5": (255, 210,  68),  # yellow
-    "6": (255, 246, 188),  # white-hot core
-}
+WHITE = (255, 255, 255)
+
 
 def build() -> Image.Image:
-    # We want a 64x64 canvas. We will draw the 16x16 sprite centered.
     img = Image.new("RGB", (GRID, GRID))
-    
-    # vertical gradient background (banded by pixel — looks good upscaled)
     for y in range(GRID):
         t = y / (GRID - 1)
         r = round(BG_TOP[0] + (BG_BOT[0] - BG_TOP[0]) * t)
@@ -56,40 +70,27 @@ def build() -> Image.Image:
         b = round(BG_TOP[2] + (BG_BOT[2] - BG_TOP[2]) * t)
         for x in range(GRID):
             img.putpixel((x, y), (r, g, b))
-            
-    draw = ImageDraw.Draw(img)
-    
-    # Flame sprite is 16x16, map it to the 64x64 grid.
-    # Each sprite pixel = 3x3 grid pixels -> 48x48 total.
-    scale = 3
-    off_x = (GRID - 16 * scale) // 2  # 8
-    off_y = (GRID - 16 * scale) // 2 + 2 # 10 (slightly lower to visually center)
-    
-    for r, row in enumerate(FIRE_SPRITE):
-        for c, char in enumerate(row):
-            if char in COLORS:
-                color = COLORS[char]
-                x0 = off_x + c * scale
-                y0 = off_y + r * scale
-                x1 = x0 + scale - 1
-                y1 = y0 + scale - 1
-                draw.rectangle([x0, y0, x1, y1], fill=color)
 
-    # tiny ember sparks for character
-    sparks = [(14, 14), (46, 12), (10, 28), (52, 34), (16, 46), (48, 48)]
-    for x, y in sparks:
-        # draw a 2x2 spark
-        draw.rectangle([x, y, x+1, y+1], fill=(255, 200, 90))
+    draw = ImageDraw.Draw(img)
+    scale = 2  # 32×32 sprite → 64×64 canvas
+    for r, row in enumerate(FLAME_SPRITE):
+        padded = row.ljust(32, " ")[:32]
+        for c, ch in enumerate(padded):
+            if ch == "1":
+                x0 = c * scale
+                y0 = r * scale
+                draw.rectangle([x0, y0, x0 + scale - 1, y0 + scale - 1], fill=WHITE)
 
     return img.resize((OUT, OUT), Image.NEAREST)
+
 
 def main() -> None:
     icon = build()
     for path in TARGETS:
-        # Ensure parent directories exist
         path.parent.mkdir(parents=True, exist_ok=True)
         icon.save(path, format="PNG")
         print(f"wrote {path}")
+
 
 if __name__ == "__main__":
     main()

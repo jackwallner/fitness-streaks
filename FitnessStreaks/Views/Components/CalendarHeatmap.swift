@@ -25,6 +25,16 @@ enum HeatmapDateRange: String, CaseIterable {
         }
     }
 
+    /// Fixed cell size per range for consistent visual density
+    var cellSize: CGFloat {
+        switch self {
+        case .last30Days: return 16
+        case .last90Days: return 10
+        case .last180Days: return 6
+        case .fullYear: return 4
+        }
+    }
+
     /// Pick the smallest range that comfortably contains the user's lookback window.
     static func defaultFor(lookbackDays: Int) -> HeatmapDateRange {
         switch lookbackDays {
@@ -46,97 +56,102 @@ struct CalendarHeatmap: View {
     @Binding var selectedRange: HeatmapDateRange
 
     private let gap: CGFloat = 2
-    private let minCell: CGFloat = 6
-    private let maxCell: CGFloat = 18
 
-    /// Build a complete calendar grid for the selected range. Missing Health rows
-    /// still get a cell so longer ranges don't collapse into sparse columns.
+    /// Build weeks only containing days within the selected range.
+    /// Each week starts on Monday and contains exactly 7 days.
     private var calendarWeeks: [[HeatmapDay]] {
         let today = DateHelpers.startOfDay()
         let firstVisibleDay = DateHelpers.addDays(-(selectedRange.days - 1), to: today)
-        let firstWeekStart = DateHelpers.startOfWeek(firstVisibleDay)
         let entryByDay = Dictionary(entries.map { (DateHelpers.startOfDay($0.date), $0) },
                                     uniquingKeysWith: { _, latest in latest })
 
+        // Start from Monday of the week containing firstVisibleDay
+        let firstWeekStart = DateHelpers.startOfWeek(firstVisibleDay)
+
         var weeks: [[HeatmapDay]] = []
-        var week: [HeatmapDay] = []
         var day = firstWeekStart
 
         while day <= today {
-            let normalized = DateHelpers.startOfDay(day)
-            let entry = entryByDay[normalized] ?? (date: normalized, value: 0, met: false)
-            week.append(entry)
-
-            if week.count == 7 {
+            var week: [HeatmapDay] = []
+            for _ in 0..<7 {
+                guard day <= today else { break }
+                let normalized = DateHelpers.startOfDay(day)
+                let entry = entryByDay[normalized] ?? (date: normalized, value: 0, met: false)
+                week.append(entry)
+                day = DateHelpers.addDays(1, to: day)
+            }
+            if !week.isEmpty {
                 weeks.append(week)
-                week = []
             }
-
-            guard let nextDay = DateHelpers.gregorian.date(byAdding: .day, value: 1, to: day) else {
-                break
-            }
-            day = nextDay
-        }
-
-        if !week.isEmpty {
-            weeks.append(week)
         }
 
         return weeks
     }
 
+    /// Month labels positioned at the start of each month
+    private func monthLabels(for weeks: [[HeatmapDay]], cell: CGFloat) -> [(index: Int, name: String)] {
+        var labels: [(Int, String)] = []
+        var lastMonth: Int?
+
+        for (index, week) in weeks.enumerated() {
+            guard let firstDay = week.first?.date else { continue }
+            let month = DateHelpers.gregorian.component(.month, from: firstDay)
+            let day = DateHelpers.gregorian.component(.day, from: firstDay)
+
+            // Show label on first week of month, or if month changed mid-week
+            if month != lastMonth && day <= 7 {
+                labels.append((index, monthName(for: firstDay)))
+                lastMonth = month
+            }
+        }
+
+        return labels
+    }
+
     var body: some View {
         let weeks = calendarWeeks
-        GeometryReader { geo in
-            let cell = cellSize(for: weeks.count, available: geo.size.width)
-            let needsScroll = cell <= minCell + 0.1
-            let height = CGFloat(7) * cell + CGFloat(6) * gap + 16 // cells + gaps + month labels
+        let cell = selectedRange.cellSize
+        let height = CGFloat(7) * cell + CGFloat(6) * gap + 14 // cells + gaps + month labels
 
-            Group {
-                if needsScroll {
-                    ScrollViewReader { proxy in
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            grid(weeks: weeks, cell: cell)
-                        }
-                        .onAppear {
-                            proxy.scrollTo(weeks.count - 1, anchor: .trailing)
-                        }
-                        .onChange(of: selectedRange) { _, _ in
-                            DispatchQueue.main.async {
-                                withAnimation { proxy.scrollTo(weeks.count - 1, anchor: .trailing) }
-                            }
-                        }
-                    }
-                } else {
-                    grid(weeks: weeks, cell: cell)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                grid(weeks: weeks, cell: cell)
+            }
+            .onAppear {
+                withAnimation(.easeOut(duration: 0.2)) {
+                    proxy.scrollTo(weeks.count - 1, anchor: .trailing)
                 }
             }
-            .frame(height: height)
+            .onChange(of: selectedRange) { _, _ in
+                DispatchQueue.main.async {
+                    withAnimation(.easeOut(duration: 0.2)) {
+                        proxy.scrollTo(weeks.count - 1, anchor: .trailing)
+                    }
+                }
+            }
         }
-        .frame(height: maxHeight)
+        .frame(height: height)
     }
 
     @ViewBuilder
     private func grid(weeks: [[HeatmapDay]], cell: CGFloat) -> some View {
         let width = CGFloat(weeks.count) * cell + CGFloat(max(0, weeks.count - 1)) * gap
+        let labels = monthLabels(for: weeks, cell: cell)
+
         VStack(alignment: .leading, spacing: 4) {
+            // Month labels row
             ZStack(alignment: .topLeading) {
-                // Reserve a row for month labels.
-                Color.clear.frame(height: 12)
-                ForEach(Array(weeks.enumerated()), id: \.offset) { item in
-                    let firstDay = item.element.first?.date ?? Date()
-                    let isFirstWeekOfMonth = DateHelpers.gregorian.component(.day, from: firstDay) <= 7
-                    if isFirstWeekOfMonth {
-                        Text(monthName(for: firstDay))
-                            .font(RetroFont.pixel(8))
-                            .foregroundStyle(Theme.retroInkDim)
-                            .fixedSize()
-                            .offset(x: CGFloat(item.offset) * (cell + gap))
-                    }
+                Color.clear.frame(height: 10)
+                ForEach(labels, id: \.index) { label in
+                    Text(label.name)
+                        .font(RetroFont.pixel(7))
+                        .foregroundStyle(Theme.retroInkDim)
+                        .fixedSize()
+                        .offset(x: CGFloat(label.index) * (cell + gap))
                 }
             }
 
+            // Day cells grid
             HStack(alignment: .top, spacing: gap) {
                 ForEach(Array(weeks.enumerated()), id: \.offset) { item in
                     VStack(spacing: gap) {
@@ -150,19 +165,8 @@ struct CalendarHeatmap: View {
             }
         }
         .padding(.vertical, 2)
-        .padding(.trailing, 24) // leave room for the rightmost month label to extend past the last column
-        .frame(width: width + 24, alignment: .leading)
-    }
-
-    private func cellSize(for weekCount: Int, available: CGFloat) -> CGFloat {
-        guard weekCount > 0, available > 0 else { return minCell }
-        let totalGaps = CGFloat(max(0, weekCount - 1)) * gap
-        let raw = (available - totalGaps) / CGFloat(weekCount)
-        return max(minCell, min(maxCell, raw))
-    }
-
-    private var maxHeight: CGFloat {
-        CGFloat(7) * maxCell + CGFloat(6) * gap + 16
+        .padding(.horizontal, 2)
+        .frame(width: width + 4, alignment: .leading)
     }
 
     private func monthName(for date: Date) -> String {

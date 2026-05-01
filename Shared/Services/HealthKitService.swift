@@ -31,25 +31,31 @@ final class HealthKitService: ObservableObject {
         .heartRate,
     ]
 
-    /// Category types (mindful session, sleep analysis, stand hour) + workout type.
-    private var categoryReadTypes: Set<HKObjectType> {
-        var set: Set<HKObjectType> = [HKObjectType.workoutType()]
-        if let mindful = HKObjectType.categoryType(forIdentifier: .mindfulSession) {
-            set.insert(mindful)
-        }
-        if let sleep = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) {
-            set.insert(sleep)
-        }
-        if let standHour = HKObjectType.categoryType(forIdentifier: .appleStandHour) {
-            set.insert(standHour)
+    /// Category types (mindful session, sleep analysis, stand hour).
+    /// Note: workoutType() is HKObjectType, not HKSampleType, so it cannot be included
+    /// in the authorization request set which requires Set<HKSampleType>.
+    private var categorySampleTypes: Set<HKSampleType> {
+        var set: Set<HKSampleType> = []
+        let identifiers: [HKCategoryTypeIdentifier] = [.mindfulSession, .sleepAnalysis, .appleStandHour]
+        for id in identifiers {
+            if let type = HKObjectType.categoryType(forIdentifier: id) {
+                set.insert(type)
+            } else {
+                log.error("Failed to resolve category type identifier: \(id.rawValue)")
+            }
         }
         return set
     }
 
-    private var quantityReadTypes: Set<HKObjectType> {
-        var set: Set<HKObjectType> = []
+    /// Workout type for querying (separate from authorization types since it's not an HKSampleType).
+    private var workoutType: HKObjectType {
+        HKObjectType.workoutType()
+    }
+
+    private var quantitySampleTypes: Set<HKSampleType> {
+        var set: Set<HKSampleType> = []
         for id in quantityTypes {
-            if let type = HKObjectType.quantityType(forIdentifier: id) {
+            if let type = HKQuantityType.quantityType(forIdentifier: id) {
                 set.insert(type)
             } else {
                 log.error("Failed to resolve quantity type identifier: \(id.rawValue)")
@@ -58,9 +64,18 @@ final class HealthKitService: ObservableObject {
         return set
     }
 
+    /// Types for authorization request (must be HKSampleType, excludes workoutType)
+    private var authorizationTypes: Set<HKSampleType> {
+        var types: Set<HKSampleType> = categorySampleTypes
+        types.formUnion(quantitySampleTypes)
+        return types
+    }
+
+    /// All readable types for status checking (includes workoutType)
     private var allReadTypes: Set<HKObjectType> {
-        var types: Set<HKObjectType> = categoryReadTypes
-        types.formUnion(quantityReadTypes)
+        var types: Set<HKObjectType> = categorySampleTypes
+        types.formUnion(quantitySampleTypes)
+        types.insert(workoutType)
         return types
     }
 
@@ -81,7 +96,7 @@ final class HealthKitService: ObservableObject {
             throw HealthKitError.unavailable
         }
         let pre = await authorizationRequestStatus()
-        let types = self.allReadTypes
+        let types = self.authorizationTypes
         let typeIDs = types.map(\.identifier).sorted().joined(separator: ",")
         log.info("Requesting HealthKit authorization (preStatus=\(String(describing: pre))) for \(types.count) read types: \(typeIDs)")
         guard !types.isEmpty else {
@@ -96,16 +111,40 @@ final class HealthKitService: ObservableObject {
 
     func authorizationRequestStatus() async -> HKAuthorizationRequestStatus? {
         guard HKHealthStore.isHealthDataAvailable() else { return nil }
-        return await withCheckedContinuation { continuation in
-            store.getRequestStatusForAuthorization(toShare: [], read: allReadTypes) { status, error in
-                if let error {
-                    log.error("auth request status error: \(String(describing: error))")
-                    continuation.resume(returning: nil)
-                } else {
-                    continuation.resume(returning: status)
+        return await withTimeout(seconds: 5) {
+            await withCheckedContinuation { continuation in
+                store.getRequestStatusForAuthorization(toShare: [], read: allReadTypes) { status, error in
+                    if let error {
+                        log.error("auth request status error: \(String(describing: error))")
+                        continuation.resume(returning: nil)
+                    } else {
+                        continuation.resume(returning: status)
+                    }
                 }
             }
+        } fallback: {
+            log.error("authorizationRequestStatus timed out")
+            return nil
         }
+    }
+
+    /// Helper to add timeout to async operations. Returns fallback if operation times out.
+    private func withTimeout<T: Sendable>(seconds: TimeInterval, operation: @escaping () async -> T, fallback: @escaping @Sendable () -> T) async -> T {
+        let timeoutTask = Task { () -> T? in
+            try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+            return nil  // nil indicates timeout
+        }
+        let operationTask = Task { await operation() }
+        // Race between timeout and operation
+        let result = await withTaskGroup(of: Optional<T>.self) { group in
+            group.addTask { await timeoutTask.value }
+            group.addTask { await operationTask.value }
+            // First to complete wins
+            let first = await group.next()
+            group.cancelAll()
+            return first
+        }
+        return result ?? fallback()
     }
 
     /// Reflects current authorization state without ever prompting. The system permission
