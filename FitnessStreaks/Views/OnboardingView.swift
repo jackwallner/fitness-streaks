@@ -94,10 +94,6 @@ struct OnboardingView: View {
 
             Spacer(minLength: 8)
 
-            if let err = errorText {
-                errorBlock(err)
-            }
-
             connectButton
                 .padding(.horizontal, 20)
                 .padding(.bottom, 24)
@@ -138,17 +134,16 @@ struct OnboardingView: View {
 
     private var connectButton: some View {
         Button {
-            Task { await beginConnect() }
+            withAnimation { phase = .intensity }
         } label: {
-            Text(requesting ? "CONNECTING..." : "▶ CONNECT HEALTH")
+            Text("▶ GET STARTED")
                 .font(RetroFont.mono(13, weight: .bold))
                 .foregroundStyle(Theme.retroBg)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
-                .background(requesting ? Theme.retroInkFaint : Theme.retroLime)
+                .background(Theme.retroLime)
         }
         .buttonStyle(.plain)
-        .disabled(requesting)
     }
 
     private func errorBlock(_ err: String) -> some View {
@@ -213,17 +208,23 @@ struct OnboardingView: View {
 
             Spacer(minLength: 8)
 
+            if let err = errorText {
+                errorBlock(err)
+                    .padding(.bottom, 12)
+            }
+
             Button {
-                startDiscovery()
+                Task { await beginDiscoveryWithAuth() }
             } label: {
-                Text("▶ FIND MY STREAKS")
+                Text(requesting ? "CONNECTING..." : "▶ FIND MY STREAKS")
                     .font(RetroFont.mono(13, weight: .bold))
                     .foregroundStyle(Theme.retroBg)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
-                    .background(Theme.retroLime)
+                    .background(requesting ? Theme.retroInkFaint : Theme.retroLime)
             }
             .buttonStyle(.plain)
+            .disabled(requesting)
             .padding(.horizontal, 20)
             .padding(.bottom, 24)
         }
@@ -450,11 +451,11 @@ struct OnboardingView: View {
 
     // MARK: - Flow
 
-    private func beginConnect() async {
+    private func beginDiscoveryWithAuth() async {
         errorText = nil
         await requestAuth()
         guard errorText == nil else { return }
-        withAnimation { phase = .intensity }
+        startDiscovery()
     }
 
     private func startDiscovery() {
@@ -508,6 +509,8 @@ struct OnboardingView: View {
         defer { requesting = false }
         do {
             try await healthKit.requestAuthorization()
+        } catch is HealthKitError {
+            errorText = "Health access is taking too long. Please try again or open Settings to enable access."
         } catch {
             errorText = "Couldn't connect. Open iOS Settings and turn on Streak Finder's Health access."
         }

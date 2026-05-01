@@ -95,6 +95,8 @@ struct WatchOnboardingView: View {
                             try await healthKit.requestAuthorization()
                             settings.hasCompletedSetup = true
                             await store.load()
+                        } catch is HealthKitError {
+                            log.error("watch authorization timeout")
                         } catch {
                             log.error("watch authorization failed: \(String(describing: error))")
                         }

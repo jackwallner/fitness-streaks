@@ -9,6 +9,10 @@ import WatchKit
 
 private let log = Logger(subsystem: "com.jackwallner.streaks", category: "HealthKit")
 
+enum HealthKitError: Error {
+    case timeout
+}
+
 @MainActor
 final class HealthKitService: ObservableObject {
     static let shared = HealthKitService()
@@ -63,8 +67,33 @@ final class HealthKitService: ObservableObject {
     func requestAuthorization() async throws {
         guard HKHealthStore.isHealthDataAvailable() else { return }
         log.info("Requesting HealthKit authorization for \(self.allReadTypes.count) read types")
-        try await store.requestAuthorization(toShare: [], read: allReadTypes)
-        hasRequestedAuthorization = true
+
+        // Wrap in timeout to prevent indefinite hangs (HealthKit can hang in edge cases)
+        try await withTimeout(seconds: 10) {
+            try await self.store.requestAuthorization(toShare: [], read: self.allReadTypes)
+        }
+
+        // Verify actual status - request completing doesn't mean user granted permission
+        if let status = await authorizationRequestStatus() {
+            hasRequestedAuthorization = (status == .unnecessary)
+        } else {
+            hasRequestedAuthorization = true // Assume we asked if status check fails
+        }
+    }
+
+    private func withTimeout<T>(seconds: TimeInterval, operation: @escaping () async throws -> T) async throws -> T {
+        try await withThrowingTaskGroup(of: T.self) { group in
+            group.addTask {
+                try await operation()
+            }
+            group.addTask {
+                try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+                throw HealthKitError.timeout
+            }
+            let result = try await group.next()!
+            group.cancelAll()
+            return result
+        }
     }
 
     func authorizationRequestStatus() async -> HKAuthorizationRequestStatus? {
