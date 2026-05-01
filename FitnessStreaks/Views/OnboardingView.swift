@@ -516,6 +516,10 @@ struct OnboardingView: View {
         do {
             try await healthKit.requestAuthorization()
             print("[Onboarding] Authorization request completed")
+            // Check status and update flag
+            if let status = await healthKit.authorizationRequestStatus() {
+                print("[Onboarding] Status: \(status)")
+            }
         } catch is HealthKitError {
             print("[Onboarding] Authorization timed out")
             errorText = "Health access is taking too long. Please try again or open Settings to enable access."

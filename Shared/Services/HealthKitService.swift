@@ -68,29 +68,30 @@ final class HealthKitService: ObservableObject {
         guard HKHealthStore.isHealthDataAvailable() else { return }
         log.info("Requesting HealthKit authorization for \(self.allReadTypes.count) read types")
 
-        // Wrap in timeout to prevent indefinite hangs (HealthKit can hang in edge cases)
+        // Use closure-based API with continuation - more reliable for UI presentation
         let store = self.store
         let types = self.allReadTypes
-        try await withThrowingTaskGroup(of: Void.self) { group in
-            group.addTask {
-                log.info("Starting authorization request...")
-                try await store.requestAuthorization(toShare: [], read: types)
-                log.info("Authorization request returned")
-            }
-            group.addTask {
-                try await Task.sleep(nanoseconds: 10_000_000_000) // 10 seconds
-                log.warning("Authorization request timed out after 10 seconds")
-                throw HealthKitError.timeout
-            }
-            try await group.next()!
-            group.cancelAll()
-        }
 
-        // Verify actual status - request completing doesn't mean user granted permission
-        if let status = await authorizationRequestStatus() {
-            hasRequestedAuthorization = (status == .unnecessary)
-        } else {
-            hasRequestedAuthorization = true // Assume we asked if status check fails
+        return try await withCheckedThrowingContinuation { continuation in
+            // Set up a timeout
+            let task = Task {
+                try? await Task.sleep(nanoseconds: 15_000_000_000) // 15 seconds
+                if !Task.isCancelled {
+                    log.warning("Authorization request timed out")
+                    continuation.resume(throwing: HealthKitError.timeout)
+                }
+            }
+
+            store.requestAuthorization(toShare: [], read: types) { success, error in
+                task.cancel()
+                if let error = error {
+                    log.error("Authorization request failed: \(error.localizedDescription)")
+                    continuation.resume(throwing: error)
+                } else {
+                    log.info("Authorization request completed, success: \(success)")
+                    continuation.resume()
+                }
+            }
         }
     }
 
