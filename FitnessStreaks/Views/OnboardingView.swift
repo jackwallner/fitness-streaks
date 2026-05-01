@@ -521,8 +521,8 @@ struct OnboardingView: View {
                 print("[Onboarding] Status: \(status)")
             }
         } catch is HealthKitError {
-            print("[Onboarding] Authorization timed out")
-            errorText = "Health access is taking too long. Please try again or open Settings to enable access."
+            print("[Onboarding] Authorization failed with HealthKitError")
+            errorText = "Couldn't request Health access from iOS. If the prompt doesn't appear, open Settings and enable Health access for Streak Finder."
             return
         } catch {
             print("[Onboarding] Authorization failed: \(error)")

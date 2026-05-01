@@ -11,6 +11,9 @@ private let log = Logger(subsystem: "com.jackwallner.streaks", category: "Health
 
 enum HealthKitError: Error {
     case timeout
+    case unavailable
+    case noReadTypes
+    case requestUnsuccessful
 }
 
 @MainActor
@@ -45,11 +48,21 @@ final class HealthKitService: ObservableObject {
         return set
     }
 
+    private var quantityReadTypes: Set<HKObjectType> {
+        var set: Set<HKObjectType> = []
+        for id in quantityTypes {
+            if let type = HKObjectType.quantityType(forIdentifier: id) {
+                set.insert(type)
+            } else {
+                log.error("Failed to resolve quantity type identifier: \(id.rawValue)")
+            }
+        }
+        return set
+    }
+
     private var allReadTypes: Set<HKObjectType> {
         var types: Set<HKObjectType> = categoryReadTypes
-        for id in quantityTypes {
-            types.insert(HKQuantityType(id))
-        }
+        types.formUnion(quantityReadTypes)
         return types
     }
 
@@ -65,13 +78,22 @@ final class HealthKitService: ObservableObject {
     // MARK: - Authorization
 
     func requestAuthorization() async throws {
-        guard HKHealthStore.isHealthDataAvailable() else { return }
+        guard HKHealthStore.isHealthDataAvailable() else {
+            log.error("Health data is not available on this device")
+            throw HealthKitError.unavailable
+        }
         let pre = await authorizationRequestStatus()
-        log.info("Requesting HealthKit authorization (preStatus=\(String(describing: pre))) for \(self.allReadTypes.count) read types")
+        let types = self.allReadTypes
+        let typeIDs = types.map(\.identifier).sorted().joined(separator: ",")
+        log.info("Requesting HealthKit authorization (preStatus=\(String(describing: pre))) for \(types.count) read types: \(typeIDs)")
+        guard !types.isEmpty else {
+            log.error("Aborting HealthKit authorization because read type set is empty")
+            throw HealthKitError.noReadTypes
+        }
+        logAuthorizationStatuses(prefix: "pre-request")
 
         // Use closure-based API with continuation - more reliable for UI presentation
         let store = self.store
-        let types = self.allReadTypes
 
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
             let lock = NSLock()
@@ -104,7 +126,12 @@ final class HealthKitService: ObservableObject {
                         continuation.resume(throwing: error)
                     } else {
                         log.info("Authorization request completed (success=\(success))")
-                        continuation.resume()
+                        if success {
+                            continuation.resume()
+                        } else {
+                            // Rare but important: HealthKit can callback with success=false and nil error.
+                            continuation.resume(throwing: HealthKitError.requestUnsuccessful)
+                        }
                     }
                 }
             }
@@ -112,6 +139,7 @@ final class HealthKitService: ObservableObject {
 
         await synchronizeAuthorization()
         let post = await authorizationRequestStatus()
+        logAuthorizationStatuses(prefix: "post-request")
         log.info("HealthKit authorization flow finished (postStatus=\(String(describing: post)), hasRequestedAuthorization=\(self.hasRequestedAuthorization))")
     }
 
@@ -138,6 +166,26 @@ final class HealthKitService: ObservableObject {
         // .unnecessary means we've asked at least once; treat that as "proceed to dashboard"
         // even if the user denied specific types — the empty state guides them to Settings.
         hasRequestedAuthorization = (status == .unnecessary)
+        log.info("synchronizeAuthorization -> requestStatus=\(String(describing: status)), hasRequestedAuthorization=\(self.hasRequestedAuthorization)")
+        logAuthorizationStatuses(prefix: "sync")
+    }
+
+    private func logAuthorizationStatuses(prefix: String) {
+        let statuses = allReadTypes
+            .map { ($0.identifier, store.authorizationStatus(for: $0)) }
+            .sorted { $0.0 < $1.0 }
+            .map { "\($0.0)=\(Self.authorizationLabel($0.1))" }
+            .joined(separator: ", ")
+        log.info("HealthKit \(prefix) per-type authorization statuses: \(statuses)")
+    }
+
+    nonisolated private static func authorizationLabel(_ status: HKAuthorizationStatus) -> String {
+        switch status {
+        case .notDetermined: return "notDetermined"
+        case .sharingDenied: return "sharingDenied"
+        case .sharingAuthorized: return "sharingAuthorized"
+        @unknown default: return "unknown"
+        }
     }
 
     // MARK: - History fetch
