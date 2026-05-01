@@ -81,8 +81,8 @@ final class HealthKitService: ObservableObject {
         }
     }
 
-    private func withTimeout<T>(seconds: TimeInterval, operation: @escaping () async throws -> T) async throws -> T {
-        try await withThrowingTaskGroup(of: T.self) { group in
+    private func withTimeout(seconds: TimeInterval, operation: @escaping () async throws -> Void) async throws {
+        try await withThrowingTaskGroup(of: Void.self) { group in
             group.addTask {
                 try await operation()
             }
@@ -90,9 +90,8 @@ final class HealthKitService: ObservableObject {
                 try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
                 throw HealthKitError.timeout
             }
-            let result = try await group.next()!
+            try await group.next()!
             group.cancelAll()
-            return result
         }
     }
 
