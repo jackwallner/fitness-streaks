@@ -507,12 +507,27 @@ struct OnboardingView: View {
     private func requestAuth() async {
         requesting = true
         defer { requesting = false }
+        print("[Onboarding] Starting HealthKit authorization request")
         do {
             try await healthKit.requestAuthorization()
+            print("[Onboarding] Authorization request completed")
         } catch is HealthKitError {
+            print("[Onboarding] Authorization timed out")
             errorText = "Health access is taking too long. Please try again or open Settings to enable access."
+            return
         } catch {
+            print("[Onboarding] Authorization failed: \(error)")
             errorText = "Couldn't connect. Open iOS Settings and turn on Streak Finder's Health access."
+            return
+        }
+
+        // Check if we actually got permission. If iOS won't re-prompt (already asked & denied),
+        // we need to direct user to Settings.
+        let status = await healthKit.authorizationRequestStatus()
+        print("[Onboarding] Authorization status after request: \(String(describing: status))")
+        if status == .shouldRequest {
+            // iOS says we should request, but request did nothing - prompt was suppressed or failed
+            errorText = "Health access needed. Open Settings to enable Streak Finder's access to Apple Health."
         }
     }
 

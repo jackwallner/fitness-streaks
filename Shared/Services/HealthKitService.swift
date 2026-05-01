@@ -73,10 +73,13 @@ final class HealthKitService: ObservableObject {
         let types = self.allReadTypes
         try await withThrowingTaskGroup(of: Void.self) { group in
             group.addTask {
+                log.info("Starting authorization request...")
                 try await store.requestAuthorization(toShare: [], read: types)
+                log.info("Authorization request returned")
             }
             group.addTask {
                 try await Task.sleep(nanoseconds: 10_000_000_000) // 10 seconds
+                log.warning("Authorization request timed out after 10 seconds")
                 throw HealthKitError.timeout
             }
             try await group.next()!
