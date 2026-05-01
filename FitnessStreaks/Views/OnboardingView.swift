@@ -507,36 +507,24 @@ struct OnboardingView: View {
     private func requestAuth() async {
         requesting = true
         defer { requesting = false }
-        print("[Onboarding] Starting HealthKit authorization request")
-
-        // Check status BEFORE requesting - if .unnecessary, iOS won't show dialog
-        let preStatus = await healthKit.authorizationRequestStatus()
-        print("[Onboarding] Pre-request status: \(String(describing: preStatus))")
 
         do {
             try await healthKit.requestAuthorization()
-            print("[Onboarding] Authorization request completed")
-            // Check status and update flag
-            if let status = await healthKit.authorizationRequestStatus() {
-                print("[Onboarding] Status: \(status)")
-            }
         } catch is HealthKitError {
-            print("[Onboarding] Authorization failed with HealthKitError")
-            errorText = "Couldn't request Health access from iOS. If the prompt doesn't appear, open Settings and enable Health access for Streak Finder."
+            errorText = "Couldn't request Health access from iOS. Open the Health app or Settings and enable access for Streak Finder."
             return
         } catch {
-            print("[Onboarding] Authorization failed: \(error)")
-            errorText = "Couldn't connect. Open iOS Settings and turn on Streak Finder's Health access."
+            errorText = "Couldn't connect to Apple Health. Open the Health app and enable access for Streak Finder."
             return
         }
 
-        // Check if we actually got permission. If iOS won't re-prompt (already asked & denied),
-        // we need to direct user to Settings.
+        // We can't detect read-permission denial (Apple privacy). The one signal we
+        // do get: if post-request status is still `.shouldRequest`, the prompt was
+        // suppressed (almost always because the user previously denied). Direct
+        // them to Settings rather than parking on a data-less dashboard.
         let postStatus = await healthKit.authorizationRequestStatus()
-        print("[Onboarding] Post-request status: \(String(describing: postStatus))")
         if postStatus == .shouldRequest {
-            // iOS says we should request, but request did nothing - prompt was suppressed or failed
-            errorText = "Health access needed. Open Settings to enable Streak Finder's access to Apple Health."
+            errorText = "Health access needed. Open the Health app or Settings to enable Streak Finder's access to Apple Health."
         }
     }
 

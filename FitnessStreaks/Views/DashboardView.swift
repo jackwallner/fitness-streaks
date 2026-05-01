@@ -29,6 +29,11 @@ struct DashboardView: View {
                     topBar
                         .padding(.top, 4)
 
+                    if store.dataMaybeRevoked {
+                        revokedBanner
+                            .padding(.horizontal, 6)
+                    }
+
                     if !visibleBrokenStreaks.isEmpty {
                         ForEach(visibleBrokenStreaks.prefix(3)) { broken in
                             brokenBanner(broken)
@@ -175,6 +180,34 @@ struct DashboardView: View {
             .accessibilityLabel("Open settings")
         }
         .padding(.horizontal, 16)
+    }
+
+    private var revokedBanner: some View {
+        Button {
+            if let url = URL(string: "x-apple-health://"), UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
+            } else if let url = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(url)
+            }
+        } label: {
+            HStack(spacing: 10) {
+                Text("! NO RECENT DATA")
+                    .font(RetroFont.mono(9, weight: .bold))
+                    .tracking(1)
+                    .foregroundStyle(Theme.retroCyan)
+                Text("Apple Health may have revoked access · TAP TO FIX")
+                    .font(RetroFont.mono(10))
+                    .foregroundStyle(Theme.retroInk)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                Spacer()
+            }
+            .padding(.vertical, 8)
+            .padding(.horizontal, 12)
+            .pixelPanel(color: Theme.retroCyan, fill: Theme.retroBg)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Apple Health may have revoked access. Tap to open Health Settings.")
     }
 
     private func atRiskBanner(for streak: Streak) -> some View {

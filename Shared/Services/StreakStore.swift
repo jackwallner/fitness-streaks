@@ -36,6 +36,14 @@ final class StreakStore: ObservableObject {
     @Published var lastUpdated: Date? = nil
     @Published var isRefreshing: Bool = false
 
+    /// Heuristic flag: a fresh HealthKit fetch returned zero step data across the
+    /// recent window even though the cache previously held non-trivial data. The
+    /// most likely cause is the user revoked Apple Health access in iOS Settings,
+    /// but this can't be confirmed (Apple's privacy contract hides read denial),
+    /// so the UI presents this as a soft "may need attention" banner — never a
+    /// destructive action.
+    @Published var dataMaybeRevoked: Bool = false
+
     var hero: Streak? { streaks.first }
     var badges: [Streak] { Array(streaks.dropFirst()) }
 
@@ -57,6 +65,21 @@ final class StreakStore: ObservableObject {
         guard let tracked else { return streaks }
         if tracked.isEmpty { return [] }
         return streaks.filter { tracked.contains($0.trackingKey) }
+    }
+
+    /// Heuristic: did this refresh look like a revoked-permission situation?
+    /// True iff the fresh fetch shows zero steps across the last 14 days but the
+    /// pre-fetch cache had a meaningful step total (≥ 5,000) over the same window.
+    /// Tuned conservatively to avoid false positives for users on a real lull.
+    nonisolated static func detectLikelyRevocation(fresh: [ActivityDay], previousCache: [ActivityDay]) -> Bool {
+        guard !previousCache.isEmpty else { return false }
+        let windowStart = DateHelpers.daysAgo(13)
+        let recentFresh = fresh.filter { $0.date >= windowStart }
+        let recentCache = previousCache.filter { $0.date >= windowStart }
+        guard !recentFresh.isEmpty, !recentCache.isEmpty else { return false }
+        let freshSteps = recentFresh.reduce(0.0) { $0 + $1.steps }
+        let cachedSteps = recentCache.reduce(0.0) { $0 + $1.steps }
+        return freshSteps == 0 && cachedSteps >= 5_000
     }
 
     /// Apply manual ordering: items in manualOrder come first in that order,
@@ -108,7 +131,12 @@ final class StreakStore: ObservableObject {
         }
         do {
             let previous = self.streaks
+            // Snapshot pre-fetch cache for the revocation heuristic below — once we
+            // call HealthKitService.cache() with the fresh result, this comparison
+            // would be against itself.
+            let preFetchCached = HealthKitService.shared.cachedHistory(days: 30)
             let fresh = try await HealthKitService.shared.fetchHistory(days: 400)
+            self.dataMaybeRevoked = Self.detectLikelyRevocation(fresh: fresh, previousCache: preFetchCached)
             withAnimation(.linear(duration: 0.25)) {
                 loadProgress = 0.5
                 loadStage = .analyzingPatterns

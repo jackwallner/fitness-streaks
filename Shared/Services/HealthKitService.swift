@@ -31,9 +31,6 @@ final class HealthKitService: ObservableObject {
         .heartRate,
     ]
 
-    /// Category types (mindful session, sleep analysis, stand hour).
-    /// Note: workoutType() is HKObjectType, not HKSampleType, so it cannot be included
-    /// in the authorization request set which requires Set<HKSampleType>.
     private var categorySampleTypes: Set<HKSampleType> {
         var set: Set<HKSampleType> = []
         let identifiers: [HKCategoryTypeIdentifier] = [.mindfulSession, .sleepAnalysis, .appleStandHour]
@@ -45,11 +42,6 @@ final class HealthKitService: ObservableObject {
             }
         }
         return set
-    }
-
-    /// Workout type for querying (separate from authorization types since it's not an HKSampleType).
-    private var workoutType: HKObjectType {
-        HKObjectType.workoutType()
     }
 
     private var quantitySampleTypes: Set<HKSampleType> {
@@ -64,19 +56,20 @@ final class HealthKitService: ObservableObject {
         return set
     }
 
-    /// Types for authorization request (must be HKSampleType, excludes workoutType)
+    /// Types for the read authorization request. `HKWorkoutType` inherits from
+    /// `HKSampleType`, so it goes here too — including it makes "Workouts" appear
+    /// as its own row in the Health permission sheet.
     private var authorizationTypes: Set<HKSampleType> {
         var types: Set<HKSampleType> = categorySampleTypes
         types.formUnion(quantitySampleTypes)
+        types.insert(HKObjectType.workoutType())
         return types
     }
 
-    /// All readable types for status checking (includes workoutType)
+    /// Same set, viewed as `HKObjectType` — used by APIs (e.g. `getRequestStatusForAuthorization`)
+    /// that take the broader supertype.
     private var allReadTypes: Set<HKObjectType> {
-        var types: Set<HKObjectType> = categorySampleTypes
-        types.formUnion(quantitySampleTypes)
-        types.insert(workoutType)
-        return types
+        Set(authorizationTypes.map { $0 as HKObjectType })
     }
 
     private init() {
@@ -105,8 +98,11 @@ final class HealthKitService: ObservableObject {
         }
         try await store.requestAuthorization(toShare: [], read: types)
         hasRequestedAuthorization = true
-        log.info("HealthKit authorization request finished")
-        logAuthorizationStatuses(prefix: "post-request")
+        // Per Apple's privacy contract, `authorizationStatus(for:)` always returns
+        // `.notDetermined` for read-only types — so we deliberately don't log per-type
+        // statuses here; they would be misleading.
+        let post = await authorizationRequestStatus()
+        log.info("HealthKit authorization request finished (postStatus=\(String(describing: post)))")
     }
 
     func authorizationRequestStatus() async -> HKAuthorizationRequestStatus? {
@@ -158,25 +154,6 @@ final class HealthKitService: ObservableObject {
         // even if the user denied specific types — the empty state guides them to Settings.
         hasRequestedAuthorization = (status == .unnecessary)
         log.info("synchronizeAuthorization -> requestStatus=\(String(describing: status)), hasRequestedAuthorization=\(self.hasRequestedAuthorization)")
-        logAuthorizationStatuses(prefix: "sync")
-    }
-
-    private func logAuthorizationStatuses(prefix: String) {
-        let statuses = allReadTypes
-            .map { ($0.identifier, store.authorizationStatus(for: $0)) }
-            .sorted { $0.0 < $1.0 }
-            .map { "\($0.0)=\(Self.authorizationLabel($0.1))" }
-            .joined(separator: ", ")
-        log.info("HealthKit \(prefix) per-type authorization statuses: \(statuses)")
-    }
-
-    nonisolated private static func authorizationLabel(_ status: HKAuthorizationStatus) -> String {
-        switch status {
-        case .notDetermined: return "notDetermined"
-        case .sharingDenied: return "sharingDenied"
-        case .sharingAuthorized: return "sharingAuthorized"
-        @unknown default: return "unknown"
-        }
     }
 
     // MARK: - History fetch

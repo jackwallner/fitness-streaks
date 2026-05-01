@@ -73,6 +73,7 @@ struct WatchOnboardingView: View {
     @EnvironmentObject var settings: StreakSettings
     @EnvironmentObject var store: StreakStore
     @State private var requesting = false
+    @State private var showHelp = false
 
     var body: some View {
         ScrollView {
@@ -88,19 +89,7 @@ struct WatchOnboardingView: View {
                     .multilineTextAlignment(.center)
 
                 Button {
-                    Task {
-                        requesting = true
-                        defer { requesting = false }
-                        do {
-                            try await healthKit.requestAuthorization()
-                            settings.hasCompletedSetup = true
-                            await store.load()
-                        } catch is HealthKitError {
-                            log.error("watch authorization timeout")
-                        } catch {
-                            log.error("watch authorization failed: \(String(describing: error))")
-                        }
-                    }
+                    Task { await connect() }
                 } label: {
                     Text(requesting ? "…" : "Connect")
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
@@ -109,9 +98,64 @@ struct WatchOnboardingView: View {
                 }
                 .tint(Theme.streakHot)
                 .buttonStyle(.borderedProminent)
+                .disabled(requesting)
                 .padding(.top, 4)
+
+                if showHelp {
+                    helpBlock
+                }
             }
             .padding()
         }
+    }
+
+    private var helpBlock: some View {
+        VStack(spacing: 6) {
+            Text("Didn't see a prompt?")
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .foregroundStyle(.primary)
+            Text("Open the Health app on your iPhone → Sharing → Apps → Streak Finder, then enable the categories you want to track.")
+                .font(.system(size: 11, design: .rounded))
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+            Button("Continue Anyway") {
+                settings.hasCompletedSetup = true
+                Task { await store.load() }
+            }
+            .font(.system(size: 11, weight: .semibold, design: .rounded))
+            .buttonStyle(.bordered)
+            .tint(Theme.streakHot)
+            .padding(.top, 4)
+        }
+        .padding(.top, 8)
+    }
+
+    private func connect() async {
+        requesting = true
+        showHelp = false
+        defer { requesting = false }
+
+        do {
+            try await healthKit.requestAuthorization()
+        } catch {
+            log.error("watch authorization failed: \(String(describing: error))")
+            showHelp = true
+            return
+        }
+
+        // We can't detect read-permission denial directly (Apple privacy). But if the
+        // post-request status is still `.shouldRequest`, it means the system suppressed
+        // the prompt entirely — almost always because the user already denied at some
+        // earlier point. Surface phone-side recovery instructions instead of silently
+        // dropping into a data-less dashboard.
+        let post = await healthKit.authorizationRequestStatus()
+        if post == .shouldRequest {
+            log.warning("watch auth: postStatus=.shouldRequest after request — prompt suppressed")
+            showHelp = true
+            return
+        }
+
+        settings.hasCompletedSetup = true
+        await store.load()
     }
 }
