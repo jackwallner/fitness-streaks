@@ -69,8 +69,18 @@ final class HealthKitService: ObservableObject {
         log.info("Requesting HealthKit authorization for \(self.allReadTypes.count) read types")
 
         // Wrap in timeout to prevent indefinite hangs (HealthKit can hang in edge cases)
-        try await withTimeout(seconds: 10) {
-            try await self.store.requestAuthorization(toShare: [], read: self.allReadTypes)
+        let store = self.store
+        let types = self.allReadTypes
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            group.addTask {
+                try await store.requestAuthorization(toShare: [], read: types)
+            }
+            group.addTask {
+                try await Task.sleep(nanoseconds: 10_000_000_000) // 10 seconds
+                throw HealthKitError.timeout
+            }
+            try await group.next()!
+            group.cancelAll()
         }
 
         // Verify actual status - request completing doesn't mean user granted permission
@@ -78,20 +88,6 @@ final class HealthKitService: ObservableObject {
             hasRequestedAuthorization = (status == .unnecessary)
         } else {
             hasRequestedAuthorization = true // Assume we asked if status check fails
-        }
-    }
-
-    private func withTimeout(seconds: TimeInterval, operation: @escaping () async throws -> Void) async throws {
-        try await withThrowingTaskGroup(of: Void.self) { group in
-            group.addTask {
-                try await operation()
-            }
-            group.addTask {
-                try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
-                throw HealthKitError.timeout
-            }
-            try await group.next()!
-            group.cancelAll()
         }
     }
 
