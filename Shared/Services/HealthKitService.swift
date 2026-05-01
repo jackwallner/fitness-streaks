@@ -113,7 +113,7 @@ final class HealthKitService: ObservableObject {
         guard HKHealthStore.isHealthDataAvailable() else { return nil }
         return await withTimeout(seconds: 5) {
             await withCheckedContinuation { continuation in
-                store.getRequestStatusForAuthorization(toShare: [], read: allReadTypes) { status, error in
+                self.store.getRequestStatusForAuthorization(toShare: [], read: self.allReadTypes) { status, error in
                     if let error {
                         log.error("auth request status error: \(String(describing: error))")
                         continuation.resume(returning: nil)
@@ -144,7 +144,8 @@ final class HealthKitService: ObservableObject {
             group.cancelAll()
             return first
         }
-        return result ?? fallback()
+        guard let result, let unwrapped = result else { return fallback() }
+        return unwrapped
     }
 
     /// Reflects current authorization state without ever prompting. The system permission
