@@ -66,33 +66,53 @@ final class HealthKitService: ObservableObject {
 
     func requestAuthorization() async throws {
         guard HKHealthStore.isHealthDataAvailable() else { return }
-        log.info("Requesting HealthKit authorization for \(self.allReadTypes.count) read types")
+        let pre = await authorizationRequestStatus()
+        log.info("Requesting HealthKit authorization (preStatus=\(String(describing: pre))) for \(self.allReadTypes.count) read types")
 
         // Use closure-based API with continuation - more reliable for UI presentation
         let store = self.store
         let types = self.allReadTypes
 
-        return try await withCheckedThrowingContinuation { continuation in
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
+            let lock = NSLock()
+            var didResume = false
+
+            func resumeOnce(_ action: () -> Void) {
+                lock.lock()
+                defer { lock.unlock() }
+                guard !didResume else { return }
+                didResume = true
+                action()
+            }
+
             // Set up a timeout
             let task = Task {
                 try? await Task.sleep(nanoseconds: 15_000_000_000) // 15 seconds
                 if !Task.isCancelled {
                     log.warning("Authorization request timed out")
-                    continuation.resume(throwing: HealthKitError.timeout)
+                    resumeOnce {
+                        continuation.resume(throwing: HealthKitError.timeout)
+                    }
                 }
             }
 
             store.requestAuthorization(toShare: [], read: types) { success, error in
                 task.cancel()
-                if let error = error {
-                    log.error("Authorization request failed: \(error.localizedDescription)")
-                    continuation.resume(throwing: error)
-                } else {
-                    log.info("Authorization request completed, success: \(success)")
-                    continuation.resume()
+                resumeOnce {
+                    if let error = error {
+                        log.error("Authorization request failed: \(String(describing: error))")
+                        continuation.resume(throwing: error)
+                    } else {
+                        log.info("Authorization request completed (success=\(success))")
+                        continuation.resume()
+                    }
                 }
             }
         }
+
+        await synchronizeAuthorization()
+        let post = await authorizationRequestStatus()
+        log.info("HealthKit authorization flow finished (postStatus=\(String(describing: post)), hasRequestedAuthorization=\(self.hasRequestedAuthorization))")
     }
 
     func authorizationRequestStatus() async -> HKAuthorizationRequestStatus? {

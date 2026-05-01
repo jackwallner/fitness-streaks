@@ -57,6 +57,13 @@ struct FitnessStreaksApp: App {
                 .environmentObject(store)
                 .task {
                     await healthKit.synchronizeAuthorization()
+                    // If setup was completed previously but HealthKit was never requested on
+                    // this device/install, force onboarding so the user gets a clear path to
+                    // trigger the Health permission prompt from an explicit tap.
+                    if settings.hasCompletedSetup && !healthKit.hasRequestedAuthorization {
+                        log.warning("Resetting onboarding because HealthKit has not been requested (hasCompletedSetup=true, hasRequestedAuthorization=false)")
+                        settings.hasCompletedSetup = false
+                    }
                     await store.load(allowCachedSnapshot: true)
                 }
                 .onChange(of: scenePhase) { _, phase in

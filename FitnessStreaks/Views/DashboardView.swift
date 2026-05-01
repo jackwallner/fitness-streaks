@@ -1,4 +1,7 @@
 import SwiftUI
+import os
+
+private let log = Logger(subsystem: "com.jackwallner.streaks", category: "Dashboard")
 
 struct DashboardView: View {
     @EnvironmentObject var store: StreakStore
@@ -9,6 +12,8 @@ struct DashboardView: View {
     @State private var selectedStreak: Streak? = nil
     @State private var showPicker = false
     @State private var selectedBroken: BrokenStreak? = nil
+    @State private var requestingHealthAccess = false
+    @State private var healthAccessErrorText: String? = nil
 
     private let grid = [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)]
     private static let relativeFormatter: RelativeDateTimeFormatter = {
@@ -84,6 +89,21 @@ struct DashboardView: View {
                     settings.dismissBroken(broken)
                     store.persistCurrentSnapshot()
                 }
+            }
+            .alert("Health Access", isPresented: Binding(
+                get: { healthAccessErrorText != nil },
+                set: { shown in
+                    if !shown { healthAccessErrorText = nil }
+                }
+            )) {
+                Button("Open Settings") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                }
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(healthAccessErrorText ?? "")
             }
         }
     }
@@ -294,10 +314,8 @@ struct DashboardView: View {
                 .overlay(Rectangle().stroke(Theme.retroLime, lineWidth: 2))
                 .accessibilityLabel("Refresh streaks from Apple Health")
 
-                Button("HEALTH SETTINGS") {
-                    if let url = URL(string: UIApplication.openSettingsURLString) {
-                        UIApplication.shared.open(url)
-                    }
+                Button(requestingHealthAccess ? "REQUESTING..." : "REQUEST HEALTH ACCESS") {
+                    Task { await requestHealthAccess() }
                 }
                 .buttonStyle(.plain)
                 .font(RetroFont.mono(11, weight: .bold))
@@ -305,6 +323,20 @@ struct DashboardView: View {
                 .padding(.horizontal, 18)
                 .padding(.vertical, 10)
                 .overlay(Rectangle().stroke(Theme.retroCyan, lineWidth: 2))
+                .disabled(requestingHealthAccess)
+                .accessibilityLabel("Request Health access")
+
+                Button("HEALTH SETTINGS") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                }
+                .buttonStyle(.plain)
+                .font(RetroFont.mono(11, weight: .bold))
+                .foregroundStyle(Theme.retroInkDim)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 10)
+                .overlay(Rectangle().stroke(Theme.retroInkFaint, lineWidth: 2))
                 .accessibilityLabel("Open iOS Settings for Health access")
             }
         }
@@ -324,5 +356,27 @@ struct DashboardView: View {
         settings.trackedStreaks = tracked
         settings.dismissBroken(broken)
         store.refilter()
+    }
+
+    private func requestHealthAccess() async {
+        guard !requestingHealthAccess else { return }
+        requestingHealthAccess = true
+        defer { requestingHealthAccess = false }
+
+        let preStatus = await healthKit.authorizationRequestStatus()
+        log.info("Manual health access request started from dashboard (preStatus=\(String(describing: preStatus)))")
+
+        do {
+            try await healthKit.requestAuthorization()
+            let postStatus = await healthKit.authorizationRequestStatus()
+            log.info("Manual health access request finished (postStatus=\(String(describing: postStatus)), hasRequestedAuthorization=\(self.healthKit.hasRequestedAuthorization))")
+            await store.load()
+        } catch is HealthKitError {
+            log.error("Manual health access request timed out")
+            healthAccessErrorText = "Health access request timed out. Try again, then open Settings if the prompt does not appear."
+        } catch {
+            log.error("Manual health access request failed: \(String(describing: error))")
+            healthAccessErrorText = "Could not request Health access from iOS. Open Settings and enable Health access for Streak Finder."
+        }
     }
 }
