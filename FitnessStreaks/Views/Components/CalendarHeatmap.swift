@@ -134,7 +134,8 @@ struct CalendarHeatmap: View {
     // MARK: - Layout Calculation
 
     private struct Layout {
-        let cell: CGFloat
+        let cellWidth: CGFloat
+        let cellHeight: CGFloat
         let gap: CGFloat
         let gridWidth: CGFloat
         let gridHeight: CGFloat
@@ -148,23 +149,19 @@ struct CalendarHeatmap: View {
         let availableWidth = size.width - weekdayLabelWidth - 8
         let availableHeight = size.height - headerHeight - footerHeight - 8
 
-        // Calculate cell size from width constraint
-        // (weekCount * cell) + ((weekCount - 1) * gap) = availableWidth
-        let cellFromWidth = (availableWidth - (weekCount - 1) * gap) / weekCount
+        // Use ALL available width - calculate cell width independently
+        let cellWidth = (availableWidth - (weekCount - 1) * gap) / weekCount
 
-        // Calculate cell size from height constraint
-        // (rowCount * cell) + ((rowCount - 1) * gap) = availableHeight
-        let cellFromHeight = (availableHeight - (rowCount - 1) * gap) / rowCount
+        // Use ALL available height - calculate cell height independently  
+        let cellHeight = (availableHeight - (rowCount - 1) * gap) / rowCount
 
-        // Use the smaller of the two to ensure it fits
-        let cell = min(cellFromWidth, cellFromHeight)
-
-        // Recalculate actual dimensions
-        let actualGridWidth = weekCount * cell + (weekCount - 1) * gap
-        let actualGridHeight = rowCount * cell + (rowCount - 1) * gap
+        // Actual grid dimensions fill the container
+        let actualGridWidth = weekCount * cellWidth + (weekCount - 1) * gap
+        let actualGridHeight = rowCount * cellHeight + (rowCount - 1) * gap
 
         return Layout(
-            cell: max(4, cell),
+            cellWidth: max(2, cellWidth),
+            cellHeight: max(8, cellHeight), // Minimum 8pt height for visibility
             gap: gap,
             gridWidth: actualGridWidth,
             gridHeight: actualGridHeight
@@ -188,7 +185,7 @@ struct CalendarHeatmap: View {
                         .font(RetroFont.pixel(7))
                         .foregroundStyle(Theme.retroInkDim)
                         .position(
-                            x: CGFloat(label.index) * (layout.cell + layout.gap) + layout.cell/2,
+                            x: CGFloat(label.index) * (layout.cellWidth + layout.gap) + layout.cellWidth/2,
                             y: headerHeight/2
                         )
                 }
@@ -198,7 +195,7 @@ struct CalendarHeatmap: View {
 
     private func gridRow(weeks: [[RenderedDay]], layout: Layout) -> some View {
         HStack(alignment: .top, spacing: 4) {
-            weekdayLabels(cell: layout.cell)
+            weekdayLabels(cellHeight: layout.cellHeight)
                 .frame(width: weekdayLabelWidth)
 
             HStack(alignment: .top, spacing: layout.gap) {
@@ -213,30 +210,30 @@ struct CalendarHeatmap: View {
     private func weekColumn(week: [RenderedDay], layout: Layout) -> some View {
         VStack(spacing: layout.gap) {
             ForEach(week, id: \.id) { day in
-                cellView(day: day, size: layout.cell)
+                cellView(day: day, width: layout.cellWidth, height: layout.cellHeight)
             }
         }
     }
 
     @ViewBuilder
-    private func cellView(day: RenderedDay, size: CGFloat) -> some View {
+    private func cellView(day: RenderedDay, width: CGFloat, height: CGFloat) -> some View {
         Rectangle()
             .fill(color(for: day))
-            .frame(width: size, height: size)
+            .frame(width: width, height: height)
             .overlay {
                 if day.isToday {
-                    Rectangle().stroke(Theme.retroCyan, lineWidth: max(1, size/6))
+                    Rectangle().stroke(Theme.retroCyan, lineWidth: max(1, min(width, height)/6))
                 }
             }
     }
 
-    private func weekdayLabels(cell: CGFloat) -> some View {
+    private func weekdayLabels(cellHeight: CGFloat) -> some View {
         VStack(spacing: gap) {
             ForEach(["M", "T", "W", "T", "F", "S", "S"], id: \.self) { label in
                 Text(label)
                     .font(RetroFont.pixel(7))
                     .foregroundStyle(Theme.retroInkDim)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(maxWidth: .infinity, minHeight: cellHeight, maxHeight: cellHeight)
             }
         }
     }
