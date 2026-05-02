@@ -25,23 +25,9 @@ enum HeatmapDateRange: String, CaseIterable {
         }
     }
 
-    /// Upper bound for cells; the actual size is computed from available card width.
-    var maxCellSize: CGFloat {
-        switch self {
-        case .last30Days: return 40
-        case .last90Days: return 24
-        case .last180Days: return 10
-        case .fullYear: return 8
-        }
-    }
-
-    var heatmapHeight: CGFloat {
-        switch self {
-        case .last30Days: return 338
-        case .last90Days: return 226
-        case .last180Days: return 112
-        case .fullYear: return 112
-        }
+    /// Number of weeks (columns) for this range, approximated.
+    var weeksCount: Int {
+        (days + 6) / 7
     }
 
     /// Pick the smallest range that comfortably contains the user's lookback window.
@@ -146,6 +132,9 @@ struct CalendarHeatmap: View {
         return labels
     }
 
+    // Fixed card height - cells expand to fill available space
+    private let cardHeight: CGFloat = 140
+
     var body: some View {
         let weeks = calendarWeeks
 
@@ -153,7 +142,7 @@ struct CalendarHeatmap: View {
             let layout = layoutMetrics(weekCount: weeks.count, availableWidth: proxy.size.width)
             grid(weeks: weeks, layout: layout)
         }
-        .frame(height: selectedRange.heatmapHeight)
+        .frame(height: cardHeight)
     }
 
     @ViewBuilder
@@ -215,25 +204,26 @@ struct CalendarHeatmap: View {
     private func layoutMetrics(weekCount: Int, availableWidth: CGFloat) -> LayoutMetrics {
         let columns = max(1, weekCount)
         let gridWidth = max(0, availableWidth - weekdayLabelWidth - 8)
-        let baseSpacing = gap
 
-        // Calculate cell size from fixed height to ensure square cells
-        // Height budget: heatmapHeight - vertical padding - month label - bottom label row
-        let verticalPadding: CGFloat = 4 // 2 top + 2 bottom from grid padding
-        let monthLabelHeight: CGFloat = 14
-        let bottomLabelHeight: CGFloat = 20
-        let availableHeight = selectedRange.heatmapHeight - verticalPadding - monthLabelHeight - bottomLabelHeight - 4 // extra safety
-        let heightBasedCell = (availableHeight - 6 * baseSpacing) / 7 // 7 rows, 6 gaps
-        let cell = max(4, min(selectedRange.maxCellSize, floor(heightBasedCell)))
+        // Fixed height layout: calculate cell size from available height
+        // Height budget: cardHeight - top label - bottom label - padding
+        let topLabelHeight: CGFloat = 14      // Month labels
+        let bottomLabelHeight: CGFloat = 16     // Date range + TODAY
+        let verticalPadding: CGFloat = 8        // Total vertical padding
+        let availableForCells = cardHeight - topLabelHeight - bottomLabelHeight - verticalPadding
+
+        // Cell fills available height: (available - 6 gaps) / 7 rows
+        let idealCell = (availableForCells - 6 * gap) / 7
+        let cell = max(4, idealCell)
 
         // Distribute remaining horizontal space as column spacing
         let usedByCells = CGFloat(columns) * cell
         let remainingWidth = max(0, gridWidth - usedByCells)
-        let columnSpacing = columns > 1 ? remainingWidth / CGFloat(columns - 1) : baseSpacing
+        let columnSpacing = columns > 1 ? remainingWidth / CGFloat(columns - 1) : gap
 
         return LayoutMetrics(
             cell: cell,
-            columnSpacing: max(baseSpacing, columnSpacing),
+            columnSpacing: max(gap, columnSpacing),
             gridWidth: gridWidth
         )
     }
