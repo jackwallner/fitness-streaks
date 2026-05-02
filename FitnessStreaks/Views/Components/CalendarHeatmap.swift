@@ -25,13 +25,22 @@ enum HeatmapDateRange: String, CaseIterable {
         }
     }
 
-    /// Fixed cell size per range for consistent visual density
-    var cellSize: CGFloat {
+    /// Upper bound for cells; the actual size is computed from available card width.
+    var maxCellSize: CGFloat {
         switch self {
-        case .last30Days: return 16
-        case .last90Days: return 12
-        case .last180Days: return 10
+        case .last30Days: return 40
+        case .last90Days: return 24
+        case .last180Days: return 16
         case .fullYear: return 8
+        }
+    }
+
+    var heatmapHeight: CGFloat {
+        switch self {
+        case .last30Days: return 338
+        case .last90Days: return 226
+        case .last180Days: return 170
+        case .fullYear: return 112
         }
     }
 
@@ -57,6 +66,12 @@ struct CalendarHeatmap: View {
 
     private let gap: CGFloat = 2
     private let weekdayLabelWidth: CGFloat = 14
+
+    private struct LayoutMetrics {
+        let cell: CGFloat
+        let columnSpacing: CGFloat
+        let gridWidth: CGFloat
+    }
 
     private struct RenderedDay: Identifiable {
         let date: Date
@@ -133,32 +148,16 @@ struct CalendarHeatmap: View {
 
     var body: some View {
         let weeks = calendarWeeks
-        let cell = selectedRange.cellSize
-        let height = CGFloat(7) * cell + CGFloat(6) * gap + 42 // cells + gaps + labels + range key
 
-        ScrollViewReader { proxy in
-            ScrollView(.horizontal, showsIndicators: false) {
-                grid(weeks: weeks, cell: cell)
-            }
-            .onAppear {
-                withAnimation(.easeOut(duration: 0.2)) {
-                    proxy.scrollTo(max(0, weeks.count - 1), anchor: .trailing)
-                }
-            }
-            .onChange(of: selectedRange) { _, _ in
-                DispatchQueue.main.async {
-                    withAnimation(.easeOut(duration: 0.2)) {
-                        proxy.scrollTo(max(0, weeks.count - 1), anchor: .trailing)
-                    }
-                }
-            }
+        GeometryReader { proxy in
+            let layout = layoutMetrics(weekCount: weeks.count, availableWidth: proxy.size.width)
+            grid(weeks: weeks, layout: layout)
         }
-        .frame(height: height)
+        .frame(height: selectedRange.heatmapHeight)
     }
 
     @ViewBuilder
-    private func grid(weeks: [[RenderedDay]], cell: CGFloat) -> some View {
-        let width = CGFloat(weeks.count) * cell + CGFloat(max(0, weeks.count - 1)) * gap
+    private func grid(weeks: [[RenderedDay]], layout: LayoutMetrics) -> some View {
         let labels = monthLabels(for: weeks)
 
         VStack(alignment: .leading, spacing: 4) {
@@ -166,25 +165,25 @@ struct CalendarHeatmap: View {
                 Color.clear.frame(width: weekdayLabelWidth, height: 10)
 
                 ZStack(alignment: .topLeading) {
-                    Color.clear.frame(width: width, height: 10)
+                    Color.clear.frame(width: layout.gridWidth, height: 10)
                     ForEach(labels, id: \.index) { label in
                         Text(label.name)
                             .font(RetroFont.pixel(7))
                             .foregroundStyle(Theme.retroInkDim)
                             .fixedSize()
-                            .offset(x: CGFloat(label.index) * (cell + gap))
+                            .offset(x: CGFloat(label.index) * (layout.cell + layout.columnSpacing))
                     }
                 }
             }
 
             HStack(alignment: .top, spacing: 4) {
-                weekdayLabels(cell: cell)
+                weekdayLabels(cell: layout.cell)
 
-                HStack(alignment: .top, spacing: gap) {
+                HStack(alignment: .top, spacing: layout.columnSpacing) {
                     ForEach(Array(weeks.enumerated()), id: \.offset) { item in
                         VStack(spacing: gap) {
                             ForEach(item.element) { day in
-                                cellView(day: day, size: cell)
+                                cellView(day: day, size: layout.cell)
                             }
                         }
                         .id(item.offset)
@@ -210,7 +209,24 @@ struct CalendarHeatmap: View {
         }
         .padding(.vertical, 2)
         .padding(.horizontal, 2)
-        .frame(width: width + weekdayLabelWidth + 10, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func layoutMetrics(weekCount: Int, availableWidth: CGFloat) -> LayoutMetrics {
+        let columns = max(1, weekCount)
+        let gridWidth = max(0, availableWidth - weekdayLabelWidth - 8)
+        let baseSpacing = gap
+        let fittedCell = (gridWidth - CGFloat(columns - 1) * baseSpacing) / CGFloat(columns)
+        let cell = max(4, min(selectedRange.maxCellSize, floor(fittedCell)))
+        let usedByCells = CGFloat(columns) * cell
+        let availableSpacing = max(baseSpacing, gridWidth - usedByCells)
+        let columnSpacing = columns > 1 ? availableSpacing / CGFloat(columns - 1) : baseSpacing
+
+        return LayoutMetrics(
+            cell: cell,
+            columnSpacing: max(baseSpacing, columnSpacing),
+            gridWidth: gridWidth
+        )
     }
 
     private func weekdayLabels(cell: CGFloat) -> some View {
