@@ -280,7 +280,11 @@ final class StreakStore: ObservableObject {
             )
         }
         guard !restored.isEmpty else { return }
-        streaks = restored
+        // Re-apply tracked filter and manual order to ensure consistency with iPhone
+        let settings = StreakSettings.shared
+        var filtered = Self.applyTrackedFilter(restored, tracked: settings.trackedStreaks)
+        filtered = Self.applyManualOrder(filtered, manualOrder: settings.manualStreakOrder)
+        streaks = filtered
         allCandidates = restored
         lastUpdated = snapshot.updated
     }
