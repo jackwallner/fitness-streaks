@@ -519,11 +519,13 @@ struct StreakDetailView: View {
             HeatmapRangePicker(selectedRange: $selectedHeatmapRange)
                 .padding(.bottom, 4)
 
+            // Fixed height container so heatmap can fill it dynamically
             CalendarHeatmap(
                 entries: heatmapEntries,
                 accent: streak.metric.accent,
                 selectedRange: $selectedHeatmapRange
             )
+            .frame(height: 140)
 
             // Simplified binary legend
             HStack(spacing: 12) {

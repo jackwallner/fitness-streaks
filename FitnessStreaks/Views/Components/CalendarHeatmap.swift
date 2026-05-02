@@ -25,12 +25,10 @@ enum HeatmapDateRange: String, CaseIterable {
         }
     }
 
-    /// Number of weeks (columns) for this range, approximated.
     var weeksCount: Int {
         (days + 6) / 7
     }
 
-    /// Pick the smallest range that comfortably contains the user's lookback window.
     static func defaultFor(lookbackDays: Int) -> HeatmapDateRange {
         switch lookbackDays {
         case ..<46: return .last30Days
@@ -43,47 +41,44 @@ enum HeatmapDateRange: String, CaseIterable {
 
 typealias HeatmapDay = (date: Date, value: Double, met: Bool)
 
-/// Pixel calendar heatmap. Columns = weeks, rows = weekdays (Mon–Sun).
-/// Sharp square cells, no corner radius. Binary colors for pass/fail goals.
+/// Calendar heatmap that completely fills its container.
+/// Dynamically calculates cell size to fit available width + height perfectly.
 struct CalendarHeatmap: View {
     let entries: [HeatmapDay]
     let accent: Color
     @Binding var selectedRange: HeatmapDateRange
 
-    private let gap: CGFloat = 3
+    private let gap: CGFloat = 2
     private let weekdayLabelWidth: CGFloat = 16
+    private let headerHeight: CGFloat = 16
+    private let footerHeight: CGFloat = 20
 
-    private struct LayoutMetrics {
-        let cell: CGFloat
-        let columnSpacing: CGFloat
-        let gridWidth: CGFloat
-    }
-
-    private struct RenderedDay: Identifiable {
+    private struct RenderedDay: Identifiable, Hashable {
         let date: Date
         let value: Double
         let met: Bool
         let isInRange: Bool
         let isToday: Bool
         let isFuture: Bool
-
         var id: String { DateHelpers.dayKey(date) }
+
+        static func == (lhs: RenderedDay, rhs: RenderedDay) -> Bool {
+            lhs.id == rhs.id
+        }
+
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(id)
+        }
     }
 
-    private var today: Date {
-        DateHelpers.startOfDay()
-    }
-
+    private var today: Date { DateHelpers.startOfDay() }
     private var firstVisibleDay: Date {
         DateHelpers.addDays(-(selectedRange.days - 1), to: today)
     }
 
-    /// Build complete Monday-start weeks for the selected range.
-    /// Days before the selected range and future days are rendered as orientation only.
     private var calendarWeeks: [[RenderedDay]] {
         let entryByDay = Dictionary(entries.map { (DateHelpers.startOfDay($0.date), $0) },
                                     uniquingKeysWith: { _, latest in latest })
-
         let firstWeekStart = DateHelpers.startOfWeek(firstVisibleDay)
         let lastWeekStart = DateHelpers.startOfWeek(today)
 
@@ -110,163 +105,117 @@ struct CalendarHeatmap: View {
             weeks.append(week)
             weekStart = DateHelpers.addDays(7, to: weekStart)
         }
-
         return weeks
-    }
-
-    /// Month labels positioned when the visible range enters a new month.
-    private func monthLabels(for weeks: [[RenderedDay]]) -> [(index: Int, name: String)] {
-        var labels: [(Int, String)] = []
-        var lastMonth: Int?
-
-        for (index, week) in weeks.enumerated() {
-            guard let firstDay = week.first(where: { $0.isInRange })?.date else { continue }
-            let month = DateHelpers.gregorian.component(.month, from: firstDay)
-
-            if month != lastMonth {
-                labels.append((index, monthName(for: firstDay)))
-                lastMonth = month
-            }
-        }
-
-        return labels
     }
 
     var body: some View {
         let weeks = calendarWeeks
 
         GeometryReader { proxy in
-            let layout = layoutMetrics(weekCount: weeks.count, availableWidth: proxy.size.width)
-            grid(weeks: weeks, layout: layout)
-                .frame(height: layoutHeight(for: layout.cell))
+            let layout = calculateLayout(weeks: weeks, size: proxy.size)
+
+            VStack(alignment: .leading, spacing: 4) {
+                // Month labels header
+                monthLabelsRow(weeks: weeks, layout: layout)
+                    .frame(height: headerHeight)
+
+                // Main grid - fills remaining space
+                gridRow(weeks: weeks, layout: layout)
+                    .frame(height: layout.gridHeight)
+
+                // Footer legend
+                legendRow()
+                    .frame(height: footerHeight)
+            }
+            .frame(width: proxy.size.width, height: proxy.size.height)
         }
     }
 
-    /// Calculate card height based on cell size to fit the grid perfectly
-    private func layoutHeight(for cellSize: CGFloat) -> CGFloat {
-        let topLabelHeight: CGFloat = 18      // Month labels
-        let bottomLabelHeight: CGFloat = 20    // Date range + TODAY
-        let verticalPadding: CGFloat = 16      // Total vertical padding
-        let cellArea = 7 * cellSize + 6 * gap  // 7 rows + 6 gaps
-        // Minimum height ensures visibility even on smaller screens
-        return max(120, topLabelHeight + cellArea + bottomLabelHeight + verticalPadding)
+    // MARK: - Layout Calculation
+
+    private struct Layout {
+        let cell: CGFloat
+        let gap: CGFloat
+        let gridWidth: CGFloat
+        let gridHeight: CGFloat
     }
 
-    @ViewBuilder
-    private func grid(weeks: [[RenderedDay]], layout: LayoutMetrics) -> some View {
-        let labels = monthLabels(for: weeks)
+    private func calculateLayout(weeks: [[RenderedDay]], size: CGSize) -> Layout {
+        let weekCount = CGFloat(weeks.count)
+        let rowCount: CGFloat = 7
 
-        VStack(alignment: .leading, spacing: 6) {
-            // Month labels row
-            HStack(alignment: .top, spacing: 4) {
-                Color.clear.frame(width: weekdayLabelWidth, height: 12)
+        // Available space for the grid itself
+        let availableWidth = size.width - weekdayLabelWidth - 8
+        let availableHeight = size.height - headerHeight - footerHeight - 8
 
-                ZStack(alignment: .topLeading) {
-                    Color.clear.frame(width: layout.gridWidth, height: 12)
-                    ForEach(labels, id: \.index) { label in
-                        Text(label.name)
-                            .font(RetroFont.pixel(7))
-                            .foregroundStyle(Theme.retroInkDim)
-                            .fixedSize()
-                            .offset(x: CGFloat(label.index) * (layout.cell + layout.columnSpacing))
-                    }
-                }
-            }
+        // Calculate cell size from width constraint
+        // (weekCount * cell) + ((weekCount - 1) * gap) = availableWidth
+        let cellFromWidth = (availableWidth - (weekCount - 1) * gap) / weekCount
 
-            // Grid row - constrained to calculated width
-            HStack(alignment: .top, spacing: 4) {
-                weekdayLabels(cell: layout.cell)
+        // Calculate cell size from height constraint
+        // (rowCount * cell) + ((rowCount - 1) * gap) = availableHeight
+        let cellFromHeight = (availableHeight - (rowCount - 1) * gap) / rowCount
 
-                // Fixed width container prevents overflow
-                HStack(alignment: .top, spacing: layout.columnSpacing) {
-                    ForEach(Array(weeks.enumerated()), id: \.offset) { item in
-                        VStack(spacing: gap) {
-                            ForEach(item.element) { day in
-                                cellView(day: day, size: layout.cell)
-                            }
-                        }
-                        .id(item.offset)
-                    }
-                }
-                .frame(width: layout.gridWidth, alignment: .leading)
-                .clipped()
-            }
+        // Use the smaller of the two to ensure it fits
+        let cell = min(cellFromWidth, cellFromHeight)
 
-            // Bottom legend row
-            HStack(spacing: 8) {
-                Text("\(rangeLabelStart) - \(rangeLabelEnd)")
-                    .font(RetroFont.pixel(8))
-                    .foregroundStyle(Theme.retroInkDim)
+        // Recalculate actual dimensions
+        let actualGridWidth = weekCount * cell + (weekCount - 1) * gap
+        let actualGridHeight = rowCount * cell + (rowCount - 1) * gap
 
-                HStack(spacing: 4) {
-                    Rectangle()
-                        .stroke(Theme.retroCyan, lineWidth: 2)
-                        .frame(width: 10, height: 10)
-                    Text("TODAY")
-                        .font(RetroFont.pixel(8))
-                        .foregroundStyle(Theme.retroCyan)
-                }
-            }
-            .padding(.leading, weekdayLabelWidth + 4)
-        }
-        .padding(.vertical, 4)
-        .padding(.horizontal, 4)
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    /// Target cell sizes for each range - larger cells for shorter time periods
-    private func targetCellSize(for weeks: Int) -> CGFloat {
-        switch weeks {
-        case ...5: return 32   // 30 days (~5 weeks)
-        case ...13: return 20  // 90 days (~13 weeks)
-        case ...26: return 14  // 180 days (~26 weeks)
-        default: return 10     // 365 days (~53 weeks) - minimum visible size
-        }
-    }
-
-    /// Minimum cell size to ensure cells are visible and tappable
-    private let minCellSize: CGFloat = 10
-
-    private func layoutMetrics(weekCount: Int, availableWidth: CGFloat) -> LayoutMetrics {
-        let columns = max(1, weekCount)
-        // Account for weekday labels + spacing + padding
-        let gridWidth = max(0, availableWidth - weekdayLabelWidth - 12)
-
-        // Target cell size based on how many weeks we're showing
-        let targetSize = targetCellSize(for: columns)
-
-        // Calculate: (columns * cell) + ((columns-1) * gap) = gridWidth
-        // Solving for max cell: cell = (gridWidth - (columns-1)*gap) / columns
-        let maxWidthBasedCell = (gridWidth - CGFloat(columns - 1) * gap) / CGFloat(columns)
-
-        // Use the smaller of target or what fits, with minimum bound
-        let cell = max(minCellSize, min(targetSize, maxWidthBasedCell))
-
-        // Recalculate actual grid width based on final cell size to prevent overflow
-        let actualGridWidth = CGFloat(columns) * cell + CGFloat(columns - 1) * gap
-
-        return LayoutMetrics(
-            cell: cell,
-            columnSpacing: gap,
-            gridWidth: actualGridWidth
+        return Layout(
+            cell: max(4, cell),
+            gap: gap,
+            gridWidth: actualGridWidth,
+            gridHeight: actualGridHeight
         )
     }
 
-    private func weekdayLabels(cell: CGFloat) -> some View {
-        VStack(spacing: gap) {
-            ForEach(Array(["M", "T", "W", "T", "F", "S", "S"].enumerated()), id: \.offset) { _, label in
-                Text(label)
-                    .font(RetroFont.pixel(7))
-                    .foregroundStyle(Theme.retroInkDim)
-                    .frame(width: weekdayLabelWidth, height: cell, alignment: .trailing)
+    // MARK: - Views
+
+    private func monthLabelsRow(weeks: [[RenderedDay]], layout: Layout) -> some View {
+        let labels = monthLabels(for: weeks)
+
+        return HStack(spacing: 0) {
+            Color.clear.frame(width: weekdayLabelWidth)
+
+            ZStack(alignment: .topLeading) {
+                Color.clear.frame(width: layout.gridWidth, height: headerHeight)
+
+                ForEach(labels.indices, id: \.self) { i in
+                    let label = labels[i]
+                    Text(label.name)
+                        .font(RetroFont.pixel(7))
+                        .foregroundStyle(Theme.retroInkDim)
+                        .position(
+                            x: CGFloat(label.index) * (layout.cell + layout.gap) + layout.cell/2,
+                            y: headerHeight/2
+                        )
+                }
             }
         }
     }
 
-    private func monthName(for date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM"
-        return formatter.string(from: date).uppercased()
+    private func gridRow(weeks: [[RenderedDay]], layout: Layout) -> some View {
+        HStack(alignment: .top, spacing: 4) {
+            weekdayLabels(cell: layout.cell)
+                .frame(width: weekdayLabelWidth)
+
+            HStack(alignment: .top, spacing: layout.gap) {
+                ForEach(weeks.indices, id: \.self) { index in
+                    weekColumn(week: weeks[index], layout: layout)
+                }
+            }
+            .frame(width: layout.gridWidth, height: layout.gridHeight)
+        }
+    }
+
+    private func weekColumn(week: [RenderedDay], layout: Layout) -> some View {
+        VStack(spacing: layout.gap) {
+            ForEach(week, id: \.id) { day in
+                cellView(day: day, size: layout.cell)
+            }
+        }
     }
 
     @ViewBuilder
@@ -276,13 +225,59 @@ struct CalendarHeatmap: View {
             .frame(width: size, height: size)
             .overlay {
                 if day.isToday {
-                    Rectangle().stroke(Theme.retroCyan, lineWidth: 2)
+                    Rectangle().stroke(Theme.retroCyan, lineWidth: max(1, size/6))
                 }
             }
-            .accessibilityLabel(accessibilityLabel(for: day))
     }
 
-    /// Binary color scheme: met = accent, miss/data = faint, range/future padding = dim background.
+    private func weekdayLabels(cell: CGFloat) -> some View {
+        VStack(spacing: gap) {
+            ForEach(["M", "T", "W", "T", "F", "S", "S"], id: \.self) { label in
+                Text(label)
+                    .font(RetroFont.pixel(7))
+                    .foregroundStyle(Theme.retroInkDim)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+        }
+    }
+
+    private func legendRow() -> some View {
+        HStack(spacing: 8) {
+            Text("\(rangeLabelStart) - \(rangeLabelEnd)")
+                .font(RetroFont.pixel(8))
+                .foregroundStyle(Theme.retroInkDim)
+
+            HStack(spacing: 4) {
+                Rectangle()
+                    .stroke(Theme.retroCyan, lineWidth: 2)
+                    .frame(width: 10, height: 10)
+                Text("TODAY")
+                    .font(RetroFont.pixel(8))
+                    .foregroundStyle(Theme.retroCyan)
+            }
+
+            Spacer()
+        }
+        .padding(.leading, weekdayLabelWidth + 4)
+    }
+
+    // MARK: - Helpers
+
+    private func monthLabels(for weeks: [[RenderedDay]]) -> [(index: Int, name: String)] {
+        var labels: [(Int, String)] = []
+        var lastMonth: Int?
+
+        for (index, week) in weeks.enumerated() {
+            guard let firstDay = week.first(where: { $0.isInRange })?.date else { continue }
+            let month = DateHelpers.gregorian.component(.month, from: firstDay)
+            if month != lastMonth {
+                labels.append((index, monthName(for: firstDay)))
+                lastMonth = month
+            }
+        }
+        return labels
+    }
+
     private func color(for day: RenderedDay) -> Color {
         guard day.isInRange else { return Theme.retroInkFaint.opacity(day.isFuture ? 0.12 : 0.18) }
         if day.met { return accent }
@@ -290,50 +285,48 @@ struct CalendarHeatmap: View {
         return Theme.retroInkFaint.opacity(0.2)
     }
 
+    private func monthName(for date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM"
+        return formatter.string(from: date).uppercased()
+    }
+
     private var rangeLabelStart: String {
-        rangeLabel(for: firstVisibleDay)
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return formatter.string(from: firstVisibleDay).uppercased()
     }
 
     private var rangeLabelEnd: String {
-        rangeLabel(for: today)
-    }
-
-    private func accessibilityLabel(for day: RenderedDay) -> String {
         let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .none
-        let date = formatter.string(from: day.date)
-        if day.isFuture { return "\(date), future day" }
-        if !day.isInRange { return "\(date), outside selected range" }
-        return "\(date), \(day.met ? "goal met" : "goal missed")"
-    }
-
-    private func rangeLabel(for date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.setLocalizedDateFormatFromTemplate("MMM d")
-        return formatter.string(from: date).uppercased()
+        formatter.dateFormat = "MMM d"
+        return formatter.string(from: today).uppercased()
     }
 }
 
-/// Date range picker for heatmap
+// MARK: - Range Picker
+
 struct HeatmapRangePicker: View {
     @Binding var selectedRange: HeatmapDateRange
 
     var body: some View {
-        HStack(spacing: 4) {
-            ForEach(HeatmapDateRange.allCases, id: \.rawValue) { range in
+        HStack(spacing: 8) {
+            ForEach(HeatmapDateRange.allCases, id: \.self) { range in
                 Button {
-                    selectedRange = range
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        selectedRange = range
+                    }
                 } label: {
                     Text(range.label)
-                        .font(RetroFont.mono(9, weight: .bold))
-                        .foregroundStyle(selectedRange == range ? Theme.retroBg : Theme.retroInkDim)
+                        .font(RetroFont.mono(10, weight: selectedRange == range ? .bold : .regular))
+                        .foregroundStyle(selectedRange == range ? Theme.retroBg : Theme.retroInk)
+                        .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .padding(.horizontal, 6)
                         .background(selectedRange == range ? Theme.retroCyan : Color.clear)
                 }
                 .buttonStyle(.plain)
             }
+            Spacer()
         }
     }
 }
