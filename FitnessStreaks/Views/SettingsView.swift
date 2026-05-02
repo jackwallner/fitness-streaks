@@ -680,23 +680,7 @@ struct SettingsView: View {
                     }
                 }
                 dashedLine
-                if let url = URL(string: "https://github.com/jackwallner/fitness-streaks") {
-                    Link(destination: url) {
-                        HStack {
-                            Text("SOURCE")
-                                .font(RetroFont.pixel(10))
-                                .foregroundStyle(Theme.retroInk)
-                            Spacer()
-                            Text("↗")
-                                .font(RetroFont.pixel(11))
-                                .foregroundStyle(Theme.retroCyan)
-                        }
-                        .padding(.vertical, 12)
-                        .padding(.horizontal, 14)
-                    }
-                }
-                dashedLine
-                if let url = URL(string: "https://jackwallner.github.io/fitness-streaks/") {
+                if let url = URL(string: "mailto:jackwallner+fs@gmail.com") {
                     Link(destination: url) {
                         HStack {
                             Text("SUPPORT")
