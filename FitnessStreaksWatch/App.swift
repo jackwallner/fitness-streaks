@@ -21,15 +21,45 @@ private final class WatchSyncService: NSObject, WCSessionDelegate, @unchecked Se
         session.activate()
     }
 
-    func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
-        // iPhone sent updated streak data - refresh UI
+    func requestLatestSnapshot() {
+        guard WCSession.isSupported(), WCSession.default.isReachable else { return }
+        WCSession.default.sendMessage(["request": true], replyHandler: nil) { error in
+            log.error("WC snapshot request failed: \(String(describing: error))")
+        }
+    }
+
+    private func saveSnapshot(from message: [String: Any], source: String) {
+        guard let data = message[SnapshotStore.transferDataKey] as? Data else {
+            log.debug("WC \(source) ignored: no snapshot data")
+            return
+        }
+        guard SnapshotStore.saveEncodedSnapshot(data) != nil else {
+            log.error("WC \(source) ignored: snapshot data could not be decoded")
+            return
+        }
         DispatchQueue.main.async { [weak self] in
             self?.onDataUpdate?()
         }
     }
 
+    func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
+        saveSnapshot(from: message, source: "message")
+    }
+
+    func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
+        saveSnapshot(from: applicationContext, source: "applicationContext")
+    }
+
+    func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
+        saveSnapshot(from: userInfo, source: "userInfo")
+    }
+
     func session(_ session: WCSession, activationDidCompleteWith state: WCSessionActivationState, error: Error?) {
         if let error { log.error("WC activation failed: \(String(describing: error))") }
+        if state == .activated {
+            saveSnapshot(from: session.receivedApplicationContext, source: "activationContext")
+            requestLatestSnapshot()
+        }
     }
 }
 #endif
@@ -51,6 +81,12 @@ struct FitnessStreaksWatchApp: App {
                 .environmentObject(settings)
                 .environmentObject(store)
                 .task {
+                    #if canImport(WatchConnectivity)
+                    WatchSyncService.shared.onDataUpdate = {
+                        Task { await store.load() }
+                    }
+                    WatchSyncService.shared.requestLatestSnapshot()
+                    #endif
                     await store.load()
                     Self.scheduleBackgroundRefresh()
                 }
@@ -87,69 +123,34 @@ struct FitnessStreaksWatchApp: App {
 }
 
 struct WatchRootView: View {
-    @EnvironmentObject var settings: StreakSettings
     @EnvironmentObject var store: StreakStore
 
     var body: some View {
-        if settings.hasWatchCompletedSetup {
-            WatchTodayView()
-        } else {
+        if store.streaks.isEmpty {
             WatchOnboardingView()
+        } else {
+            WatchTodayView()
         }
     }
 }
 
 struct WatchOnboardingView: View {
-    @EnvironmentObject var settings: StreakSettings
     @EnvironmentObject var store: StreakStore
-    @State private var dataJustReceived = false
 
     var body: some View {
         ScrollView {
             VStack(spacing: 10) {
-                Image(systemName: dataJustReceived ? "checkmark.circle.fill" : "flame.fill")
+                Image(systemName: "flame.fill")
                     .font(.system(size: 40))
-                    .foregroundStyle(dataJustReceived ? Color.green : Theme.streakHot)
-                Text(dataJustReceived ? "Streaks Synced!" : "Streak Finder")
+                    .foregroundStyle(Theme.streakHot)
+                Text("Streak Finder")
                     .font(.system(size: 16, weight: .bold, design: .rounded))
-                Text(messageText)
+                Text("Open the iPhone app to set up your streaks. They'll sync to your watch automatically.")
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
-
-                Button {
-                    settings.hasWatchCompletedSetup = true
-                } label: {
-                    Text(dataJustReceived ? "Get Started" : "Continue")
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 6)
-                }
-                .tint(Theme.streakHot)
-                .buttonStyle(.borderedProminent)
-                .padding(.top, 4)
             }
             .padding()
         }
-        .task {
-            // Check if data already available
-            if SnapshotStore.load() != nil {
-                dataJustReceived = true
-            }
-            // Listen for sync from iPhone
-            #if canImport(WatchConnectivity)
-            WatchSyncService.shared.onDataUpdate = {
-                dataJustReceived = true
-                Task { await store.load() }
-            }
-            #endif
-        }
-    }
-
-    private var messageText: String {
-        if dataJustReceived {
-            return "Your streaks are ready. Tap below to view them."
-        }
-        return "Open the iPhone app to set up your streaks. They'll sync to your watch automatically."
     }
 }

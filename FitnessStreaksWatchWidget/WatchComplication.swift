@@ -78,9 +78,9 @@ struct WatchComplicationView: View {
     private var inline: some View {
         Group {
             if let hero = entry.hero {
-                Text("\(Image(systemName: hero.displaySymbol)) \(hero.current) \(hero.cadence == "daily" ? "d" : "w")")
+                Text("\(Image(systemName: hero.displaySymbol)) \(hero.current) \(shortCadenceLabel(hero))")
             } else {
-                Text("No streak yet — open app")
+                Text("Open app to sync streaks")
             }
         }
     }
@@ -89,24 +89,29 @@ struct WatchComplicationView: View {
         ZStack {
             AccessoryWidgetBackground()
             if let hero = entry.hero {
-                VStack(spacing: 0) {
-                    Image(systemName: "flame.fill")
-                        .font(.system(size: 10, weight: .semibold))
-                    Text("\(hero.current)")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
-                        .minimumScaleFactor(0.5)
-                    Text(hero.cadence == "daily" ? "d" : "w")
-                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                Gauge(value: clampedProgress(hero)) {
+                    Image(systemName: hero.displaySymbol)
+                } currentValueLabel: {
+                    VStack(spacing: 0) {
+                        Text("\(hero.current)")
+                            .font(.system(size: 20, weight: .bold, design: .rounded))
+                            .minimumScaleFactor(0.5)
+                        Text(shortCadenceLabel(hero))
+                            .font(.system(size: 8, weight: .bold, design: .rounded))
+                    }
                 }
+                .gaugeStyle(.accessoryCircular)
+                .tint(heroAccent(hero))
             } else {
-                Image(systemName: "figure.run").font(.system(size: 18))
+                Image(systemName: "flame")
+                    .font(.system(size: 18))
             }
         }
         .containerBackground(.clear, for: .widget)
     }
 
     private var rectangular: some View {
-        VStack(alignment: .leading, spacing: 1) {
+        VStack(alignment: .leading, spacing: 2) {
             if let hero = entry.hero {
                 HStack(spacing: 4) {
                     Image(systemName: hero.displaySymbol).font(.system(size: 10, weight: .semibold))
@@ -116,14 +121,17 @@ struct WatchComplicationView: View {
                     Text("\(hero.current)")
                         .font(.system(size: 22, weight: .bold, design: .rounded))
                         .monospacedDigit()
-                    Text(hero.cadence == "daily" ? "days" : "weeks")
+                    Text(cadenceLabel(hero))
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
                 }
-                Text(hero.thresholdLabel)
-                    .font(.system(size: 9, weight: .medium, design: .rounded))
+                ProgressView(value: clampedProgress(hero))
+                    .tint(heroAccent(hero))
+                Text(rectangularProgressLabel(hero))
+                    .font(.system(size: 9, weight: .semibold, design: .rounded))
                     .lineLimit(1)
             } else {
-                Text("NO STREAK YET — open app").font(.system(size: 12, weight: .semibold))
+                Text("Open iPhone app to sync")
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
             }
         }
         .containerBackground(.clear, for: .widget)
@@ -136,13 +144,49 @@ struct WatchComplicationView: View {
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .widgetCurvesContent()
                     .widgetLabel {
-                        Text(hero.displayName)
+                        Label(hero.displayName, systemImage: hero.displaySymbol)
                     }
             } else {
-                Image(systemName: "figure.run").widgetLabel("No streak yet — open app")
+                Image(systemName: "flame").widgetLabel("Open app to sync")
             }
         }
         .containerBackground(.clear, for: .widget)
+    }
+
+    private func clampedProgress(_ item: StreakSnapshot.Item) -> Double {
+        min(max(item.currentUnitProgress, 0), 1)
+    }
+
+    private func shortCadenceLabel(_ item: StreakSnapshot.Item) -> String {
+        item.cadence == "daily" ? "d" : "w"
+    }
+
+    private func cadenceLabel(_ item: StreakSnapshot.Item) -> String {
+        item.cadence == "daily" ? "days" : "weeks"
+    }
+
+    private func heroAccent(_ item: StreakSnapshot.Item) -> Color {
+        item.streakMetric?.accent ?? Theme.streakHot
+    }
+
+    private func rectangularProgressLabel(_ item: StreakSnapshot.Item) -> String {
+        if item.currentUnitCompleted {
+            return item.cadence == "daily" ? "Today locked in" : "Week locked in"
+        }
+        return "\(currentValueText(item)) / \(item.thresholdLabel)"
+    }
+
+    private func currentValueText(_ item: StreakSnapshot.Item) -> String {
+        if let measure = item.workoutMeasureValue {
+            switch measure {
+            case .count: return "\(Int(item.currentUnitValue))"
+            case .minutes: return "\(Int(item.currentUnitValue))"
+            case .miles:
+                let truncated = floor(item.currentUnitValue * 10) / 10
+                return String(format: truncated < 10 ? "%.1f" : "%.0f", truncated)
+            }
+        }
+        return item.streakMetric?.formatTruncating(value: item.currentUnitValue) ?? "\(Int(item.currentUnitValue))"
     }
 }
 

@@ -411,10 +411,11 @@ struct GracePreservation: Codable, Sendable, Hashable {
 
 enum SnapshotStore {
     private static let key = "streakSnapshot.v1"
+    static let transferDataKey = "streakSnapshot.data.v1"
 
     static func save(_ snapshot: StreakSnapshot) {
         let defaults = UserDefaults(suiteName: streaksAppGroupID) ?? .standard
-        guard let data = try? JSONEncoder().encode(snapshot) else { return }
+        guard let data = encode(snapshot) else { return }
         defaults.set(data, forKey: key)
         WidgetCenter.shared.reloadAllTimelines()
     }
@@ -422,6 +423,21 @@ enum SnapshotStore {
     static func load() -> StreakSnapshot? {
         let defaults = UserDefaults(suiteName: streaksAppGroupID) ?? .standard
         guard let data = defaults.data(forKey: key) else { return nil }
-        return try? JSONDecoder().decode(StreakSnapshot.self, from: data)
+        return decode(data)
+    }
+
+    static func encode(_ snapshot: StreakSnapshot) -> Data? {
+        try? JSONEncoder().encode(snapshot)
+    }
+
+    static func decode(_ data: Data) -> StreakSnapshot? {
+        try? JSONDecoder().decode(StreakSnapshot.self, from: data)
+    }
+
+    @discardableResult
+    static func saveEncodedSnapshot(_ data: Data) -> StreakSnapshot? {
+        guard let snapshot = decode(data) else { return nil }
+        save(snapshot)
+        return snapshot
     }
 }

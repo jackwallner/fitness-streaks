@@ -39,26 +39,78 @@ private final class PhoneSyncService: NSObject, WCSessionDelegate {
         session.activate()
     }
 
-    /// Send updated streak snapshot to paired watch immediately
-    func syncToWatch() {
-        guard WCSession.default.isReachable else { return }
-        guard let snapshot = SnapshotStore.load() else { return }
-        let dict: [String: Any] = [
+    private func currentSnapshotPayload(response: Bool = false) -> [String: Any]? {
+        guard let snapshot = SnapshotStore.load(),
+              let data = SnapshotStore.encode(snapshot) else {
+            log.error("WC sync skipped: no encodable snapshot available")
+            return nil
+        }
+        return [
+            SnapshotStore.transferDataKey: data,
             "updated": snapshot.updated.timeIntervalSince1970,
             "hero": snapshot.hero?.metric ?? "none",
-            "current": snapshot.hero?.current ?? 0
+            "current": snapshot.hero?.current ?? 0,
+            "response": response
         ]
-        WCSession.default.sendMessage(dict, replyHandler: nil) { error in
-            log.error("WC send failed: \(String(describing: error))")
+    }
+
+    /// Send updated streak snapshot to paired watch immediately
+    func syncToWatch() {
+        guard let payload = currentSnapshotPayload() else { return }
+        let session = WCSession.default
+        do {
+            try session.updateApplicationContext(payload)
+        } catch {
+            log.error("WC application context update failed: \(String(describing: error))")
+        }
+
+        _ = session.transferUserInfo(payload)
+        if session.remainingComplicationUserInfoTransfers > 0 {
+            _ = session.transferCurrentComplicationUserInfo(payload)
+        }
+
+        // Try immediate delivery when the watch app is open; queued transfers cover the rest.
+        if session.isReachable {
+            session.sendMessage(payload, replyHandler: nil) { error in
+                log.error("WC send failed: \(String(describing: error))")
+            }
+        }
+    }
+
+    /// Respond to watch's data request with current snapshot
+    private func respondToWatchRequest() {
+        guard let payload = currentSnapshotPayload(response: true) else { return }
+        let session = WCSession.default
+        if session.isReachable {
+            session.sendMessage(payload, replyHandler: nil) { error in
+                log.error("WC response failed: \(String(describing: error))")
+            }
         }
     }
 
     func session(_ session: WCSession, activationDidCompleteWith state: WCSessionActivationState, error: Error?) {
         if let error { log.error("WC activation failed: \(String(describing: error))") }
+        if state == .activated {
+            syncToWatch()
+        }
     }
 
     func sessionDidBecomeInactive(_ session: WCSession) {}
     func sessionDidDeactivate(_ session: WCSession) { session.activate() }
+
+    /// Watch requested fresh data — respond immediately
+    func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
+        if message["request"] as? Bool == true {
+            respondToWatchRequest()
+        }
+    }
+
+    /// Watch became reachable — push latest data proactively
+    func sessionReachabilityDidChange(_ session: WCSession) {
+        if session.isReachable {
+            syncToWatch()
+        }
+    }
 }
 #endif
 
