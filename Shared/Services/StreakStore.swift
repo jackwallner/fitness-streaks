@@ -129,7 +129,7 @@ final class StreakStore: ObservableObject {
         if allowCachedSnapshot, streaks.isEmpty, let snapshot = SnapshotStore.load() {
             restore(snapshot)
         }
-        isLoading = streaks.isEmpty
+        isLoading = true
         withAnimation(.linear(duration: 0.2)) {
             loadStage = .readingHistory
             loadProgress = 0.05
