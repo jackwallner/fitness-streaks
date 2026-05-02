@@ -132,17 +132,23 @@ struct CalendarHeatmap: View {
         return labels
     }
 
-    // Fixed card height - cells expand to fill available space
-    private let cardHeight: CGFloat = 140
-
     var body: some View {
         let weeks = calendarWeeks
 
         GeometryReader { proxy in
             let layout = layoutMetrics(weekCount: weeks.count, availableWidth: proxy.size.width)
             grid(weeks: weeks, layout: layout)
+                .frame(height: layoutHeight(for: layout.cell))
         }
-        .frame(height: cardHeight)
+    }
+
+    /// Calculate card height based on cell size to fit the grid perfectly
+    private func layoutHeight(for cellSize: CGFloat) -> CGFloat {
+        let topLabelHeight: CGFloat = 14      // Month labels
+        let bottomLabelHeight: CGFloat = 16     // Date range + TODAY
+        let verticalPadding: CGFloat = 12       // Total vertical padding
+        let cellArea = 7 * cellSize + 6 * gap   // 7 rows + 6 gaps
+        return topLabelHeight + cellArea + bottomLabelHeight + verticalPadding
     }
 
     @ViewBuilder
@@ -201,29 +207,35 @@ struct CalendarHeatmap: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
+    /// Target cell sizes for each range - larger cells for shorter time periods
+    private func targetCellSize(for weeks: Int) -> CGFloat {
+        switch weeks {
+        case ...5: return 28   // 30 days (~5 weeks)
+        case ...13: return 18  // 90 days (~13 weeks)
+        case ...26: return 12  // 180 days (~26 weeks)
+        default: return 8      // 365 days (~53 weeks)
+        }
+    }
+
     private func layoutMetrics(weekCount: Int, availableWidth: CGFloat) -> LayoutMetrics {
         let columns = max(1, weekCount)
         let gridWidth = max(0, availableWidth - weekdayLabelWidth - 8)
 
-        // Fixed height layout: calculate cell size from available height
-        // Height budget: cardHeight - top label - bottom label - padding
-        let topLabelHeight: CGFloat = 14      // Month labels
-        let bottomLabelHeight: CGFloat = 16     // Date range + TODAY
-        let verticalPadding: CGFloat = 8        // Total vertical padding
-        let availableForCells = cardHeight - topLabelHeight - bottomLabelHeight - verticalPadding
+        // Target cell size based on how many weeks we're showing
+        let targetSize = targetCellSize(for: columns)
 
-        // Cell fills available height: (available - 6 gaps) / 7 rows
-        let idealCell = (availableForCells - 6 * gap) / 7
-        let cell = max(4, idealCell)
+        // Maximum cell size that fits in the available width
+        let maxWidthBasedCell = (gridWidth - CGFloat(columns - 1) * gap) / CGFloat(columns)
 
-        // Distribute remaining horizontal space as column spacing
-        let usedByCells = CGFloat(columns) * cell
-        let remainingWidth = max(0, gridWidth - usedByCells)
-        let columnSpacing = columns > 1 ? remainingWidth / CGFloat(columns - 1) : gap
+        // Use the smaller of target or what fits, with bounds
+        let cell = max(6, min(targetSize, maxWidthBasedCell))
+
+        // Minimal gap between columns
+        let columnSpacing = gap
 
         return LayoutMetrics(
             cell: cell,
-            columnSpacing: max(gap, columnSpacing),
+            columnSpacing: columnSpacing,
             gridWidth: gridWidth
         )
     }
