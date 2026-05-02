@@ -162,6 +162,11 @@ final class StreakSettings: ObservableObject {
         didSet { defaults.set(hasCompletedSetup, forKey: "hasCompletedSetup") }
     }
 
+    /// Watch-specific setup flag (separate from iOS because watch doesn't do its own HealthKit auth)
+    @Published var hasWatchCompletedSetup: Bool {
+        didSet { defaults.set(hasWatchCompletedSetup, forKey: "hasWatchCompletedSetup") }
+    }
+
     @Published var appearance: AppAppearance {
         didSet { defaults.set(appearance.rawValue, forKey: "appearance") }
     }
@@ -283,6 +288,7 @@ final class StreakSettings: ObservableObject {
         self.defaults = defaults
 
         self.hasCompletedSetup = defaults.bool(forKey: "hasCompletedSetup")
+        self.hasWatchCompletedSetup = defaults.bool(forKey: "hasWatchCompletedSetup")
         self.appearance = AppAppearance(rawValue: defaults.integer(forKey: "appearance")) ?? .light
         // Default OFF — never request notification permission until the user explicitly opts in.
         self.notificationsEnabled = defaults.object(forKey: "notificationsEnabled") as? Bool ?? false

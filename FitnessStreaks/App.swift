@@ -21,6 +21,20 @@ private final class PhoneSyncService: NSObject, WCSessionDelegate {
         session.activate()
     }
 
+    /// Send updated streak snapshot to paired watch immediately
+    func syncToWatch() {
+        guard WCSession.default.isReachable else { return }
+        guard let snapshot = SnapshotStore.load() else { return }
+        let dict: [String: Any] = [
+            "updated": snapshot.updated.timeIntervalSince1970,
+            "hero": snapshot.hero?.metric ?? "none",
+            "current": snapshot.hero?.current ?? 0
+        ]
+        WCSession.default.sendMessage(dict, replyHandler: nil) { error in
+            log.error("WC send failed: \(String(describing: error))")
+        }
+    }
+
     func session(_ session: WCSession, activationDidCompleteWith state: WCSessionActivationState, error: Error?) {
         if let error { log.error("WC activation failed: \(String(describing: error))") }
     }
@@ -45,6 +59,14 @@ struct FitnessStreaksApp: App {
         Self.scheduleAppRefresh()
         #if canImport(WatchConnectivity)
         PhoneSyncService.shared.activate()
+        // Listen for snapshot updates and push to watch
+        NotificationCenter.default.addObserver(
+            forName: .streakSnapshotUpdated,
+            object: nil,
+            queue: .main
+        ) { _ in
+            PhoneSyncService.shared.syncToWatch()
+        }
         #endif
     }
 

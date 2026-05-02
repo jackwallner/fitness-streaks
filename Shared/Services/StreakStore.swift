@@ -100,6 +100,8 @@ final class StreakStore: ObservableObject {
         var snapshot = StreakEngine.snapshot(from: streaks)
         snapshot.recentlyBroken = StreakSettings.shared.recentlyBroken
         SnapshotStore.save(snapshot)
+        // Notify iOS app to sync to watch (iOS-only, watch ignores this)
+        NotificationCenter.default.post(name: .streakSnapshotUpdated, object: nil)
     }
 
     func refreshIfNeeded(force: Bool = false) async {
@@ -112,8 +114,18 @@ final class StreakStore: ObservableObject {
     }
 
     /// Fetches fresh history from HealthKit, runs the engine, updates published state + widget snapshot.
+    /// On watchOS, skips HealthKit and reads only from the snapshot written by the iPhone app.
     func load(allowCachedSnapshot: Bool = false) async {
         if isLoading { return }
+
+        #if os(watchOS)
+        // Watch app: no HealthKit access needed; just display data synced from iPhone
+        if let snapshot = SnapshotStore.load() {
+            restore(snapshot)
+        }
+        return
+        #else
+
         if allowCachedSnapshot, streaks.isEmpty, let snapshot = SnapshotStore.load() {
             restore(snapshot)
         }
@@ -243,6 +255,7 @@ final class StreakStore: ObservableObject {
                 persistCurrentSnapshot()
             }
         }
+        #endif
     }
 
     private func restore(_ snapshot: StreakSnapshot) {
@@ -354,4 +367,8 @@ final class StreakStore: ObservableObject {
         let map = Dictionary(uniqueKeysWithValues: streaks.map { ($0.trackingKey, $0.current) })
         StreakSettings.shared.lastKnownStreakLengths = map
     }
+}
+
+extension Notification.Name {
+    static let streakSnapshotUpdated = Notification.Name("streakSnapshotUpdated")
 }

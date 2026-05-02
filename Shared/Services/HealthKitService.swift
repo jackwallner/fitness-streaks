@@ -62,7 +62,7 @@ final class HealthKitService: ObservableObject {
     private var authorizationTypes: Set<HKSampleType> {
         var types: Set<HKSampleType> = categorySampleTypes
         types.formUnion(quantitySampleTypes)
-        types.insert(HKObjectType.workoutType())
+        types.insert(HKSampleType.workoutType())
         return types
     }
 

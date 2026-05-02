@@ -3,23 +3,54 @@ import SwiftData
 import WatchKit
 import WidgetKit
 import os
+#if canImport(WatchConnectivity)
+@preconcurrency import WatchConnectivity
+#endif
 
 private let log = Logger(subsystem: "com.jackwallner.streaks.watch", category: "App")
 
+#if canImport(WatchConnectivity)
+private final class WatchSyncService: NSObject, WCSessionDelegate, @unchecked Sendable {
+    static let shared = WatchSyncService()
+    var onDataUpdate: (() -> Void)?
+
+    func activate() {
+        guard WCSession.isSupported() else { return }
+        let session = WCSession.default
+        session.delegate = self
+        session.activate()
+    }
+
+    func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
+        // iPhone sent updated streak data - refresh UI
+        DispatchQueue.main.async { [weak self] in
+            self?.onDataUpdate?()
+        }
+    }
+
+    func session(_ session: WCSession, activationDidCompleteWith state: WCSessionActivationState, error: Error?) {
+        if let error { log.error("WC activation failed: \(String(describing: error))") }
+    }
+}
+#endif
+
 @main
 struct FitnessStreaksWatchApp: App {
-    @StateObject private var healthKit = HealthKitService.shared
     @StateObject private var settings = StreakSettings.shared
     @StateObject private var store = StreakStore.shared
+
+    init() {
+        #if canImport(WatchConnectivity)
+        WatchSyncService.shared.activate()
+        #endif
+    }
 
     var body: some Scene {
         WindowGroup {
             WatchRootView()
-                .environmentObject(healthKit)
                 .environmentObject(settings)
                 .environmentObject(store)
                 .task {
-                    await healthKit.synchronizeAuthorization()
                     await store.load()
                     Self.scheduleBackgroundRefresh()
                 }
@@ -56,11 +87,11 @@ struct FitnessStreaksWatchApp: App {
 }
 
 struct WatchRootView: View {
-    @EnvironmentObject var healthKit: HealthKitService
     @EnvironmentObject var settings: StreakSettings
+    @EnvironmentObject var store: StreakStore
 
     var body: some View {
-        if healthKit.hasRequestedAuthorization && settings.hasCompletedSetup {
+        if settings.hasWatchCompletedSetup {
             WatchTodayView()
         } else {
             WatchOnboardingView()
@@ -69,93 +100,56 @@ struct WatchRootView: View {
 }
 
 struct WatchOnboardingView: View {
-    @EnvironmentObject var healthKit: HealthKitService
     @EnvironmentObject var settings: StreakSettings
     @EnvironmentObject var store: StreakStore
-    @State private var requesting = false
-    @State private var showHelp = false
+    @State private var dataJustReceived = false
 
     var body: some View {
         ScrollView {
             VStack(spacing: 10) {
-                Image(systemName: "flame.fill")
+                Image(systemName: dataJustReceived ? "checkmark.circle.fill" : "flame.fill")
                     .font(.system(size: 40))
-                    .foregroundStyle(Theme.streakGradient)
-                Text("Streak Finder")
+                    .foregroundStyle(dataJustReceived ? Color.green : Theme.streakHot)
+                Text(dataJustReceived ? "Streaks Synced!" : "Streak Finder")
                     .font(.system(size: 16, weight: .bold, design: .rounded))
-                Text("Allow Health access to see your streaks.")
+                Text(messageText)
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
 
                 Button {
-                    Task { await connect() }
+                    settings.hasWatchCompletedSetup = true
                 } label: {
-                    Text(requesting ? "…" : "Connect")
+                    Text(dataJustReceived ? "Get Started" : "Continue")
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 6)
                 }
                 .tint(Theme.streakHot)
                 .buttonStyle(.borderedProminent)
-                .disabled(requesting)
                 .padding(.top, 4)
-
-                if showHelp {
-                    helpBlock
-                }
             }
             .padding()
         }
-    }
-
-    private var helpBlock: some View {
-        VStack(spacing: 6) {
-            Text("Didn't see a prompt?")
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
-                .foregroundStyle(.primary)
-            Text("Open the Health app on your iPhone → Sharing → Apps → Streak Finder, then enable the categories you want to track.")
-                .font(.system(size: 11, design: .rounded))
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-            Button("Continue Anyway") {
-                settings.hasCompletedSetup = true
+        .task {
+            // Check if data already available
+            if SnapshotStore.load() != nil {
+                dataJustReceived = true
+            }
+            // Listen for sync from iPhone
+            #if canImport(WatchConnectivity)
+            WatchSyncService.shared.onDataUpdate = {
+                dataJustReceived = true
                 Task { await store.load() }
             }
-            .font(.system(size: 11, weight: .semibold, design: .rounded))
-            .buttonStyle(.bordered)
-            .tint(Theme.streakHot)
-            .padding(.top, 4)
+            #endif
         }
-        .padding(.top, 8)
     }
 
-    private func connect() async {
-        requesting = true
-        showHelp = false
-        defer { requesting = false }
-
-        do {
-            try await healthKit.requestAuthorization()
-        } catch {
-            log.error("watch authorization failed: \(String(describing: error))")
-            showHelp = true
-            return
+    private var messageText: String {
+        if dataJustReceived {
+            return "Your streaks are ready. Tap below to view them."
         }
-
-        // We can't detect read-permission denial directly (Apple privacy). But if the
-        // post-request status is still `.shouldRequest`, it means the system suppressed
-        // the prompt entirely — almost always because the user already denied at some
-        // earlier point. Surface phone-side recovery instructions instead of silently
-        // dropping into a data-less dashboard.
-        let post = await healthKit.authorizationRequestStatus()
-        if post == .shouldRequest {
-            log.warning("watch auth: postStatus=.shouldRequest after request — prompt suppressed")
-            showHelp = true
-            return
-        }
-
-        settings.hasCompletedSetup = true
-        await store.load()
+        return "Open the iPhone app to set up your streaks. They'll sync to your watch automatically."
     }
 }
