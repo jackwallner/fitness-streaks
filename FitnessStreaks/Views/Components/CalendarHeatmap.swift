@@ -30,7 +30,7 @@ enum HeatmapDateRange: String, CaseIterable {
         switch self {
         case .last30Days: return 40
         case .last90Days: return 24
-        case .last180Days: return 16
+        case .last180Days: return 10
         case .fullYear: return 8
         }
     }
@@ -39,7 +39,7 @@ enum HeatmapDateRange: String, CaseIterable {
         switch self {
         case .last30Days: return 338
         case .last90Days: return 226
-        case .last180Days: return 170
+        case .last180Days: return 112
         case .fullYear: return 112
         }
     }
@@ -216,11 +216,20 @@ struct CalendarHeatmap: View {
         let columns = max(1, weekCount)
         let gridWidth = max(0, availableWidth - weekdayLabelWidth - 8)
         let baseSpacing = gap
-        let fittedCell = (gridWidth - CGFloat(columns - 1) * baseSpacing) / CGFloat(columns)
-        let cell = max(4, min(selectedRange.maxCellSize, floor(fittedCell)))
+
+        // Calculate cell size from fixed height to ensure square cells
+        // Height budget: heatmapHeight - vertical padding - month label - bottom label row
+        let verticalPadding: CGFloat = 4 // 2 top + 2 bottom from grid padding
+        let monthLabelHeight: CGFloat = 14
+        let bottomLabelHeight: CGFloat = 20
+        let availableHeight = selectedRange.heatmapHeight - verticalPadding - monthLabelHeight - bottomLabelHeight - 4 // extra safety
+        let heightBasedCell = (availableHeight - 6 * baseSpacing) / 7 // 7 rows, 6 gaps
+        let cell = max(4, min(selectedRange.maxCellSize, floor(heightBasedCell)))
+
+        // Distribute remaining horizontal space as column spacing
         let usedByCells = CGFloat(columns) * cell
-        let availableSpacing = max(baseSpacing, gridWidth - usedByCells)
-        let columnSpacing = columns > 1 ? availableSpacing / CGFloat(columns - 1) : baseSpacing
+        let remainingWidth = max(0, gridWidth - usedByCells)
+        let columnSpacing = columns > 1 ? remainingWidth / CGFloat(columns - 1) : baseSpacing
 
         return LayoutMetrics(
             cell: cell,
