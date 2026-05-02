@@ -352,6 +352,13 @@ final class StreakSettings: ObservableObject {
         committedThresholds.removeValue(forKey: key)
     }
 
+    func updateCustomStreak(id: String, threshold: Double) {
+        guard let index = customStreaks.firstIndex(where: { $0.id == id }) else { return }
+        var updated = customStreaks[index]
+        updated.threshold = threshold
+        customStreaks[index] = updated
+    }
+
     func dismissBroken(_ broken: BrokenStreak) {
         recentlyBroken.removeAll { $0.id == broken.id }
     }
