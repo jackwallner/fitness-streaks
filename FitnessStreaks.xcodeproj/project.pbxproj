@@ -64,6 +64,7 @@
 		82F01C345F0E2CD67A487A65 /* JetBrainsMono-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A05515A54F5B25D57C150872 /* JetBrainsMono-Regular.ttf */; };
 		84D6812F0C8A7FEE43194A5C /* StreakStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C302E6F3992442B6C651F13 /* StreakStore.swift */; };
 		8940A3E2B286387755D00BBE /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 242B2759902C4F6C883A7C7B /* PrivacyInfo.xcprivacy */; };
+		8B8B89A5CB565DEB0B5BDD28 /* CustomStreakEdgeCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20041B5DF7448F99407D0C0E /* CustomStreakEdgeCaseTests.swift */; };
 		8F5705E093278934C59D51DB /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E54FC44A8D7A428347652F2 /* OnboardingView.swift */; };
 		8FB182D4198D2FE8B97B8963 /* FitnessStreaksWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D49FFCC5C215612722C4FD4A /* FitnessStreaksWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		918057F9D94928BFE6F39097 /* StreakFlame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DA2285D9C3624EC0E762310 /* StreakFlame.swift */; };
@@ -72,6 +73,7 @@
 		9B0964764ED4D761D283DB3D /* Streak.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF5B8C88482BC235E56075E /* Streak.swift */; };
 		A3CE1EF798BA513764B6823A /* FitnessStreaksWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DD57D170B35D6F1A4D519C3 /* FitnessStreaksWidget.swift */; };
 		A6E9D296BFA48CA00C3975F2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F7A3FE7DC594DF00505EB22 /* Assets.xcassets */; };
+		A6FD84D22D78F3CE0202804A /* StreakSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA270B28BC95CC6A51C31565 /* StreakSettingsTests.swift */; };
 		A74045D58F30215759F53AA4 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 2EECD679C4AE189933F0942B /* PrivacyInfo.xcprivacy */; };
 		AAA8E437649BAAF7A5B0BBC9 /* DataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F34D2FE6D3914BB5A4D903 /* DataService.swift */; };
 		ABB7FC3D34A1DA9D82B6A1C3 /* StreakHero.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B4AF29EC104B213DA5DD0CA /* StreakHero.swift */; };
@@ -174,6 +176,7 @@
 		1D4AEA661B2CDB0B05946A25 /* FitnessStreaksWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FitnessStreaksWidget.entitlements; sourceTree = "<group>"; };
 		1EDE5E401D8E238E4B790CEF /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
 		1F7A3FE7DC594DF00505EB22 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		20041B5DF7448F99407D0C0E /* CustomStreakEdgeCaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomStreakEdgeCaseTests.swift; sourceTree = "<group>"; };
 		242B2759902C4F6C883A7C7B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		2DE780A4E064FF2F98F94209 /* FitnessStreaks.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FitnessStreaks.entitlements; sourceTree = "<group>"; };
 		2EECD679C4AE189933F0942B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -209,6 +212,7 @@
 		9C80A4826A373B331E583A1E /* StreakMetric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakMetric.swift; sourceTree = "<group>"; };
 		A05515A54F5B25D57C150872 /* JetBrainsMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "JetBrainsMono-Regular.ttf"; sourceTree = "<group>"; };
 		A235BEE85624E479B2AE5BDF /* WorkoutType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutType.swift; sourceTree = "<group>"; };
+		AA270B28BC95CC6A51C31565 /* StreakSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakSettingsTests.swift; sourceTree = "<group>"; };
 		AEF5B8C88482BC235E56075E /* Streak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Streak.swift; sourceTree = "<group>"; };
 		C1F67D164655801499990542 /* StreakEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakEngineTests.swift; sourceTree = "<group>"; };
 		C4E8CEC684BE97ED0A1826C9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -270,7 +274,9 @@
 		47A2CA6C84BD0895C87F51DA /* FitnessStreaksTests */ = {
 			isa = PBXGroup;
 			children = (
+				20041B5DF7448F99407D0C0E /* CustomStreakEdgeCaseTests.swift */,
 				C1F67D164655801499990542 /* StreakEngineTests.swift */,
+				AA270B28BC95CC6A51C31565 /* StreakSettingsTests.swift */,
 			);
 			path = FitnessStreaksTests;
 			sourceTree = "<group>";
@@ -592,6 +598,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8B8B89A5CB565DEB0B5BDD28 /* CustomStreakEdgeCaseTests.swift in Sources */,
 				D2A28B93EFF7C980D52981BF /* DailyActivity.swift in Sources */,
 				32C925739CCBBE8F58CEEDCD /* DataService.swift in Sources */,
 				25F21CF803DAE58D6C3ABC78 /* DateHelpers.swift in Sources */,
@@ -602,6 +609,7 @@
 				5C5162AB7569C6DC0AA56E81 /* StreakEngineTests.swift in Sources */,
 				C1B6D765AE9BAB50D4583825 /* StreakMetric.swift in Sources */,
 				DDD38A8136426AE3698966BE /* StreakSettings.swift in Sources */,
+				A6FD84D22D78F3CE0202804A /* StreakSettingsTests.swift in Sources */,
 				39316DB0B2C1CCA8766EC585 /* StreakStore.swift in Sources */,
 				B13B1EBB94CAAD64F87F5F5C /* Theme.swift in Sources */,
 				6CAC0B964F3065C90A6B269B /* WorkoutType.swift in Sources */,
@@ -822,7 +830,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 65;
+				CURRENT_PROJECT_VERSION = 68;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = YXG4MP6W39;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -899,7 +907,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 65;
+				CURRENT_PROJECT_VERSION = 68;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = YXG4MP6W39;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
