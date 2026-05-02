@@ -10,6 +10,24 @@ import os
 private let log = Logger(subsystem: "com.jackwallner.streaks", category: "App")
 private let refreshTaskID = "com.jackwallner.streaks.refresh"
 
+private final class BackgroundTaskCompletion: @unchecked Sendable {
+    private let task: BGTask
+    private let lock = NSLock()
+    private var didComplete = false
+
+    init(task: BGTask) {
+        self.task = task
+    }
+
+    func complete(success: Bool) {
+        lock.lock()
+        defer { lock.unlock() }
+        guard !didComplete else { return }
+        didComplete = true
+        task.setTaskCompleted(success: success)
+    }
+}
+
 #if canImport(WatchConnectivity)
 private final class PhoneSyncService: NSObject, WCSessionDelegate {
     nonisolated(unsafe) static let shared = PhoneSyncService()
@@ -107,14 +125,19 @@ struct FitnessStreaksApp: App {
 
     private static func handleAppRefresh(_ task: BGAppRefreshTask) {
         scheduleAppRefresh()
+        let completion = BackgroundTaskCompletion(task: task)
         let work = Task { @MainActor in
+            guard !Task.isCancelled else { return false }
             await StreakStore.shared.refreshIfNeeded(force: true)
-            return true
+            return !Task.isCancelled
         }
-        task.expirationHandler = { work.cancel() }
+        task.expirationHandler = {
+            work.cancel()
+            completion.complete(success: false)
+        }
         Task {
             let ok = await work.value
-            task.setTaskCompleted(success: ok)
+            completion.complete(success: ok)
         }
     }
 }

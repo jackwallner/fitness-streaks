@@ -18,6 +18,11 @@ struct SettingsView: View {
     private static let lookbackOptions: [Int] = [7, 30, 90, 180, 365]
     private static let coachServicesURL = URL(string: "https://www.e3fit.me/#services")!
     private static let coachContactURL = URL(string: "https://www.e3fit.me/#contact")!
+    private static let notificationTimeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return formatter
+    }()
 
     var body: some View {
         NavigationStack {
@@ -402,9 +407,7 @@ struct SettingsView: View {
 
     private var notificationTimeLabel: String {
         let date = notificationTimeBinding.wrappedValue
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
+        return Self.notificationTimeFormatter.string(from: date)
     }
 
     private func enableNotifications() async {

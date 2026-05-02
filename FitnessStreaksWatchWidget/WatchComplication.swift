@@ -29,7 +29,8 @@ struct WatchStreakProvider: TimelineProvider {
 
     func getTimeline(in context: Context, completion: @escaping @Sendable (Timeline<WatchStreakEntry>) -> Void) {
         let now = Date.now
-        let tomorrow = Calendar.current.startOfDay(for: Calendar.current.date(byAdding: .day, value: 1, to: now) ?? now)
+        let calendar = DateHelpers.gregorian
+        let tomorrow = calendar.startOfDay(for: calendar.date(byAdding: .day, value: 1, to: now) ?? now)
         let snap = SnapshotStore.load()
         let nowEntry = WatchStreakEntry(date: now, hero: snap?.hero)
         let midnightEntry = WatchStreakEntry(date: tomorrow, hero: snap?.hero.map(Self.resetForNewDay))

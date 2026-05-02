@@ -35,7 +35,8 @@ struct StreakTimelineProvider: TimelineProvider {
 
     func getTimeline(in context: Context, completion: @escaping @Sendable (Timeline<StreakEntry>) -> Void) {
         let now = Date.now
-        let tomorrow = Calendar.current.startOfDay(for: Calendar.current.date(byAdding: .day, value: 1, to: now) ?? now)
+        let calendar = DateHelpers.gregorian
+        let tomorrow = calendar.startOfDay(for: calendar.date(byAdding: .day, value: 1, to: now) ?? now)
         let nowEntry = currentEntry(at: now, resetForNewDay: false)
         // Emit a second entry at midnight that resets today's "locked-in" state to false,
         // so the lock-screen widget doesn't keep claiming today is done after midnight rolls.

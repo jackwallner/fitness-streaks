@@ -306,7 +306,11 @@ final class StreakSettings: ObservableObject {
         // Migration: ignore old minStreakLength semantics; default to 30-day lookback.
         let raw = defaults.object(forKey: "lookbackDays") as? Int
             ?? defaults.object(forKey: "minStreakLength") as? Int
-        self.lookbackDays = (raw != nil && raw! >= 7 && raw! <= 365) ? raw! : 30
+        if let raw, (7...365).contains(raw) {
+            self.lookbackDays = raw
+        } else {
+            self.lookbackDays = 30
+        }
 
         if let raws = defaults.array(forKey: "hiddenMetrics") as? [String] {
             self.hiddenMetrics = Set(raws.compactMap(StreakMetric.init(rawValue:)))
