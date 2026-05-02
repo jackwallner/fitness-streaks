@@ -73,3 +73,6 @@ Weekly totals: summed per ISO week starting Monday (see `DateHelpers.startOfWeek
 - watchOS `Theme`: no UIKit semantic colors — handled via `#if os(watchOS)`.
 - Swift 6: all HealthKit callbacks wrapped in async continuations; `@Sendable` where required.
 - `WKCompanionAppBundleIdentifier` in `FitnessStreaksWatch/Info.plist` must match the iOS bundle ID exactly.
+
+## Workflow
+- Do NOT add Co-Authored-By lines to commits.
