@@ -652,6 +652,23 @@ enum StreakEngine {
 
     /// For the detail screen: per-day value + whether it met the threshold.
     static func dailyHistory(
+        for streak: Streak,
+        history: [ActivityDay]
+    ) -> [(date: Date, value: Double, met: Bool)] {
+        if streak.metric == .workouts,
+           let workoutType = streak.workoutType,
+           let measure = streak.workoutMeasure {
+            return history.map { day in
+                let v = day.workoutDetails[workoutType]?.value(for: measure) ?? 0
+                return (date: day.date, value: v, met: v >= streak.threshold)
+            }
+        }
+
+        return dailyHistory(for: streak.metric, threshold: streak.threshold, history: history)
+    }
+
+    /// For the detail screen: per-day value + whether it met the threshold.
+    static func dailyHistory(
         for metric: StreakMetric,
         threshold: Double,
         history: [ActivityDay]

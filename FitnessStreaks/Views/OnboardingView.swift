@@ -20,6 +20,7 @@ struct OnboardingView: View {
     @State private var loadTask: Task<Void, Never>? = nil
     @State private var flameVisible = true
     @State private var selection: Set<String> = []
+    @State private var authProgress: Double = 0
 
     private static let tips: [String] = [
         "Streaks update automatically from Apple Health — no manual logging.",
@@ -32,6 +33,7 @@ struct OnboardingView: View {
     private static let privacyPolicyURL = URL(string: "https://jackwallner.github.io/fitness-streaks/privacy-policy.html")!
 
     private let tipTimer = Timer.publish(every: 3.5, on: .main, in: .common).autoconnect()
+    private let progressTimer = Timer.publish(every: 0.35, on: .main, in: .common).autoconnect()
 
     var body: some View {
         ZStack {
@@ -49,6 +51,12 @@ struct OnboardingView: View {
             guard phase == .loading else { return }
             withAnimation(.easeInOut(duration: 0.4)) {
                 tipIndex = (tipIndex + 1) % Self.tips.count
+            }
+        }
+        .onReceive(progressTimer) { _ in
+            guard phase == .loading, requesting else { return }
+            withAnimation(.linear(duration: 0.3)) {
+                authProgress = min(0.42, authProgress + 0.035)
             }
         }
     }
@@ -299,7 +307,7 @@ struct OnboardingView: View {
                     .tracking(1)
                     .foregroundStyle(Theme.retroCyan)
                 Spacer()
-                Text("\(Int(store.loadProgress * 100))%")
+                Text("\(Int(displayedProgress * 100))%")
                     .font(RetroFont.mono(11, weight: .bold))
                     .foregroundStyle(Theme.retroCyan)
             }
@@ -310,7 +318,7 @@ struct OnboardingView: View {
                         .overlay(Rectangle().stroke(Theme.retroCyan, lineWidth: 2))
                     Rectangle()
                         .fill(Theme.retroCyan)
-                        .frame(width: max(0, geo.size.width * CGFloat(store.loadProgress)))
+                        .frame(width: max(0, geo.size.width * CGFloat(displayedProgress)))
                         .padding(2)
                 }
             }
@@ -339,8 +347,21 @@ struct OnboardingView: View {
     }
 
     private var currentStageLabel: String {
+        if requesting {
+            return "CONNECTING TO APPLE HEALTH"
+        }
         let label = store.loadStage.label
         return label.isEmpty ? "CONNECTING…" : label
+    }
+
+    private var displayedProgress: Double {
+        if requesting {
+            return max(0.08, authProgress)
+        }
+        if phase == .loading {
+            return max(authProgress, store.loadProgress)
+        }
+        return store.loadProgress
     }
 
     // MARK: - Selecting
@@ -453,8 +474,13 @@ struct OnboardingView: View {
 
     private func beginDiscoveryWithAuth() async {
         errorText = nil
+        authProgress = 0.08
+        withAnimation { phase = .loading }
         await requestAuth()
-        guard errorText == nil else { return }
+        guard errorText == nil else {
+            withAnimation { phase = .intensity }
+            return
+        }
         startDiscovery()
     }
 
@@ -506,10 +532,16 @@ struct OnboardingView: View {
 
     private func requestAuth() async {
         requesting = true
+        withAnimation(.linear(duration: 0.2)) {
+            authProgress = max(authProgress, 0.14)
+        }
         defer { requesting = false }
 
         do {
             try await healthKit.requestAuthorization()
+            withAnimation(.linear(duration: 0.2)) {
+                authProgress = max(authProgress, 0.45)
+            }
         } catch is HealthKitError {
             errorText = "Couldn't request Health access from iOS. Open the Health app or Settings and enable access for Streak Finder."
             return

@@ -520,11 +520,7 @@ struct StreakDetailView: View {
                 .padding(.bottom, 4)
 
             CalendarHeatmap(
-                entries: StreakEngine.dailyHistory(
-                    for: streak.metric,
-                    threshold: streak.threshold,
-                    history: store.history
-                ),
+                entries: heatmapEntries,
                 accent: streak.metric.accent,
                 selectedRange: $selectedHeatmapRange
             )
@@ -560,7 +556,7 @@ struct StreakDetailView: View {
 
                 Spacer()
 
-                Text("AVG \(String(format: "%.1f", avgHitsPerWeek)) HITS/WK")
+                Text("\(selectedHeatmapHits) HITS · \(String(format: "%.1f", avgHitsPerWeek)) / WK")
                     .font(RetroFont.pixel(8))
                     .foregroundStyle(Theme.retroInkDim)
             }
@@ -569,11 +565,26 @@ struct StreakDetailView: View {
         .pixelPanel(color: streak.metric.accent)
     }
 
+    private var heatmapEntries: [HeatmapDay] {
+        StreakEngine.dailyHistory(for: streak, history: store.history)
+    }
+
+    private var selectedHeatmapEntries: [HeatmapDay] {
+        let today = DateHelpers.startOfDay()
+        let start = DateHelpers.addDays(-(selectedHeatmapRange.days - 1), to: today)
+        return heatmapEntries.filter { day in
+            let date = DateHelpers.startOfDay(day.date)
+            return date >= start && date <= today
+        }
+    }
+
+    private var selectedHeatmapHits: Int {
+        selectedHeatmapEntries.filter(\.met).count
+    }
+
     private var avgHitsPerWeek: Double {
-        let hits = StreakEngine.dailyHistory(for: streak.metric, threshold: streak.threshold, history: store.history)
-            .filter(\.met).count
-        let weeks = max(1, store.history.count / 7)
-        return Double(hits) / Double(weeks)
+        let weeks = max(1.0, Double(selectedHeatmapRange.days) / 7.0)
+        return Double(selectedHeatmapHits) / weeks
     }
 
     // MARK: - Stats row
