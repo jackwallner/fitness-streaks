@@ -1,5 +1,4 @@
 import SwiftUI
-import WidgetKit
 
 struct SettingsView: View {
     @EnvironmentObject var settings: StreakSettings
@@ -30,7 +29,6 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     appearanceSection
                     intensitySection
-                    widgetSection
                     notificationsSection
                     metricsSection
                     dataSection
@@ -252,62 +250,6 @@ struct SettingsView: View {
             return "\(set.count) PICKED"
         }
         return "ALL"
-    }
-
-    // MARK: - Widget
-
-    private var widgetSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Home Screen Widget")
-
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(alignment: .top, spacing: 10) {
-                    Image(systemName: "square.grid.2x2.fill")
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundStyle(Theme.retroLime)
-                        .frame(width: 26)
-
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("TRACKED STREAKS AT A GLANCE")
-                            .font(RetroFont.mono(10, weight: .bold))
-                            .tracking(1)
-                            .foregroundStyle(Theme.retroLime)
-                        Text("Add the Streak Finder small or medium widget from the iOS Home Screen widget gallery. It uses your tracked streak order, with your primary streak first.")
-                            .font(RetroFont.mono(10))
-                            .foregroundStyle(Theme.retroInkDim)
-                            .lineSpacing(2)
-                    }
-                }
-
-                VStack(alignment: .leading, spacing: 5) {
-                    Text("1. Touch and hold the Home Screen")
-                    Text("2. Tap +, search Streak Finder")
-                    Text("3. Pick Small or Medium, then Add Widget")
-                }
-                .font(RetroFont.mono(10))
-                .foregroundStyle(Theme.retroInk)
-
-                Button {
-                    store.persistCurrentSnapshot()
-                    WidgetCenter.shared.reloadAllTimelines()
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "arrow.clockwise")
-                        Text("REFRESH WIDGET DATA")
-                            .font(RetroFont.mono(10, weight: .bold))
-                            .tracking(1)
-                    }
-                    .foregroundStyle(Theme.retroCyan)
-                    .padding(.vertical, 9)
-                    .padding(.horizontal, 12)
-                    .overlay(Rectangle().stroke(Theme.retroCyan, lineWidth: 2))
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Refresh Home Screen widget data")
-            }
-            .padding(14)
-            .pixelPanel(color: Theme.retroLime)
-        }
     }
 
     // MARK: - Notifications
