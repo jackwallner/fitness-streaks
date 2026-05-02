@@ -540,19 +540,18 @@ struct CustomStreakEditSheet: View {
 
     private var step: Double {
         switch metric {
-        case .steps: return 100
+        case .steps, .earlySteps: return 100
         case .activeEnergy: return 10
-        case .distanceMiles, .intensityRatio: return 0.1
+        case .distanceMiles, .intensityRatio, .sleepHours: return 0.1
         default: return 1
         }
     }
 
     private var minValue: Double {
         switch metric {
-        case .steps: return 100
+        case .steps, .earlySteps: return 100
         case .activeEnergy: return 10
-        case .distanceMiles: return 0.1
-        case .intensityRatio: return 0.1
+        case .distanceMiles, .intensityRatio, .sleepHours: return 0.1
         default: return 1
         }
     }
@@ -560,9 +559,14 @@ struct CustomStreakEditSheet: View {
     private var maxValue: Double {
         switch metric {
         case .steps: return 50000
+        case .earlySteps: return 10000
         case .activeEnergy: return 2000
         case .distanceMiles: return 26.0
+        case .sleepHours: return 12.0
         case .intensityRatio: return 2.0
+        case .exerciseMinutes, .mindfulMinutes, .heartRateMinutes: return 60
+        case .standHours: return 12
+        case .flightsClimbed: return 50
         case .workouts:
             if custom.workoutType != nil {
                 switch custom.workoutMeasure {
