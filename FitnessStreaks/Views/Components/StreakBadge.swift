@@ -109,7 +109,6 @@ struct StreakBadgeCard: View {
     }
 
     private var chargeLabel: String {
-        let t = streak.format(currentUnitValue: streak.threshold)
         let unit = streak.current == 1 ? streak.cadence.label : streak.cadence.pluralLabel
         if streak.currentUnitCompleted {
             return "\(streak.current) \(unit) · DONE"
