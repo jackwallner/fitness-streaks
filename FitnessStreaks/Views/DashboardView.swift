@@ -1,5 +1,6 @@
 import SwiftUI
 import os
+import WidgetKit
 
 private let log = Logger(subsystem: "com.jackwallner.streaks", category: "Dashboard")
 
@@ -64,6 +65,9 @@ struct DashboardView: View {
                         }
 
                         findMoreButton
+                            .padding(.horizontal, 6)
+
+                        widgetPromo
                             .padding(.horizontal, 6)
                     } else if store.isLoading {
                         loadingState
@@ -283,6 +287,52 @@ struct DashboardView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Find more streaks")
+    }
+
+    private var widgetPromo: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: "square.grid.2x2.fill")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(Theme.retroCyan)
+                    .frame(width: 26)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("ADD HOME SCREEN WIDGET")
+                        .font(RetroFont.mono(10, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(Theme.retroCyan)
+                    Text("See your streaks at a glance without opening the app")
+                        .font(RetroFont.mono(10))
+                        .foregroundStyle(Theme.retroInkDim)
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("1. Long-press Home Screen, tap +")
+                Text("2. Search Streak Finder")
+                Text("3. Pick Small or Medium")
+            }
+            .font(RetroFont.mono(10))
+            .foregroundStyle(Theme.retroInk)
+
+            Button {
+                store.persistCurrentSnapshot()
+                WidgetCenter.shared.reloadAllTimelines()
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.system(size: 10))
+                    Text("REFRESH WIDGET")
+                        .font(RetroFont.mono(9, weight: .bold))
+                        .tracking(0.5)
+                }
+                .foregroundStyle(Theme.retroCyan)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(12)
+        .pixelPanel(color: Theme.retroCyan.opacity(0.5), fill: Theme.retroBgRaised)
     }
 
     private var badgeGrid: some View {
