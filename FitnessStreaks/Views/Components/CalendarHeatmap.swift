@@ -171,7 +171,7 @@ struct CalendarHeatmap: View {
     // MARK: - Views
 
     private func monthLabelsRow(weeks: [[RenderedDay]], layout: Layout) -> some View {
-        let labels = monthLabels(for: weeks)
+        let labels = monthLabels(for: weeks, cellWidth: layout.cellWidth, gap: layout.gap)
 
         return HStack(spacing: 0) {
             Color.clear.frame(width: weekdayLabelWidth)
@@ -260,15 +260,27 @@ struct CalendarHeatmap: View {
 
     // MARK: - Helpers
 
-    private func monthLabels(for weeks: [[RenderedDay]]) -> [(index: Int, name: String)] {
+    private func monthLabels(for weeks: [[RenderedDay]], cellWidth: CGFloat, gap: CGFloat) -> [(index: Int, name: String)] {
         var labels: [(Int, String)] = []
         var lastMonth: Int?
+        var lastIndex: Int = -10 // Ensure first label always shows
+
+        // Minimum pixel spacing between labels to prevent overlap
+        let minLabelSpacing: CGFloat = 28
 
         for (index, week) in weeks.enumerated() {
             guard let firstDay = week.first(where: { $0.isInRange })?.date else { continue }
             let month = DateHelpers.gregorian.component(.month, from: firstDay)
+
             if month != lastMonth {
-                labels.append((index, monthName(for: firstDay)))
+                let pixelPosition = CGFloat(index) * (cellWidth + gap)
+                let lastPosition = CGFloat(lastIndex) * (cellWidth + gap)
+
+                // Only add label if it's far enough from the last one
+                if pixelPosition - lastPosition >= minLabelSpacing {
+                    labels.append((index, monthName(for: firstDay)))
+                    lastIndex = index
+                }
                 lastMonth = month
             }
         }
