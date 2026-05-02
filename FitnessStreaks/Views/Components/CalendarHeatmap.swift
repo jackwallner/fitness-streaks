@@ -50,8 +50,8 @@ struct CalendarHeatmap: View {
     let accent: Color
     @Binding var selectedRange: HeatmapDateRange
 
-    private let gap: CGFloat = 2
-    private let weekdayLabelWidth: CGFloat = 14
+    private let gap: CGFloat = 3
+    private let weekdayLabelWidth: CGFloat = 16
 
     private struct LayoutMetrics {
         let cell: CGFloat
@@ -144,23 +144,25 @@ struct CalendarHeatmap: View {
 
     /// Calculate card height based on cell size to fit the grid perfectly
     private func layoutHeight(for cellSize: CGFloat) -> CGFloat {
-        let topLabelHeight: CGFloat = 14      // Month labels
-        let bottomLabelHeight: CGFloat = 16     // Date range + TODAY
-        let verticalPadding: CGFloat = 12       // Total vertical padding
-        let cellArea = 7 * cellSize + 6 * gap   // 7 rows + 6 gaps
-        return topLabelHeight + cellArea + bottomLabelHeight + verticalPadding
+        let topLabelHeight: CGFloat = 18      // Month labels
+        let bottomLabelHeight: CGFloat = 20    // Date range + TODAY
+        let verticalPadding: CGFloat = 16      // Total vertical padding
+        let cellArea = 7 * cellSize + 6 * gap  // 7 rows + 6 gaps
+        // Minimum height ensures visibility even on smaller screens
+        return max(120, topLabelHeight + cellArea + bottomLabelHeight + verticalPadding)
     }
 
     @ViewBuilder
     private func grid(weeks: [[RenderedDay]], layout: LayoutMetrics) -> some View {
         let labels = monthLabels(for: weeks)
 
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 6) {
+            // Month labels row
             HStack(alignment: .top, spacing: 4) {
-                Color.clear.frame(width: weekdayLabelWidth, height: 10)
+                Color.clear.frame(width: weekdayLabelWidth, height: 12)
 
                 ZStack(alignment: .topLeading) {
-                    Color.clear.frame(width: layout.gridWidth, height: 10)
+                    Color.clear.frame(width: layout.gridWidth, height: 12)
                     ForEach(labels, id: \.index) { label in
                         Text(label.name)
                             .font(RetroFont.pixel(7))
@@ -171,9 +173,11 @@ struct CalendarHeatmap: View {
                 }
             }
 
+            // Grid row - constrained to calculated width
             HStack(alignment: .top, spacing: 4) {
                 weekdayLabels(cell: layout.cell)
 
+                // Fixed width container prevents overflow
                 HStack(alignment: .top, spacing: layout.columnSpacing) {
                     ForEach(Array(weeks.enumerated()), id: \.offset) { item in
                         VStack(spacing: gap) {
@@ -184,8 +188,11 @@ struct CalendarHeatmap: View {
                         .id(item.offset)
                     }
                 }
+                .frame(width: layout.gridWidth, alignment: .leading)
+                .clipped()
             }
 
+            // Bottom legend row
             HStack(spacing: 8) {
                 Text("\(rangeLabelStart) - \(rangeLabelEnd)")
                     .font(RetroFont.pixel(8))
@@ -202,41 +209,46 @@ struct CalendarHeatmap: View {
             }
             .padding(.leading, weekdayLabelWidth + 4)
         }
-        .padding(.vertical, 2)
-        .padding(.horizontal, 2)
+        .padding(.vertical, 4)
+        .padding(.horizontal, 4)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     /// Target cell sizes for each range - larger cells for shorter time periods
     private func targetCellSize(for weeks: Int) -> CGFloat {
         switch weeks {
-        case ...5: return 28   // 30 days (~5 weeks)
-        case ...13: return 18  // 90 days (~13 weeks)
-        case ...26: return 12  // 180 days (~26 weeks)
-        default: return 8      // 365 days (~53 weeks)
+        case ...5: return 32   // 30 days (~5 weeks)
+        case ...13: return 20  // 90 days (~13 weeks)
+        case ...26: return 14  // 180 days (~26 weeks)
+        default: return 10     // 365 days (~53 weeks) - minimum visible size
         }
     }
 
+    /// Minimum cell size to ensure cells are visible and tappable
+    private let minCellSize: CGFloat = 10
+
     private func layoutMetrics(weekCount: Int, availableWidth: CGFloat) -> LayoutMetrics {
         let columns = max(1, weekCount)
-        let gridWidth = max(0, availableWidth - weekdayLabelWidth - 8)
+        // Account for weekday labels + spacing + padding
+        let gridWidth = max(0, availableWidth - weekdayLabelWidth - 12)
 
         // Target cell size based on how many weeks we're showing
         let targetSize = targetCellSize(for: columns)
 
-        // Maximum cell size that fits in the available width
+        // Calculate: (columns * cell) + ((columns-1) * gap) = gridWidth
+        // Solving for max cell: cell = (gridWidth - (columns-1)*gap) / columns
         let maxWidthBasedCell = (gridWidth - CGFloat(columns - 1) * gap) / CGFloat(columns)
 
-        // Use the smaller of target or what fits, with bounds
-        let cell = max(6, min(targetSize, maxWidthBasedCell))
+        // Use the smaller of target or what fits, with minimum bound
+        let cell = max(minCellSize, min(targetSize, maxWidthBasedCell))
 
-        // Minimal gap between columns
-        let columnSpacing = gap
+        // Recalculate actual grid width based on final cell size to prevent overflow
+        let actualGridWidth = CGFloat(columns) * cell + CGFloat(columns - 1) * gap
 
         return LayoutMetrics(
             cell: cell,
-            columnSpacing: columnSpacing,
-            gridWidth: gridWidth
+            columnSpacing: gap,
+            gridWidth: actualGridWidth
         )
     }
 
