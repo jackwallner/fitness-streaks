@@ -66,6 +66,19 @@ footer a{color:#86868b;text-decoration:none;margin:0 10px}
 footer a:hover{color:#1d1d1f}
 @media(max-width:768px){.hero{padding:72px 20px 48px}.hero h1{font-size:36px;letter-spacing:-1px}.hero .tagline{font-size:19px}.phone-frame img{height:400px;border-radius:24px}.features-grid{grid-template-columns:1fr}.features-header h2{font-size:26px}.privacy h2,.cta h2{font-size:24px}}
 @media(max-width:480px){.phone-frame:not(:first-child){display:none}.phone-frame img{height:440px}}
+.more-info{padding:64px 24px;background:#fff;border-top:1px solid rgba(0,0,0,0.06)}
+.more-info-header{text-align:center;margin-bottom:48px}
+.more-info-header h2{font-size:32px;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px}
+.more-info-header p{font-size:17px;color:#6e6e73}
+.more-info-content{max-width:720px;margin:0 auto}
+.more-info-section{margin-bottom:40px}
+.more-info-section h3{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:#86868b;margin-bottom:12px}
+.more-info-section p{font-size:15px;line-height:1.6;color:#1d1d1f;margin-bottom:12px}
+.more-info-section p:last-child{margin-bottom:0}
+.more-info-section strong{font-weight:600}
+.specs-table{width:100%;font-size:14px;border-collapse:collapse;margin-top:16px}
+.specs-table td{padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.06)}
+.specs-table td:first-child{color:#86868b;width:140px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px}
 </style>
 </head>
 <body>
@@ -157,10 +170,47 @@ footer a:hover{color:#1d1d1f}
 </div>
 </section>
 
+<section class="more-info">
+<div class="container">
+<div class="more-info-header">
+<h2>More info</h2>
+<p>How it's built and why it matters.</p>
+</div>
+<div class="more-info-content">
+<div class="more-info-section">
+<h3>The Pitch</h3>
+<p>You already have streaks — you just don't know it. That 47-day walk streak, the 12-week sleep average above 7 hours, the 3-month daily stand goal. They're buried in HealthKit, invisible.</p>
+<p>Streak Finder surfaces them automatically, ranks them by how impressive they actually are, and warns you before you break the good ones.</p>
+</div>
+
+<div class="more-info-section">
+<h3>Specs</h3>
+<table class="specs-table">
+<tr><td>Platform</td><td>iOS 17+, watchOS 10+</td></tr>
+<tr><td>Language</td><td>Swift 6 with strict concurrency checking</td></tr>
+<tr><td>Data</td><td>SwiftData cache, App Group shared with widgets</td></tr>
+<tr><td>Metrics</td><td>Steps, exercise, stand, energy, distance, flights, workouts, sleep, mindfulness</td></tr>
+<tr><td>Analysis</td><td>400 days of history, daily + weekly cadences, threshold tiers</td></tr>
+<tr><td>Notifications</td><td>7 PM at-risk nudge for hero streak</td></tr>
+</table>
+</div>
+
+<div class="more-info-section">
+<h3>What Mattered</h3>
+<p><strong>The discovery engine.</strong> Every metric has 6 threshold tiers. The engine evaluates every (metric, cadence, threshold) combo across 400 days, finds contiguous streaks, and filters for minimum viability. Then it ranks by a weighted score: streak length × threshold difficulty.</p>
+<p><strong>Hero streak + badges.</strong> One streak gets featured — your best current run. Everything else appears as tappable badges. The hero rotates automatically as streaks break and new ones form. No manual curation, no decision fatigue.</p>
+<p><strong>Calendar heatmaps.</strong> Each streak has a year-view heatmap showing every hit and miss. Green intensity maps to how far above threshold. It's visceral — you can see your life patterns.</p>
+<p><strong>The 7 PM nudge.</strong> If your hero streak isn't "locked in" for the day, you get a gentle notification at 7 PM. Not nagging — context. You decide if you care enough to save it.</p>
+<p><strong>Widget reliability.</strong> All widgets read from a snapshot JSON in App Group UserDefaults — never HealthKit directly. The main app refreshes this on every foreground and background task. Widgets are instant, not laggy.</p>
+</div>
+</div>
+</div>
+</section>
+
 <section class="cta">
 <h2>Ready to find your streaks?</h2>
 <p>Download free on the App Store</p>
-<a class="download-btn" href="https://github.com/jackwallner/fitness-streaks">Coming Soon</a>
+<a class="download-btn" href="https://apps.apple.com/us/app/streak-finder-fitness-habits/APP_STORE_ID">Download</a>
 </section>
 
 <footer>
