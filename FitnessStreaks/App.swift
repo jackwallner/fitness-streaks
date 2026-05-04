@@ -122,6 +122,9 @@ struct FitnessStreaksApp: App {
     @StateObject private var storeKit = StoreKitService.shared
     @Environment(\.scenePhase) private var scenePhase
 
+    // Store observer token for cleanup
+    @State private var snapshotObserver: NSObjectProtocol?
+
     init() {
         BGTaskScheduler.shared.register(forTaskWithIdentifier: refreshTaskID, using: DispatchQueue.main) { task in
             guard let task = task as? BGAppRefreshTask else { return }
@@ -130,14 +133,6 @@ struct FitnessStreaksApp: App {
         Self.scheduleAppRefresh()
         #if canImport(WatchConnectivity)
         PhoneSyncService.shared.activate()
-        // Listen for snapshot updates and push to watch
-        NotificationCenter.default.addObserver(
-            forName: .streakSnapshotUpdated,
-            object: nil,
-            queue: .main
-        ) { _ in
-            PhoneSyncService.shared.syncToWatch()
-        }
         #endif
     }
 
@@ -166,6 +161,26 @@ struct FitnessStreaksApp: App {
                     Task(priority: .utility) {
                         await store.refreshIfNeeded()
                     }
+                }
+                .onAppear {
+                    #if canImport(WatchConnectivity)
+                    // Register observer for snapshot updates to push to watch
+                    snapshotObserver = NotificationCenter.default.addObserver(
+                        forName: .streakSnapshotUpdated,
+                        object: nil,
+                        queue: .main
+                    ) { _ in
+                        PhoneSyncService.shared.syncToWatch()
+                    }
+                    #endif
+                }
+                .onDisappear {
+                    #if canImport(WatchConnectivity)
+                    if let observer = snapshotObserver {
+                        NotificationCenter.default.removeObserver(observer)
+                        snapshotObserver = nil
+                    }
+                    #endif
                 }
         }
         .modelContainer(DataService.sharedModelContainer)

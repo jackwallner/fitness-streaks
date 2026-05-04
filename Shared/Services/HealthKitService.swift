@@ -9,6 +9,10 @@ import WatchKit
 
 private let log = Logger(subsystem: "com.jackwallner.streaks", category: "HealthKit")
 
+/// Maximum samples to fetch to prevent OOM crashes for users with large HealthKit histories.
+/// Covers ~10+ years of daily data but prevents memory exhaustion.
+private let maxSamplesPerQuery = 10_000
+
 enum HealthKitError: Error {
     case unavailable
     case noReadTypes
@@ -288,8 +292,8 @@ final class HealthKitService: ObservableObject {
             let query = HKSampleQuery(
                 sampleType: HKObjectType.workoutType(),
                 predicate: predicate,
-                limit: HKObjectQueryNoLimit,
-                sortDescriptors: nil
+                limit: maxSamplesPerQuery,
+                sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)]
             ) { _, results, error in
                 if let error {
                     continuation.resume(throwing: error)
@@ -334,8 +338,8 @@ final class HealthKitService: ObservableObject {
             let query = HKSampleQuery(
                 sampleType: type,
                 predicate: predicate,
-                limit: HKObjectQueryNoLimit,
-                sortDescriptors: nil
+                limit: maxSamplesPerQuery,
+                sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)]
             ) { _, results, error in
                 if let error {
                     continuation.resume(throwing: error)
@@ -362,8 +366,8 @@ final class HealthKitService: ObservableObject {
             let query = HKSampleQuery(
                 sampleType: type,
                 predicate: predicate,
-                limit: HKObjectQueryNoLimit,
-                sortDescriptors: nil
+                limit: maxSamplesPerQuery,
+                sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)]
             ) { _, results, error in
                 if let error {
                     continuation.resume(throwing: error)
@@ -399,8 +403,8 @@ final class HealthKitService: ObservableObject {
             let query = HKSampleQuery(
                 sampleType: type,
                 predicate: predicate,
-                limit: HKObjectQueryNoLimit,
-                sortDescriptors: nil
+                limit: maxSamplesPerQuery,
+                sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)]
             ) { _, results, error in
                 if let error {
                     continuation.resume(throwing: error)

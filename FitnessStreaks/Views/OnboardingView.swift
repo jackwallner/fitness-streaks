@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 struct OnboardingView: View {
     @EnvironmentObject var healthKit: HealthKitService
@@ -32,8 +33,11 @@ struct OnboardingView: View {
     ]
     private static let privacyPolicyURL = URL(string: "https://jackwallner.github.io/fitness-streaks/privacy-policy.html")!
 
-    private let tipTimer = Timer.publish(every: 3.5, on: .main, in: .common).autoconnect()
-    private let progressTimer = Timer.publish(every: 0.35, on: .main, in: .common).autoconnect()
+    // Timer publishers - stored to allow proper cleanup
+    private let tipTimerPublisher = Timer.publish(every: 3.5, on: .main, in: .common)
+    private let progressTimerPublisher = Timer.publish(every: 0.35, on: .main, in: .common)
+    @State private var tipTimerCancellable: AnyCancellable?
+    @State private var progressTimerCancellable: AnyCancellable?
 
     var body: some View {
         ZStack {
@@ -47,17 +51,27 @@ struct OnboardingView: View {
             case .empty:     emptyScreen
             }
         }
-        .onReceive(tipTimer) { _ in
-            guard phase == .loading else { return }
-            withAnimation(.easeInOut(duration: 0.4)) {
-                tipIndex = (tipIndex + 1) % Self.tips.count
-            }
+        .onAppear {
+            // Start timers on appear
+            tipTimerCancellable = tipTimerPublisher
+                .sink { _ in
+                    guard phase == .loading else { return }
+                    withAnimation(.easeInOut(duration: 0.4)) {
+                        tipIndex = (tipIndex + 1) % Self.tips.count
+                    }
+                }
+            progressTimerCancellable = progressTimerPublisher
+                .sink { _ in
+                    guard phase == .loading, requesting else { return }
+                    withAnimation(.linear(duration: 0.3)) {
+                        authProgress = min(0.42, authProgress + 0.035)
+                    }
+                }
         }
-        .onReceive(progressTimer) { _ in
-            guard phase == .loading, requesting else { return }
-            withAnimation(.linear(duration: 0.3)) {
-                authProgress = min(0.42, authProgress + 0.035)
-            }
+        .onDisappear {
+            // Cancel timers to prevent memory/CPU leak
+            tipTimerCancellable?.cancel()
+            progressTimerCancellable?.cancel()
         }
     }
 
