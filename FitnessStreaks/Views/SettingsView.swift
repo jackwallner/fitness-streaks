@@ -4,6 +4,7 @@ struct SettingsView: View {
     @EnvironmentObject var settings: StreakSettings
     @EnvironmentObject var healthKit: HealthKitService
     @EnvironmentObject var store: StreakStore
+    @EnvironmentObject var storeKit: StoreKitService
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
@@ -13,6 +14,7 @@ struct SettingsView: View {
     @State private var recalibrateAllMessage: String? = nil
     @State private var showingLookbackRecalibratePrompt = false
     @State private var pendingLookbackDays: Int? = nil
+    @State private var showingPaywall = false
 
     private static let lookbackOptions: [Int] = [7, 30, 90, 180, 365]
     private static let coachServicesURL = URL(string: "https://www.e3fit.me/#services")!
@@ -27,6 +29,7 @@ struct SettingsView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
+                    proSection
                     appearanceSection
                     intensitySection
                     notificationsSection
@@ -77,6 +80,11 @@ struct SettingsView: View {
                     .environmentObject(settings)
                     .environmentObject(store)
             }
+            .sheet(isPresented: $showingPaywall) {
+                ProPaywallView()
+                    .environmentObject(storeKit)
+                    .environmentObject(settings)
+            }
             .onChange(of: store.isLoading) { _, isLoading in
                 if !isLoading { recalibrateAllMessage = nil }
             }
@@ -101,6 +109,124 @@ struct SettingsView: View {
                 Text("Would you like to recalibrate your goals based on this new lookback period? This will re-analyze your last \(pendingLookbackDays ?? 0) days and may suggest different goals.")
             }
         }
+    }
+
+    // MARK: - Pro / Grace Days
+
+    private var proSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            PixelSectionHeader(title: storeKit.isPro ? "Pro · Grace Days" : "Grace Days · Pro")
+
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(alignment: .top, spacing: 12) {
+                    PixelFlame(size: 32, intensity: 0.7, tint: storeKit.isPro ? Theme.retroLime : Theme.retroMagenta)
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack(spacing: 8) {
+                            Text("GRACE DAYS")
+                                .font(RetroFont.pixel(11))
+                                .tracking(1)
+                                .foregroundStyle(Theme.retroInk)
+                            if storeKit.isPro {
+                                PixelChip(text: "PRO", accent: Theme.retroLime)
+                            } else {
+                                PixelChip(text: "LOCKED", accent: Theme.retroMagenta)
+                            }
+                        }
+                        Text("Banked: \(settings.earnedGraceDays) / 9")
+                            .font(RetroFont.mono(11, weight: .bold))
+                            .foregroundStyle(storeKit.isPro ? Theme.retroLime : Theme.retroAmber)
+                    }
+                    Spacer(minLength: 0)
+                }
+
+                Text(graceCopy)
+                    .font(RetroFont.mono(10))
+                    .foregroundStyle(Theme.retroInkDim)
+                    .lineSpacing(2)
+
+                if !storeKit.isPro {
+                    Button {
+                        showingPaywall = true
+                    } label: {
+                        HStack {
+                            Text(settings.earnedGraceDays > 0 ? "UNLOCK PRO TO USE THEM" : "UNLOCK FITNESSSTREAKS PRO")
+                                .font(RetroFont.mono(10, weight: .bold))
+                                .tracking(1)
+                                .foregroundStyle(Theme.retroBg)
+                            Spacer()
+                            Text("›")
+                                .font(RetroFont.mono(14, weight: .bold))
+                                .foregroundStyle(Theme.retroBg)
+                        }
+                        .padding(14)
+                        .background(Theme.retroMagenta)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Unlock FitnessStreaks Pro")
+                } else if !recentPreservations.isEmpty {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("RECENT SAVES")
+                            .font(RetroFont.pixel(9))
+                            .tracking(1)
+                            .foregroundStyle(Theme.retroInkDim)
+                        ForEach(recentPreservations, id: \.key) { p in
+                            HStack(spacing: 8) {
+                                Image(systemName: "shield.lefthalf.filled")
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundStyle(Theme.retroLime)
+                                Text("\(p.metric.displayName) · saved \(p.preservedLength)-day run")
+                                    .font(RetroFont.mono(10))
+                                    .foregroundStyle(Theme.retroInk)
+                                Spacer()
+                            }
+                        }
+                    }
+                    .padding(.top, 4)
+
+                    Button {
+                        if let url = URL(string: "https://apps.apple.com/account/subscriptions") {
+                            UIApplication.shared.open(url)
+                        }
+                    } label: {
+                        HStack {
+                            Text("MANAGE SUBSCRIPTION")
+                                .font(RetroFont.mono(10, weight: .bold))
+                                .tracking(1)
+                                .foregroundStyle(Theme.retroCyan)
+                            Spacer()
+                            Text("↗")
+                                .font(RetroFont.mono(11))
+                                .foregroundStyle(Theme.retroCyan)
+                        }
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 4)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(14)
+            .pixelPanel(color: storeKit.isPro ? Theme.retroLime : Theme.retroMagenta, fill: Theme.retroBgRaised)
+        }
+    }
+
+    private var graceCopy: String {
+        if storeKit.isPro {
+            if settings.earnedGraceDays == 0 {
+                return "When you bank a Grace Day, FitnessStreaks will spend it automatically to save a streak you missed. You earn 1 every 30 days you keep your hero streak alive."
+            }
+            return "FitnessStreaks will automatically spend a Grace Day to preserve a streak you missed. They never expire — you can bank up to 9."
+        }
+        if settings.earnedGraceDays > 0 {
+            return "You've banked \(settings.earnedGraceDays) Grace Day\(settings.earnedGraceDays == 1 ? "" : "s") from your streak progress. Unlock Pro to start using them automatically when life gets in the way."
+        }
+        return "Earn 1 Grace Day for every 30 days you keep your hero streak alive. Unlock Pro to spend them automatically and save streaks you'd otherwise lose."
+    }
+
+    private var recentPreservations: [GracePreservation] {
+        let cutoff = Date().addingTimeInterval(-30 * 24 * 60 * 60)
+        return settings.gracePreservations.values
+            .filter { $0.grantedAt >= cutoff }
+            .sorted { $0.grantedAt > $1.grantedAt }
     }
 
     // MARK: - Appearance

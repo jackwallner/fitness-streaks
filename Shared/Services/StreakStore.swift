@@ -334,7 +334,7 @@ final class StreakStore: ObservableObject {
             guard newCurrent == 0 else { continue }
             guard !newBroken.contains(where: { $0.key == key }) else { continue }
 
-            if settings.consumeGraceDay() {
+            if settings.consumeGraceDay(isPro: StoreKitService.shared.isPro) {
                 preservations[key] = GracePreservation(
                     key: key,
                     missedDate: DateHelpers.addDays(-1, to: today),

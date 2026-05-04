@@ -78,7 +78,7 @@ struct WatchComplicationView: View {
     private var inline: some View {
         Group {
             if let hero = entry.hero {
-                Text("\(Image(systemName: hero.displaySymbol)) \(hero.current) \(shortCadenceLabel(hero))")
+                Text("\(Image(systemName: hero.displaySymbol)) \(hero.progressValueLabel)")
             } else {
                 Text("Open app to sync streaks")
             }
@@ -93,11 +93,12 @@ struct WatchComplicationView: View {
                     Image(systemName: hero.displaySymbol)
                 } currentValueLabel: {
                     VStack(spacing: 0) {
-                        Text("\(hero.current)")
-                            .font(.system(size: 20, weight: .bold, design: .rounded))
+                        Text(hero.compactCurrentUnitValueLabel)
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
                             .minimumScaleFactor(0.5)
-                        Text(shortCadenceLabel(hero))
+                        Text("/\(hero.compactGoalValueLabel)")
                             .font(.system(size: 8, weight: .bold, design: .rounded))
+                            .minimumScaleFactor(0.6)
                     }
                 }
                 .gaugeStyle(.accessoryCircular)
@@ -118,11 +119,14 @@ struct WatchComplicationView: View {
                     Text(hero.displayName).font(.system(size: 11, weight: .semibold, design: .rounded))
                 }
                 HStack(alignment: .firstTextBaseline, spacing: 3) {
-                    Text("\(hero.current)")
+                    Text(hero.currentUnitValueLabel)
                         .font(.system(size: 22, weight: .bold, design: .rounded))
                         .monospacedDigit()
-                    Text(cadenceLabel(hero))
+                        .minimumScaleFactor(0.55)
+                    Text("/ \(hero.goalValueLabel) \(hero.unitLabel)")
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
                 }
                 ProgressView(value: clampedProgress(hero))
                     .tint(heroAccent(hero))
@@ -140,11 +144,12 @@ struct WatchComplicationView: View {
     private var corner: some View {
         Group {
             if let hero = entry.hero {
-                Text("\(hero.current)")
+                Text(hero.compactCurrentUnitValueLabel)
                     .font(.system(size: 24, weight: .bold, design: .rounded))
+                    .minimumScaleFactor(0.45)
                     .widgetCurvesContent()
                     .widgetLabel {
-                        Label(hero.displayName, systemImage: hero.displaySymbol)
+                        Label("\(hero.displayName) / \(hero.compactGoalValueLabel)", systemImage: hero.displaySymbol)
                     }
             } else {
                 Image(systemName: "flame").widgetLabel("Open app to sync")
@@ -157,36 +162,15 @@ struct WatchComplicationView: View {
         min(max(item.currentUnitProgress, 0), 1)
     }
 
-    private func shortCadenceLabel(_ item: StreakSnapshot.Item) -> String {
-        item.cadence == "daily" ? "d" : "w"
-    }
-
-    private func cadenceLabel(_ item: StreakSnapshot.Item) -> String {
-        item.cadence == "daily" ? "days" : "weeks"
-    }
-
     private func heroAccent(_ item: StreakSnapshot.Item) -> Color {
         item.streakMetric?.accent ?? Theme.streakHot
     }
 
     private func rectangularProgressLabel(_ item: StreakSnapshot.Item) -> String {
         if item.currentUnitCompleted {
-            return item.cadence == "daily" ? "Today locked in" : "Week locked in"
+            return "\(item.progressValueLabel) done"
         }
-        return "\(currentValueText(item)) / \(item.thresholdLabel)"
-    }
-
-    private func currentValueText(_ item: StreakSnapshot.Item) -> String {
-        if let measure = item.workoutMeasureValue {
-            switch measure {
-            case .count: return "\(Int(item.currentUnitValue))"
-            case .minutes: return "\(Int(item.currentUnitValue))"
-            case .miles:
-                let truncated = floor(item.currentUnitValue * 10) / 10
-                return String(format: truncated < 10 ? "%.1f" : "%.0f", truncated)
-            }
-        }
-        return item.streakMetric?.formatTruncating(value: item.currentUnitValue) ?? "\(Int(item.currentUnitValue))"
+        return item.progressValueLabel
     }
 }
 

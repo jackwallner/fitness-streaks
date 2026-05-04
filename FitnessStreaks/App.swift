@@ -119,6 +119,7 @@ struct FitnessStreaksApp: App {
     @StateObject private var healthKit = HealthKitService.shared
     @StateObject private var settings = StreakSettings.shared
     @StateObject private var store = StreakStore.shared
+    @StateObject private var storeKit = StoreKitService.shared
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
@@ -147,8 +148,10 @@ struct FitnessStreaksApp: App {
                 .environmentObject(healthKit)
                 .environmentObject(settings)
                 .environmentObject(store)
+                .environmentObject(storeKit)
                 .task {
                     await healthKit.synchronizeAuthorization()
+                    await storeKit.refreshState()
                     // If setup was completed previously but HealthKit was never requested on
                     // this device/install, force onboarding so the user gets a clear path to
                     // trigger the Health permission prompt from an explicit tap.

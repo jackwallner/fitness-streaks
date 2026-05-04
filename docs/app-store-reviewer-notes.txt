@@ -1,0 +1,3 @@
+This app integrates directly with HealthKit to provide users with insights into their activity streaks (e.g., steps, workouts, sleep). The app is completely read-only for HealthKit data and requires no user account, login, or internet connection. All data processing is done strictly locally on the device using SwiftData. 
+
+To test the app, please ensure the testing device has some Apple Health data (such as steps or exercise minutes) so the app can successfully discover and display a streak. If no Health data is present, the app will display an empty state prompting the user to become active to start their first streak, which is the intended behavior for brand-new users.

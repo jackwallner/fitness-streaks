@@ -13,7 +13,7 @@ settings:
     DEVELOPMENT_TEAM: YXG4MP6W39
     CODE_SIGN_STYLE: Automatic
     MARKETING_VERSION: "1.0.0"
-    CURRENT_PROJECT_VERSION: 73
+    CURRENT_PROJECT_VERSION: 75
     GENERATE_INFOPLIST_FILE: NO
 
 schemes:
@@ -28,6 +28,7 @@ schemes:
         - FitnessStreaksTests
     run:
       config: Debug
+      storeKitConfiguration: FitnessStreaks/FitnessStreaks.storekit
   FitnessStreaksWatch:
     build:
       targets:
@@ -42,6 +43,10 @@ targets:
     platform: iOS
     sources:
       - path: FitnessStreaks
+        excludes:
+          - "FitnessStreaks.storekit"
+      - path: FitnessStreaks/FitnessStreaks.storekit
+        buildPhase: none
       - path: Shared
         excludes:
           - "Fonts"

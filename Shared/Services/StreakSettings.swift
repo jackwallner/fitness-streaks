@@ -118,6 +118,81 @@ struct StreakSnapshot: Codable, Sendable {
             }
             return streakMetric?.thresholdLabel(threshold, cadence: streakCadence) ?? ""
         }
+
+        var unitLabel: String {
+            if let measure = workoutMeasureValue { return measure.unit }
+            return streakMetric?.unitLabel ?? ""
+        }
+
+        var currentUnitValueLabel: String {
+            formatValue(currentUnitValue, rounded: false, compact: false)
+        }
+
+        var goalValueLabel: String {
+            formatValue(threshold, rounded: true, compact: false)
+        }
+
+        var compactCurrentUnitValueLabel: String {
+            formatValue(currentUnitValue, rounded: false, compact: true)
+        }
+
+        var compactGoalValueLabel: String {
+            formatValue(threshold, rounded: true, compact: true)
+        }
+
+        var progressValueLabel: String {
+            let unit = unitLabel
+            let values = "\(currentUnitValueLabel) / \(goalValueLabel)"
+            return unit.isEmpty ? values : "\(values) \(unit)"
+        }
+
+        private func formatValue(_ value: Double, rounded: Bool, compact: Bool) -> String {
+            if compact {
+                return Self.compactFormat(value)
+            }
+            if let measure = workoutMeasureValue {
+                switch measure {
+                case .count, .minutes:
+                    return Self.integerFormat(rounded ? value.rounded() : floor(value))
+                case .miles:
+                    let displayed = rounded ? value : floor(value * 10) / 10
+                    return String(format: displayed < 10 ? "%.1f" : "%.0f", displayed)
+                }
+            }
+            guard let metric = streakMetric else {
+                return Self.integerFormat(rounded ? value.rounded() : floor(value))
+            }
+            switch metric {
+            case .sleepHours, .distanceMiles, .intensityRatio:
+                let displayed = rounded ? value : floor(value * 10) / 10
+                return String(format: displayed < 10 ? "%.1f" : "%.0f", displayed)
+            default:
+                return Self.integerFormat(rounded ? value.rounded() : floor(value))
+            }
+        }
+
+        private static func integerFormat(_ value: Double) -> String {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.maximumFractionDigits = 0
+            return formatter.string(from: NSNumber(value: value)) ?? "\(Int(value))"
+        }
+
+        private static func compactFormat(_ value: Double) -> String {
+            let absValue = abs(value)
+            if absValue >= 10_000 {
+                return "\(Int((value / 1_000).rounded()))k"
+            }
+            if absValue >= 1_000 {
+                let truncated = floor(value / 100) / 10
+                return String(format: truncated.truncatingRemainder(dividingBy: 1) == 0 ? "%.0fk" : "%.1fk", truncated)
+            }
+            if absValue >= 10 {
+                return "\(Int(value.rounded()))"
+            }
+            let truncated = floor(value * 10) / 10
+            return String(format: truncated.truncatingRemainder(dividingBy: 1) == 0 ? "%.0f" : "%.1f", truncated)
+        }
     }
 
     let updated: Date
@@ -181,10 +256,6 @@ final class StreakSettings: ObservableObject {
 
     @Published var notificationMinute: Int {
         didSet { defaults.set(notificationMinute, forKey: "notificationMinute") }
-    }
-
-    @Published var graceDaysEnabled: Bool {
-        didSet { defaults.set(graceDaysEnabled, forKey: "graceDaysEnabled") }
     }
 
     @Published var earnedGraceDays: Int {
@@ -294,7 +365,6 @@ final class StreakSettings: ObservableObject {
         self.notificationsEnabled = defaults.object(forKey: "notificationsEnabled") as? Bool ?? false
         self.notificationHour = defaults.object(forKey: "notificationHour") as? Int ?? 19
         self.notificationMinute = defaults.object(forKey: "notificationMinute") as? Int ?? 0
-        self.graceDaysEnabled = defaults.object(forKey: "graceDaysEnabled") as? Bool ?? false
         self.earnedGraceDays = defaults.object(forKey: "earnedGraceDays") as? Int ?? 0
         self.graceAwardTier = defaults.object(forKey: "graceAwardTier") as? Int ?? 0
         if let stored = defaults.object(forKey: "discoveryVibe") as? Int,
@@ -371,8 +441,9 @@ final class StreakSettings: ObservableObject {
         recentlyBroken.removeAll { now.timeIntervalSince($0.brokenAt) > 48 * 60 * 60 }
     }
 
+    /// Bank Grace Days as the user crosses 30-day tiers on their hero streak.
+    /// Free users accrue too — used as Pro upsell currency ("you have 3 banked").
     func awardGraceDays(from streaks: [Streak]) {
-        guard graceDaysEnabled else { return }
         // Tier is driven by the hero streak so the user understands the reward source.
         let tier = (streaks.first?.current ?? 0) / 30
         if tier > graceAwardTier {
@@ -381,8 +452,10 @@ final class StreakSettings: ObservableObject {
         }
     }
 
-    func consumeGraceDay() -> Bool {
-        guard graceDaysEnabled, earnedGraceDays > 0 else { return false }
+    /// Spend a Grace Day to preserve a streak. Pro entitlement required.
+    /// Free users accrue but cannot consume — that's the upsell hook.
+    func consumeGraceDay(isPro: Bool) -> Bool {
+        guard isPro, earnedGraceDays > 0 else { return false }
         earnedGraceDays -= 1
         return true
     }

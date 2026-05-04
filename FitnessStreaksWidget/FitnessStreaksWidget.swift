@@ -97,10 +97,10 @@ struct StreakWidgetView: View {
     private var inlineView: some View {
         if let hero = entry.hero {
             return AnyView(
-                Text("\(Image(systemName: hero.displaySymbol)) \(hero.current) \(cadenceLabel(hero))")
+                Text("\(Image(systemName: hero.displaySymbol)) \(hero.progressValueLabel)")
             )
         }
-        return AnyView(Text("No streak yet — open app"))
+        return AnyView(Text("Open app to sync streaks"))
     }
 
     // Lock-screen circular
@@ -109,15 +109,20 @@ struct StreakWidgetView: View {
             if let hero = entry.hero {
                 ZStack {
                     AccessoryWidgetBackground()
-                    VStack(spacing: 0) {
-                        Image(systemName: "flame.fill")
-                            .font(.system(size: 10, weight: .semibold))
-                        Text("\(hero.current)")
-                            .font(.system(size: 22, weight: .bold, design: .rounded))
-                            .minimumScaleFactor(0.6)
-                        Text(hero.cadence == "daily" ? "days" : "wks")
-                            .font(.system(size: 9, weight: .semibold, design: .rounded))
+                    Gauge(value: clampedProgress(hero)) {
+                        Image(systemName: hero.displaySymbol)
+                    } currentValueLabel: {
+                        VStack(spacing: 0) {
+                            Text(hero.compactCurrentUnitValueLabel)
+                                .font(.system(size: 18, weight: .bold, design: .rounded))
+                                .minimumScaleFactor(0.5)
+                            Text("/\(hero.compactGoalValueLabel)")
+                                .font(.system(size: 8, weight: .bold, design: .rounded))
+                                .minimumScaleFactor(0.6)
+                        }
                     }
+                    .gaugeStyle(.accessoryCircular)
+                    .tint(heroAccent(hero))
                 }
             } else {
                 ZStack {
@@ -139,14 +144,19 @@ struct StreakWidgetView: View {
                     Text(hero.displayName).font(.system(size: 11, weight: .semibold, design: .rounded))
                 }
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text("\(hero.current)")
+                    Text(hero.currentUnitValueLabel)
                         .font(.system(size: 22, weight: .bold, design: .rounded))
                         .monospacedDigit()
-                    Text(cadenceLabel(hero))
+                        .minimumScaleFactor(0.55)
+                    Text("/ \(hero.goalValueLabel) \(hero.unitLabel)")
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
                 }
-                Text(hero.thresholdLabel)
-                    .font(.system(size: 9, weight: .medium, design: .rounded))
+                ProgressView(value: clampedProgress(hero))
+                    .tint(heroAccent(hero))
+                Text("\(streakLengthLabel(hero)) streak")
+                    .font(.system(size: 9, weight: .semibold, design: .rounded))
                     .lineLimit(1)
             } else {
                 Text("No streak yet")
@@ -160,23 +170,39 @@ struct StreakWidgetView: View {
     private var smallView: some View {
         ZStack {
             Theme.streakGradient
-            VStack(spacing: 2) {
+            VStack(alignment: .leading, spacing: 7) {
                 if let hero = entry.hero {
-                    Image(systemName: hero.displaySymbol)
-                        .font(.system(size: 16, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.9))
-                        .padding(.bottom, 2)
-                    Text("\(hero.current)")
-                        .font(.system(size: 58, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .monospacedDigit()
-                        .minimumScaleFactor(0.6)
-                    Text(cadenceLabel(hero))
-                        .font(.system(size: 12, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.85))
-                    Text(hero.displayName)
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.75))
+                    HStack(spacing: 6) {
+                        Image(systemName: hero.displaySymbol)
+                            .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        Text(hero.displayName)
+                            .font(.system(size: 12, weight: .bold, design: .rounded))
+                            .lineLimit(1)
+                        Spacer(minLength: 0)
+                    }
+                    .foregroundStyle(.white.opacity(0.92))
+
+                    Spacer(minLength: 0)
+
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text(hero.compactCurrentUnitValueLabel)
+                            .font(.system(size: 48, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+                            .monospacedDigit()
+                            .minimumScaleFactor(0.45)
+                        Text("/ \(hero.compactGoalValueLabel) \(hero.unitLabel)")
+                            .font(.system(size: 12, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.82))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.65)
+                    }
+
+                    ProgressView(value: clampedProgress(hero))
+                        .tint(.white)
+
+                    Text("\(streakLengthLabel(hero)) streak")
+                        .font(.system(size: 11, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.78))
                         .lineLimit(1)
                 } else {
                     Image(systemName: "figure.run")
@@ -199,22 +225,28 @@ struct StreakWidgetView: View {
             ZStack {
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
                     .fill(Theme.streakGradient)
-                VStack(spacing: 2) {
+                VStack(alignment: .leading, spacing: 7) {
                     if let hero = entry.hero {
-                        Image(systemName: hero.displaySymbol)
-                            .font(.system(size: 12, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.9))
-                        Text("\(hero.current)")
-                            .font(.system(size: 44, weight: .bold, design: .rounded))
+                        Label(hero.displayName, systemImage: hero.displaySymbol)
+                            .font(.system(size: 11, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.92))
+                            .lineLimit(1)
+                        Spacer(minLength: 0)
+                        Text(hero.compactCurrentUnitValueLabel)
+                            .font(.system(size: 40, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
                             .monospacedDigit()
-                            .minimumScaleFactor(0.6)
-                        Text(cadenceLabel(hero))
+                            .minimumScaleFactor(0.45)
+                        Text("/ \(hero.compactGoalValueLabel) \(hero.unitLabel)")
+                            .font(.system(size: 10, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.82))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.65)
+                        ProgressView(value: clampedProgress(hero))
+                            .tint(.white)
+                        Text("\(streakLengthLabel(hero)) streak")
                             .font(.system(size: 10, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.85))
-                        Text(hero.displayName)
-                            .font(.system(size: 10, weight: .medium, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.75))
+                            .foregroundStyle(.white.opacity(0.78))
                             .lineLimit(1)
                     } else {
                         Image(systemName: "figure.run")
@@ -226,24 +258,12 @@ struct StreakWidgetView: View {
             }
             .frame(width: 120)
 
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 7) {
+                Text("More streaks")
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .foregroundStyle(.secondary)
                 ForEach(entry.badges.prefix(3)) { b in
-                    HStack(spacing: 6) {
-                        Image(systemName: b.displaySymbol)
-                            .font(.system(size: 11, weight: .semibold))
-                            .foregroundStyle(b.streakMetric?.accent ?? .primary)
-                            .frame(width: 16)
-                        Text(b.displayName)
-                            .font(.system(size: 12, weight: .semibold, design: .rounded))
-                            .lineLimit(1)
-                        Spacer(minLength: 2)
-                        Text("\(b.current)")
-                            .font(.system(size: 14, weight: .bold, design: .rounded))
-                            .monospacedDigit()
-                        Text(b.cadence == "daily" ? "d" : "w")
-                            .font(.system(size: 10, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.secondary)
-                    }
+                    mediumBadgeRow(b)
                 }
                 if entry.badges.isEmpty {
                     Text("No streak yet — open app")
@@ -257,11 +277,41 @@ struct StreakWidgetView: View {
         .containerBackground(.fill.tertiary, for: .widget)
     }
 
-    private func cadenceLabel(_ item: StreakSnapshot.Item) -> String {
-        if item.cadence == "daily" {
-            return item.current == 1 ? "day" : "days"
+    private func mediumBadgeRow(_ item: StreakSnapshot.Item) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 6) {
+                Image(systemName: item.displaySymbol)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(heroAccent(item))
+                    .frame(width: 16)
+                Text(item.displayName)
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .lineLimit(1)
+                Spacer(minLength: 2)
+                Text("\(item.compactCurrentUnitValueLabel)/\(item.compactGoalValueLabel)")
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+            }
+            ProgressView(value: clampedProgress(item))
+                .tint(heroAccent(item))
         }
-        return item.current == 1 ? "week" : "weeks"
+    }
+
+    private func clampedProgress(_ item: StreakSnapshot.Item) -> Double {
+        min(max(item.currentUnitProgress, 0), 1)
+    }
+
+    private func heroAccent(_ item: StreakSnapshot.Item) -> Color {
+        item.streakMetric?.accent ?? Theme.streakHot
+    }
+
+    private func streakLengthLabel(_ item: StreakSnapshot.Item) -> String {
+        if item.cadence == "daily" {
+            return item.current == 1 ? "1 day" : "\(item.current) days"
+        }
+        return item.current == 1 ? "1 week" : "\(item.current) weeks"
     }
 }
 

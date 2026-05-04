@@ -1,0 +1,66 @@
+{
+  "identifier" : "FitnessStreaksStoreKit",
+  "nonRenewingSubscriptions" : [],
+  "products" : [
+    {
+      "displayPrice" : "9.99",
+      "familyShareable" : false,
+      "internalID" : "FS_PRO_LIFETIME",
+      "localizations" : [
+        {
+          "description" : "Unlock Grace Days forever. One-time purchase.",
+          "displayName" : "FitnessStreaks Pro · Lifetime",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.jackwallner.streaks.pro.lifetime",
+      "referenceName" : "Pro Lifetime",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : []
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "FS_PRO_GROUP",
+      "localizations" : [],
+      "name" : "FitnessStreaks Pro",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [],
+          "codeOffers" : [],
+          "displayPrice" : "4.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "FS_PRO_YEARLY",
+          "introductoryOffer" : {
+            "internalID" : "FS_PRO_INTRO_7D",
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P1W",
+            "numberOfPeriods" : 1
+          },
+          "localizations" : [
+            {
+              "description" : "FitnessStreaks Pro, billed yearly. 7-day free trial.",
+              "displayName" : "FitnessStreaks Pro · Yearly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.jackwallner.streaks.pro.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Pro Yearly",
+          "subscriptionGroupID" : "FS_PRO_GROUP",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}
