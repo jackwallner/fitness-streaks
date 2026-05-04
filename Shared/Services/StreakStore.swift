@@ -1,5 +1,8 @@
 import Foundation
 import SwiftUI
+import os
+
+private let log = Logger(subsystem: "com.jackwallner.streaks", category: "StreakStore")
 
 /// Orchestrates HealthKit fetch → engine → published state for all UIs (iOS app + watch app).
 @MainActor
@@ -230,7 +233,7 @@ final class StreakStore: ObservableObject {
                 loadProgress = 1.0
             }
         } catch {
-            print("StreakStore load error: \(error)")
+            log.error("StreakStore load error: \(String(describing: error))")
             // Fall back to cached snapshot values if HK read failed
             let cached = HealthKitService.shared.cachedHistory()
             if !cached.isEmpty {
