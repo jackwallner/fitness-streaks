@@ -159,6 +159,7 @@ struct FitnessStreaksApp: App {
                 .onChange(of: scenePhase) { _, phase in
                     guard phase == .active else { return }
                     Task(priority: .utility) {
+                        await storeKit.refreshEntitlement()
                         await store.refreshIfNeeded()
                     }
                 }
@@ -198,6 +199,7 @@ struct FitnessStreaksApp: App {
         let completion = BackgroundTaskCompletion(task: task)
         let work = Task { @MainActor in
             guard !Task.isCancelled else { return false }
+            await StoreKitService.shared.refreshEntitlement()
             await StreakStore.shared.refreshIfNeeded(force: true)
             return !Task.isCancelled
         }
