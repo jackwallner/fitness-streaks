@@ -15,6 +15,8 @@ struct SettingsView: View {
     @State private var showingLookbackRecalibratePrompt = false
     @State private var pendingLookbackDays: Int? = nil
     @State private var showingPaywall = false
+    @State private var showingFreezeDatePicker = false
+    @State private var newFreezeDate = Date()
 
     private static let lookbackOptions: [Int] = [7, 30, 90, 180, 365]
     private static let coachServicesURL = URL(string: "https://www.e3fit.me/#services")!
@@ -35,6 +37,7 @@ struct SettingsView: View {
                     notificationsSection
                     metricsSection
                     dataSection
+                    plannedFreezesSection
                     coachSection
                     aboutSection
 
@@ -584,6 +587,125 @@ struct SettingsView: View {
             .buttonStyle(.plain)
             .pixelPanel(color: Theme.retroInkFaint)
         }
+    }
+
+    // MARK: - Planned Freezes
+
+    private var plannedFreezesSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            PixelSectionHeader(title: "Planned Freezes")
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Mark days you know you'll miss (vacation, travel, sick). Freeze days won't break your streaks or extend them.")
+                    .font(RetroFont.mono(10))
+                    .foregroundStyle(Theme.retroInkDim)
+                    .lineSpacing(2)
+
+                if settings.plannedFreezes.isEmpty {
+                    Text("No freeze days set.")
+                        .font(RetroFont.mono(10))
+                        .foregroundStyle(Theme.retroInkFaint)
+                        .padding(.vertical, 8)
+                } else {
+                    ForEach(sortedFreezes, id: \.self) { date in
+                        HStack(spacing: 8) {
+                            Image(systemName: "snowflake")
+                                .font(.system(size: 12))
+                                .foregroundStyle(Theme.retroCyan)
+                            Text(formatFreezeDate(date))
+                                .font(RetroFont.mono(10, weight: .bold))
+                                .foregroundStyle(Theme.retroInk)
+                            Spacer()
+                            Button {
+                                settings.removeFreezeDay(date)
+                                Task { await store.load() }
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .font(.system(size: 14))
+                                    .foregroundStyle(Theme.retroRed)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+
+                Button {
+                    newFreezeDate = Date()
+                    showingFreezeDatePicker = true
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "plus.circle.fill")
+                        Text("ADD FREEZE DAY")
+                            .font(RetroFont.mono(10, weight: .bold))
+                            .tracking(1)
+                    }
+                    .foregroundStyle(Theme.retroCyan)
+                    .padding(.vertical, 8)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(14)
+            .pixelPanel(color: Theme.retroCyan)
+        }
+        .sheet(isPresented: $showingFreezeDatePicker) {
+            NavigationStack {
+                VStack(spacing: 20) {
+                    Text("Pick a day to freeze")
+                        .font(RetroFont.mono(14, weight: .bold))
+                        .foregroundStyle(Theme.retroInk)
+                        .padding(.top, 20)
+
+                    DatePicker(
+                        "Freeze day",
+                        selection: $newFreezeDate,
+                        in: Date()...,
+                        displayedComponents: .date
+                    )
+                    .datePickerStyle(.graphical)
+                    .tint(Theme.retroCyan)
+                    .padding(.horizontal, 20)
+
+                    Button {
+                        settings.addFreezeDay(newFreezeDate)
+                        showingFreezeDatePicker = false
+                        Task { await store.load() }
+                    } label: {
+                        Text("FREEZE THIS DAY")
+                            .font(RetroFont.mono(12, weight: .bold))
+                            .tracking(1)
+                            .foregroundStyle(Theme.retroBg)
+                            .padding(.vertical, 14)
+                            .frame(maxWidth: .infinity)
+                            .background(Theme.retroCyan)
+                            .padding(.horizontal, 20)
+                    }
+                    .buttonStyle(.plain)
+
+                    Spacer()
+                }
+                .background(Theme.retroBg.ignoresSafeArea())
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("CANCEL") {
+                            showingFreezeDatePicker = false
+                        }
+                        .font(RetroFont.mono(10, weight: .bold))
+                        .foregroundStyle(Theme.retroMagenta)
+                    }
+                }
+            }
+        }
+    }
+
+    private var sortedFreezes: [Date] {
+        settings.plannedFreezes.sorted()
+    }
+
+    private func formatFreezeDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE, MMM d"
+        return formatter.string(from: date)
     }
 
     // MARK: - Coach (Elsa)

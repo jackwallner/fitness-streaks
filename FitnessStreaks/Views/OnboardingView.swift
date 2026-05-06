@@ -575,9 +575,7 @@ struct OnboardingView: View {
     }
 
     private func openHealthAccess() {
-        if let url = URL(string: "x-apple-health://"), UIApplication.shared.canOpenURL(url) {
-            UIApplication.shared.open(url)
-        } else if let url = URL(string: UIApplication.openSettingsURLString) {
+        if let url = URL(string: UIApplication.openSettingsURLString) {
             UIApplication.shared.open(url)
         }
     }

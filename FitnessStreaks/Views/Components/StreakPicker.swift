@@ -141,11 +141,20 @@ struct StreakPickerList: View {
 struct StreakPickerSheet: View {
     @EnvironmentObject var store: StreakStore
     @EnvironmentObject var settings: StreakSettings
+    @EnvironmentObject var storeKit: StoreKitService
     @Environment(\.dismiss) private var dismiss
 
     @State private var selection: Set<String> = []
     @State private var showingBuilder = false
     @State private var editingCustomID: String? = nil
+    @State private var showingPaywall = false
+
+    /// Free tier gets one custom streak; Pro unlocks unlimited.
+    static let freeCustomLimit = 1
+
+    private var canBuildCustom: Bool {
+        storeKit.isPro || settings.customStreaks.count < Self.freeCustomLimit
+    }
 
     private var editingCustomStreak: CustomStreak? {
         editingCustomID.flatMap { id in settings.customStreaks.first(where: { $0.id == id }) }
@@ -177,23 +186,34 @@ struct StreakPickerSheet: View {
                     .padding(.horizontal, 14)
 
                     Button {
-                        showingBuilder = true
+                        if canBuildCustom {
+                            showingBuilder = true
+                        } else {
+                            showingPaywall = true
+                        }
                     } label: {
                         HStack {
-                            Text("+ BUILD YOUR OWN")
+                            Text(canBuildCustom ? "+ BUILD YOUR OWN" : "+ BUILD YOUR OWN — PRO")
                                 .font(RetroFont.mono(10, weight: .bold))
                                 .tracking(1)
-                                .foregroundStyle(Theme.retroLime)
+                                .foregroundStyle(canBuildCustom ? Theme.retroLime : Theme.retroMagenta)
                             Spacer()
-                            Text("CUSTOM")
+                            Text(canBuildCustom ? "CUSTOM" : "LOCKED")
                                 .font(RetroFont.mono(9, weight: .bold))
-                                .foregroundStyle(Theme.retroInkDim)
+                                .foregroundStyle(canBuildCustom ? Theme.retroInkDim : Theme.retroMagenta)
                         }
                         .padding(14)
-                        .pixelPanel(color: Theme.retroLime, fill: Theme.retroBgRaised)
+                        .pixelPanel(color: canBuildCustom ? Theme.retroLime : Theme.retroMagenta, fill: Theme.retroBgRaised)
                     }
                     .buttonStyle(.plain)
                     .padding(.horizontal, 14)
+
+                    if !canBuildCustom {
+                        Text("Free includes 1 custom streak. Unlock Pro for unlimited.")
+                            .font(RetroFont.mono(10))
+                            .foregroundStyle(Theme.retroInkDim)
+                            .padding(.horizontal, 14)
+                    }
 
                     if store.allCandidates.isEmpty {
                         Text("No streaks discovered yet — pull to refresh once Apple Health has some activity.")
@@ -238,6 +258,11 @@ struct StreakPickerSheet: View {
                     selection.insert(custom.trackingKey)
                     Task { await store.load() }
                 }
+            }
+            .sheet(isPresented: $showingPaywall) {
+                ProPaywallView(context: "Pro unlocks unlimited custom streaks. Free includes one — yours is already saved.")
+                    .environmentObject(storeKit)
+                    .environmentObject(settings)
             }
             .sheet(isPresented: Binding(
                 get: { editingCustomID != nil },

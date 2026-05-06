@@ -184,9 +184,7 @@ struct DashboardView: View {
 
     private var revokedBanner: some View {
         Button {
-            if let url = URL(string: "x-apple-health://"), UIApplication.shared.canOpenURL(url) {
-                UIApplication.shared.open(url)
-            } else if let url = URL(string: UIApplication.openSettingsURLString) {
+            if let url = URL(string: UIApplication.openSettingsURLString) {
                 UIApplication.shared.open(url)
             }
         } label: {
@@ -360,9 +358,7 @@ struct DashboardView: View {
                 .accessibilityLabel("Request Health access")
 
                 Button("HEALTH SETTINGS") {
-                    if let url = URL(string: "x-apple-health://"), UIApplication.shared.canOpenURL(url) {
-                        UIApplication.shared.open(url)
-                    } else if let url = URL(string: UIApplication.openSettingsURLString) {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
                         UIApplication.shared.open(url)
                     }
                 }

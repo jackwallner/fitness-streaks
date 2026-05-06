@@ -132,6 +132,7 @@ final class StreakStore: ObservableObject {
         if allowCachedSnapshot, streaks.isEmpty, let snapshot = SnapshotStore.load() {
             restore(snapshot)
         }
+        StreakSettings.shared.pruneOldFreezes()
         isLoading = true
         withAnimation(.linear(duration: 0.2)) {
             loadStage = .readingHistory
@@ -198,7 +199,8 @@ final class StreakStore: ObservableObject {
                 lookbackDays: settings.lookbackDays,
                 committedThresholds: settings.committedThresholds,
                 customStreaks: settings.customStreaks,
-                gracePreservations: settings.gracePreservations
+                gracePreservations: settings.gracePreservations,
+                plannedFreezes: settings.plannedFreezes
             )
             var filtered = Self.applyTrackedFilter(all)
             await handleBreaks(previous: previous, fresh: filtered, hourly: hourly, history: enriched)
@@ -211,7 +213,8 @@ final class StreakStore: ObservableObject {
                     lookbackDays: settings.lookbackDays,
                     committedThresholds: settings.committedThresholds,
                     customStreaks: settings.customStreaks,
-                    gracePreservations: settings.gracePreservations
+                    gracePreservations: settings.gracePreservations,
+                    plannedFreezes: settings.plannedFreezes
                 )
             }
             filtered = Self.applyTrackedFilter(all)
@@ -249,7 +252,8 @@ final class StreakStore: ObservableObject {
                     lookbackDays: settings.lookbackDays,
                     committedThresholds: settings.committedThresholds,
                     customStreaks: settings.customStreaks,
-                    gracePreservations: settings.gracePreservations
+                    gracePreservations: settings.gracePreservations,
+                    plannedFreezes: settings.plannedFreezes
                 )
                 self.allCandidates = all
                 var filtered = Self.applyTrackedFilter(all)

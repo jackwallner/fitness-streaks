@@ -40,6 +40,7 @@ enum StreakEngine {
         committedThresholds: [String: Double] = [:],
         customStreaks: [CustomStreak] = [],
         gracePreservations: [String: GracePreservation] = [:],
+        plannedFreezes: Set<Date> = [],
         now: Date = .now
     ) -> [Streak] {
         guard !history.isEmpty else { return [] }
@@ -63,6 +64,7 @@ enum StreakEngine {
                 tolerance: completionTolerance,
                 committedThresholds: committedThresholds,
                 gracePreservations: gracePreservations,
+                plannedFreezes: plannedFreezes,
                 requestedLookback: lookbackDays
             ) {
                 found.append(best)
@@ -80,7 +82,8 @@ enum StreakEngine {
                     hourlySteps: hourlySteps,
                     today: today,
                     lookbackDays: lookbackDays,
-                    gracePreservations: gracePreservations
+                    gracePreservations: gracePreservations,
+                    plannedFreezes: plannedFreezes
                 )
             }
         found.append(contentsOf: custom)
@@ -139,13 +142,14 @@ enum StreakEngine {
         tolerance: Double,
         committedThresholds: [String: Double],
         gracePreservations: [String: GracePreservation],
+        plannedFreezes: Set<Date>,
         requestedLookback: Int
     ) -> Streak? {
         let key = StreakSettings.streakKey(metric: metric, cadence: .daily)
         if let committed = committedThresholds[key] {
             let rate = completionRate(metric: metric, threshold: committed, recentHistory: recentHistory)
             return applyingGrace(
-                to: computeDailyStreak(metric: metric, threshold: committed, byDay: byDay, today: today),
+                to: computeDailyStreak(metric: metric, threshold: committed, byDay: byDay, today: today, plannedFreezes: plannedFreezes),
                 key: key,
                 today: today,
                 gracePreservations: gracePreservations,
@@ -184,7 +188,7 @@ enum StreakEngine {
 
             // Compute streak using FULL history (not just lookback) so current streak is accurate.
             let streak = applyingGrace(
-                to: computeDailyStreak(metric: metric, threshold: threshold, byDay: byDay, today: today),
+                to: computeDailyStreak(metric: metric, threshold: threshold, byDay: byDay, today: today, plannedFreezes: plannedFreezes),
                 key: key,
                 today: today,
                 gracePreservations: gracePreservations,
@@ -222,7 +226,7 @@ enum StreakEngine {
         for threshold in metric.dailyThresholds.sorted(by: >) {
             let rate = completionRate(metric: metric, threshold: threshold, recentHistory: recentHistory)
             let streak = applyingGrace(
-                to: computeDailyStreak(metric: metric, threshold: threshold, byDay: byDay, today: today),
+                to: computeDailyStreak(metric: metric, threshold: threshold, byDay: byDay, today: today, plannedFreezes: plannedFreezes),
                 key: key,
                 today: today,
                 gracePreservations: gracePreservations,
@@ -406,7 +410,8 @@ enum StreakEngine {
         metric: StreakMetric,
         threshold: Double,
         byDayValues: [Date: Double],
-        today: Date
+        today: Date,
+        plannedFreezes: Set<Date> = []
     ) -> Streak {
         guard threshold > 0 else {
             return Streak(metric: metric, cadence: .daily, threshold: threshold,
@@ -414,10 +419,13 @@ enum StreakEngine {
                           currentUnitCompleted: false, currentUnitProgress: 0, currentUnitValue: 0)
         }
         let todayValue = byDayValues[today] ?? 0
+        let todayIsFreeze = plannedFreezes.contains(today)
         let todayMet = todayValue >= threshold
 
         var currentLen = 0
         var streakStart: Date? = nil
+        // A freeze day on `today` doesn't add to length but doesn't break either —
+        // we still walk back to count the run that's being preserved.
         if todayMet {
             currentLen = 1
             streakStart = today
@@ -425,6 +433,12 @@ enum StreakEngine {
 
         var cursor = DateHelpers.addDays(-1, to: today)
         while true {
+            if plannedFreezes.contains(cursor) {
+                // Pass-through: freeze days bridge the streak without incrementing length.
+                streakStart = cursor
+                cursor = DateHelpers.addDays(-1, to: cursor)
+                continue
+            }
             let value = byDayValues[cursor] ?? 0
             if value >= threshold {
                 currentLen += 1
@@ -439,6 +453,9 @@ enum StreakEngine {
         var best = 0
         var run = 0
         for d in sortedDays {
+            if plannedFreezes.contains(d) {
+                continue
+            }
             if (byDayValues[d] ?? 0) >= threshold {
                 run += 1
                 best = max(best, run)
@@ -463,6 +480,10 @@ enum StreakEngine {
         if let start = streakStart {
             var missedCursor = DateHelpers.addDays(-1, to: start)
             for _ in 0..<800 {
+                if plannedFreezes.contains(missedCursor) {
+                    missedCursor = DateHelpers.addDays(-1, to: missedCursor)
+                    continue
+                }
                 let value = byDayValues[missedCursor] ?? 0
                 if value < threshold {
                     lastMissed = missedCursor
@@ -482,8 +503,8 @@ enum StreakEngine {
             startDate: streakStart,
             lastHitDate: lastHit,
             lastMissedDate: lastMissed,
-            currentUnitCompleted: todayMet,
-            currentUnitProgress: progress,
+            currentUnitCompleted: todayMet || todayIsFreeze,
+            currentUnitProgress: todayIsFreeze ? 1 : progress,
             currentUnitValue: todayValue
         )
     }
@@ -494,14 +515,16 @@ enum StreakEngine {
         metric: StreakMetric,
         threshold: Double,
         byDay: [Date: ActivityDay],
-        today: Date
+        today: Date,
+        plannedFreezes: Set<Date> = []
     ) -> Streak {
         let values = Dictionary(uniqueKeysWithValues: byDay.map { ($0.key, $0.value.value(for: metric)) })
         return computeDailyStreakFromValues(
             metric: metric,
             threshold: threshold,
             byDayValues: values,
-            today: today
+            today: today,
+            plannedFreezes: plannedFreezes
         )
     }
 
@@ -574,7 +597,8 @@ enum StreakEngine {
         hourlySteps: [Date: [Int: Double]],
         today: Date,
         lookbackDays: Int,
-        gracePreservations: [String: GracePreservation]
+        gracePreservations: [String: GracePreservation],
+        plannedFreezes: Set<Date> = []
     ) -> Streak {
         let key = custom.trackingKey
         let base: Streak
@@ -591,7 +615,8 @@ enum StreakEngine {
                 metric: custom.metric,
                 threshold: custom.threshold,
                 byDayValues: values,
-                today: today
+                today: today,
+                plannedFreezes: plannedFreezes
             )
             let recent = Array(values.keys.sorted().suffix(max(1, lookbackDays)))
             let recentVals = recent.compactMap { values[$0] }
@@ -605,7 +630,8 @@ enum StreakEngine {
                 metric: custom.metric,
                 threshold: custom.threshold,
                 byDayValues: values,
-                today: today
+                today: today,
+                plannedFreezes: plannedFreezes
             )
             rate = values.isEmpty ? 0 : Double(values.values.filter { $0 >= custom.threshold }.count) / Double(values.count)
         } else {
@@ -613,7 +639,8 @@ enum StreakEngine {
                 metric: custom.metric,
                 threshold: custom.threshold,
                 byDay: byDay,
-                today: today
+                today: today,
+                plannedFreezes: plannedFreezes
             )
             let recent = Array(byDay.values.sorted { $0.date < $1.date }.suffix(max(1, lookbackDays)))
             rate = completionRate(metric: custom.metric, threshold: custom.threshold, recentHistory: recent)

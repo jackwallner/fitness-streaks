@@ -326,6 +326,16 @@ final class StreakSettings: ObservableObject {
         didSet { saveCodable(gracePreservations, key: "gracePreservations") }
     }
 
+    /// Days the user has marked as planned freezes (vacation / sick / travel).
+    /// Stored as start-of-day timestamps. Engine treats these days as preserved —
+    /// they don't break a streak and don't extend it.
+    @Published var plannedFreezes: Set<Date> {
+        didSet {
+            saveCodable(Array(plannedFreezes), key: "plannedFreezes")
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+    }
+
     /// Manual ordering of streak tracking keys. First = hero, rest = badges in order.
     /// Streaks not in this list are sorted by engine score after listed ones.
     @Published var manualStreakOrder: [String] {
@@ -400,6 +410,27 @@ final class StreakSettings: ObservableObject {
         self.gracePreservations = Self.loadCodable([String: GracePreservation].self, key: "gracePreservations", defaults: defaults) ?? [:]
         self.manualStreakOrder = Self.loadCodable([String].self, key: "manualStreakOrder", defaults: defaults) ?? []
         self.lastKnownStreakLengths = Self.loadCodable([String: Int].self, key: "lastKnownStreakLengths", defaults: defaults) ?? [:]
+        let storedFreezes = Self.loadCodable([Date].self, key: "plannedFreezes", defaults: defaults) ?? []
+        self.plannedFreezes = Set(storedFreezes.map { DateHelpers.startOfDay($0) })
+    }
+
+    func isFreezeDay(_ date: Date) -> Bool {
+        plannedFreezes.contains(DateHelpers.startOfDay(date))
+    }
+
+    func addFreezeDay(_ date: Date) {
+        plannedFreezes.insert(DateHelpers.startOfDay(date))
+    }
+
+    func removeFreezeDay(_ date: Date) {
+        plannedFreezes.remove(DateHelpers.startOfDay(date))
+    }
+
+    /// Drop freezes whose date is more than 30 days in the past — they've already
+    /// been honored by the engine and just clutter the UI.
+    func pruneOldFreezes(now: Date = .now) {
+        let cutoff = DateHelpers.addDays(-30, to: DateHelpers.startOfDay(now))
+        plannedFreezes = plannedFreezes.filter { $0 >= cutoff }
     }
 
     func isHidden(_ metric: StreakMetric) -> Bool { hiddenMetrics.contains(metric) }
