@@ -307,27 +307,41 @@ struct ProPaywallView: View {
     // MARK: - Legal
 
     private var legalBlock: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Subscriptions auto-renew until cancelled. Manage or cancel anytime in iOS Settings → Apple ID → Subscriptions. Lifetime is a one-time purchase that never renews.")
-                .font(RetroFont.mono(9))
-                .foregroundStyle(Theme.retroInkFaint)
+        VStack(alignment: .leading, spacing: 10) {
+            Text(subscriptionDisclosure)
+                .font(RetroFont.mono(10))
+                .foregroundStyle(Theme.retroInkDim)
+                .lineSpacing(2)
+            Text("Lifetime is a one-time purchase that never renews.")
+                .font(RetroFont.mono(10))
+                .foregroundStyle(Theme.retroInkDim)
                 .lineSpacing(2)
             HStack(spacing: 14) {
                 Link(destination: Self.termsURL) {
-                    Text("TERMS")
-                        .font(RetroFont.mono(9, weight: .bold))
+                    Text("TERMS OF USE (EULA)")
+                        .font(RetroFont.mono(10, weight: .bold))
                         .tracking(1)
-                        .foregroundStyle(Theme.retroInkDim)
+                        .foregroundStyle(Theme.retroCyan)
                 }
                 Link(destination: Self.privacyURL) {
                     Text("PRIVACY")
-                        .font(RetroFont.mono(9, weight: .bold))
+                        .font(RetroFont.mono(10, weight: .bold))
                         .tracking(1)
-                        .foregroundStyle(Theme.retroInkDim)
+                        .foregroundStyle(Theme.retroCyan)
                 }
                 Spacer()
             }
         }
         .padding(.top, 8)
+    }
+
+    private var subscriptionDisclosure: String {
+        let priceText: String
+        if let yearly = storeKit.yearly {
+            priceText = "\(storeKit.displayPrice(for: yearly)) per year"
+        } else {
+            priceText = "the listed price per year"
+        }
+        return "FitnessStreaks Pro yearly subscription auto-renews at \(priceText). Payment is charged to your Apple ID at confirmation of purchase. The subscription renews automatically unless cancelled at least 24 hours before the end of the current period. Manage or cancel anytime in iOS Settings → Apple ID → Subscriptions."
     }
 }
