@@ -242,6 +242,12 @@ final class StreakSettings: ObservableObject {
         didSet { defaults.set(hasWatchCompletedSetup, forKey: "hasWatchCompletedSetup") }
     }
 
+    /// True once the user has dismissed (or skipped) the dashboard coachmark tour.
+    /// Reset by the "Replay Tutorial" entry in Settings.
+    @Published var hasSeenTutorial: Bool {
+        didSet { defaults.set(hasSeenTutorial, forKey: "hasSeenTutorial") }
+    }
+
     @Published var appearance: AppAppearance {
         didSet { defaults.set(appearance.rawValue, forKey: "appearance") }
     }
@@ -370,6 +376,7 @@ final class StreakSettings: ObservableObject {
 
         self.hasCompletedSetup = defaults.bool(forKey: "hasCompletedSetup")
         self.hasWatchCompletedSetup = defaults.bool(forKey: "hasWatchCompletedSetup")
+        self.hasSeenTutorial = defaults.bool(forKey: "hasSeenTutorial")
         self.appearance = AppAppearance(rawValue: defaults.integer(forKey: "appearance")) ?? .light
         // Default OFF — never request notification permission until the user explicitly opts in.
         self.notificationsEnabled = defaults.object(forKey: "notificationsEnabled") as? Bool ?? false

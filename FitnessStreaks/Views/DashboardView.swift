@@ -14,6 +14,8 @@ struct DashboardView: View {
     @State private var selectedBroken: BrokenStreak? = nil
     @State private var requestingHealthAccess = false
     @State private var healthAccessErrorText: String? = nil
+    @State private var tutorialIndex = 0
+    @State private var tutorialActive = false
 
     private let grid = [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)]
     private static let relativeFormatter: RelativeDateTimeFormatter = {
@@ -24,6 +26,7 @@ struct DashboardView: View {
 
     var body: some View {
         NavigationStack {
+            ScrollViewReader { scrollProxy in
             ScrollView {
                 VStack(alignment: .leading, spacing: 10) {
                     topBar
@@ -49,6 +52,8 @@ struct DashboardView: View {
                         .accessibilityLabel("\(hero.metric.displayName) streak: \(hero.current) \(hero.cadence.pluralLabel), threshold \(Int(hero.threshold)) \(hero.metric.unitLabel)")
                         .accessibilityHint("View streak details")
                         .padding(.horizontal, 6)
+                        .coachmarkAnchor("hero")
+                        .id("coach-hero")
 
                         if shouldShowAtRisk, let hero = store.hero, !hero.currentUnitCompleted, hero.current >= 2 {
                             atRiskBanner(for: hero)
@@ -61,10 +66,14 @@ struct DashboardView: View {
 
                             badgeGrid
                                 .padding(.horizontal, 6)
+                                .coachmarkAnchor("badges")
+                                .id("coach-badges")
                         }
 
                         findMoreButton
                             .padding(.horizontal, 6)
+                            .coachmarkAnchor("findMore")
+                            .id("coach-findMore")
                     } else if store.isLoading {
                         loadingState
                     } else {
@@ -110,6 +119,87 @@ struct DashboardView: View {
             } message: {
                 Text(healthAccessErrorText ?? "")
             }
+            .scrollDisabled(tutorialActive)
+            .onChange(of: tutorialIndex) { _, newIndex in
+                scrollTutorialAnchor(into: scrollProxy, index: newIndex)
+            }
+            }
+            .onAppear { maybeStartTutorial() }
+            .onChange(of: store.hero?.id) { _, _ in maybeStartTutorial() }
+            .onChange(of: settings.hasSeenTutorial) { _, seen in
+                if !seen { maybeStartTutorial() }
+            }
+        }
+        .coachmarkOverlay(
+            steps: tutorialSteps,
+            index: $tutorialIndex,
+            isActive: tutorialActive
+        ) {
+            finishTutorial()
+        }
+    }
+
+    private var tutorialSteps: [CoachmarkStep] {
+        var steps: [CoachmarkStep] = [
+            CoachmarkStep(
+                anchorID: "hero",
+                title: "YOUR HERO STREAK",
+                body: "The longest active run we found in your Apple Health history. Today doesn't break it — stay above the threshold and the count climbs tomorrow."
+            )
+        ]
+        if !visibleBadges.isEmpty {
+            steps.append(CoachmarkStep(
+                anchorID: "badges",
+                title: "OTHER ACTIVE STREAKS",
+                body: "Every other streak we found, ranked by your intensity setting. Tap any badge for history, threshold, and recent days."
+            ))
+        }
+        steps.append(CoachmarkStep(
+            anchorID: "findMore",
+            title: "FIND MORE STREAKS",
+            body: "Add ones you skipped at setup, build a custom streak for a specific workout, or surface streaks that just got long enough to count."
+        ))
+        steps.append(CoachmarkStep(
+            anchorID: "gear",
+            title: "TUNE EVERYTHING ELSE",
+            body: "Change intensity, schedule planned freezes for travel or sick days, set a daily reminder, or replay this tour from About."
+        ))
+        return steps
+    }
+
+    private func maybeStartTutorial() {
+        guard !settings.hasSeenTutorial,
+              !tutorialActive,
+              store.hero != nil else { return }
+        // Defer one tick so anchor preferences settle before the overlay reads them.
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 250_000_000)
+            guard !settings.hasSeenTutorial, store.hero != nil else { return }
+            tutorialIndex = 0
+            withAnimation(.easeInOut(duration: 0.25)) { tutorialActive = true }
+        }
+    }
+
+    private func finishTutorial() {
+        settings.hasSeenTutorial = true
+        withAnimation(.easeInOut(duration: 0.2)) { tutorialActive = false }
+    }
+
+    private func scrollTutorialAnchor(into scrollProxy: ScrollViewProxy, index: Int) {
+        guard tutorialActive,
+              tutorialSteps.indices.contains(index),
+              let anchorID = tutorialSteps[index].anchorID else { return }
+        let scrollID: String? = {
+            switch anchorID {
+            case "hero": return "coach-hero"
+            case "badges": return "coach-badges"
+            case "findMore": return "coach-findMore"
+            default: return nil  // gear lives in the top bar, no scroll needed
+            }
+        }()
+        guard let scrollID else { return }
+        withAnimation(.easeInOut(duration: 0.3)) {
+            scrollProxy.scrollTo(scrollID, anchor: .center)
         }
     }
 
@@ -178,6 +268,7 @@ struct DashboardView: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Open settings")
+            .coachmarkAnchor("gear")
         }
         .padding(.horizontal, 16)
     }

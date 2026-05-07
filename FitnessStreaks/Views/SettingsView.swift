@@ -888,6 +888,25 @@ struct SettingsView: View {
                         .padding(.horizontal, 14)
                     }
                 }
+                dashedLine
+                Button {
+                    settings.hasSeenTutorial = false
+                    dismiss()
+                } label: {
+                    HStack {
+                        Text("REPLAY TUTORIAL")
+                            .font(RetroFont.pixel(10))
+                            .foregroundStyle(Theme.retroInk)
+                        Spacer()
+                        Text("▶")
+                            .font(RetroFont.pixel(11))
+                            .foregroundStyle(Theme.retroLime)
+                    }
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 14)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Replay tutorial")
             }
             .pixelPanel(color: Theme.retroInkFaint)
         }

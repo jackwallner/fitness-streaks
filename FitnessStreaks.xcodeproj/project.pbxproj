@@ -88,6 +88,7 @@
 		C1B6D765AE9BAB50D4583825 /* StreakMetric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C80A4826A373B331E583A1E /* StreakMetric.swift */; };
 		C32A13DCCDF3810C8CEE3FED /* JetBrainsMono-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A05515A54F5B25D57C150872 /* JetBrainsMono-Regular.ttf */; };
 		C5538997C4EFEBD384E7CBB8 /* StoreKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70A63704F6410AF79F037F69 /* StoreKitService.swift */; };
+		C60155C3C9F57BB3CE73C3EA /* CoachmarkOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD92EA0D2588A0993BCFB1F /* CoachmarkOverlay.swift */; };
 		CEA8D66BF780261F75668F56 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5499F56557690B4EE92A2E42 /* NotificationService.swift */; };
 		CF41EDA89E06DD2AFB3A485E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D6E754008340281F258E8A /* SettingsView.swift */; };
 		D2021416878234BF4B693C6A /* PressStart2P-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1207B858E4FFB44108513342 /* PressStart2P-Regular.ttf */; };
@@ -216,6 +217,7 @@
 		790E9BD5A98E837F45B5B997 /* StreakDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakDetailView.swift; sourceTree = "<group>"; };
 		7DD57D170B35D6F1A4D519C3 /* FitnessStreaksWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitnessStreaksWidget.swift; sourceTree = "<group>"; };
 		88CD00513724423456C0A89B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		8AD92EA0D2588A0993BCFB1F /* CoachmarkOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachmarkOverlay.swift; sourceTree = "<group>"; };
 		9C302E6F3992442B6C651F13 /* StreakStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakStore.swift; sourceTree = "<group>"; };
 		9C80A4826A373B331E583A1E /* StreakMetric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakMetric.swift; sourceTree = "<group>"; };
 		A05515A54F5B25D57C150872 /* JetBrainsMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "JetBrainsMono-Regular.ttf"; sourceTree = "<group>"; };
@@ -332,6 +334,7 @@
 			isa = PBXGroup;
 			children = (
 				6F5E8DB49859EF7F550A39DB /* CalendarHeatmap.swift */,
+				8AD92EA0D2588A0993BCFB1F /* CoachmarkOverlay.swift */,
 				75AE8DBC73B55DCE8482E14D /* PixelUI.swift */,
 				06EC66CCAA5304A26B7ED85F /* StreakBadge.swift */,
 				5DA2285D9C3624EC0E762310 /* StreakFlame.swift */,
@@ -636,6 +639,7 @@
 				34B0CE7F24E943474678ECA9 /* App.swift in Sources */,
 				0A0B72F188682498F53C82DA /* BrokenStreakSheet.swift in Sources */,
 				5E3A4A321CAFAE60BB68AD71 /* CalendarHeatmap.swift in Sources */,
+				C60155C3C9F57BB3CE73C3EA /* CoachmarkOverlay.swift in Sources */,
 				ECAC6491381BC89960CCAD2B /* DailyActivity.swift in Sources */,
 				FB019E441ED033465152096E /* DashboardView.swift in Sources */,
 				7F438B27433392D3D1DBB4D7 /* DataService.swift in Sources */,
