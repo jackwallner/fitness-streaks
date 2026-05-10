@@ -124,12 +124,29 @@ struct FitnessStreaksWatchApp: App {
 
 struct WatchRootView: View {
     @EnvironmentObject var store: StreakStore
+    @EnvironmentObject var settings: StreakSettings
 
     var body: some View {
-        if store.streaks.isEmpty {
+        if !settings.hasCompletedSetup {
             WatchOnboardingView()
+        } else if store.streaks.isEmpty {
+            // Data is still loading — show a minimal placeholder instead of
+            // flashing the onboarding screen, which looks like a bug.
+            WatchLoadingView()
         } else {
             WatchTodayView()
+        }
+    }
+}
+
+struct WatchLoadingView: View {
+    var body: some View {
+        VStack(spacing: 10) {
+            Image(systemName: "flame.fill")
+                .font(.system(size: 40))
+                .foregroundStyle(Theme.streakHot)
+            ProgressView()
+                .progressViewStyle(.circular)
         }
     }
 }

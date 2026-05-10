@@ -118,7 +118,13 @@ struct OnboardingView: View {
 
             connectButton
                 .padding(.horizontal, 20)
-                .padding(.bottom, 24)
+
+            Link(destination: Self.privacyPolicyURL) {
+                Text("Privacy Policy")
+                    .font(RetroFont.mono(10, weight: .medium))
+                    .foregroundStyle(Theme.retroCyan)
+            }
+            .padding(.bottom, 24)
         }
     }
 

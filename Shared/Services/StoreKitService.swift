@@ -11,7 +11,8 @@ final class StoreKitService: ObservableObject {
     // Product identifiers — must match App Store Connect exactly.
     static let lifetimeID = "com.jackwallner.streaks.pro.lifetime"
     static let yearlyID = "com.jackwallner.streaks.pro.yearly"
-    static let allProductIDs: Set<String> = [lifetimeID, yearlyID]
+    static let monthlyID = "com.jackwallner.streaks.pro.monthly"
+    static let allProductIDs: Set<String> = [lifetimeID, yearlyID, monthlyID]
 
     private static let entitlementKey = "isProEntitled.v1"
 
@@ -22,6 +23,7 @@ final class StoreKitService: ObservableObject {
 
     var lifetime: Product? { products.first { $0.id == Self.lifetimeID } }
     var yearly: Product? { products.first { $0.id == Self.yearlyID } }
+    var monthly: Product? { products.first { $0.id == Self.monthlyID } }
 
     private var updatesTask: Task<Void, Never>? = nil
 
@@ -43,6 +45,7 @@ final class StoreKitService: ObservableObject {
 
     func loadProducts() async {
         do {
+            self.lastError = nil
             let fetched = try await Product.products(for: Array(Self.allProductIDs))
             self.products = fetched.sorted { $0.price < $1.price }
         } catch {

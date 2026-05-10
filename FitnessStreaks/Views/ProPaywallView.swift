@@ -9,7 +9,7 @@ struct ProPaywallView: View {
     /// Optional context shown above the hero ("Save your 45-day streak…").
     var context: String? = nil
 
-    @State private var selectedID: String = StoreKitService.lifetimeID
+    @State private var selectedID: String = StoreKitService.yearlyID
     @State private var statusMessage: String? = nil
 
     private static let termsURL = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
@@ -61,7 +61,7 @@ struct ProPaywallView: View {
                     await storeKit.loadProducts()
                 }
                 if storeKit.yearly == nil {
-                    selectedID = StoreKitService.lifetimeID
+                    selectedID = storeKit.lifetime != nil ? StoreKitService.lifetimeID : StoreKitService.monthlyID
                 }
             }
             .onChange(of: storeKit.isPro) { _, isPro in
@@ -96,11 +96,11 @@ struct ProPaywallView: View {
                 Spacer()
                 PixelChip(text: "PRO", accent: Theme.retroMagenta)
             }
-            Text("KEEP YOUR STREAKS ALIVE WITH GRACE DAYS.")
+            Text("PROACTIVE ALERTS THAT PROTECT YOUR STREAKS.")
                 .font(RetroFont.pixel(14))
                 .foregroundStyle(Theme.retroInk)
                 .lineSpacing(4)
-            Text("Bad day? Travel? Sick? Pro spends a banked Grace Day automatically so your streak survives. You earn 1 Grace Day every 30 days you keep your hero streak alive.")
+            Text("Pro watches for streaks that are slipping, sends at-risk reminders, and spends banked Grace Days automatically when life still gets in the way.")
                 .font(RetroFont.mono(11))
                 .foregroundStyle(Theme.retroInkDim)
                 .lineSpacing(3)
@@ -115,21 +115,21 @@ struct ProPaywallView: View {
         VStack(alignment: .leading, spacing: 10) {
             featureRow(
                 accent: Theme.retroLime,
-                symbol: "shield.lefthalf.filled",
-                title: "AUTOMATIC STREAK SAVES",
-                detail: "Miss a day? Pro silently spends a Grace Day to preserve your streak — no panic, no manual recovery."
+                symbol: "bell.badge.fill",
+                title: "PROACTIVE STREAK ALERTS",
+                detail: "Get a daily at-risk nudge for your most urgent active streak before the goal slips away."
             )
             featureRow(
                 accent: Theme.retroCyan,
-                symbol: "calendar.badge.plus",
-                title: "EARN GRACE DAYS",
-                detail: "1 Grace Day banked for every 30 days of streak. Up to 9 saved at once."
+                symbol: "shield.lefthalf.filled",
+                title: "AUTOMATIC GRACE SAVES",
+                detail: "Miss anyway? Pro spends a banked Grace Day to preserve the streak — no panic, no manual recovery."
             )
             featureRow(
                 accent: Theme.retroAmber,
-                symbol: "sparkles",
-                title: "FUTURE PRO PERKS",
-                detail: "Buy once, get every Pro feature we add. Coaching is a separate service."
+                symbol: "calendar.badge.plus",
+                title: "EARN GRACE DAYS",
+                detail: "1 Grace Day banked for every 30 days of streak. Up to 9 saved at once."
             )
         }
     }
@@ -162,6 +162,28 @@ struct ProPaywallView: View {
 
     private var productBlock: some View {
         VStack(spacing: 10) {
+            if let yearly = storeKit.yearly {
+                let intro = storeKit.introOfferDescription(for: yearly)
+                productCard(
+                    product: yearly,
+                    isSelected: selectedID == yearly.id,
+                    badge: intro.map { _ in "7 DAYS FREE" } ?? "MOST POPULAR",
+                    badgeAccent: Theme.retroMagenta,
+                    priceLabel: "\(storeKit.displayPrice(for: yearly)) / yr",
+                    detail: intro
+                        ?? (storeKit.yearlyMonthlyEquivalent.map { "Billed yearly · \($0)" } ?? "Billed yearly")
+                ) { selectedID = yearly.id }
+            }
+            if let monthly = storeKit.monthly {
+                productCard(
+                    product: monthly,
+                    isSelected: selectedID == monthly.id,
+                    badge: nil,
+                    badgeAccent: Theme.retroCyan,
+                    priceLabel: "\(storeKit.displayPrice(for: monthly)) / mo",
+                    detail: "Billed monthly · Cancel anytime"
+                ) { selectedID = monthly.id }
+            }
             if let lifetime = storeKit.lifetime {
                 productCard(
                     product: lifetime,
@@ -172,29 +194,59 @@ struct ProPaywallView: View {
                     detail: "One-time purchase · Forever yours"
                 ) { selectedID = lifetime.id }
             }
-            if let yearly = storeKit.yearly {
-                productCard(
-                    product: yearly,
-                    isSelected: selectedID == yearly.id,
-                    badge: storeKit.introOfferDescription(for: yearly).map { _ in "FREE TRIAL" },
-                    badgeAccent: Theme.retroCyan,
-                    priceLabel: "\(storeKit.displayPrice(for: yearly)) / yr",
-                    detail: storeKit.introOfferDescription(for: yearly)
-                        ?? (storeKit.yearlyMonthlyEquivalent.map { "Billed yearly · \($0)" } ?? "Billed yearly")
-                ) { selectedID = yearly.id }
-            }
             if storeKit.products.isEmpty {
-                HStack(spacing: 8) {
-                    ProgressView().tint(Theme.retroInkDim)
-                    Text("LOADING PRICES…")
+                if let error = storeKit.lastError {
+                    productLoadErrorBlock(error)
+                } else {
+                    HStack(spacing: 8) {
+                        ProgressView().tint(Theme.retroInkDim)
+                        Text("LOADING PRICES…")
+                            .font(RetroFont.mono(10, weight: .bold))
+                            .tracking(1)
+                            .foregroundStyle(Theme.retroInkDim)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 24)
+                }
+            }
+        }
+    }
+
+    private func productLoadErrorBlock(_ error: String) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("PRICES DIDN'T LOAD")
+                .font(RetroFont.pixel(10))
+                .tracking(1)
+                .foregroundStyle(Theme.retroAmber)
+            Text(error)
+                .font(RetroFont.mono(10))
+                .foregroundStyle(Theme.retroInkDim)
+                .lineSpacing(2)
+            HStack(spacing: 14) {
+                Button {
+                    Task { await storeKit.loadProducts() }
+                } label: {
+                    Text("TRY AGAIN")
+                        .font(RetroFont.mono(10, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(Theme.retroLime)
+                }
+                .buttonStyle(.plain)
+
+                Button {
+                    dismiss()
+                } label: {
+                    Text("NOT NOW")
                         .font(RetroFont.mono(10, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(Theme.retroInkDim)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 24)
+                .buttonStyle(.plain)
             }
         }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .pixelPanel(color: Theme.retroAmber, fill: Theme.retroBgRaised)
     }
 
     private func productCard(
@@ -250,7 +302,7 @@ struct ProPaywallView: View {
             guard let product else { return "UNAVAILABLE" }
             if let intro = storeKit.introOfferDescription(for: product),
                intro.contains("free") {
-                return "START FREE TRIAL"
+                return "START 7-DAY FREE TRIAL"
             }
             return "UNLOCK PRO"
         }()
@@ -276,7 +328,7 @@ struct ProPaywallView: View {
     }
 
     private var currentSelectedProduct: Product? {
-        storeKit.products.first { $0.id == selectedID } ?? storeKit.lifetime ?? storeKit.yearly
+        storeKit.products.first { $0.id == selectedID } ?? storeKit.yearly ?? storeKit.monthly ?? storeKit.lifetime
     }
 
     private func purchase(_ product: Product) async {
@@ -336,12 +388,8 @@ struct ProPaywallView: View {
     }
 
     private var subscriptionDisclosure: String {
-        let priceText: String
-        if let yearly = storeKit.yearly {
-            priceText = "\(storeKit.displayPrice(for: yearly)) per year"
-        } else {
-            priceText = "the listed price per year"
-        }
-        return "FitnessStreaks Pro yearly subscription auto-renews at \(priceText). Payment is charged to your Apple ID at confirmation of purchase. The subscription renews automatically unless cancelled at least 24 hours before the end of the current period. Manage or cancel anytime in iOS Settings → Apple ID → Subscriptions."
+        let yearlyText = storeKit.yearly.map { "\(storeKit.displayPrice(for: $0)) per year" } ?? "the listed yearly price"
+        let monthlyText = storeKit.monthly.map { "\(storeKit.displayPrice(for: $0)) per month" } ?? "the listed monthly price"
+        return "FitnessStreaks Pro auto-renews at \(yearlyText) (yearly) or \(monthlyText) (monthly). Free trials convert to a paid yearly subscription if not cancelled at least 24 hours before they end. Payment is charged to your Apple ID at confirmation of purchase. Manage or cancel anytime in iOS Settings → Apple ID → Subscriptions."
     }
 }

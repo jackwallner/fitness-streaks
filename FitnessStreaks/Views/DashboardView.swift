@@ -7,6 +7,7 @@ struct DashboardView: View {
     @EnvironmentObject var store: StreakStore
     @EnvironmentObject var settings: StreakSettings
     @EnvironmentObject var healthKit: HealthKitService
+    @EnvironmentObject var storeKit: StoreKitService
 
     @State private var showSettings = false
     @State private var selectedStreak: Streak? = nil
@@ -37,6 +38,11 @@ struct DashboardView: View {
                             .padding(.horizontal, 6)
                     }
 
+                    if let hero = store.hero {
+                        graceStatusBanner(for: hero)
+                            .padding(.horizontal, 6)
+                    }
+
                     if !visibleBrokenStreaks.isEmpty {
                         ForEach(visibleBrokenStreaks.prefix(3)) { broken in
                             brokenBanner(broken)
@@ -55,7 +61,7 @@ struct DashboardView: View {
                         .coachmarkAnchor("hero")
                         .id("coach-hero")
 
-                        if shouldShowAtRisk, let hero = store.hero, !hero.currentUnitCompleted, hero.current >= 2 {
+                        if shouldShowAtRisk(for: hero) {
                             atRiskBanner(for: hero)
                                 .padding(.horizontal, 6)
                         }
@@ -220,12 +226,25 @@ struct DashboardView: View {
         }
     }
 
-    private var shouldShowAtRisk: Bool {
-        let now = Calendar.current.dateComponents([.hour, .minute], from: Date())
+    private func shouldShowAtRisk(for streak: Streak) -> Bool {
+        guard !streak.currentUnitCompleted, streak.current >= 2 else { return false }
+        let now = Calendar.current.dateComponents([.weekday, .hour, .minute], from: Date())
         guard let currentHour = now.hour, let currentMinute = now.minute else { return false }
-        let thresholdHour = settings.notificationHour
-        let thresholdMinute = settings.notificationMinute
-        return currentHour > thresholdHour || (currentHour == thresholdHour && currentMinute >= thresholdMinute)
+        let reminderReached = currentHour > settings.notificationHour
+            || (currentHour == settings.notificationHour && currentMinute >= settings.notificationMinute)
+        if reminderReached { return true }
+        if let window = streak.window {
+            return currentHour >= max(0, window.startHour - 1)
+        }
+        let progress = min(1, streak.currentUnitProgress)
+        if streak.cadence == .weekly {
+            let weekday = now.weekday ?? 1
+            let weekProgress = Double(max(0, weekday - 1)) / 7.0
+            return weekday >= 4 && progress < max(0.2, weekProgress - 0.15)
+        }
+        let minutesElapsed = Double(currentHour * 60 + currentMinute)
+        let dayProgress = minutesElapsed / 1_440.0
+        return currentHour >= 12 && progress < max(0.25, dayProgress - 0.15)
     }
 
     private var topBar: some View {
@@ -327,6 +346,55 @@ struct DashboardView: View {
             return "\(v) \(unit) between \(window.label) to finish today"
         }
         return "\(v) \(unit) to finish today"
+    }
+
+    private func graceStatusBanner(for hero: Streak) -> some View {
+        Button {
+            showSettings = true
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: storeKit.isPro ? "shield.lefthalf.filled" : "shield")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(storeKit.isPro ? Theme.retroLime : Theme.retroMagenta)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(graceStatusTitle(for: hero))
+                        .font(RetroFont.mono(9, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(storeKit.isPro ? Theme.retroLime : Theme.retroMagenta)
+                    Text(graceStatusDetail(for: hero))
+                        .font(RetroFont.mono(10))
+                        .foregroundStyle(Theme.retroInkDim)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                }
+                Spacer()
+                Text("›")
+                    .font(RetroFont.mono(14, weight: .bold))
+                    .foregroundStyle(Theme.retroInkDim)
+            }
+            .padding(.vertical, 8)
+            .padding(.horizontal, 12)
+            .pixelPanel(color: storeKit.isPro ? Theme.retroLime : Theme.retroMagenta, fill: Theme.retroBg)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(graceStatusTitle(for: hero)). \(graceStatusDetail(for: hero))")
+    }
+
+    private func graceStatusTitle(for hero: Streak) -> String {
+        if settings.earnedGraceDays > 0 {
+            return "\(settings.earnedGraceDays) GRACE DAY\(settings.earnedGraceDays == 1 ? "" : "S") \(storeKit.isPro ? "READY" : "BANKED")"
+        }
+        return "\(hero.current % 30)/30 TO NEXT GRACE DAY"
+    }
+
+    private func graceStatusDetail(for hero: Streak) -> String {
+        if storeKit.isPro {
+            return settings.earnedGraceDays > 0 ? "Pro can auto-save a missed streak." : "Keep your hero streak alive to bank protection."
+        }
+        if settings.earnedGraceDays > 0 {
+            return "Unlock Pro to use banked protection automatically."
+        }
+        return "Pro unlocks proactive alerts and automatic saves."
     }
 
     private func brokenBanner(_ broken: BrokenStreak) -> some View {

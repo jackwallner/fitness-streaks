@@ -53,6 +53,7 @@ enum NotificationService {
         center.removePendingNotificationRequests(withIdentifiers: [dailyReminderID])
 
         guard enabled,
+              StoreKitService.shared.isPro,
               await isAuthorized(),
               let reminder = bestReminderCandidate(from: streaks) else { return }
 

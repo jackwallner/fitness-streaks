@@ -182,13 +182,14 @@ enum StreakEngine {
         var best: (streak: Streak, rate: Double, distance: Double)? = nil
 
         for threshold in candidates {
-            let hitDays = values.filter { $0 >= threshold }.count
+            let roundedThreshold = roundThreshold(threshold, for: metric)
+            let hitDays = values.filter { $0 >= roundedThreshold }.count
             let rate = Double(hitDays) / windowDays
             let distance = abs(rate - target)
 
             // Compute streak using FULL history (not just lookback) so current streak is accurate.
             let streak = applyingGrace(
-                to: computeDailyStreak(metric: metric, threshold: threshold, byDay: byDay, today: today, plannedFreezes: plannedFreezes),
+                to: computeDailyStreak(metric: metric, threshold: roundedThreshold, byDay: byDay, today: today, plannedFreezes: plannedFreezes),
                 key: key,
                 today: today,
                 gracePreservations: gracePreservations,

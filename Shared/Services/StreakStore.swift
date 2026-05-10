@@ -203,8 +203,12 @@ final class StreakStore: ObservableObject {
                 plannedFreezes: settings.plannedFreezes
             )
             var filtered = Self.applyTrackedFilter(all)
+            let graceBefore = settings.gracePreservations.count
+            let brokenBefore = settings.recentlyBroken.count
             await handleBreaks(previous: previous, fresh: filtered, hourly: hourly, history: enriched)
-            if settings.gracePreservations.isEmpty == false || settings.recentlyBroken.isEmpty == false {
+            let needsRediscover = settings.gracePreservations.count > graceBefore
+                               || settings.recentlyBroken.count > brokenBefore
+            if needsRediscover {
                 all = StreakEngine.discover(
                     history: enriched,
                     hourlySteps: hourly,

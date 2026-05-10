@@ -91,6 +91,12 @@ struct SettingsView: View {
             .onChange(of: store.isLoading) { _, isLoading in
                 if !isLoading { recalibrateAllMessage = nil }
             }
+            .onChange(of: storeKit.isPro) { _, isPro in
+                if !isPro && settings.notificationsEnabled {
+                    settings.notificationsEnabled = false
+                    NotificationService.cancelAll()
+                }
+            }
             .alert("Recalibrate Goals?", isPresented: $showingLookbackRecalibratePrompt) {
                 Button("Recalibrate All", role: .destructive) {
                     if let days = pendingLookbackDays {
@@ -166,45 +172,29 @@ struct SettingsView: View {
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("Unlock FitnessStreaks Pro")
-                } else if !recentPreservations.isEmpty {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("RECENT SAVES")
-                            .font(RetroFont.pixel(9))
-                            .tracking(1)
-                            .foregroundStyle(Theme.retroInkDim)
-                        ForEach(recentPreservations, id: \.key) { p in
-                            HStack(spacing: 8) {
-                                Image(systemName: "shield.lefthalf.filled")
-                                    .font(.system(size: 12, weight: .semibold))
-                                    .foregroundStyle(Theme.retroLime)
-                                Text("\(p.metric.displayName) · saved \(p.preservedLength)-day run")
-                                    .font(RetroFont.mono(10))
-                                    .foregroundStyle(Theme.retroInk)
-                                Spacer()
+                } else {
+                    if !recentPreservations.isEmpty {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("RECENT SAVES")
+                                .font(RetroFont.pixel(9))
+                                .tracking(1)
+                                .foregroundStyle(Theme.retroInkDim)
+                            ForEach(recentPreservations, id: \.key) { p in
+                                HStack(spacing: 8) {
+                                    Image(systemName: "shield.lefthalf.filled")
+                                        .font(.system(size: 12, weight: .semibold))
+                                        .foregroundStyle(Theme.retroLime)
+                                    Text("\(p.metric.displayName) · saved \(p.preservedLength)-day run")
+                                        .font(RetroFont.mono(10))
+                                        .foregroundStyle(Theme.retroInk)
+                                    Spacer()
+                                }
                             }
                         }
+                        .padding(.top, 4)
                     }
-                    .padding(.top, 4)
 
-                    Button {
-                        if let url = URL(string: "https://apps.apple.com/account/subscriptions") {
-                            UIApplication.shared.open(url)
-                        }
-                    } label: {
-                        HStack {
-                            Text("MANAGE SUBSCRIPTION")
-                                .font(RetroFont.mono(10, weight: .bold))
-                                .tracking(1)
-                                .foregroundStyle(Theme.retroCyan)
-                            Spacer()
-                            Text("↗")
-                                .font(RetroFont.mono(11))
-                                .foregroundStyle(Theme.retroCyan)
-                        }
-                        .padding(.vertical, 10)
-                        .padding(.horizontal, 4)
-                    }
-                    .buttonStyle(.plain)
+                    manageSubscriptionButton
                 }
             }
             .padding(14)
@@ -230,6 +220,28 @@ struct SettingsView: View {
         return settings.gracePreservations.values
             .filter { $0.grantedAt >= cutoff }
             .sorted { $0.grantedAt > $1.grantedAt }
+    }
+
+    private var manageSubscriptionButton: some View {
+        Button {
+            if let url = URL(string: "https://apps.apple.com/account/subscriptions") {
+                UIApplication.shared.open(url)
+            }
+        } label: {
+            HStack {
+                Text("MANAGE SUBSCRIPTION")
+                    .font(RetroFont.mono(10, weight: .bold))
+                    .tracking(1)
+                    .foregroundStyle(Theme.retroCyan)
+                Spacer()
+                Text("↗")
+                    .font(RetroFont.mono(11))
+                    .foregroundStyle(Theme.retroCyan)
+            }
+            .padding(.vertical, 10)
+            .padding(.horizontal, 4)
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Appearance
@@ -386,8 +398,11 @@ struct SettingsView: View {
     private var notificationsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             PixelSectionHeader(title: "Notifications")
+            if !storeKit.isPro {
+                lockedProactiveAlertsCard
+            } else {
             HStack {
-                Text("AT-RISK REMINDER")
+                Text("PROACTIVE AT-RISK ALERTS")
                     .font(RetroFont.pixel(10))
                     .foregroundStyle(Theme.retroInk)
                 Spacer()
@@ -454,7 +469,47 @@ struct SettingsView: View {
                 .font(RetroFont.mono(10))
                 .foregroundStyle(Theme.retroInkDim)
                 .padding(.horizontal, 6)
+            }
         }
+    }
+
+    private var lockedProactiveAlertsCard: some View {
+        Button {
+            showingPaywall = true
+        } label: {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 8) {
+                    Image(systemName: "bell.badge.fill")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(Theme.retroMagenta)
+                    Text("PROACTIVE ALERTS")
+                        .font(RetroFont.pixel(10))
+                        .tracking(1)
+                        .foregroundStyle(Theme.retroInk)
+                    Spacer()
+                    PixelChip(text: "PRO", accent: Theme.retroMagenta)
+                }
+                Text("Upgrade to get at-risk reminders for active streaks before the day gets away from you. Daily reminder time: \(notificationTimeLabel).")
+                    .font(RetroFont.mono(10))
+                    .foregroundStyle(Theme.retroInkDim)
+                    .lineSpacing(2)
+                HStack {
+                    Text("UNLOCK PROACTIVE ALERTS")
+                        .font(RetroFont.mono(10, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(Theme.retroMagenta)
+                    Spacer()
+                    Text("›")
+                        .font(RetroFont.mono(14, weight: .bold))
+                        .foregroundStyle(Theme.retroMagenta)
+                }
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .pixelPanel(color: Theme.retroMagenta, fill: Theme.retroBgRaised)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Unlock Pro to enable proactive at-risk alerts")
     }
 
     private var notificationTimeBinding: Binding<Date> {
