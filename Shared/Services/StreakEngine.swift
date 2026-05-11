@@ -679,20 +679,34 @@ enum StreakEngine {
     // MARK: - Detail helpers
 
     /// For the detail screen: per-day value + whether it met the threshold.
+    ///
+    /// For weekly-cadence streaks the threshold is a *weekly* total (e.g. 3 workouts/week).
+    /// Comparing each day to that threshold renders every cell as a miss, so we paint
+    /// every day of a hit-week as met based on the ISO-week sum.
     static func dailyHistory(
         for streak: Streak,
         history: [ActivityDay]
     ) -> [(date: Date, value: Double, met: Bool)] {
+        let daily: [(date: Date, value: Double, met: Bool)]
         if streak.metric == .workouts,
            let workoutType = streak.workoutType,
            let measure = streak.workoutMeasure {
-            return history.map { day in
+            daily = history.map { day in
                 let v = day.workoutDetails[workoutType]?.value(for: measure) ?? 0
                 return (date: day.date, value: v, met: v >= streak.threshold)
             }
+        } else {
+            daily = dailyHistory(for: streak.metric, threshold: streak.threshold, history: history)
         }
 
-        return dailyHistory(for: streak.metric, threshold: streak.threshold, history: history)
+        guard streak.cadence == .weekly else { return daily }
+
+        let weekHits = Dictionary(grouping: daily, by: { DateHelpers.startOfWeek($0.date) })
+            .mapValues { $0.reduce(0.0) { $0 + $1.value } >= streak.threshold }
+        return daily.map { entry in
+            let weekMet = weekHits[DateHelpers.startOfWeek(entry.date)] ?? false
+            return (date: entry.date, value: entry.value, met: weekMet)
+        }
     }
 
     /// For the detail screen: per-day value + whether it met the threshold.

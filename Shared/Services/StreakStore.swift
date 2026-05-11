@@ -97,7 +97,14 @@ final class StreakStore: ObservableObject {
         }
     }
 
-    private init() {}
+    private init() {
+        // Hydrate from the last persisted snapshot so the dashboard shows
+        // cached streaks immediately on cold launch — same pattern as HealthKit's
+        // cachedHistory. Fresh data flows in once `load()` completes.
+        if let snapshot = SnapshotStore.load() {
+            restore(snapshot)
+        }
+    }
 
     func persistCurrentSnapshot() {
         var snapshot = StreakEngine.snapshot(from: streaks)

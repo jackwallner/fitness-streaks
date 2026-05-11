@@ -1,4 +1,5 @@
 import SwiftUI
+import RevenueCatUI
 
 /// Reusable list of candidate streaks with toggles. Used in onboarding and Settings.
 ///
@@ -260,9 +261,7 @@ struct StreakPickerSheet: View {
                 }
             }
             .sheet(isPresented: $showingPaywall) {
-                ProPaywallView(context: "Pro unlocks unlimited custom streaks. Free includes one — yours is already saved.")
-                    .environmentObject(storeKit)
-                    .environmentObject(settings)
+                PaywallView()
             }
             .sheet(isPresented: Binding(
                 get: { editingCustomID != nil },

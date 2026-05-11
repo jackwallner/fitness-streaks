@@ -255,11 +255,13 @@ struct DashboardView: View {
                     .tracking(1)
                     .foregroundStyle(Theme.retroMagenta)
                 if let updated = store.lastUpdated {
-                    Text("\(relative(updated)) · apple health")
+                    Text(store.isRefreshing
+                         ? "\(relative(updated)) · refreshing…"
+                         : "\(relative(updated)) · apple health")
                         .font(RetroFont.mono(10))
                         .foregroundStyle(Theme.retroInkDim)
                 } else {
-                    Text("from apple health")
+                    Text(store.isRefreshing ? "refreshing…" : "from apple health")
                         .font(RetroFont.mono(10))
                         .foregroundStyle(Theme.retroInkDim)
                 }

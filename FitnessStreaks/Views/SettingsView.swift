@@ -1,4 +1,5 @@
 import SwiftUI
+import RevenueCatUI
 
 struct SettingsView: View {
     @EnvironmentObject var settings: StreakSettings
@@ -84,9 +85,7 @@ struct SettingsView: View {
                     .environmentObject(store)
             }
             .sheet(isPresented: $showingPaywall) {
-                ProPaywallView()
-                    .environmentObject(storeKit)
-                    .environmentObject(settings)
+                PaywallView()
             }
             .onChange(of: store.isLoading) { _, isLoading in
                 if !isLoading { recalibrateAllMessage = nil }

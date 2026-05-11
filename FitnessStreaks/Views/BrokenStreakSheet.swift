@@ -1,4 +1,5 @@
 import SwiftUI
+import RevenueCatUI
 
 struct BrokenStreakSheet: View {
     let broken: BrokenStreak
@@ -92,20 +93,13 @@ struct BrokenStreakSheet: View {
             .toolbarBackground(Theme.retroBg, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .sheet(isPresented: $showingPaywall) {
-                ProPaywallView(context: paywallContext)
-                    .environmentObject(storeKit)
-                    .environmentObject(settings)
+                PaywallView()
             }
         }
     }
 
     private var shouldShowUpsell: Bool {
         !storeKit.isPro && settings.earnedGraceDays > 0
-    }
-
-    private var paywallContext: String {
-        let n = settings.earnedGraceDays
-        return "Save your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) streak. You have \(n) Grace Day\(n == 1 ? "" : "s") banked — unlock Pro to spend one and restore it."
     }
 
     private var graceUpsell: some View {
