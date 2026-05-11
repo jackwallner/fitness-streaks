@@ -235,7 +235,7 @@ private struct RootView: View {
     var body: some View {
         Group {
             if settings.hasCompletedSetup {
-                DashboardView()
+                RootTabView()
             } else {
                 OnboardingView()
             }
