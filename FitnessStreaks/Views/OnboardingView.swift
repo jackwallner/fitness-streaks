@@ -1,10 +1,12 @@
 import SwiftUI
 import Combine
+import RevenueCatUI
 
 struct OnboardingView: View {
     @EnvironmentObject var healthKit: HealthKitService
     @EnvironmentObject var settings: StreakSettings
     @EnvironmentObject var store: StreakStore
+    @EnvironmentObject var storeKit: StoreKitService
 
     enum Phase {
         case intro       // welcome + privacy + Connect Health
@@ -12,6 +14,7 @@ struct OnboardingView: View {
         case loading     // running discovery
         case selecting   // pick which discovered streaks to track
         case empty       // no streaks discovered
+        case proPitch    // Pro upsell before entering the app
     }
 
     @State private var phase: Phase = .intro
@@ -22,6 +25,7 @@ struct OnboardingView: View {
     @State private var flameVisible = true
     @State private var selection: Set<String> = []
     @State private var authProgress: Double = 0
+    @State private var showingPaywall = false
 
     private static let tips: [String] = [
         "Streaks update automatically from Apple Health — no manual logging.",
@@ -49,7 +53,15 @@ struct OnboardingView: View {
             case .loading:   loadingScreen
             case .selecting: selectingScreen
             case .empty:     emptyScreen
+            case .proPitch:  proPitchScreen
             }
+        }
+        .sheet(isPresented: $showingPaywall, onDismiss: {
+            // After the paywall closes — whether the user purchased, restored, or
+            // backed out — finish onboarding. RevenueCat will have updated isPro.
+            completeSetup()
+        }) {
+            PaywallView()
         }
         .onAppear {
             // Start timers on appear
@@ -541,13 +553,121 @@ struct OnboardingView: View {
         }
         settings.manualStreakOrder = order
         store.refilter()
-        withAnimation { settings.hasCompletedSetup = true }
+        advanceFromSelection()
     }
 
     private func finishWithoutTracking() {
         settings.trackedStreaks = nil
         store.refilter()
+        advanceFromSelection()
+    }
+
+    /// After the user picks (or skips) streaks, give existing non-Pro users one
+    /// look at the Pro pitch before dropping them into the dashboard. Pro users
+    /// (TestFlight re-installs, restored purchases) skip straight through.
+    private func advanceFromSelection() {
+        if storeKit.isPro {
+            completeSetup()
+        } else {
+            withAnimation { phase = .proPitch }
+        }
+    }
+
+    private func completeSetup() {
         withAnimation { settings.hasCompletedSetup = true }
+    }
+
+    // MARK: - Pro Pitch
+
+    private var proPitchScreen: some View {
+        VStack(spacing: 18) {
+            VStack(spacing: 10) {
+                Image(systemName: "shield.lefthalf.filled")
+                    .font(.system(size: 64))
+                    .foregroundStyle(Theme.retroMagenta)
+                    .retroGlow(Theme.retroMagenta)
+                    .padding(.top, 30)
+                Text("GO PRO")
+                    .font(RetroFont.mono(28, weight: .bold))
+                    .tracking(3)
+                    .foregroundStyle(Theme.retroMagenta)
+                    .retroGlow(Theme.retroMagenta)
+                Text("Never lose a streak again.")
+                    .font(RetroFont.mono(12))
+                    .foregroundStyle(Theme.retroInkDim)
+                    .multilineTextAlignment(.center)
+            }
+
+            VStack(alignment: .leading, spacing: 10) {
+                pitchRow(symbol: "shield.lefthalf.filled",
+                         title: "UNLIMITED AUTO-SAVES",
+                         body: "Every miss saved automatically.")
+                pitchRow(symbol: "snowflake",
+                         title: "PLANNED FREEZES",
+                         body: "Travel, sick days — freeze them.")
+                pitchRow(symbol: "bell.badge.fill",
+                         title: "PROACTIVE ALERTS",
+                         body: "A nudge before the day gets away.")
+                pitchRow(symbol: "plus.square",
+                         title: "UNLIMITED CUSTOM STREAKS",
+                         body: "Free is capped at 3.")
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .pixelPanel(color: Theme.retroMagenta, fill: Theme.retroBgRaised)
+            .padding(.horizontal, 20)
+
+            Spacer(minLength: 0)
+
+            VStack(spacing: 10) {
+                Button {
+                    showingPaywall = true
+                } label: {
+                    Text("▶ TRY PRO")
+                        .font(RetroFont.mono(13, weight: .bold))
+                        .foregroundStyle(Theme.retroBg)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(Theme.retroMagenta)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Try FitnessStreaks Pro")
+
+                Button {
+                    completeSetup()
+                } label: {
+                    Text("CONTINUE FREE")
+                        .font(RetroFont.mono(11, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(Theme.retroInkDim)
+                        .padding(.vertical, 10)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Continue without Pro")
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 24)
+        }
+    }
+
+    private func pitchRow(symbol: String, title: String, body: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: symbol)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(Theme.retroMagenta)
+                .frame(width: 22)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(RetroFont.mono(11, weight: .bold))
+                    .tracking(1)
+                    .foregroundStyle(Theme.retroInk)
+                Text(body)
+                    .font(RetroFont.mono(10))
+                    .foregroundStyle(Theme.retroInkDim)
+            }
+            Spacer(minLength: 0)
+        }
     }
 
     private func requestAuth() async {
