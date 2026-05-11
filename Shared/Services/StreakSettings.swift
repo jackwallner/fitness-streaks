@@ -264,14 +264,6 @@ final class StreakSettings: ObservableObject {
         didSet { defaults.set(notificationMinute, forKey: "notificationMinute") }
     }
 
-    @Published var earnedGraceDays: Int {
-        didSet { defaults.set(earnedGraceDays, forKey: "earnedGraceDays") }
-    }
-
-    @Published var graceAwardTier: Int {
-        didSet { defaults.set(graceAwardTier, forKey: "graceAwardTier") }
-    }
-
     @Published var intensity: DiscoveryIntensity {
         didSet {
             defaults.set(intensity.rawValue, forKey: "discoveryVibe")
@@ -382,8 +374,8 @@ final class StreakSettings: ObservableObject {
         self.notificationsEnabled = defaults.object(forKey: "notificationsEnabled") as? Bool ?? false
         self.notificationHour = defaults.object(forKey: "notificationHour") as? Int ?? 19
         self.notificationMinute = defaults.object(forKey: "notificationMinute") as? Int ?? 0
-        self.earnedGraceDays = defaults.object(forKey: "earnedGraceDays") as? Int ?? 0
-        self.graceAwardTier = defaults.object(forKey: "graceAwardTier") as? Int ?? 0
+        // Legacy keys "earnedGraceDays" / "graceAwardTier" intentionally left in defaults —
+        // the grace-day earning mechanic was removed in favor of unlimited Pro auto-saves.
         if let stored = defaults.object(forKey: "discoveryVibe") as? Int,
            let v = DiscoveryIntensity(rawValue: stored) {
             self.intensity = v
@@ -479,23 +471,10 @@ final class StreakSettings: ObservableObject {
         recentlyBroken.removeAll { now.timeIntervalSince($0.brokenAt) > 48 * 60 * 60 }
     }
 
-    /// Bank Grace Days as the user crosses 30-day tiers on their hero streak.
-    /// Free users accrue too — used as Pro upsell currency ("you have 3 banked").
-    func awardGraceDays(from streaks: [Streak]) {
-        // Tier is driven by the hero streak so the user understands the reward source.
-        let tier = (streaks.first?.current ?? 0) / 30
-        if tier > graceAwardTier {
-            earnedGraceDays = min(9, earnedGraceDays + (tier - graceAwardTier))
-            graceAwardTier = tier
-        }
-    }
-
-    /// Spend a Grace Day to preserve a streak. Pro entitlement required.
-    /// Free users accrue but cannot consume — that's the upsell hook.
-    func consumeGraceDay(isPro: Bool) -> Bool {
-        guard isPro, earnedGraceDays > 0 else { return false }
-        earnedGraceDays -= 1
-        return true
+    /// Pro auto-save: an unlimited entitlement on the subscription tier.
+    /// Free users do not get auto-save — the streak ends and they see the upgrade pitch.
+    func attemptAutoSave(isPro: Bool) -> Bool {
+        isPro
     }
 
     private func saveCodable<T: Encodable>(_ value: T, key: String) {

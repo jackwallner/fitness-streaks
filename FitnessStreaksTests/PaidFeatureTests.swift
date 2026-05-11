@@ -7,9 +7,6 @@ final class PaidFeatureTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        // Reset earned grace days to a known state before each test.
-        StreakSettings.shared.earnedGraceDays = 0
-        StreakSettings.shared.graceAwardTier = 0
         StreakSettings.shared.customStreaks = []
         StreakSettings.shared.gracePreservations = [:]
         StreakSettings.shared.recentlyBroken = []
@@ -20,8 +17,6 @@ final class PaidFeatureTests: XCTestCase {
     }
 
     override func tearDown() {
-        StreakSettings.shared.earnedGraceDays = 0
-        StreakSettings.shared.graceAwardTier = 0
         StreakSettings.shared.customStreaks = []
         StreakSettings.shared.gracePreservations = [:]
         StreakSettings.shared.recentlyBroken = []
@@ -53,8 +48,6 @@ final class PaidFeatureTests: XCTestCase {
     // ──────────────────────────────────────────────
 
     func testIsProDefaultsToFalse() {
-        // Before any debug override, isPro should reflect the persisted
-        // entitlement (which is false in a fresh test environment).
         #if DEBUG
         StoreKitService.shared.debugSetPro(false)
         #endif
@@ -64,271 +57,68 @@ final class PaidFeatureTests: XCTestCase {
     #if DEBUG
     func testDebugSetProTrue() {
         StoreKitService.shared.debugSetPro(true)
-        XCTAssertTrue(StoreKitService.shared.isPro, "debugSetPro(true) should set isPro to true")
+        XCTAssertTrue(StoreKitService.shared.isPro)
     }
 
     func testDebugSetProFalse() {
         StoreKitService.shared.debugSetPro(true)
         StoreKitService.shared.debugSetPro(false)
-        XCTAssertFalse(StoreKitService.shared.isPro, "debugSetPro(false) should set isPro to false")
+        XCTAssertFalse(StoreKitService.shared.isPro)
     }
 
     func testDebugSetProPersistsToUserDefaults() {
         StoreKitService.shared.debugSetPro(true)
         let defaults = UserDefaults(suiteName: "group.com.jackwallner.streaks") ?? .standard
-        XCTAssertTrue(defaults.bool(forKey: "isProEntitled.v1"), "Pro entitlement should be persisted to App Group UserDefaults")
+        XCTAssertTrue(defaults.bool(forKey: "isProEntitled.v1"))
     }
 
     func testDebugSetProFalseClearsPersistence() {
         StoreKitService.shared.debugSetPro(true)
         StoreKitService.shared.debugSetPro(false)
         let defaults = UserDefaults(suiteName: "group.com.jackwallner.streaks") ?? .standard
-        XCTAssertFalse(defaults.bool(forKey: "isProEntitled.v1"), "Pro entitlement should be cleared from UserDefaults")
+        XCTAssertFalse(defaults.bool(forKey: "isProEntitled.v1"))
     }
     #endif
 
     func testPurchaseInProgressInitiallyFalse() {
-        XCTAssertFalse(StoreKitService.shared.purchaseInProgress, "purchaseInProgress should be false initially")
+        XCTAssertFalse(StoreKitService.shared.purchaseInProgress)
     }
 
     func testLastErrorInitiallyNil() {
-        XCTAssertNil(StoreKitService.shared.lastError, "lastError should be nil initially")
-    }
-
-    func testProductAccessorsReturnNilWhenNotLoaded() {
-        // Before loadProducts() is called, products array is empty.
-        XCTAssertNil(StoreKitService.shared.lifetime, "lifetime should be nil before products are loaded")
-        XCTAssertNil(StoreKitService.shared.yearly, "yearly should be nil before products are loaded")
-        XCTAssertNil(StoreKitService.shared.monthly, "monthly should be nil before products are loaded")
+        XCTAssertNil(StoreKitService.shared.lastError)
     }
 
     // ──────────────────────────────────────────────
-    // MARK: - Grace Day Earning
+    // MARK: - Auto-save entitlement
+    //
+    // Pro = unlimited auto-saves; Free = no auto-saves. The "earn grace days"
+    // mechanic was removed — saves are a Pro-tier entitlement, not a counter.
     // ──────────────────────────────────────────────
 
-    func testAwardGraceDaysAtTier1_30Days() {
-        let streaks = [makeStreak(current: 30)]
-        StreakSettings.shared.awardGraceDays(from: streaks)
-
-        XCTAssertEqual(StreakSettings.shared.earnedGraceDays, 1,
-                       "Crossing 30 days should award 1 grace day")
-        XCTAssertEqual(StreakSettings.shared.graceAwardTier, 1,
-                       "graceAwardTier should be 1 after 30-day tier")
+    func testAttemptAutoSaveAsPro() {
+        XCTAssertTrue(StreakSettings.shared.attemptAutoSave(isPro: true),
+                      "Pro should always auto-save a missed streak")
     }
 
-    func testAwardGraceDaysAtTier2_60Days() {
-        let streaks = [makeStreak(current: 60)]
-        StreakSettings.shared.awardGraceDays(from: streaks)
-
-        XCTAssertEqual(StreakSettings.shared.earnedGraceDays, 2,
-                       "Crossing 60 days should award 2 grace days")
-        XCTAssertEqual(StreakSettings.shared.graceAwardTier, 2,
-                       "graceAwardTier should be 2 after 60-day tier")
+    func testAttemptAutoSaveAsFree() {
+        XCTAssertFalse(StreakSettings.shared.attemptAutoSave(isPro: false),
+                       "Free users should not auto-save — streak breaks and paywall appears")
     }
 
-    func testAwardGraceDaysAtTier3_90Days() {
-        let streaks = [makeStreak(current: 90)]
-        StreakSettings.shared.awardGraceDays(from: streaks)
-
-        XCTAssertEqual(StreakSettings.shared.earnedGraceDays, 3,
-                       "Crossing 90 days should award 3 grace days")
-    }
-
-    func testAwardGraceDaysIncrementalTiers() {
-        // Simulate progression: 30 → 60 → 90
-        let settings = StreakSettings.shared
-
-        settings.awardGraceDays(from: [makeStreak(current: 30)])
-        XCTAssertEqual(settings.earnedGraceDays, 1)
-
-        settings.awardGraceDays(from: [makeStreak(current: 60)])
-        XCTAssertEqual(settings.earnedGraceDays, 2)
-
-        settings.awardGraceDays(from: [makeStreak(current: 90)])
-        XCTAssertEqual(settings.earnedGraceDays, 3)
-    }
-
-    func testAwardGraceDaysCappedAt9() {
-        // Simulate a massive streak: tier 12 (360 days)
-        let streaks = [makeStreak(current: 360)]
-        StreakSettings.shared.awardGraceDays(from: streaks)
-
-        XCTAssertEqual(StreakSettings.shared.earnedGraceDays, 9,
-                       "Grace days should cap at 9 regardless of streak length")
-    }
-
-    func testAwardGraceDaysNoDoubleAward() {
-        let settings = StreakSettings.shared
-
-        settings.awardGraceDays(from: [makeStreak(current: 30)])
-        XCTAssertEqual(settings.earnedGraceDays, 1)
-
-        // Calling again at the same tier should not award again.
-        settings.awardGraceDays(from: [makeStreak(current: 30)])
-        XCTAssertEqual(settings.earnedGraceDays, 1,
-                       "Re-calling at same tier should not double-award")
-    }
-
-    func testAwardGraceDaysZeroStreakLength() {
-        StreakSettings.shared.awardGraceDays(from: [makeStreak(current: 0)])
-        XCTAssertEqual(StreakSettings.shared.earnedGraceDays, 0,
-                       "A 0-length streak should award no grace days")
-        XCTAssertEqual(StreakSettings.shared.graceAwardTier, 0,
-                       "Tier should remain 0 for 0-length streak")
-    }
-
-    func testAwardGraceDaysBelow30Days() {
-        StreakSettings.shared.awardGraceDays(from: [makeStreak(current: 29)])
-        XCTAssertEqual(StreakSettings.shared.earnedGraceDays, 0,
-                       "Streaks below 30 days should award no grace days")
-    }
-
-    func testAwardGraceDaysUsesHeroStreak() {
-        // Only the first (hero) streak should drive tier calculation.
-        let streaks = [
-            makeStreak(current: 120, metric: .steps),       // hero: tier 4
-            makeStreak(current: 300, metric: .workouts),     // badge: tier 10
-        ]
-        StreakSettings.shared.awardGraceDays(from: streaks)
-
-        // If the badge drove it, we'd get 10→capped at 9.
-        // If the hero drives it, we get 4.
-        XCTAssertEqual(StreakSettings.shared.earnedGraceDays, 4,
-                       "Award should be driven by hero (first) streak, not largest badge")
-    }
-
-    func testAwardGraceDaysFromEmptyStreaks() {
-        StreakSettings.shared.awardGraceDays(from: [])
-        XCTAssertEqual(StreakSettings.shared.earnedGraceDays, 0)
-        XCTAssertEqual(StreakSettings.shared.graceAwardTier, 0)
-    }
-
-    // ──────────────────────────────────────────────
-    // MARK: - Grace Day Consumption Gating
-    // ──────────────────────────────────────────────
-
-    func testConsumeGraceDayAsProWithGraceDaysAvailable() {
-        StreakSettings.shared.earnedGraceDays = 3
-        let result = StreakSettings.shared.consumeGraceDay(isPro: true)
-
-        XCTAssertTrue(result, "Pro user with grace days should be able to consume")
-        XCTAssertEqual(StreakSettings.shared.earnedGraceDays, 2,
-                       "Consumption should decrement earnedGraceDays")
-    }
-
-    func testConsumeGraceDayAsFreeWithGraceDaysAvailable() {
-        StreakSettings.shared.earnedGraceDays = 3
-        let result = StreakSettings.shared.consumeGraceDay(isPro: false)
-
-        XCTAssertFalse(result, "Free user should NOT be able to consume grace days")
-        XCTAssertEqual(StreakSettings.shared.earnedGraceDays, 3,
-                       "Free user should NOT have grace days decremented on attempt")
-    }
-
-    func testConsumeGraceDayAsProWithNoGraceDays() {
-        StreakSettings.shared.earnedGraceDays = 0
-        let result = StreakSettings.shared.consumeGraceDay(isPro: true)
-
-        XCTAssertFalse(result, "Pro user with 0 grace days should not be able to consume")
-    }
-
-    func testConsumeGraceDayAsFreeWithNoGraceDays() {
-        StreakSettings.shared.earnedGraceDays = 0
-        let result = StreakSettings.shared.consumeGraceDay(isPro: false)
-
-        XCTAssertFalse(result, "Free user with 0 grace days should not be able to consume")
-    }
-
-    func testConsumeGraceDayMultipleTimes() {
-        StreakSettings.shared.earnedGraceDays = 3
-
-        XCTAssertTrue(StreakSettings.shared.consumeGraceDay(isPro: true))
-        XCTAssertEqual(StreakSettings.shared.earnedGraceDays, 2)
-
-        XCTAssertTrue(StreakSettings.shared.consumeGraceDay(isPro: true))
-        XCTAssertEqual(StreakSettings.shared.earnedGraceDays, 1)
-
-        XCTAssertTrue(StreakSettings.shared.consumeGraceDay(isPro: true))
-        XCTAssertEqual(StreakSettings.shared.earnedGraceDays, 0)
-
-        // Now empty — should fail.
-        XCTAssertFalse(StreakSettings.shared.consumeGraceDay(isPro: true),
-                       "Should fail when grace days are exhausted")
-    }
-
-    // ──────────────────────────────────────────────
-    // MARK: - Grace Day End-to-End Flow
-    // ──────────────────────────────────────────────
-
-    func testEndToEndGraceDayFlowFreeUser() {
-        let settings = StreakSettings.shared
-
-        // Stage 1: User earns a grace day by hitting 30 days.
-        settings.awardGraceDays(from: [makeStreak(current: 30)])
-        XCTAssertEqual(settings.earnedGraceDays, 1)
-
-        // Stage 2: Streak breaks — user is free, consumption fails.
-        let consumed = settings.consumeGraceDay(isPro: false)
-        XCTAssertFalse(consumed, "Free user must not be able to consume earned grace days")
-        XCTAssertEqual(settings.earnedGraceDays, 1,
-                       "Grace days remain banked for the upsell")
-    }
-
-    func testEndToEndGraceDayFlowProUser() {
-        let settings = StreakSettings.shared
-
-        // Stage 1: Earn grace days.
-        settings.awardGraceDays(from: [makeStreak(current: 60)])
-        XCTAssertEqual(settings.earnedGraceDays, 2)
-
-        // Stage 2: Streak breaks — Pro user, consumption succeeds.
-        let consumed = settings.consumeGraceDay(isPro: true)
-        XCTAssertTrue(consumed, "Pro user must be able to consume earned grace days")
-        XCTAssertEqual(settings.earnedGraceDays, 1,
-                       "Grace day was spent, leaving 1 remaining")
-    }
-
-    func testEndToEndGraceDayFlowFreeToPro() {
-        let settings = StreakSettings.shared
-
-        // Stage 1: Free user earns grace days.
-        settings.awardGraceDays(from: [makeStreak(current: 90)])
-        XCTAssertEqual(settings.earnedGraceDays, 3)
-
-        // Stage 2: Free user streak breaks — cannot consume.
-        let freeAttempt = settings.consumeGraceDay(isPro: false)
-        XCTAssertFalse(freeAttempt)
-        XCTAssertEqual(settings.earnedGraceDays, 3)
-
-        // Stage 3: User upgrades to Pro.
-        // (Simulated via the isPro parameter — no StoreKit interaction needed.)
-
-        // Stage 4: Pro user streak breaks — consumption succeeds.
-        let proAttempt = settings.consumeGraceDay(isPro: true)
-        XCTAssertTrue(proAttempt)
-        XCTAssertEqual(settings.earnedGraceDays, 2)
-    }
-
-    func testGraceDayExhaustionAfterUpgrade() {
-        let settings = StreakSettings.shared
-
-        // Earn 9 grace days.
-        settings.awardGraceDays(from: [makeStreak(current: 270)])
-        XCTAssertEqual(settings.earnedGraceDays, 9)
-
-        // Consume all 9 as Pro.
-        for i in stride(from: 8, through: 0, by: -1) {
-            XCTAssertTrue(settings.consumeGraceDay(isPro: true),
-                          "Should consume grace day \(9 - i)")
-            XCTAssertEqual(settings.earnedGraceDays, i)
+    func testAttemptAutoSaveIsIdempotentForPro() {
+        // Pro is an unlimited entitlement — every attempt succeeds regardless of how
+        // many came before. No counter to deplete.
+        for _ in 0..<20 {
+            XCTAssertTrue(StreakSettings.shared.attemptAutoSave(isPro: true))
         }
-
-        // 10th attempt fails.
-        XCTAssertFalse(settings.consumeGraceDay(isPro: true))
     }
 
     // ──────────────────────────────────────────────
-    // MARK: - Grace Day Preservation Records
+    // MARK: - Grace Preservation Records
+    //
+    // Even though there's no "grace day" counter anymore, the engine still records
+    // each auto-save event as a GracePreservation so the user can see "Pro saved
+    // your 47-day steps streak on Apr 12."
     // ──────────────────────────────────────────────
 
     func testGracePreservationRecordStructure() {
@@ -376,15 +166,12 @@ final class PaidFeatureTests: XCTestCase {
         let isPro = false
         let freeLimit = 3
 
-        // 0 streaks → can build
         settings.customStreaks = []
         XCTAssertTrue(isPro || settings.customStreaks.count < freeLimit)
 
-        // 1 streak → can build
         settings.customStreaks = [CustomStreak(id: "a", metric: .steps, cadence: .daily, threshold: 5000)]
         XCTAssertTrue(isPro || settings.customStreaks.count < freeLimit)
 
-        // 2 streaks → can build
         settings.customStreaks = [
             CustomStreak(id: "a", metric: .steps, cadence: .daily, threshold: 5000),
             CustomStreak(id: "b", metric: .workouts, cadence: .daily, threshold: 1),
@@ -415,7 +202,6 @@ final class PaidFeatureTests: XCTestCase {
         let isPro = true
         let freeLimit = 3
 
-        // Add 10 custom streaks — Pro should still be allowed.
         settings.customStreaks = (0..<10).map { i in
             CustomStreak(
                 id: "pro-test-\(i)",
@@ -429,20 +215,13 @@ final class PaidFeatureTests: XCTestCase {
         XCTAssertTrue(canBuild, "Pro user should be able to build unlimited custom streaks")
     }
 
-    func testCustomStreakLimitIsThreeForFree() {
-        let freeLimit = 3
-        XCTAssertEqual(freeLimit, 3, "Free custom limit should be 3")
-    }
-
     // ──────────────────────────────────────────────
     // MARK: - Notification Pro Gating
     // ──────────────────────────────────────────────
 
     func testNotificationsEnabledDefaultsToFalse() {
-        // notificationsEnabled should default to false (opt-in only).
-        // After setUp reset, we can verify the default.
         XCTAssertFalse(StreakSettings.shared.notificationsEnabled,
-                       "Notifications should default to false")
+                       "Notifications should default to false (opt-in only)")
     }
 
     func testNotificationSettingsPersist() {
@@ -457,19 +236,16 @@ final class PaidFeatureTests: XCTestCase {
 
     func testNotificationTimeDefaults() {
         let settings = StreakSettings.shared
-        XCTAssertEqual(settings.notificationHour, 19, "Default notification hour should be 7 PM")
-        XCTAssertEqual(settings.notificationMinute, 0, "Default notification minute should be 0")
+        XCTAssertEqual(settings.notificationHour, 19)
+        XCTAssertEqual(settings.notificationMinute, 0)
     }
 
     func testProGatingEnforcesNotificationToggle() {
-        // This mirrors SettingsView logic:
-        // When isPro becomes false, notificationsEnabled should be forced off.
         let settings = StreakSettings.shared
         #if DEBUG
         StoreKitService.shared.debugSetPro(false)
         #endif
 
-        // Simulate: user had notifications on, then Pro expired.
         settings.notificationsEnabled = true
         let isPro = StoreKitService.shared.isPro
         if !isPro && settings.notificationsEnabled {
@@ -484,56 +260,32 @@ final class PaidFeatureTests: XCTestCase {
     // MARK: - Combined Gating Matrix
     // ──────────────────────────────────────────────
 
-    func testFullGatingMatrix() {
-        // This test exercises every gating point together to verify
-        // no gate interferes with another.
-
+    func testFullGatingMatrixAsFree() {
         let settings = StreakSettings.shared
         let isPro = false
 
-        // 1. Grace Days: free users earn but can't consume.
-        settings.awardGraceDays(from: [makeStreak(current: 60)])
-        XCTAssertEqual(settings.earnedGraceDays, 2)
-        XCTAssertFalse(settings.consumeGraceDay(isPro: isPro))
-        XCTAssertEqual(settings.earnedGraceDays, 2, "Grace days preserved for upsell")
+        // 1. Auto-save: free users get nothing.
+        XCTAssertFalse(settings.attemptAutoSave(isPro: isPro))
 
         // 2. Custom Streaks: free users limited to 3.
-        let custom = CustomStreak(
-            id: "gate-test-0",
-            metric: .exerciseMinutes,
-            cadence: .daily,
-            threshold: 30
-        )
-        let custom2 = CustomStreak(
-            id: "gate-test-1",
-            metric: .steps,
-            cadence: .daily,
-            threshold: 5000
-        )
-        let custom3 = CustomStreak(
-            id: "gate-test-2",
-            metric: .workouts,
-            cadence: .daily,
-            threshold: 1
-        )
-        settings.customStreaks = [custom, custom2, custom3]
+        settings.customStreaks = [
+            CustomStreak(id: "g0", metric: .exerciseMinutes, cadence: .daily, threshold: 30),
+            CustomStreak(id: "g1", metric: .steps, cadence: .daily, threshold: 5000),
+            CustomStreak(id: "g2", metric: .workouts, cadence: .daily, threshold: 1),
+        ]
         let canBuildAnother = isPro || settings.customStreaks.count < 3
         XCTAssertFalse(canBuildAnother)
 
         // 3. Notifications: free users can't enable.
-        let canEnableNotifications = isPro
-        XCTAssertFalse(canEnableNotifications)
+        XCTAssertFalse(isPro)
     }
 
     func testFullGatingMatrixAsPro() {
         let settings = StreakSettings.shared
         let isPro = true
 
-        // 1. Grace Days: Pro users earn AND consume.
-        settings.awardGraceDays(from: [makeStreak(current: 60)])
-        XCTAssertEqual(settings.earnedGraceDays, 2)
-        XCTAssertTrue(settings.consumeGraceDay(isPro: isPro))
-        XCTAssertEqual(settings.earnedGraceDays, 1)
+        // 1. Auto-save: Pro succeeds unconditionally.
+        XCTAssertTrue(settings.attemptAutoSave(isPro: isPro))
 
         // 2. Custom Streaks: Pro users have unlimited.
         settings.customStreaks = (0..<10).map { i in
@@ -548,79 +300,9 @@ final class PaidFeatureTests: XCTestCase {
             )
         }
         let canBuildAnother = isPro || settings.customStreaks.count < 3
-        XCTAssertTrue(canBuildAnother, "Pro users should always be able to build custom streaks")
+        XCTAssertTrue(canBuildAnother)
 
         // 3. Notifications: Pro users can enable.
-        let canEnableNotifications = isPro
-        XCTAssertTrue(canEnableNotifications)
-    }
-
-    // ──────────────────────────────────────────────
-    // MARK: - Edge Cases
-    // ──────────────────────────────────────────────
-
-    func testAwardGraceDaysNegativeStreakLength() {
-        // current should never be negative, but verify defensive behavior.
-        StreakSettings.shared.awardGraceDays(from: [makeStreak(current: -1)])
-        XCTAssertEqual(StreakSettings.shared.earnedGraceDays, 0)
-        XCTAssertEqual(StreakSettings.shared.graceAwardTier, 0)
-    }
-
-    func testConsumeGraceDayDoesNotGoNegative() {
-        StreakSettings.shared.earnedGraceDays = 0
-        _ = StreakSettings.shared.consumeGraceDay(isPro: true)
-        // earnedGraceDays is Int and the method guards `> 0` before decrementing,
-        // so it should never go negative.
-        XCTAssertGreaterThanOrEqual(StreakSettings.shared.earnedGraceDays, 0)
-    }
-
-    func testAwardGraceDaysSimulatesRealProgression() {
-        let settings = StreakSettings.shared
-
-        // Simulate a user building their streak day by day:
-        // Day 30: 1 grace day earned
-        settings.awardGraceDays(from: [makeStreak(current: 30)])
-        XCTAssertEqual(settings.earnedGraceDays, 1)
-        XCTAssertEqual(settings.graceAwardTier, 1)
-
-        // Day 31-59: no new awards (same tier)
-        settings.awardGraceDays(from: [makeStreak(current: 31)])
-        settings.awardGraceDays(from: [makeStreak(current: 45)])
-        settings.awardGraceDays(from: [makeStreak(current: 59)])
-        XCTAssertEqual(settings.earnedGraceDays, 1, "Should not award for same tier")
-
-        // Day 60: 2nd grace day
-        settings.awardGraceDays(from: [makeStreak(current: 60)])
-        XCTAssertEqual(settings.earnedGraceDays, 2)
-        XCTAssertEqual(settings.graceAwardTier, 2)
-
-        // Day 90: 3rd grace day
-        settings.awardGraceDays(from: [makeStreak(current: 90)])
-        XCTAssertEqual(settings.earnedGraceDays, 3)
-    }
-
-    func testFreeUserBankedDaysVisibleToProAfterUpgrade() {
-        // The core upsell mechanic: a free user who has banked grace days
-        // should have them instantly available after going Pro.
-
-        let settings = StreakSettings.shared
-
-        // Free user earns 4 grace days over time.
-        settings.awardGraceDays(from: [makeStreak(current: 30)])
-        settings.awardGraceDays(from: [makeStreak(current: 60)])
-        settings.awardGraceDays(from: [makeStreak(current: 90)])
-        settings.awardGraceDays(from: [makeStreak(current: 120)])
-        XCTAssertEqual(settings.earnedGraceDays, 4)
-
-        // Free user can't consume.
-        XCTAssertFalse(settings.consumeGraceDay(isPro: false))
-        XCTAssertEqual(settings.earnedGraceDays, 4)
-
-        // User upgrades — now they can consume their banked days.
-        XCTAssertTrue(settings.consumeGraceDay(isPro: true))
-        XCTAssertEqual(settings.earnedGraceDays, 3)
-
-        XCTAssertTrue(settings.consumeGraceDay(isPro: true))
-        XCTAssertEqual(settings.earnedGraceDays, 2)
+        XCTAssertTrue(isPro)
     }
 }

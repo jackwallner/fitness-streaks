@@ -233,7 +233,6 @@ final class StreakStore: ObservableObject {
             self.allCandidates = all
             self.streaks = filtered
             settings.commitThresholds(for: filtered)
-            settings.awardGraceDays(from: filtered)
             persistCurrentSnapshot()
             recordLastKnownLengths()
             self.lastUpdated = .now
@@ -352,7 +351,7 @@ final class StreakStore: ObservableObject {
             guard newCurrent == 0 else { continue }
             guard !newBroken.contains(where: { $0.key == key }) else { continue }
 
-            if settings.consumeGraceDay(isPro: StoreKitService.shared.isPro) {
+            if settings.attemptAutoSave(isPro: StoreKitService.shared.isPro) {
                 preservations[key] = GracePreservation(
                     key: key,
                     missedDate: DateHelpers.addDays(-1, to: today),

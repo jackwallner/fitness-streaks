@@ -99,7 +99,7 @@ struct BrokenStreakSheet: View {
     }
 
     private var shouldShowUpsell: Bool {
-        !storeKit.isPro && settings.earnedGraceDays > 0
+        !storeKit.isPro
     }
 
     private var graceUpsell: some View {
@@ -111,14 +111,14 @@ struct BrokenStreakSheet: View {
                     Image(systemName: "shield.lefthalf.filled")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(Theme.retroLime)
-                    Text("YOU HAVE \(settings.earnedGraceDays) GRACE DAY\(settings.earnedGraceDays == 1 ? "" : "S") BANKED")
+                    Text("PRO WOULD'VE SAVED THIS")
                         .font(RetroFont.pixel(10))
                         .tracking(1)
                         .foregroundStyle(Theme.retroLime)
                     Spacer()
                     PixelChip(text: "PRO", accent: Theme.retroMagenta)
                 }
-                Text("Unlock FitnessStreaks Pro to spend one and save this streak. Future misses will be saved automatically.")
+                Text("Pro auto-saves every missed day. Your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) run would still be alive. Upgrade so this doesn't happen again.")
                     .font(RetroFont.mono(11))
                     .foregroundStyle(Theme.retroInk)
                     .lineSpacing(3)
@@ -140,6 +140,6 @@ struct BrokenStreakSheet: View {
             .pixelPanel(color: Theme.retroLime, fill: Theme.retroBgRaised)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Unlock Pro to use a banked Grace Day and save this streak")
+        .accessibilityLabel("Unlock Pro to auto-save future missed streaks")
     }
 }

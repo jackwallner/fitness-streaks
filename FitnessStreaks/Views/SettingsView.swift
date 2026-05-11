@@ -123,31 +123,31 @@ struct SettingsView: View {
 
     private var proSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: storeKit.isPro ? "Pro · Grace Days" : "Grace Days · Pro")
+            PixelSectionHeader(title: storeKit.isPro ? "Pro · Auto-save" : "Auto-save · Pro")
 
             VStack(alignment: .leading, spacing: 12) {
                 HStack(alignment: .top, spacing: 12) {
                     PixelFlame(size: 32, intensity: 0.7, tint: storeKit.isPro ? Theme.retroLime : Theme.retroMagenta)
                     VStack(alignment: .leading, spacing: 4) {
                         HStack(spacing: 8) {
-                            Text("GRACE DAYS")
+                            Text("AUTO-SAVE")
                                 .font(RetroFont.pixel(11))
                                 .tracking(1)
                                 .foregroundStyle(Theme.retroInk)
                             if storeKit.isPro {
-                                PixelChip(text: "PRO", accent: Theme.retroLime)
+                                PixelChip(text: "ON", accent: Theme.retroLime)
                             } else {
                                 PixelChip(text: "LOCKED", accent: Theme.retroMagenta)
                             }
                         }
-                        Text("Banked: \(settings.earnedGraceDays) / 9")
+                        Text(storeKit.isPro ? "Unlimited · Pro" : "Pro only")
                             .font(RetroFont.mono(11, weight: .bold))
                             .foregroundStyle(storeKit.isPro ? Theme.retroLime : Theme.retroAmber)
                     }
                     Spacer(minLength: 0)
                 }
 
-                Text(graceCopy)
+                Text(autoSaveCopy)
                     .font(RetroFont.mono(10))
                     .foregroundStyle(Theme.retroInkDim)
                     .lineSpacing(2)
@@ -157,7 +157,7 @@ struct SettingsView: View {
                         showingPaywall = true
                     } label: {
                         HStack {
-                            Text(settings.earnedGraceDays > 0 ? "UNLOCK PRO TO USE THEM" : "UNLOCK FITNESSSTREAKS PRO")
+                            Text("UNLOCK FITNESSSTREAKS PRO")
                                 .font(RetroFont.mono(10, weight: .bold))
                                 .tracking(1)
                                 .foregroundStyle(Theme.retroBg)
@@ -201,17 +201,11 @@ struct SettingsView: View {
         }
     }
 
-    private var graceCopy: String {
+    private var autoSaveCopy: String {
         if storeKit.isPro {
-            if settings.earnedGraceDays == 0 {
-                return "When you bank a Grace Day, FitnessStreaks will spend it automatically to save a streak you missed. You earn 1 every 30 days you keep your hero streak alive."
-            }
-            return "FitnessStreaks will automatically spend a Grace Day to preserve a streak you missed. They never expire — you can bank up to 9."
+            return "Pro auto-saves any day you miss — your streak survives and the count keeps climbing tomorrow. Unlimited, automatic, no action needed."
         }
-        if settings.earnedGraceDays > 0 {
-            return "You've banked \(settings.earnedGraceDays) Grace Day\(settings.earnedGraceDays == 1 ? "" : "s") from your streak progress. Unlock Pro to start using them automatically when life gets in the way."
-        }
-        return "Earn 1 Grace Day for every 30 days you keep your hero streak alive. Unlock Pro to spend them automatically and save streaks you'd otherwise lose."
+        return "One missed day ends your streak. Pro auto-saves every miss so your run keeps growing through travel, sick days, and life."
     }
 
     private var recentPreservations: [GracePreservation] {

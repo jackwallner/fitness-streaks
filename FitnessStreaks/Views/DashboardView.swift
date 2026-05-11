@@ -383,20 +383,13 @@ struct DashboardView: View {
     }
 
     private func graceStatusTitle(for hero: Streak) -> String {
-        if settings.earnedGraceDays > 0 {
-            return "\(settings.earnedGraceDays) GRACE DAY\(settings.earnedGraceDays == 1 ? "" : "S") \(storeKit.isPro ? "READY" : "BANKED")"
-        }
-        return "\(hero.current % 30)/30 TO NEXT GRACE DAY"
+        storeKit.isPro ? "AUTO-SAVE ON" : "UPGRADE TO PRO"
     }
 
     private func graceStatusDetail(for hero: Streak) -> String {
-        if storeKit.isPro {
-            return settings.earnedGraceDays > 0 ? "Pro can auto-save a missed streak." : "Keep your hero streak alive to bank protection."
-        }
-        if settings.earnedGraceDays > 0 {
-            return "Unlock Pro to use banked protection automatically."
-        }
-        return "Pro unlocks proactive alerts and automatic saves."
+        storeKit.isPro
+            ? "Pro auto-saves any missed day — your streak survives."
+            : "One miss ends this streak. Pro auto-saves every miss."
     }
 
     private func brokenBanner(_ broken: BrokenStreak) -> some View {
