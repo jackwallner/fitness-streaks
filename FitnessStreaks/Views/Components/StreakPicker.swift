@@ -150,7 +150,7 @@ struct StreakPickerSheet: View {
     @State private var showingPaywall = false
 
     /// Free tier gets one custom streak; Pro unlocks unlimited.
-    static let freeCustomLimit = 1
+    static let freeCustomLimit = 3
 
     private var canBuildCustom: Bool {
         storeKit.isPro || settings.customStreaks.count < Self.freeCustomLimit

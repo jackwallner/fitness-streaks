@@ -1,78 +1,74 @@
 import Foundation
-import StoreKit
 
-/// Manages StoreKit 2 purchases for FitnessStreaks Pro.
+#if REVENUECAT
+import RevenueCat
+
+/// Manages RevenueCat purchases and entitlements for FitnessStreaks Pro.
 /// Single source of truth for `isPro`. Persists entitlement to App Group UserDefaults
-/// so widgets / watch can read the same value without re-running StoreKit.
+/// so widgets / watch can read the same value without running RevenueCat.
 @MainActor
 final class StoreKitService: ObservableObject {
     static let shared = StoreKitService()
 
-    // Product identifiers — must match App Store Connect exactly.
-    static let lifetimeID = "com.jackwallner.streaks.pro.lifetime"
-    static let yearlyID = "com.jackwallner.streaks.pro.yearly"
-    static let monthlyID = "com.jackwallner.streaks.pro.monthly"
-    static let allProductIDs: Set<String> = [lifetimeID, yearlyID, monthlyID]
+    // Product identifiers — must match App Store Connect AND RevenueCat dashboard.
+    static let lifetimeID = "com.jackwallner.streaks.lifetime"
+    static let yearlyID = "com.jackwallner.streaks.yearly"
+    static let monthlyID = "com.jackwallner.streaks.monthly"
 
     private static let entitlementKey = "isProEntitled.v1"
 
-    @Published private(set) var products: [Product] = []
+    @Published private(set) var offerings: Offerings? = nil
     @Published private(set) var isPro: Bool = false
     @Published private(set) var purchaseInProgress: Bool = false
     @Published private(set) var lastError: String? = nil
 
-    var lifetime: Product? { products.first { $0.id == Self.lifetimeID } }
-    var yearly: Product? { products.first { $0.id == Self.yearlyID } }
-    var monthly: Product? { products.first { $0.id == Self.monthlyID } }
+    var monthly: Package? { offerings?.current?.monthly }
+    var yearly: Package? { offerings?.current?.annual }
+    var lifetime: Package? { offerings?.current?.lifetime }
 
-    private var updatesTask: Task<Void, Never>? = nil
+    var products: [Package] {
+        offerings?.current?.availablePackages ?? []
+    }
 
     private var defaults: UserDefaults {
         UserDefaults(suiteName: streaksAppGroupID) ?? .standard
     }
 
     private init() {
-        // Restore cached entitlement immediately so the UI doesn't flash "free" on cold launch
-        // before StoreKit's currentEntitlements iterator finishes.
+        guard let apiKey = Self.loadAPIKey(), !apiKey.isEmpty, apiKey != "REVENUECAT_API_KEY" else {
+            self.isPro = defaults.bool(forKey: Self.entitlementKey)
+            return
+        }
         self.isPro = defaults.bool(forKey: Self.entitlementKey)
-        startTransactionListener()
+        Purchases.logLevel = .error
+        Purchases.configure(with: .init(withAPIKey: apiKey)
+            .with(usesStoreKit2IfAvailable: true))
         Task { await refreshState() }
     }
-
-    deinit { updatesTask?.cancel() }
 
     // MARK: - Public API
 
     func loadProducts() async {
         do {
             self.lastError = nil
-            let fetched = try await Product.products(for: Array(Self.allProductIDs))
-            self.products = fetched.sorted { $0.price < $1.price }
+            self.offerings = try await Purchases.shared.offerings()
         } catch {
             self.lastError = "Couldn't load products: \(error.localizedDescription)"
         }
     }
 
     @discardableResult
-    func purchase(_ product: Product) async -> PurchaseOutcome {
+    func purchase(package: Package) async -> PurchaseOutcome {
         guard !purchaseInProgress else { return .cancelled }
         purchaseInProgress = true
         defer { purchaseInProgress = false }
         do {
-            let result = try await product.purchase()
-            switch result {
-            case .success(let verification):
-                let transaction = try checkVerified(verification)
-                await transaction.finish()
-                await refreshEntitlement()
-                return .purchased
-            case .userCancelled:
-                return .cancelled
-            case .pending:
-                return .pending
-            @unknown default:
+            let (_, customerInfo, userCancelled) = try await Purchases.shared.purchase(package: package)
+            if userCancelled {
                 return .cancelled
             }
+            updateProStatus(from: customerInfo)
+            return customerInfo.entitlements["pro"]?.isActive == true ? .purchased : .pending
         } catch {
             lastError = error.localizedDescription
             return .failed
@@ -81,8 +77,8 @@ final class StoreKitService: ObservableObject {
 
     func restore() async {
         do {
-            try await AppStore.sync()
-            await refreshEntitlement()
+            let customerInfo = try await Purchases.shared.restorePurchases()
+            updateProStatus(from: customerInfo)
         } catch {
             lastError = error.localizedDescription
         }
@@ -94,31 +90,57 @@ final class StoreKitService: ObservableObject {
     }
 
     func refreshEntitlement() async {
-        var entitled = false
-        for await result in Transaction.currentEntitlements {
-            guard case .verified(let txn) = result else { continue }
-            guard Self.allProductIDs.contains(txn.productID) else { continue }
-            if txn.revocationDate == nil {
-                entitled = true
-            }
+        do {
+            let customerInfo = try await Purchases.shared.customerInfo()
+            updateProStatus(from: customerInfo)
+        } catch {
+            lastError = error.localizedDescription
         }
-        setIsPro(entitled)
     }
 
     enum PurchaseOutcome { case purchased, cancelled, pending, failed }
 
+    // MARK: - Pricing helpers
+
+    func displayPrice(for package: Package) -> String {
+        package.storeProduct.localizedPriceString
+    }
+
+    var yearlyMonthlyEquivalent: String? {
+        guard let product = yearly?.storeProduct,
+              let price = product.priceDecimalNumber as? NSDecimalNumber else { return nil }
+        let monthly = price.dividing(by: NSDecimalNumber(value: 12))
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = product.priceFormatter?.locale ?? .current
+        formatter.maximumFractionDigits = 2
+        guard let formatted = formatter.string(from: monthly) else { return nil }
+        return "\(formatted) / mo"
+    }
+
+    func introOfferDescription(for package: Package) -> String? {
+        guard let discount = package.storeProduct.introductoryDiscount else { return nil }
+        let unit: String = {
+            switch discount.subscriptionPeriod.unit {
+            case .day: return discount.subscriptionPeriod.value == 1 ? "day" : "days"
+            case .week: return discount.subscriptionPeriod.value == 1 ? "week" : "weeks"
+            case .month: return discount.subscriptionPeriod.value == 1 ? "month" : "months"
+            case .year: return discount.subscriptionPeriod.value == 1 ? "year" : "years"
+            @unknown default: return ""
+            }
+        }()
+        let qty = discount.subscriptionPeriod.value
+        if discount.paymentMode == .freeTrial {
+            return "\(qty) \(unit) free, then \(package.storeProduct.localizedPriceString)"
+        }
+        return "\(discount.localizedPriceString) for \(qty) \(unit), then \(package.storeProduct.localizedPriceString)"
+    }
+
     // MARK: - Internals
 
-    private func startTransactionListener() {
-        updatesTask = Task { [weak self] in
-            for await update in Transaction.updates {
-                guard let self else { continue }
-                if case .verified(let txn) = update {
-                    await txn.finish()
-                    await self.refreshEntitlement()
-                }
-            }
-        }
+    private func updateProStatus(from customerInfo: CustomerInfo) {
+        let entitled = customerInfo.entitlements["pro"]?.isActive == true
+        setIsPro(entitled)
     }
 
     private func setIsPro(_ value: Bool) {
@@ -126,70 +148,60 @@ final class StoreKitService: ObservableObject {
         defaults.set(value, forKey: Self.entitlementKey)
     }
 
-    private func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {
-        switch result {
-        case .verified(let safe): return safe
-        case .unverified: throw StoreError.unverified
-        }
-    }
-
-    enum StoreError: LocalizedError {
-        case unverified
-        var errorDescription: String? {
-            switch self {
-            case .unverified: "Purchase couldn't be verified by the App Store."
-            }
-        }
-    }
-
-    // MARK: - Pricing helpers
-
-    /// Localized monthly cost equivalent of the yearly subscription, e.g. "$0.42 / mo".
-    var yearlyMonthlyEquivalent: String? {
-        guard let product = yearly else { return nil }
-        let monthly = NSDecimalNumber(decimal: product.price)
-            .dividing(by: NSDecimalNumber(value: 12))
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = product.priceFormatStyle.locale
-        formatter.maximumFractionDigits = 2
-        guard let formatted = formatter.string(from: monthly) else { return nil }
-        return "\(formatted) / mo"
-    }
-
-    /// Display price for the given product (e.g. "$9.99").
-    func displayPrice(for product: Product) -> String {
-        product.displayPrice
-    }
-
-    /// Localized intro offer description ("7 days free, then $4.99/yr"), or nil if no intro.
-    func introOfferDescription(for product: Product) -> String? {
-        guard let sub = product.subscription else { return nil }
-        guard let intro = sub.introductoryOffer else { return nil }
-        let unit: String = {
-            switch intro.period.unit {
-            case .day: return intro.period.value == 1 ? "day" : "days"
-            case .week: return intro.period.value == 1 ? "week" : "weeks"
-            case .month: return intro.period.value == 1 ? "month" : "months"
-            case .year: return intro.period.value == 1 ? "year" : "years"
-            @unknown default: return ""
-            }
-        }()
-        let qty = intro.period.value
-        switch intro.paymentMode {
-        case .freeTrial:
-            return "\(qty) \(unit) free, then \(product.displayPrice)"
-        case .payAsYouGo, .payUpFront:
-            return "\(intro.displayPrice) for \(qty) \(unit), then \(product.displayPrice)"
-        default:
+    private static func loadAPIKey() -> String? {
+        guard let url = Bundle.main.url(forResource: "RevenueCat", withExtension: "plist"),
+              let data = try? Data(contentsOf: url),
+              let plist = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any] else {
             return nil
         }
+        return plist["API_KEY"] as? String
     }
 
     #if DEBUG
-    /// Debug-only override for screenshots / local QA. Not compiled in release.
     func debugSetPro(_ value: Bool) {
         setIsPro(value)
     }
     #endif
 }
+
+#else
+// Stub for watch/widget targets that don't link RevenueCat.
+// They read isPro from the shared App Group UserDefaults written by the main app.
+
+@MainActor
+final class StoreKitService: ObservableObject {
+    static let shared = StoreKitService()
+
+    static let lifetimeID = "com.jackwallner.streaks.lifetime"
+    static let yearlyID = "com.jackwallner.streaks.yearly"
+    static let monthlyID = "com.jackwallner.streaks.monthly"
+
+    @Published private(set) var isPro: Bool = false
+    @Published private(set) var purchaseInProgress: Bool = false
+    @Published private(set) var lastError: String? = nil
+
+    private var defaults: UserDefaults {
+        UserDefaults(suiteName: streaksAppGroupID) ?? .standard
+    }
+
+    private init() {
+        self.isPro = defaults.bool(forKey: "isProEntitled.v1")
+    }
+
+    func refreshEntitlement() {
+        let value = defaults.bool(forKey: "isProEntitled.v1")
+        if isPro != value { isPro = value }
+    }
+
+    func refreshState() async {
+        refreshEntitlement()
+    }
+
+    #if DEBUG
+    func debugSetPro(_ value: Bool) {
+        isPro = value
+        defaults.set(value, forKey: "isProEntitled.v1")
+    }
+    #endif
+}
+#endif

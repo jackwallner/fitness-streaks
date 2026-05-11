@@ -146,14 +146,23 @@ struct FitnessStreaksApp: App {
                 .environmentObject(storeKit)
                 .task {
                     await healthKit.synchronizeAuthorization()
+                    #if DEBUG
+                    if CommandLine.arguments.contains("-UITestSetPro") {
+                        storeKit.debugSetPro(true)
+                    } else {
+                        await storeKit.refreshState()
+                    }
+                    #else
                     await storeKit.refreshState()
+                    #endif
                     // If setup was completed previously but this device has never actually
                     // fetched HealthKit data (cache is empty), force onboarding so the user
                     // gets a clear path to trigger the Health permission prompt.
                     // We check for actual data rather than authorization status because
                     // authorizationStatus(for:) always returns .notDetermined for read-only
                     // types, making status-based checks unreliable on cold launch.
-                    if settings.hasCompletedSetup {
+                    if settings.hasCompletedSetup,
+                       !CommandLine.arguments.contains("-UITestSkipHealthKit") {
                         let cached = HealthKitService.shared.cachedHistory(days: 30)
                         if cached.isEmpty {
                             log.warning("Resetting onboarding — hasCompletedSetup=true but HealthKit cache is empty (never authorized)")

@@ -3,7 +3,7 @@
   "nonRenewingSubscriptions" : [],
   "products" : [
     {
-      "displayPrice" : "9.99",
+      "displayPrice" : "29.99",
       "familyShareable" : false,
       "internalID" : "FS_PRO_LIFETIME",
       "localizations" : [
@@ -13,7 +13,7 @@
           "locale" : "en_US"
         }
       ],
-      "productID" : "com.jackwallner.streaks.pro.lifetime",
+      "productID" : "com.jackwallner.streaks.lifetime",
       "referenceName" : "Pro Lifetime",
       "type" : "NonConsumable"
     }
@@ -33,18 +33,24 @@
         {
           "adHocOffers" : [],
           "codeOffers" : [],
-          "displayPrice" : "0.99",
+          "displayPrice" : "1.99",
           "familyShareable" : false,
           "groupNumber" : 2,
           "internalID" : "FS_PRO_MONTHLY",
+          "introductoryOffer" : {
+            "internalID" : "FS_PRO_INTRO_7D_MONTHLY",
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P1D",
+            "numberOfPeriods" : 7
+          },
           "localizations" : [
             {
-              "description" : "FitnessStreaks Pro, billed monthly.",
+              "description" : "FitnessStreaks Pro, billed monthly. 7-day free trial.",
               "displayName" : "FitnessStreaks Pro · Monthly",
               "locale" : "en_US"
             }
           ],
-          "productID" : "com.jackwallner.streaks.pro.monthly",
+          "productID" : "com.jackwallner.streaks.monthly",
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Pro Monthly",
           "subscriptionGroupID" : "FS_PRO_GROUP",
@@ -53,7 +59,7 @@
         {
           "adHocOffers" : [],
           "codeOffers" : [],
-          "displayPrice" : "4.99",
+          "displayPrice" : "14.99",
           "familyShareable" : false,
           "groupNumber" : 1,
           "internalID" : "FS_PRO_YEARLY",
@@ -65,12 +71,12 @@
           },
           "localizations" : [
             {
-              "description" : "FitnessStreaks Pro, billed yearly. 7-day free trial.",
+              "description" : "Save every streak. At-risk alerts + automatic Grace Day saves. Billed yearly. 7-day free trial.",
               "displayName" : "FitnessStreaks Pro · Yearly",
               "locale" : "en_US"
             }
           ],
-          "productID" : "com.jackwallner.streaks.pro.yearly",
+          "productID" : "com.jackwallner.streaks.yearly",
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "Pro Yearly",
           "subscriptionGroupID" : "FS_PRO_GROUP",
@@ -84,3 +90,7 @@
     "minor" : 0
   }
 }
+
+
+}
+

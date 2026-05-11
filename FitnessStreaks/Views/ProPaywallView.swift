@@ -1,12 +1,11 @@
 import SwiftUI
-import StoreKit
+import RevenueCat
 
 struct ProPaywallView: View {
     @EnvironmentObject var storeKit: StoreKitService
     @EnvironmentObject var settings: StreakSettings
     @Environment(\.dismiss) private var dismiss
 
-    /// Optional context shown above the hero ("Save your 45-day streak…").
     var context: String? = nil
 
     @State private var selectedID: String = StoreKitService.yearlyID
@@ -61,7 +60,7 @@ struct ProPaywallView: View {
                     await storeKit.loadProducts()
                 }
                 if storeKit.yearly == nil {
-                    selectedID = storeKit.lifetime != nil ? StoreKitService.lifetimeID : StoreKitService.monthlyID
+                    selectedID = storeKit.lifetime?.storeProduct.productIdentifier ?? StoreKitService.monthlyID
                 }
             }
             .onChange(of: storeKit.isPro) { _, isPro in
@@ -70,7 +69,7 @@ struct ProPaywallView: View {
         }
     }
 
-    // MARK: - Context banner (high-intent path)
+    // MARK: - Context banner
 
     private func contextBanner(_ text: String) -> some View {
         HStack(spacing: 10) {
@@ -96,11 +95,11 @@ struct ProPaywallView: View {
                 Spacer()
                 PixelChip(text: "PRO", accent: Theme.retroMagenta)
             }
-            Text("PROACTIVE ALERTS THAT PROTECT YOUR STREAKS.")
+            Text("NEVER LOSE A STREAK AGAIN.")
                 .font(RetroFont.pixel(14))
                 .foregroundStyle(Theme.retroInk)
                 .lineSpacing(4)
-            Text("Pro watches for streaks that are slipping, sends at-risk reminders, and spends banked Grace Days automatically when life still gets in the way.")
+            Text("Pro watches your active streaks, warns you before one slips, and automatically spends a Grace Day to save it when life still gets in the way.")
                 .font(RetroFont.mono(11))
                 .foregroundStyle(Theme.retroInkDim)
                 .lineSpacing(3)
@@ -116,20 +115,20 @@ struct ProPaywallView: View {
             featureRow(
                 accent: Theme.retroLime,
                 symbol: "bell.badge.fill",
-                title: "PROACTIVE STREAK ALERTS",
-                detail: "Get a daily at-risk nudge for your most urgent active streak before the goal slips away."
+                title: "STREAK AT-RISK ALERTS",
+                detail: "Pro warns you when your longest active streak isn't locked in yet — before the day gets away."
             )
             featureRow(
                 accent: Theme.retroCyan,
                 symbol: "shield.lefthalf.filled",
-                title: "AUTOMATIC GRACE SAVES",
-                detail: "Miss anyway? Pro spends a banked Grace Day to preserve the streak — no panic, no manual recovery."
+                title: "AUTOMATIC STREAK SAVES",
+                detail: "Miss anyway? Pro instantly spends a Grace Day to save your streak. You don't lift a finger."
             )
             featureRow(
                 accent: Theme.retroAmber,
                 symbol: "calendar.badge.plus",
-                title: "EARN GRACE DAYS",
-                detail: "1 Grace Day banked for every 30 days of streak. Up to 9 saved at once."
+                title: "BUILD YOUR SAFETY NET",
+                detail: "Earn 1 Grace Day every 30 days you keep your hero streak alive. Bank up to 9 — that's 9 misses covered."
             )
         }
     }
@@ -165,34 +164,34 @@ struct ProPaywallView: View {
             if let yearly = storeKit.yearly {
                 let intro = storeKit.introOfferDescription(for: yearly)
                 productCard(
-                    product: yearly,
-                    isSelected: selectedID == yearly.id,
+                    package: yearly,
+                    isSelected: selectedID == yearly.storeProduct.productIdentifier,
                     badge: intro.map { _ in "7 DAYS FREE" } ?? "MOST POPULAR",
                     badgeAccent: Theme.retroMagenta,
                     priceLabel: "\(storeKit.displayPrice(for: yearly)) / yr",
                     detail: intro
                         ?? (storeKit.yearlyMonthlyEquivalent.map { "Billed yearly · \($0)" } ?? "Billed yearly")
-                ) { selectedID = yearly.id }
+                ) { selectedID = yearly.storeProduct.productIdentifier }
             }
             if let monthly = storeKit.monthly {
                 productCard(
-                    product: monthly,
-                    isSelected: selectedID == monthly.id,
+                    package: monthly,
+                    isSelected: selectedID == monthly.storeProduct.productIdentifier,
                     badge: nil,
                     badgeAccent: Theme.retroCyan,
                     priceLabel: "\(storeKit.displayPrice(for: monthly)) / mo",
                     detail: "Billed monthly · Cancel anytime"
-                ) { selectedID = monthly.id }
+                ) { selectedID = monthly.storeProduct.productIdentifier }
             }
             if let lifetime = storeKit.lifetime {
                 productCard(
-                    product: lifetime,
-                    isSelected: selectedID == lifetime.id,
+                    package: lifetime,
+                    isSelected: selectedID == lifetime.storeProduct.productIdentifier,
                     badge: "BEST VALUE",
                     badgeAccent: Theme.retroLime,
                     priceLabel: storeKit.displayPrice(for: lifetime),
                     detail: "One-time purchase · Forever yours"
-                ) { selectedID = lifetime.id }
+                ) { selectedID = lifetime.storeProduct.productIdentifier }
             }
             if storeKit.products.isEmpty {
                 if let error = storeKit.lastError {
@@ -250,7 +249,7 @@ struct ProPaywallView: View {
     }
 
     private func productCard(
-        product: Product,
+        package: Package,
         isSelected: Bool,
         badge: String?,
         badgeAccent: Color,
@@ -262,7 +261,7 @@ struct ProPaywallView: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(product.displayName.uppercased())
+                        Text(package.storeProduct.localizedTitle.uppercased())
                             .font(RetroFont.pixel(11))
                             .tracking(1)
                             .foregroundStyle(Theme.retroInk)
@@ -296,11 +295,11 @@ struct ProPaywallView: View {
     // MARK: - Purchase / restore
 
     private var purchaseButton: some View {
-        let product = currentSelectedProduct
+        let package = currentSelectedPackage
         let title: String = {
             if storeKit.purchaseInProgress { return "PROCESSING…" }
-            guard let product else { return "UNAVAILABLE" }
-            if let intro = storeKit.introOfferDescription(for: product),
+            guard let package else { return "UNAVAILABLE" }
+            if let intro = storeKit.introOfferDescription(for: package),
                intro.contains("free") {
                 return "START 7-DAY FREE TRIAL"
             }
@@ -308,11 +307,11 @@ struct ProPaywallView: View {
         }()
         return VStack(spacing: 10) {
             PixelButton(title: title, accent: Theme.retroLime) {
-                guard let product, !storeKit.purchaseInProgress else { return }
-                Task { await purchase(product) }
+                guard let package, !storeKit.purchaseInProgress else { return }
+                Task { await purchase(package: package) }
             }
-            .disabled(product == nil || storeKit.purchaseInProgress)
-            .opacity(product == nil ? 0.5 : 1)
+            .disabled(package == nil || storeKit.purchaseInProgress)
+            .opacity(package == nil ? 0.5 : 1)
 
             HStack(spacing: 16) {
                 Button("RESTORE PURCHASES") {
@@ -327,13 +326,14 @@ struct ProPaywallView: View {
         }
     }
 
-    private var currentSelectedProduct: Product? {
-        storeKit.products.first { $0.id == selectedID } ?? storeKit.yearly ?? storeKit.monthly ?? storeKit.lifetime
+    private var currentSelectedPackage: Package? {
+        storeKit.products.first { $0.storeProduct.productIdentifier == selectedID }
+            ?? storeKit.yearly ?? storeKit.monthly ?? storeKit.lifetime
     }
 
-    private func purchase(_ product: Product) async {
+    private func purchase(package: Package) async {
         statusMessage = nil
-        let outcome = await storeKit.purchase(product)
+        let outcome = await storeKit.purchase(package: package)
         switch outcome {
         case .purchased:
             statusMessage = "WELCOME TO PRO."
