@@ -93,7 +93,13 @@ struct BrokenStreakSheet: View {
             .toolbarBackground(Theme.retroBg, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .sheet(isPresented: $showingPaywall) {
-                PaywallView()
+                if let offering = storeKit.offerings?.current {
+                    PaywallView(offering: offering)
+                        .interactiveDismissDisabled(true)
+                } else {
+                    PaywallView()
+                        .interactiveDismissDisabled(true)
+                }
             }
         }
     }

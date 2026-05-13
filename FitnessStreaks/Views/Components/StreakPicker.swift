@@ -261,7 +261,13 @@ struct StreakPickerSheet: View {
                 }
             }
             .sheet(isPresented: $showingPaywall) {
-                PaywallView()
+                if let offering = storeKit.offerings?.current {
+                    PaywallView(offering: offering)
+                        .interactiveDismissDisabled(true)
+                } else {
+                    PaywallView()
+                        .interactiveDismissDisabled(true)
+                }
             }
             .sheet(isPresented: Binding(
                 get: { editingCustomID != nil },

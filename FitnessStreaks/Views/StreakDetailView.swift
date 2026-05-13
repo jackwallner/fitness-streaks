@@ -32,7 +32,23 @@ struct StreakDetailView: View {
         ScrollView {
             VStack(spacing: 12) {
                 headerCard.padding(.horizontal, 14)
-                if let actionMessage { statusCard(actionMessage).padding(.horizontal, 14) }
+                if isRecalibrating, let msg = actionMessage {
+                    HStack(spacing: 8) {
+                        ProgressView()
+                            .tint(Theme.retroAmber)
+                            .controlSize(.small)
+                        Text(msg)
+                            .font(RetroFont.mono(11, weight: .bold))
+                            .foregroundStyle(Theme.retroAmber)
+                    }
+                    .padding(12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .pixelPanel(color: Theme.retroAmber, fill: Theme.retroBg)
+                    .padding(.horizontal, 14)
+                    .transition(.opacity)
+                } else if let actionMessage {
+                    statusCard(actionMessage).padding(.horizontal, 14)
+                }
                 quickActionsCard.padding(.horizontal, 14)
 
                 if streak.window != nil {
@@ -364,8 +380,9 @@ struct StreakDetailView: View {
             .alert("Recalibrate Goal?", isPresented: $showingRecalibrateConfirm) {
                 Button("Recalibrate (Apple Health)", role: .destructive) {
                     settings.clearCommittedThreshold(for: streak.trackingKey)
-                    Task { await store.load() }
+                    isRecalibrating = true
                     actionMessage = "Recalibrating from Apple Health..."
+                    Task { await store.load() }
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {

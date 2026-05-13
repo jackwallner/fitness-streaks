@@ -54,7 +54,15 @@ struct SavesView: View {
             }
             .toolbarBackground(Theme.retroBg, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
-            .sheet(isPresented: $showingPaywall) { PaywallView() }
+            .sheet(isPresented: $showingPaywall) {
+                if let offering = storeKit.offerings?.current {
+                    PaywallView(offering: offering)
+                        .interactiveDismissDisabled(true)
+                } else {
+                    PaywallView()
+                        .interactiveDismissDisabled(true)
+                }
+            }
             .sheet(isPresented: $showingFreezeDatePicker) { freezePicker }
         }
     }
@@ -161,59 +169,101 @@ struct SavesView: View {
     private var plannedFreezesCard: some View {
         VStack(alignment: .leading, spacing: 10) {
             PixelSectionHeader(title: "Planned Freezes")
+            if storeKit.isPro {
+                proFreezesContent
+            } else {
+                lockedFreezesContent
+            }
+        }
+    }
+
+    private var proFreezesContent: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Mark days you know you'll miss (vacation, travel, sick). Freeze days don't break streaks or extend them.")
+                .font(RetroFont.mono(10))
+                .foregroundStyle(Theme.retroInkDim)
+                .lineSpacing(2)
+
+            if settings.plannedFreezes.isEmpty {
+                Text("No freeze days set.")
+                    .font(RetroFont.mono(10))
+                    .foregroundStyle(Theme.retroInkFaint)
+                    .padding(.vertical, 6)
+            } else {
+                ForEach(settings.plannedFreezes.sorted(), id: \.self) { date in
+                    HStack(spacing: 8) {
+                        Image(systemName: "snowflake")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Theme.retroCyan)
+                        Text(Self.freezeDateFormatter.string(from: date))
+                            .font(RetroFont.mono(10, weight: .bold))
+                            .foregroundStyle(Theme.retroInk)
+                        Spacer()
+                        Button {
+                            settings.removeFreezeDay(date)
+                            Task { await store.load() }
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 14))
+                                .foregroundStyle(Theme.retroRed)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.vertical, 4)
+                }
+            }
+
+            Button {
+                newFreezeDate = Date()
+                showingFreezeDatePicker = true
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "plus.circle.fill")
+                    Text("ADD FREEZE DAY")
+                        .font(RetroFont.mono(10, weight: .bold))
+                        .tracking(1)
+                }
+                .foregroundStyle(Theme.retroCyan)
+                .padding(.vertical, 8)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(14)
+        .pixelPanel(color: Theme.retroCyan)
+    }
+
+    private var lockedFreezesContent: some View {
+        Button {
+            showingPaywall = true
+        } label: {
             VStack(alignment: .leading, spacing: 10) {
-                Text("Mark days you know you'll miss (vacation, travel, sick). Freeze days don't break streaks or extend them.")
+                HStack(spacing: 8) {
+                    Image(systemName: "lock.fill")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.retroMagenta)
+                    PixelChip(text: "PRO", accent: Theme.retroMagenta)
+                    Spacer()
+                    Text("UNLOCK →")
+                        .font(RetroFont.mono(9, weight: .bold))
+                        .foregroundStyle(Theme.retroMagenta)
+                }
+
+                Text("Planned freezes let you mark vacation, travel, or sick days so they don't break your streaks.")
                     .font(RetroFont.mono(10))
                     .foregroundStyle(Theme.retroInkDim)
                     .lineSpacing(2)
 
-                if settings.plannedFreezes.isEmpty {
-                    Text("No freeze days set.")
+                if !settings.plannedFreezes.isEmpty {
+                    Text("\(settings.plannedFreezes.count) freeze day\(settings.plannedFreezes.count == 1 ? "" : "s") set")
                         .font(RetroFont.mono(10))
                         .foregroundStyle(Theme.retroInkFaint)
-                        .padding(.vertical, 6)
-                } else {
-                    ForEach(settings.plannedFreezes.sorted(), id: \.self) { date in
-                        HStack(spacing: 8) {
-                            Image(systemName: "snowflake")
-                                .font(.system(size: 12))
-                                .foregroundStyle(Theme.retroCyan)
-                            Text(Self.freezeDateFormatter.string(from: date))
-                                .font(RetroFont.mono(10, weight: .bold))
-                                .foregroundStyle(Theme.retroInk)
-                            Spacer()
-                            Button {
-                                settings.removeFreezeDay(date)
-                                Task { await store.load() }
-                            } label: {
-                                Image(systemName: "xmark.circle.fill")
-                                    .font(.system(size: 14))
-                                    .foregroundStyle(Theme.retroRed)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                        .padding(.vertical, 4)
-                    }
                 }
-
-                Button {
-                    newFreezeDate = Date()
-                    showingFreezeDatePicker = true
-                } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: "plus.circle.fill")
-                        Text("ADD FREEZE DAY")
-                            .font(RetroFont.mono(10, weight: .bold))
-                            .tracking(1)
-                    }
-                    .foregroundStyle(Theme.retroCyan)
-                    .padding(.vertical, 8)
-                }
-                .buttonStyle(.plain)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(14)
-            .pixelPanel(color: Theme.retroCyan)
+            .pixelPanel(color: Theme.retroMagenta)
         }
+        .buttonStyle(.plain)
     }
 
     private var freezePicker: some View {

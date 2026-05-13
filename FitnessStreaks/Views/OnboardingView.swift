@@ -57,11 +57,20 @@ struct OnboardingView: View {
             }
         }
         .sheet(isPresented: $showingPaywall, onDismiss: {
-            // After the paywall closes — whether the user purchased, restored, or
-            // backed out — finish onboarding. RevenueCat will have updated isPro.
-            completeSetup()
+            // After the paywall closes, check if user actually purchased Pro.
+            // If not, return to the pro pitch screen where they can explicitly
+            // choose "CONTINUE FREE" — no silent bypass via swipe-down.
+            if storeKit.isPro {
+                completeSetup()
+            }
         }) {
-            PaywallView()
+            if let offering = storeKit.offerings?.current {
+                PaywallView(offering: offering)
+                    .interactiveDismissDisabled(true)
+            } else {
+                PaywallView()
+                    .interactiveDismissDisabled(true)
+            }
         }
         .onAppear {
             // Start timers on appear
@@ -130,28 +139,21 @@ struct OnboardingView: View {
 
             connectButton
                 .padding(.horizontal, 20)
-
-            Link(destination: Self.privacyPolicyURL) {
-                Text("Privacy Policy")
-                    .font(RetroFont.mono(10, weight: .medium))
-                    .foregroundStyle(Theme.retroCyan)
-            }
-            .padding(.bottom, 24)
         }
     }
 
     private var privacyPanel: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .top, spacing: 12) {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .top, spacing: 10) {
                 Image(systemName: "lock.shield.fill")
-                    .font(.system(size: 24))
+                    .font(.system(size: 20))
                     .foregroundStyle(Theme.retroLime)
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 2) {
                     Text("PRIVATE & SECURE")
-                        .font(RetroFont.mono(12, weight: .bold))
+                        .font(RetroFont.mono(11, weight: .bold))
                         .foregroundStyle(Theme.retroLime)
                     Text("Read-only access to Apple Health. Everything stays on your device — no networks, no tracking.")
-                        .font(RetroFont.mono(11))
+                        .font(RetroFont.mono(10))
                         .foregroundStyle(Theme.retroInkDim)
                         .lineSpacing(2)
                 }
@@ -370,8 +372,7 @@ struct OnboardingView: View {
                 .multilineTextAlignment(.leading)
                 .lineSpacing(2)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .id(tipIndex)
-                .transition(.opacity)
+                .animation(.easeInOut(duration: 0.4), value: tipIndex)
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -611,6 +612,9 @@ struct OnboardingView: View {
                 pitchRow(symbol: "plus.square",
                          title: "UNLIMITED CUSTOM STREAKS",
                          body: "Free is capped at 3.")
+                pitchRow(symbol: "heart.fill",
+                         title: "SUPPORT INDIE DEV",
+                         body: "Keep FitnessStreaks alive and growing.")
             }
             .padding(16)
             .frame(maxWidth: .infinity, alignment: .leading)
