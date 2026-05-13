@@ -14,7 +14,6 @@ struct OnboardingView: View {
         case loading     // running discovery
         case selecting   // pick which discovered streaks to track
         case empty       // no streaks discovered
-        case proPitch    // Pro upsell before entering the app
     }
 
     @State private var phase: Phase = .intro
@@ -53,16 +52,12 @@ struct OnboardingView: View {
             case .loading:   loadingScreen
             case .selecting: selectingScreen
             case .empty:     emptyScreen
-            case .proPitch:  proPitchScreen
             }
         }
         .sheet(isPresented: $showingPaywall, onDismiss: {
-            // After the paywall closes, check if user actually purchased Pro.
-            // If not, return to the pro pitch screen where they can explicitly
-            // choose "CONTINUE FREE" — no silent bypass via swipe-down.
-            if storeKit.isPro {
-                completeSetup()
-            }
+            // Pro or not, proceed to the app. The paywall is a natural step
+            // after streak selection — no need for a separate pitch screen.
+            completeSetup()
         }) {
             if let offering = storeKit.offerings?.current {
                 PaywallView(offering: offering)
@@ -130,48 +125,74 @@ struct OnboardingView: View {
                         .lineSpacing(4)
                 }
 
-                privacyPanel
+                streakPreview
                     .padding(.horizontal, 20)
                     .padding(.top, 4)
             }
 
             Spacer(minLength: 8)
 
-            connectButton
-                .padding(.horizontal, 20)
+            VStack(spacing: 8) {
+                connectButton
+                compactPrivacyNotice
+            }
+            .padding(.horizontal, 20)
         }
     }
 
-    private var privacyPanel: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(alignment: .top, spacing: 10) {
-                Image(systemName: "lock.shield.fill")
-                    .font(.system(size: 20))
-                    .foregroundStyle(Theme.retroLime)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("PRIVATE & SECURE")
-                        .font(RetroFont.mono(11, weight: .bold))
-                        .foregroundStyle(Theme.retroLime)
-                    Text("Read-only access to Apple Health. Everything stays on your device — no networks, no tracking.")
-                        .font(RetroFont.mono(10))
-                        .foregroundStyle(Theme.retroInkDim)
-                        .lineSpacing(2)
-                }
-            }
-
-            Link(destination: Self.privacyPolicyURL) {
-                HStack(spacing: 6) {
-                    Text("PRIVACY POLICY")
-                    Text("↗")
-                }
+    private var streakPreview: some View {
+        VStack(spacing: 10) {
+            Text("DISCOVER YOUR STREAKS")
                 .font(RetroFont.mono(10, weight: .bold))
                 .tracking(1)
                 .foregroundStyle(Theme.retroCyan)
+
+            HStack(spacing: 14) {
+                streakPreviewItem(icon: "figure.walk", label: "STEPS")
+                streakPreviewItem(icon: "figure.run", label: "EXERCISE")
+                streakPreviewItem(icon: "figure.stand", label: "STAND")
+                streakPreviewItem(icon: "flame.fill", label: "WORKOUTS")
+            }
+            .padding(.horizontal, 4)
+        }
+        .padding(.vertical, 10)
+        .frame(maxWidth: .infinity)
+        .pixelPanel(color: Theme.retroCyan)
+    }
+
+    private func streakPreviewItem(icon: String, label: String) -> some View {
+        VStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 22))
+                .foregroundStyle(Theme.retroMagenta)
+            Text(label)
+                .font(RetroFont.mono(8, weight: .bold))
+                .tracking(1)
+                .foregroundStyle(Theme.retroInkDim)
+        }
+        .frame(minWidth: 52)
+    }
+
+    private var compactPrivacyNotice: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "lock.shield.fill")
+                .font(.system(size: 10))
+                .foregroundStyle(Theme.retroLime)
+            Text("Read-only Apple Health access. Everything stays on device.")
+                .font(RetroFont.mono(9))
+                .foregroundStyle(Theme.retroInkDim)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+            Link(destination: Self.privacyPolicyURL) {
+                HStack(spacing: 3) {
+                    Text("POLICY")
+                    Text("↗")
+                }
+                .font(RetroFont.mono(9, weight: .bold))
+                .foregroundStyle(Theme.retroCyan)
             }
         }
-        .padding(14)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .pixelPanel(color: Theme.retroLime)
+        .padding(.bottom, 6)
     }
 
     private var connectButton: some View {
@@ -445,6 +466,12 @@ struct OnboardingView: View {
                 .padding(.bottom, 16)
             }
 
+            if !storeKit.isPro {
+                proContextCard
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 8)
+            }
+
             Button {
                 finishWithSelection()
             } label: {
@@ -560,17 +587,18 @@ struct OnboardingView: View {
     private func finishWithoutTracking() {
         settings.trackedStreaks = nil
         store.refilter()
-        advanceFromSelection()
+        advanceFromSelection(showPaywall: false)
     }
 
-    /// After the user picks (or skips) streaks, give existing non-Pro users one
-    /// look at the Pro pitch before dropping them into the dashboard. Pro users
-    /// (TestFlight re-installs, restored purchases) skip straight through.
-    private func advanceFromSelection() {
+    /// After the user picks (or skips) streaks, route non-Pro users through
+    /// the paywall directly as the natural next step. Pro users skip through.
+    private func advanceFromSelection(showPaywall: Bool = true) {
         if storeKit.isPro {
             completeSetup()
+        } else if showPaywall {
+            showingPaywall = true
         } else {
-            withAnimation { phase = .proPitch }
+            completeSetup()
         }
     }
 
@@ -578,100 +606,27 @@ struct OnboardingView: View {
         withAnimation { settings.hasCompletedSetup = true }
     }
 
-    // MARK: - Pro Pitch
+    // MARK: - Pro Context
 
-    private var proPitchScreen: some View {
-        VStack(spacing: 18) {
-            VStack(spacing: 10) {
-                Image(systemName: "shield.lefthalf.filled")
-                    .font(.system(size: 64))
-                    .foregroundStyle(Theme.retroMagenta)
-                    .retroGlow(Theme.retroMagenta)
-                    .padding(.top, 30)
-                Text("GO PRO")
-                    .font(RetroFont.mono(28, weight: .bold))
-                    .tracking(3)
-                    .foregroundStyle(Theme.retroMagenta)
-                    .retroGlow(Theme.retroMagenta)
-                Text("Never lose a streak again.")
-                    .font(RetroFont.mono(12))
-                    .foregroundStyle(Theme.retroInkDim)
-                    .multilineTextAlignment(.center)
-            }
-
-            VStack(alignment: .leading, spacing: 10) {
-                pitchRow(symbol: "shield.lefthalf.filled",
-                         title: "UNLIMITED AUTO-SAVES",
-                         body: "Every miss saved automatically.")
-                pitchRow(symbol: "snowflake",
-                         title: "PLANNED FREEZES",
-                         body: "Travel, sick days — freeze them.")
-                pitchRow(symbol: "bell.badge.fill",
-                         title: "PROACTIVE ALERTS",
-                         body: "A nudge before the day gets away.")
-                pitchRow(symbol: "plus.square",
-                         title: "UNLIMITED CUSTOM STREAKS",
-                         body: "Free is capped at 3.")
-                pitchRow(symbol: "heart.fill",
-                         title: "SUPPORT INDIE DEV",
-                         body: "Keep FitnessStreaks alive and growing.")
-            }
-            .padding(16)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .pixelPanel(color: Theme.retroMagenta, fill: Theme.retroBgRaised)
-            .padding(.horizontal, 20)
-
-            Spacer(minLength: 0)
-
-            VStack(spacing: 10) {
-                Button {
-                    showingPaywall = true
-                } label: {
-                    Text("▶ TRY PRO")
-                        .font(RetroFont.mono(13, weight: .bold))
-                        .foregroundStyle(Theme.retroBg)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                        .background(Theme.retroMagenta)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Try FitnessStreaks Pro")
-
-                Button {
-                    completeSetup()
-                } label: {
-                    Text("CONTINUE FREE")
-                        .font(RetroFont.mono(11, weight: .bold))
-                        .tracking(1)
-                        .foregroundStyle(Theme.retroInkDim)
-                        .padding(.vertical, 10)
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Continue without Pro")
-            }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 24)
-        }
-    }
-
-    private func pitchRow(symbol: String, title: String, body: String) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: symbol)
-                .font(.system(size: 16, weight: .semibold))
+    private var proContextCard: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "shield.lefthalf.filled")
+                .font(.system(size: 18))
                 .foregroundStyle(Theme.retroMagenta)
-                .frame(width: 22)
             VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(RetroFont.mono(11, weight: .bold))
+                Text("KEEP YOUR STREAKS SAFE WITH PRO")
+                    .font(RetroFont.mono(10, weight: .bold))
                     .tracking(1)
-                    .foregroundStyle(Theme.retroInk)
-                Text(body)
-                    .font(RetroFont.mono(10))
+                    .foregroundStyle(Theme.retroMagenta)
+                Text("Auto-save missed days · Freeze for travel · At-risk alerts")
+                    .font(RetroFont.mono(9))
                     .foregroundStyle(Theme.retroInkDim)
             }
             Spacer(minLength: 0)
         }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .pixelPanel(color: Theme.retroMagenta, fill: Theme.retroBgRaised)
     }
 
     private func requestAuth() async {

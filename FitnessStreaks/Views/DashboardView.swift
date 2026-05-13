@@ -1,4 +1,5 @@
 import SwiftUI
+import RevenueCatUI
 import os
 
 private let log = Logger(subsystem: "com.jackwallner.streaks", category: "Dashboard")
@@ -10,6 +11,7 @@ struct DashboardView: View {
     @EnvironmentObject var storeKit: StoreKitService
 
     @State private var showSettings = false
+    @State private var showingPaywall = false
     @State private var selectedStreak: Streak? = nil
     @State private var showPicker = false
     @State private var selectedBroken: BrokenStreak? = nil
@@ -95,6 +97,15 @@ struct DashboardView: View {
             }
             .sheet(isPresented: $showSettings) {
                 SettingsView()
+            }
+            .sheet(isPresented: $showingPaywall) {
+                if let offering = storeKit.offerings?.current {
+                    PaywallView(offering: offering)
+                        .interactiveDismissDisabled(true)
+                } else {
+                    PaywallView()
+                        .interactiveDismissDisabled(true)
+                }
             }
             .sheet(isPresented: $showPicker) {
                 StreakPickerSheet()
@@ -352,7 +363,11 @@ struct DashboardView: View {
 
     private func graceStatusBanner(for hero: Streak) -> some View {
         Button {
-            showSettings = true
+            if storeKit.isPro {
+                showSettings = true
+            } else {
+                showingPaywall = true
+            }
         } label: {
             HStack(spacing: 10) {
                 Image(systemName: storeKit.isPro ? "shield.lefthalf.filled" : "shield")
