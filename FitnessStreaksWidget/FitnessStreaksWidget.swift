@@ -168,135 +168,196 @@ struct StreakWidgetView: View {
 
     // Home-screen small
     private var smallView: some View {
-        ZStack {
-            Theme.streakGradient
-            VStack(alignment: .leading, spacing: 7) {
-                if let hero = entry.hero {
-                    HStack(spacing: 6) {
+        Group {
+            if let hero = entry.hero {
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack(spacing: 5) {
                         Image(systemName: hero.displaySymbol)
-                            .font(.system(size: 15, weight: .semibold, design: .rounded))
+                            .font(.system(size: 13, weight: .bold))
                         Text(hero.displayName)
                             .font(.system(size: 12, weight: .bold, design: .rounded))
                             .lineLimit(1)
-                        Spacer(minLength: 0)
+                            .minimumScaleFactor(0.75)
                     }
-                    .foregroundStyle(.white.opacity(0.92))
+                    .foregroundStyle(.white.opacity(0.95))
 
-                    Spacer(minLength: 0)
+                    Spacer(minLength: 6)
 
-                    VStack(alignment: .leading, spacing: 0) {
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
                         Text(hero.compactCurrentUnitValueLabel)
-                            .font(.system(size: 48, weight: .bold, design: .rounded))
+                            .font(.system(size: 44, weight: .heavy, design: .rounded))
                             .foregroundStyle(.white)
                             .monospacedDigit()
-                            .minimumScaleFactor(0.45)
-                        Text("/ \(hero.compactGoalValueLabel) \(hero.unitLabel)")
-                            .font(.system(size: 12, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.82))
                             .lineLimit(1)
-                            .minimumScaleFactor(0.65)
+                            .minimumScaleFactor(0.5)
+                        Text(hero.unitLabel)
+                            .font(.system(size: 13, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.85))
                     }
-
-                    ProgressView(value: clampedProgress(hero))
-                        .tint(.white)
-
-                    Text("\(streakLengthLabel(hero)) streak")
+                    Text("of \(hero.compactGoalValueLabel) goal")
                         .font(.system(size: 11, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.78))
+                        .foregroundStyle(.white.opacity(0.8))
                         .lineLimit(1)
-                } else {
-                    Image(systemName: "figure.run")
-                        .font(.system(size: 34, weight: .regular))
-                        .foregroundStyle(.white.opacity(0.9))
-                    Text("No streak yet — open app")
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.85))
-                        .multilineTextAlignment(.center)
+                        .minimumScaleFactor(0.7)
+
+                    Spacer(minLength: 8)
+
+                    progressBar(clampedProgress(hero), height: 7)
+
+                    HStack(spacing: 4) {
+                        Image(systemName: "flame.fill")
+                            .font(.system(size: 10, weight: .bold))
+                        Text(streakLengthLabel(hero))
+                            .font(.system(size: 11, weight: .bold, design: .rounded))
+                            .lineLimit(1)
+                        if hero.currentUnitCompleted {
+                            Spacer(minLength: 0)
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: 11, weight: .bold))
+                        }
+                    }
+                    .foregroundStyle(.white.opacity(0.9))
+                    .padding(.top, 6)
                 }
+            } else {
+                emptyState
             }
-            .padding(10)
         }
-        .containerBackground(.clear, for: .widget)
+        .containerBackground(Theme.streakGradient, for: .widget)
     }
 
     // Home-screen medium: hero + up to 3 badges
     private var mediumView: some View {
-        HStack(spacing: 12) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(Theme.streakGradient)
-                VStack(alignment: .leading, spacing: 7) {
-                    if let hero = entry.hero {
-                        Label(hero.displayName, systemImage: hero.displaySymbol)
-                            .font(.system(size: 11, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.92))
-                            .lineLimit(1)
-                        Spacer(minLength: 0)
-                        Text(hero.compactCurrentUnitValueLabel)
-                            .font(.system(size: 40, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .monospacedDigit()
-                            .minimumScaleFactor(0.45)
-                        Text("/ \(hero.compactGoalValueLabel) \(hero.unitLabel)")
-                            .font(.system(size: 10, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.82))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.65)
-                        ProgressView(value: clampedProgress(hero))
-                            .tint(.white)
-                        Text("\(streakLengthLabel(hero)) streak")
-                            .font(.system(size: 10, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.78))
-                            .lineLimit(1)
-                    } else {
-                        Image(systemName: "figure.run")
-                            .font(.system(size: 28))
-                            .foregroundStyle(.white)
-                    }
-                }
-                .padding(8)
-            }
-            .frame(width: 120)
+        HStack(spacing: 14) {
+            Group {
+                if let hero = entry.hero {
+                    VStack(alignment: .leading, spacing: 0) {
+                        HStack(spacing: 5) {
+                            Image(systemName: hero.displaySymbol)
+                                .font(.system(size: 12, weight: .bold))
+                            Text(hero.displayName)
+                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.75)
+                        }
+                        .foregroundStyle(.white.opacity(0.95))
 
-            VStack(alignment: .leading, spacing: 7) {
-                Text("More streaks")
-                    .font(.system(size: 11, weight: .bold, design: .rounded))
-                    .foregroundStyle(.secondary)
-                ForEach(entry.badges.prefix(3)) { b in
-                    mediumBadgeRow(b)
+                        Spacer(minLength: 4)
+
+                        HStack(alignment: .firstTextBaseline, spacing: 3) {
+                            Text(hero.compactCurrentUnitValueLabel)
+                                .font(.system(size: 40, weight: .heavy, design: .rounded))
+                                .foregroundStyle(.white)
+                                .monospacedDigit()
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.5)
+                            Text(hero.unitLabel)
+                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.85))
+                        }
+                        Text("of \(hero.compactGoalValueLabel) goal")
+                            .font(.system(size: 10, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.8))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+
+                        Spacer(minLength: 6)
+
+                        progressBar(clampedProgress(hero), height: 6)
+
+                        HStack(spacing: 4) {
+                            Image(systemName: "flame.fill")
+                                .font(.system(size: 9, weight: .bold))
+                            Text(streakLengthLabel(hero))
+                                .font(.system(size: 10, weight: .bold, design: .rounded))
+                                .lineLimit(1)
+                        }
+                        .foregroundStyle(.white.opacity(0.9))
+                        .padding(.top, 5)
+                    }
+                } else {
+                    emptyState
                 }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("MORE STREAKS")
+                    .font(.system(size: 9, weight: .heavy, design: .rounded))
+                    .tracking(0.6)
+                    .foregroundStyle(.white.opacity(0.65))
                 if entry.badges.isEmpty {
-                    Text("No streak yet — open app")
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundStyle(.secondary)
+                    Text("Keep going to unlock more")
+                        .font(.system(size: 10, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.7))
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    ForEach(entry.badges.prefix(3)) { b in
+                        mediumBadgeRow(b)
+                    }
                 }
                 Spacer(minLength: 0)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(12)
+            .background(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(.white.opacity(0.14))
+            )
         }
-        .padding(10)
-        .containerBackground(.fill.tertiary, for: .widget)
+        .containerBackground(Theme.streakGradient, for: .widget)
     }
 
     private func mediumBadgeRow(_ item: StreakSnapshot.Item) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
-            HStack(spacing: 6) {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 5) {
                 Image(systemName: item.displaySymbol)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(heroAccent(item))
-                    .frame(width: 16)
+                    .font(.system(size: 10, weight: .bold))
+                    .frame(width: 14)
                 Text(item.displayName)
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
                     .lineLimit(1)
+                    .minimumScaleFactor(0.7)
                 Spacer(minLength: 2)
                 Text("\(item.compactCurrentUnitValueLabel)/\(item.compactGoalValueLabel)")
-                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                    .font(.system(size: 10, weight: .bold, design: .rounded))
                     .monospacedDigit()
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
             }
-            ProgressView(value: clampedProgress(item))
-                .tint(heroAccent(item))
+            .foregroundStyle(.white.opacity(0.95))
+            progressBar(clampedProgress(item), height: 4, trackOpacity: 0.2, fillOpacity: 0.9)
         }
+    }
+
+    // Crisp capsule progress bar — replaces the default ProgressView, which
+    // renders inconsistently and can't be sized cleanly inside widgets.
+    private func progressBar(_ value: Double,
+                             height: CGFloat,
+                             trackOpacity: Double = 0.25,
+                             fillOpacity: Double = 1) -> some View {
+        GeometryReader { geo in
+            ZStack(alignment: .leading) {
+                Capsule().fill(.white.opacity(trackOpacity))
+                Capsule()
+                    .fill(.white.opacity(fillOpacity))
+                    .frame(width: value <= 0 ? 0 : max(height, geo.size.width * value))
+            }
+        }
+        .frame(height: height)
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 8) {
+            Image(systemName: "figure.run")
+                .font(.system(size: 30, weight: .semibold))
+                .foregroundStyle(.white)
+            Text("Open app to sync streaks")
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white.opacity(0.9))
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func clampedProgress(_ item: StreakSnapshot.Item) -> Double {
