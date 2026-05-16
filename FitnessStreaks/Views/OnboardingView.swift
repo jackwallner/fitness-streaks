@@ -613,7 +613,7 @@ struct OnboardingView: View {
                     .font(RetroFont.mono(10, weight: .bold))
                     .tracking(1)
                     .foregroundStyle(Theme.retroMagenta)
-                Text("Auto-save missed days · Freeze for travel · At-risk alerts")
+                Text("Try free · Auto-save missed days · Freeze for travel")
                     .font(RetroFont.mono(9))
                     .foregroundStyle(Theme.retroInkDim)
             }

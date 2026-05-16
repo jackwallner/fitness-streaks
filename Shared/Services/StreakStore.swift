@@ -419,6 +419,30 @@ final class StreakStore: ObservableObject {
         settings.recentlyBroken = newBroken
     }
 
+    /// Convert a recently-broken streak into a grace preservation so the engine
+    /// bridges the missed day on the next load. Called when the user upgrades to
+    /// Pro from the BrokenStreakSheet — the trial *is* the revival.
+    ///
+    /// The engine only bridges yesterday's miss (see `applyPreservation` in
+    /// StreakEngine), so callers should gate this on `canRevive`.
+    func reviveBrokenStreak(_ broken: BrokenStreak) async {
+        let settings = StreakSettings.shared
+        var preservations = settings.gracePreservations
+        preservations[broken.key] = GracePreservation(
+            key: broken.key,
+            missedDate: DateHelpers.startOfDay(broken.brokenAt),
+            preservedLength: broken.brokenLength,
+            threshold: broken.threshold,
+            metric: broken.metric,
+            cadence: broken.cadence,
+            hourWindow: broken.hourWindow,
+            grantedAt: .now
+        )
+        settings.gracePreservations = preservations
+        settings.recentlyBroken.removeAll { $0.id == broken.id }
+        await load()
+    }
+
     /// Snapshot the current tracked streak lengths so the next launch can detect breaks
     /// that happened while the app was killed.
     fileprivate func recordLastKnownLengths() {
