@@ -124,7 +124,9 @@ struct BrokenStreakSheet: View {
                     Spacer()
                     PixelChip(text: "PRO", accent: Theme.retroMagenta)
                 }
-                Text("Pro auto-saves every missed day. Your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) run would still be alive. Upgrade so this doesn't happen again.")
+                Text(settings.freeAutoSaveUsed
+                     ? "You've already used your one free save. Pro auto-saves every miss — your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) run would still be alive. Upgrade so this never happens again."
+                     : "Pro auto-saves every missed day. Your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) run would still be alive. Upgrade so this doesn't happen again.")
                     .font(RetroFont.mono(11))
                     .foregroundStyle(Theme.retroInk)
                     .lineSpacing(3)

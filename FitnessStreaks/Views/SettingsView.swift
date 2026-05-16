@@ -211,7 +211,10 @@ struct SettingsView: View {
         if storeKit.isPro {
             return "Pro auto-saves any day you miss — your streak survives and the count keeps climbing tomorrow. Unlimited, automatic, no action needed."
         }
-        return "One missed day ends your streak. Pro auto-saves every miss so your run keeps growing through travel, sick days, and life."
+        if settings.freeAutoSaveUsed {
+            return "Your one free save has been used. Your next missed day ends the streak. Pro auto-saves every miss so your run keeps growing through travel, sick days, and life."
+        }
+        return "You get one free auto-save. After that, a missed day ends your streak — Pro auto-saves every miss so your run keeps growing through travel, sick days, and life."
     }
 
     private var recentPreservations: [GracePreservation] {
@@ -488,7 +491,7 @@ struct SettingsView: View {
                     Spacer()
                     PixelChip(text: "PRO", accent: Theme.retroMagenta)
                 }
-                Text("Upgrade to get at-risk reminders for active streaks before the day gets away from you. Daily reminder time: \(notificationTimeLabel).")
+                Text("You already see at-risk warnings inside the app for free. Pro adds a daily push reminder so a streak never slips just because you didn't open the app. Reminder time: \(notificationTimeLabel).")
                     .font(RetroFont.mono(10))
                     .foregroundStyle(Theme.retroInkDim)
                     .lineSpacing(2)

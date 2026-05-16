@@ -278,17 +278,21 @@ struct DashboardView: View {
                 }
             }
             Spacer()
+            let refreshing = store.isLoading || store.isRefreshing
             Button {
                 Task { await store.load() }
             } label: {
                 Image(systemName: "arrow.clockwise")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Theme.retroInkDim)
+                    .foregroundStyle(refreshing ? Theme.retroInkFaint : Theme.retroInkDim)
+                    .rotationEffect(.degrees(refreshing ? 360 : 0))
+                    .animation(refreshing ? .linear(duration: 0.9).repeatForever(autoreverses: false) : .default, value: refreshing)
                     .frame(width: 36, height: 36)
                     .background(Theme.retroBgRaised)
                     .overlay(Rectangle().stroke(Theme.retroInkFaint, lineWidth: 2))
             }
             .buttonStyle(.plain)
+            .disabled(refreshing)
             .accessibilityLabel("Refresh streaks from Apple Health")
             Button { showSettings = true } label: {
                 Image(systemName: "gearshape.fill")
@@ -331,24 +335,47 @@ struct DashboardView: View {
         .accessibilityLabel("Apple Health may have revoked access. Tap to open Health Settings.")
     }
 
+    @ViewBuilder
     private func atRiskBanner(for streak: Streak) -> some View {
-        HStack(spacing: 10) {
-            Text("! AT RISK")
-                .font(RetroFont.mono(9, weight: .bold))
-                .tracking(1)
-                .foregroundStyle(Theme.retroRed)
-            Text("\(streak.metric.displayName): \(riskText(for: streak))")
-                .font(RetroFont.mono(11))
-                .foregroundStyle(Theme.retroInk)
-                .lineLimit(1)
-            Spacer()
+        if storeKit.isPro {
+            atRiskContent(for: streak, showProHint: false)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("At risk: \(streak.metric.displayName). \(riskText(for: streak))")
+        } else {
+            // Pre-loss conversion moment: the streak isn't dead yet, but the user
+            // is anxious. Cheaper emotionally than the post-break pitch.
+            Button { showingPaywall = true } label: {
+                atRiskContent(for: streak, showProHint: true)
+            }
+            .buttonStyle(.plain)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("At risk: \(streak.metric.displayName). \(riskText(for: streak)). Tap to unlock Pro auto-save.")
+        }
+    }
+
+    private func atRiskContent(for streak: Streak, showProHint: Bool) -> some View {
+        VStack(alignment: .leading, spacing: showProHint ? 4 : 0) {
+            HStack(spacing: 10) {
+                Text("! AT RISK")
+                    .font(RetroFont.mono(9, weight: .bold))
+                    .tracking(1)
+                    .foregroundStyle(Theme.retroRed)
+                Text("\(streak.metric.displayName): \(riskText(for: streak))")
+                    .font(RetroFont.mono(11))
+                    .foregroundStyle(Theme.retroInk)
+                    .lineLimit(1)
+                Spacer()
+            }
+            if showProHint {
+                Text("Pro auto-saves this if today slips ›")
+                    .font(RetroFont.mono(9, weight: .bold))
+                    .foregroundStyle(Theme.retroMagenta)
+            }
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 12)
         .frame(maxWidth: .infinity)
         .pixelPanel(color: Theme.retroRed, fill: Theme.retroBg)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("At risk: \(streak.metric.displayName). \(riskText(for: streak))")
     }
 
     private func riskText(for streak: Streak) -> String {
@@ -398,13 +425,17 @@ struct DashboardView: View {
     }
 
     private func graceStatusTitle(for hero: Streak) -> String {
-        storeKit.isPro ? "AUTO-SAVE ON" : "UPGRADE TO PRO"
+        if storeKit.isPro { return "AUTO-SAVE ON" }
+        return settings.freeAutoSaveUsed ? "FREE SAVE USED" : "1 FREE SAVE READY"
     }
 
     private func graceStatusDetail(for hero: Streak) -> String {
-        storeKit.isPro
-            ? "Pro auto-saves any missed day — your streak survives."
-            : "One miss ends this streak. Pro auto-saves every miss."
+        if storeKit.isPro {
+            return "Pro auto-saves any missed day — your streak survives."
+        }
+        return settings.freeAutoSaveUsed
+            ? "Your next miss ends this streak. Pro auto-saves every miss."
+            : "Your first missed day is auto-saved free. After that, go Pro."
     }
 
     private func brokenBanner(_ broken: BrokenStreak) -> some View {

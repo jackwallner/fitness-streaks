@@ -350,6 +350,13 @@ final class StreakSettings: ObservableObject {
         didSet { saveCodable(lastKnownStreakLengths, key: "lastKnownStreakLengths") }
     }
 
+    /// Free users get exactly one lifetime auto-save. Once consumed, the next missed
+    /// day breaks the streak unless they upgrade. This converts on the *second* scare
+    /// instead of burning goodwill by letting the first long run die for the pitch.
+    @Published var freeAutoSaveUsed: Bool {
+        didSet { defaults.set(freeAutoSaveUsed, forKey: "freeAutoSaveUsed.v1") }
+    }
+
     nonisolated static func streakKey(metric: StreakMetric, cadence: StreakCadence, window: HourWindow? = nil) -> String {
         if let w = window {
             return "\(metric.rawValue)-\(cadence.rawValue)-h\(w.startHour)"
@@ -409,6 +416,7 @@ final class StreakSettings: ObservableObject {
         self.gracePreservations = Self.loadCodable([String: GracePreservation].self, key: "gracePreservations", defaults: defaults) ?? [:]
         self.manualStreakOrder = Self.loadCodable([String].self, key: "manualStreakOrder", defaults: defaults) ?? []
         self.lastKnownStreakLengths = Self.loadCodable([String: Int].self, key: "lastKnownStreakLengths", defaults: defaults) ?? [:]
+        self.freeAutoSaveUsed = defaults.bool(forKey: "freeAutoSaveUsed.v1")
         let storedFreezes = Self.loadCodable([Date].self, key: "plannedFreezes", defaults: defaults) ?? []
         self.plannedFreezes = Set(storedFreezes.map { DateHelpers.startOfDay($0) })
     }
@@ -468,13 +476,24 @@ final class StreakSettings: ObservableObject {
     }
 
     func pruneBroken(now: Date = .now) {
-        recentlyBroken.removeAll { now.timeIntervalSince($0.brokenAt) > 48 * 60 * 60 }
+        // 14 days, not 48h: a user who doesn't open the app for a long weekend or a
+        // week-long trip should still get the recovery flow when they come back.
+        recentlyBroken.removeAll { now.timeIntervalSince($0.brokenAt) > 14 * 24 * 60 * 60 }
     }
 
-    /// Pro auto-save: an unlimited entitlement on the subscription tier.
-    /// Free users do not get auto-save — the streak ends and they see the upgrade pitch.
+    /// Auto-save entitlement.
+    /// - Pro: unlimited — every miss is saved, no counter to deplete.
+    /// - Free: exactly one lifetime save. The first call consumes it (returns `true`);
+    ///   every subsequent call returns `false` so the streak breaks and the upgrade
+    ///   pitch lands on the second scare rather than the first.
+    ///
+    /// This mutates state for free users (consuming the free save), so it must only
+    /// be called when a real break is being committed — never speculatively.
     func attemptAutoSave(isPro: Bool) -> Bool {
-        isPro
+        if isPro { return true }
+        if freeAutoSaveUsed { return false }
+        freeAutoSaveUsed = true
+        return true
     }
 
     private func saveCodable<T: Encodable>(_ value: T, key: String) {

@@ -70,19 +70,38 @@ final class StreakStore: ObservableObject {
         return streaks.filter { tracked.contains($0.trackingKey) }
     }
 
-    /// Heuristic: did this refresh look like a revoked-permission situation?
-    /// True iff the fresh fetch shows zero steps across the last 14 days but the
-    /// pre-fetch cache had a meaningful step total (≥ 5,000) over the same window.
-    /// Tuned conservatively to avoid false positives for users on a real lull.
-    nonisolated static func detectLikelyRevocation(fresh: [ActivityDay], previousCache: [ActivityDay]) -> Bool {
+    /// Composite cross-metric activity signal for a window. Steps dominate for most
+    /// users, but the weighted terms keep the signal meaningful for people who don't
+    /// track steps at all (wheelchair users, cyclists, swimmers) so data-loss
+    /// detection isn't steps-only.
+    nonisolated static func activitySignal(_ days: [ActivityDay]) -> Double {
+        days.reduce(0.0) { sum, d in
+            sum + d.steps
+                + d.exerciseMinutes * 100
+                + d.activeEnergy
+                + d.distanceMiles * 1_000
+                + d.flightsClimbed * 100
+                + d.workoutCount * 1_000
+                + d.standHours * 100
+        }
+    }
+
+    /// Heuristic: does this fetch look like a transient empty read or a revoked
+    /// permission — i.e. NOT a real lull? True iff the fresh fetch shows *zero*
+    /// recorded activity of any kind across the last 14 days while the pre-fetch
+    /// cache had a meaningful total over the same window.
+    ///
+    /// When true the caller must NOT run break detection or overwrite state: Apple's
+    /// privacy contract hides read denial, and a cold-launch race can momentarily
+    /// return all-zero data — declaring streaks broken (and pushing a discouraging
+    /// notification) off that is the worst possible false positive.
+    nonisolated static func detectLikelyDataLoss(fresh: [ActivityDay], previousCache: [ActivityDay]) -> Bool {
         guard !previousCache.isEmpty else { return false }
         let windowStart = DateHelpers.daysAgo(13)
         let recentFresh = fresh.filter { $0.date >= windowStart }
         let recentCache = previousCache.filter { $0.date >= windowStart }
         guard !recentFresh.isEmpty, !recentCache.isEmpty else { return false }
-        let freshSteps = recentFresh.reduce(0.0) { $0 + $1.steps }
-        let cachedSteps = recentCache.reduce(0.0) { $0 + $1.steps }
-        return freshSteps == 0 && cachedSteps >= 5_000
+        return activitySignal(recentFresh) == 0 && activitySignal(recentCache) >= 3_000
     }
 
     /// Apply manual ordering: items in manualOrder come first in that order,
@@ -154,12 +173,23 @@ final class StreakStore: ObservableObject {
         }
         do {
             let previous = self.streaks
-            // Snapshot pre-fetch cache for the revocation heuristic below — once we
+            // Snapshot pre-fetch cache for the data-loss heuristic below — once we
             // call HealthKitService.cache() with the fresh result, this comparison
             // would be against itself.
             let preFetchCached = HealthKitService.shared.cachedHistory(days: 30)
             let fresh = try await HealthKitService.shared.fetchHistory(days: 400)
-            self.dataMaybeRevoked = Self.detectLikelyRevocation(fresh: fresh, previousCache: preFetchCached)
+
+            // If the fetch came back suspiciously empty (transient cold-launch race
+            // or revoked permission — Apple hides read denial), do NOT cache it,
+            // run the engine, detect breaks, or overwrite displayed state. Surface
+            // the soft banner and keep the last good data intact. Returning here is
+            // the single most important guard against falsely killing a real streak.
+            if Self.detectLikelyDataLoss(fresh: fresh, previousCache: preFetchCached) {
+                log.warning("Skipping load — fresh HealthKit fetch is empty but cache had activity (likely transient/revoked)")
+                self.dataMaybeRevoked = true
+                return
+            }
+            self.dataMaybeRevoked = false
             withAnimation(.linear(duration: 0.25)) {
                 loadProgress = 0.5
                 loadStage = .analyzingPatterns
@@ -198,6 +228,12 @@ final class StreakStore: ObservableObject {
             try HealthKitService.shared.cache(enriched)
             let settings = StreakSettings.shared
             settings.pruneBroken()
+            // Planned freezes are a Pro-only benefit. Keep the data in settings (so a
+            // re-subscribe restores it) but don't let the engine honor it when the
+            // entitlement has lapsed — otherwise freezes silently keep working while
+            // the UI to manage them is locked. gracePreservations are intentionally
+            // NOT gated: the free one-shot auto-save writes one and it must be honored.
+            let effectiveFreezes = StoreKitService.shared.isPro ? settings.plannedFreezes : []
             var all = StreakEngine.discover(
                 history: enriched,
                 hourlySteps: hourly,
@@ -207,7 +243,7 @@ final class StreakStore: ObservableObject {
                 committedThresholds: settings.committedThresholds,
                 customStreaks: settings.customStreaks,
                 gracePreservations: settings.gracePreservations,
-                plannedFreezes: settings.plannedFreezes
+                plannedFreezes: effectiveFreezes
             )
             var filtered = Self.applyTrackedFilter(all)
             let graceBefore = settings.gracePreservations.count
@@ -225,7 +261,7 @@ final class StreakStore: ObservableObject {
                     committedThresholds: settings.committedThresholds,
                     customStreaks: settings.customStreaks,
                     gracePreservations: settings.gracePreservations,
-                    plannedFreezes: settings.plannedFreezes
+                    plannedFreezes: effectiveFreezes
                 )
             }
             filtered = Self.applyTrackedFilter(all)
@@ -254,6 +290,7 @@ final class StreakStore: ObservableObject {
                 self.history = cached
                 let hourly = (try? await HealthKitService.shared.fetchHourlySteps(days: 90)) ?? [:]
                 self.hourlySteps = hourly
+                let effectiveFreezes = StoreKitService.shared.isPro ? settings.plannedFreezes : []
                 let all = StreakEngine.discover(
                     history: cached,
                     hourlySteps: hourly,
@@ -263,7 +300,7 @@ final class StreakStore: ObservableObject {
                     committedThresholds: settings.committedThresholds,
                     customStreaks: settings.customStreaks,
                     gracePreservations: settings.gracePreservations,
-                    plannedFreezes: settings.plannedFreezes
+                    plannedFreezes: effectiveFreezes
                 )
                 self.allCandidates = all
                 var filtered = Self.applyTrackedFilter(all)

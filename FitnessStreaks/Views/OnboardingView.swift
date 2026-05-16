@@ -9,7 +9,7 @@ struct OnboardingView: View {
     @EnvironmentObject var storeKit: StoreKitService
 
     enum Phase {
-        case intro       // welcome + privacy + Connect Health
+        case intro       // welcome + privacy notice (Health auth happens at intensity step)
         case intensity   // pick discovery intensity (after auth)
         case loading     // running discovery
         case selecting   // pick which discovered streaks to track
@@ -55,16 +55,15 @@ struct OnboardingView: View {
             }
         }
         .sheet(isPresented: $showingPaywall, onDismiss: {
-            // Pro or not, proceed to the app. The paywall is a natural step
-            // after streak selection — no need for a separate pitch screen.
+            // Pro or not, proceed to the app. Soft paywall: swipe-to-dismiss is
+            // intentionally allowed so a failed/slow RevenueCat load can never
+            // brick first launch. This onDismiss is the guaranteed escape hatch.
             completeSetup()
         }) {
             if let offering = storeKit.offerings?.current {
                 PaywallView(offering: offering)
-                    .interactiveDismissDisabled(true)
             } else {
                 PaywallView()
-                    .interactiveDismissDisabled(true)
             }
         }
         .onAppear {
@@ -568,17 +567,12 @@ struct OnboardingView: View {
     private func finishWithSelection() {
         guard !selection.isEmpty else { return }
         settings.trackedStreaks = selection
-        // Manual order = engine order, filtered to selection (preserves intensity ranking).
-        // Then prefer steps-daily as the primary if it's in the selected set — most users
-        // expect their step streak to be the headline, not whatever the engine ranked first.
-        var order = store.allCandidates
+        // Manual order = engine order, filtered to selection. This preserves the
+        // user's chosen intensity ranking for the hero rather than overriding it
+        // with a hardcoded steps-first assumption.
+        let order = store.allCandidates
             .map(\.trackingKey)
             .filter { selection.contains($0) }
-        let stepsKey = StreakSettings.streakKey(metric: .steps, cadence: .daily)
-        if let idx = order.firstIndex(of: stepsKey), idx != 0 {
-            order.remove(at: idx)
-            order.insert(stepsKey, at: 0)
-        }
         settings.manualStreakOrder = order
         store.refilter()
         advanceFromSelection()
@@ -593,12 +587,13 @@ struct OnboardingView: View {
     /// After the user picks (or skips) streaks, route non-Pro users through
     /// the paywall directly as the natural next step. Pro users skip through.
     private func advanceFromSelection(showPaywall: Bool = true) {
-        if storeKit.isPro {
+        // Only gate on the paywall when there's actually an offering to show. If
+        // RevenueCat hasn't loaded (offline / slow / misconfigured), proceed into
+        // the app rather than presenting an empty, non-actionable paywall.
+        if storeKit.isPro || !showPaywall || storeKit.offerings?.current == nil {
             completeSetup()
-        } else if showPaywall {
-            showingPaywall = true
         } else {
-            completeSetup()
+            showingPaywall = true
         }
     }
 
