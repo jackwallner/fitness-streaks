@@ -36,6 +36,15 @@ struct OnboardingView: View {
     ]
     private static let privacyPolicyURL = URL(string: "https://jackwallner.github.io/fitness-streaks/privacy-policy.html")!
 
+    /// Free accounts track at most this many discovered streaks. Pre-selection
+    /// intentionally exceeds it so the confirm step pitches the trial: trial to
+    /// keep them all, or fall back to the top N. Mirrors `freeCustomLimit`.
+    static let freeTrackedLimit = 3
+
+    private var overFreeTrackedLimit: Bool {
+        !storeKit.isPro && selection.count > Self.freeTrackedLimit
+    }
+
     // Timer publishers - stored to allow proper cleanup
     private let tipTimerPublisher = Timer.publish(every: 3.5, on: .main, in: .common)
     private let progressTimerPublisher = Timer.publish(every: 0.35, on: .main, in: .common)
@@ -58,7 +67,12 @@ struct OnboardingView: View {
             // Pro or not, proceed to the app. Soft paywall: swipe-to-dismiss is
             // intentionally allowed so a failed/slow RevenueCat load can never
             // brick first launch. This onDismiss is the guaranteed escape hatch.
-            completeSetup()
+            // Refresh entitlement first so a just-completed trial is reflected
+            // before enforceFreeTrackedCap() decides whether to trim selection.
+            Task {
+                await storeKit.refreshEntitlement()
+                completeSetup()
+            }
         }) {
             if let offering = storeKit.offerings?.current {
                 PaywallView(offering: offering)
@@ -474,7 +488,7 @@ struct OnboardingView: View {
             Button {
                 finishWithSelection()
             } label: {
-                Text(selection.isEmpty ? "PICK AT LEAST ONE" : "▶ START · \(selection.count) STREAK\(selection.count == 1 ? "" : "S")")
+                Text(startButtonLabel)
                     .font(RetroFont.mono(13, weight: .bold))
                     .foregroundStyle(Theme.retroBg)
                     .frame(maxWidth: .infinity)
@@ -597,8 +611,36 @@ struct OnboardingView: View {
         }
     }
 
+    private var startButtonLabel: String {
+        if selection.isEmpty { return "PICK AT LEAST ONE" }
+        if overFreeTrackedLimit {
+            return "▶ TRIAL TO KEEP \(selection.count) STREAKS"
+        }
+        return "▶ START · \(selection.count) STREAK\(selection.count == 1 ? "" : "S")"
+    }
+
     private func completeSetup() {
+        enforceFreeTrackedCap()
         withAnimation { settings.hasCompletedSetup = true }
+    }
+
+    /// Last line of defense for the free 3-streak cap. Runs on every completion
+    /// path (paywall dismissed without upgrading, no offering available, etc.).
+    /// No-ops for Pro, for the skip-tracking path (`trackedStreaks == nil`), and
+    /// when already within the limit. Keeps the user's top picks in engine order.
+    private func enforceFreeTrackedCap() {
+        guard !storeKit.isPro,
+              let tracked = settings.trackedStreaks,
+              tracked.count > Self.freeTrackedLimit else { return }
+        let kept = store.allCandidates
+            .map(\.trackingKey)
+            .filter { tracked.contains($0) }
+            .prefix(Self.freeTrackedLimit)
+        let keptSet = Set(kept)
+        settings.trackedStreaks = keptSet
+        settings.manualStreakOrder = Array(kept)
+        selection = keptSet
+        store.refilter()
     }
 
     // MARK: - Pro Context
@@ -609,11 +651,15 @@ struct OnboardingView: View {
                 .font(.system(size: 18))
                 .foregroundStyle(Theme.retroMagenta)
             VStack(alignment: .leading, spacing: 2) {
-                Text("KEEP YOUR STREAKS SAFE WITH PRO")
+                Text(overFreeTrackedLimit
+                     ? "FREE TRACKS \(Self.freeTrackedLimit) STREAKS"
+                     : "KEEP YOUR STREAKS SAFE WITH PRO")
                     .font(RetroFont.mono(10, weight: .bold))
                     .tracking(1)
                     .foregroundStyle(Theme.retroMagenta)
-                Text("Try free · Auto-save missed days · Freeze for travel")
+                Text(overFreeTrackedLimit
+                     ? "Start a free trial to track all \(selection.count) — or continue and we'll keep your top \(Self.freeTrackedLimit)."
+                     : "Try free · Auto-save missed days · Freeze for travel")
                     .font(RetroFont.mono(9))
                     .foregroundStyle(Theme.retroInkDim)
             }
