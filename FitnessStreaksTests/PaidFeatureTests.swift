@@ -14,7 +14,6 @@ final class PaidFeatureTests: XCTestCase {
         StreakSettings.shared.trackedStreaks = nil
         StreakSettings.shared.hiddenMetrics = []
         StreakSettings.shared.intensity = .challenging
-        StreakSettings.shared.freeAutoSaveUsed = false
     }
 
     override func tearDown() {
@@ -22,7 +21,6 @@ final class PaidFeatureTests: XCTestCase {
         StreakSettings.shared.gracePreservations = [:]
         StreakSettings.shared.recentlyBroken = []
         StreakSettings.shared.committedThresholds = [:]
-        StreakSettings.shared.freeAutoSaveUsed = false
         super.tearDown()
     }
 
@@ -93,8 +91,8 @@ final class PaidFeatureTests: XCTestCase {
     // ──────────────────────────────────────────────
     // MARK: - Auto-save entitlement
     //
-    // Pro = unlimited auto-saves. Free = exactly one lifetime save, then the
-    // streak breaks and the paywall appears (second-scare conversion).
+    // Pro = unlimited auto-saves. Free = no automatic saves — the break is
+    // shown and the user is offered a Pro trial to revive the run.
     // ──────────────────────────────────────────────
 
     func testAttemptAutoSaveAsPro() {
@@ -102,25 +100,12 @@ final class PaidFeatureTests: XCTestCase {
                       "Pro should always auto-save a missed streak")
     }
 
-    func testFreeUserGetsExactlyOneAutoSave() {
+    func testFreeUserGetsNoAutoSave() {
         let settings = StreakSettings.shared
-        XCTAssertFalse(settings.freeAutoSaveUsed)
-        XCTAssertTrue(settings.attemptAutoSave(isPro: false),
-                      "First free miss should be auto-saved")
-        XCTAssertTrue(settings.freeAutoSaveUsed, "The free save should now be consumed")
         XCTAssertFalse(settings.attemptAutoSave(isPro: false),
-                       "Second free miss must break — paywall moment")
+                       "Free users never get an auto-save — the trial is the revival path")
         XCTAssertFalse(settings.attemptAutoSave(isPro: false),
-                       "Still no further free saves")
-    }
-
-    func testProAutoSaveDoesNotConsumeFreeSave() {
-        let settings = StreakSettings.shared
-        _ = settings.attemptAutoSave(isPro: true)
-        XCTAssertFalse(settings.freeAutoSaveUsed,
-                       "Pro saves must not deplete the free one-shot")
-        XCTAssertTrue(settings.attemptAutoSave(isPro: false),
-                      "Free save still available after Pro saves")
+                       "Still no auto-save on repeat calls")
     }
 
     func testAttemptAutoSaveIsIdempotentForPro() {
@@ -282,9 +267,8 @@ final class PaidFeatureTests: XCTestCase {
         let settings = StreakSettings.shared
         let isPro = false
 
-        // 1. Auto-save: free users get exactly one, then nothing.
-        XCTAssertTrue(settings.attemptAutoSave(isPro: isPro), "first free save granted")
-        XCTAssertFalse(settings.attemptAutoSave(isPro: isPro), "no second free save")
+        // 1. Auto-save: free users get no automatic saves — the break drives the trial pitch.
+        XCTAssertFalse(settings.attemptAutoSave(isPro: isPro), "free users never auto-save")
 
         // 2. Custom Streaks: free users limited to 3.
         settings.customStreaks = [

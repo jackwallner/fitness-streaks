@@ -9,6 +9,7 @@ struct BrokenStreakSheet: View {
 
     @EnvironmentObject var storeKit: StoreKitService
     @EnvironmentObject var settings: StreakSettings
+    @EnvironmentObject var store: StreakStore
 
     @Environment(\.dismiss) private var close
     @State private var showingPaywall = false
@@ -26,7 +27,7 @@ struct BrokenStreakSheet: View {
                             .font(RetroFont.mono(12, weight: .bold))
                             .tracking(2)
                             .foregroundStyle(Theme.retroRed)
-                        Text("Your \(broken.metric.displayName.lowercased()) run ended at \(broken.brokenLength) \(broken.cadence.pluralLabel). Keep the same goal on your dashboard or pick a new one.")
+                        Text("Your \(broken.metric.displayName.lowercased()) run ended at \(broken.brokenLength) \(broken.cadence.pluralLabel).")
                             .font(RetroFont.mono(12))
                             .foregroundStyle(Theme.retroInk)
                             .lineSpacing(3)
@@ -35,7 +36,7 @@ struct BrokenStreakSheet: View {
                     .pixelPanel(color: Theme.retroRed, fill: Theme.retroBgRaised)
 
                     if shouldShowUpsell {
-                        graceUpsell
+                        revivalUpsell
                     }
 
                     Button {
@@ -92,23 +93,39 @@ struct BrokenStreakSheet: View {
             }
             .toolbarBackground(Theme.retroBg, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
-            .sheet(isPresented: $showingPaywall) {
+            .sheet(isPresented: $showingPaywall, onDismiss: handlePaywallDismiss) {
                 if let offering = storeKit.offerings?.current {
                     PaywallView(offering: offering)
-                        .interactiveDismissDisabled(true)
                 } else {
                     PaywallView()
-                        .interactiveDismissDisabled(true)
                 }
             }
         }
     }
 
     private var shouldShowUpsell: Bool {
-        !storeKit.isPro
+        !storeKit.isPro && canRevive
     }
 
-    private var graceUpsell: some View {
+    /// We can only bridge a single missed day. If the break is older than
+    /// yesterday, an upgrade still gets them Pro but can't retroactively revive
+    /// this particular run, so we fall back to the standard recovery options.
+    private var canRevive: Bool {
+        let missed = DateHelpers.startOfDay(broken.brokenAt)
+        let today = DateHelpers.startOfDay(.now)
+        let days = DateHelpers.gregorian.dateComponents([.day], from: missed, to: today).day ?? 0
+        return days <= 1
+    }
+
+    private func handlePaywallDismiss() {
+        guard storeKit.isPro else { return }
+        Task {
+            await store.reviveBrokenStreak(broken)
+            close()
+        }
+    }
+
+    private var revivalUpsell: some View {
         Button {
             showingPaywall = true
         } label: {
@@ -117,22 +134,20 @@ struct BrokenStreakSheet: View {
                     Image(systemName: "shield.lefthalf.filled")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(Theme.retroLime)
-                    Text("PRO WOULD'VE SAVED THIS")
+                    Text("REVIVE WITH A PRO TRIAL")
                         .font(RetroFont.pixel(10))
                         .tracking(1)
                         .foregroundStyle(Theme.retroLime)
                     Spacer()
                     PixelChip(text: "PRO", accent: Theme.retroMagenta)
                 }
-                Text(settings.freeAutoSaveUsed
-                     ? "You've already used your one free save. Pro auto-saves every miss — your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) run would still be alive. Upgrade so this never happens again."
-                     : "Pro auto-saves every missed day. Your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) run would still be alive. Upgrade so this doesn't happen again.")
+                Text("Start a Pro trial and we'll restore your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) run on the spot. Pro auto-saves every missed day so this doesn't happen again.")
                     .font(RetroFont.mono(11))
                     .foregroundStyle(Theme.retroInk)
                     .lineSpacing(3)
                     .multilineTextAlignment(.leading)
                 HStack {
-                    Text("UNLOCK PRO")
+                    Text("START TRIAL · REVIVE STREAK")
                         .font(RetroFont.mono(10, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(Theme.retroMagenta)
@@ -148,6 +163,6 @@ struct BrokenStreakSheet: View {
             .pixelPanel(color: Theme.retroLime, fill: Theme.retroBgRaised)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Unlock Pro to auto-save future missed streaks")
+        .accessibilityLabel("Start a Pro trial to revive your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) streak")
     }
 }

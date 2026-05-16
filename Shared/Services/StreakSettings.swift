@@ -350,13 +350,6 @@ final class StreakSettings: ObservableObject {
         didSet { saveCodable(lastKnownStreakLengths, key: "lastKnownStreakLengths") }
     }
 
-    /// Free users get exactly one lifetime auto-save. Once consumed, the next missed
-    /// day breaks the streak unless they upgrade. This converts on the *second* scare
-    /// instead of burning goodwill by letting the first long run die for the pitch.
-    @Published var freeAutoSaveUsed: Bool {
-        didSet { defaults.set(freeAutoSaveUsed, forKey: "freeAutoSaveUsed.v1") }
-    }
-
     nonisolated static func streakKey(metric: StreakMetric, cadence: StreakCadence, window: HourWindow? = nil) -> String {
         if let w = window {
             return "\(metric.rawValue)-\(cadence.rawValue)-h\(w.startHour)"
@@ -416,7 +409,6 @@ final class StreakSettings: ObservableObject {
         self.gracePreservations = Self.loadCodable([String: GracePreservation].self, key: "gracePreservations", defaults: defaults) ?? [:]
         self.manualStreakOrder = Self.loadCodable([String].self, key: "manualStreakOrder", defaults: defaults) ?? []
         self.lastKnownStreakLengths = Self.loadCodable([String: Int].self, key: "lastKnownStreakLengths", defaults: defaults) ?? [:]
-        self.freeAutoSaveUsed = defaults.bool(forKey: "freeAutoSaveUsed.v1")
         let storedFreezes = Self.loadCodable([Date].self, key: "plannedFreezes", defaults: defaults) ?? []
         self.plannedFreezes = Set(storedFreezes.map { DateHelpers.startOfDay($0) })
     }
@@ -482,18 +474,11 @@ final class StreakSettings: ObservableObject {
     }
 
     /// Auto-save entitlement.
-    /// - Pro: unlimited — every miss is saved, no counter to deplete.
-    /// - Free: exactly one lifetime save. The first call consumes it (returns `true`);
-    ///   every subsequent call returns `false` so the streak breaks and the upgrade
-    ///   pitch lands on the second scare rather than the first.
-    ///
-    /// This mutates state for free users (consuming the free save), so it must only
-    /// be called when a real break is being committed — never speculatively.
+    /// - Pro: unlimited — every miss is saved.
+    /// - Free: never — the miss breaks the streak and the BrokenStreakSheet pitches
+    ///   the trial as the way to revive it. The trial *is* the free save.
     func attemptAutoSave(isPro: Bool) -> Bool {
-        if isPro { return true }
-        if freeAutoSaveUsed { return false }
-        freeAutoSaveUsed = true
-        return true
+        isPro
     }
 
     private func saveCodable<T: Encodable>(_ value: T, key: String) {

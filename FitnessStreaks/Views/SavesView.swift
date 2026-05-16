@@ -85,7 +85,7 @@ struct SavesView: View {
                     }
                     Text(storeKit.isPro
                          ? "Miss a day, keep your streak. Unlimited."
-                         : "One miss ends your streak.")
+                         : "One miss ends your streak — unless you trial Pro.")
                         .font(RetroFont.mono(11, weight: .bold))
                         .foregroundStyle(Theme.retroInk)
                 }
@@ -94,7 +94,7 @@ struct SavesView: View {
 
             Text(storeKit.isPro
                  ? "Pro saves every missed day automatically — your streak keeps growing through travel, sick days, and life. No grace days to ration, no manual taps."
-                 : "Free streaks die on the first miss. Pro auto-saves every miss so the count keeps climbing. Travel, sick days, life — Pro doesn't care.")
+                 : "Free streaks die on the first miss. Start a Pro trial when it happens and we'll revive the run on the spot — then every miss after is auto-saved.")
                 .font(RetroFont.mono(11))
                 .foregroundStyle(Theme.retroInkDim)
                 .lineSpacing(3)

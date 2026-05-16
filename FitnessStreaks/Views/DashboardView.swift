@@ -425,17 +425,14 @@ struct DashboardView: View {
     }
 
     private func graceStatusTitle(for hero: Streak) -> String {
-        if storeKit.isPro { return "AUTO-SAVE ON" }
-        return settings.freeAutoSaveUsed ? "FREE SAVE USED" : "1 FREE SAVE READY"
+        storeKit.isPro ? "AUTO-SAVE ON" : "TRY PRO FREE"
     }
 
     private func graceStatusDetail(for hero: Streak) -> String {
         if storeKit.isPro {
             return "Pro auto-saves any missed day — your streak survives."
         }
-        return settings.freeAutoSaveUsed
-            ? "Your next miss ends this streak. Pro auto-saves every miss."
-            : "Your first missed day is auto-saved free. After that, go Pro."
+        return "Start a trial — Pro auto-saves every missed day."
     }
 
     private func brokenBanner(_ broken: BrokenStreak) -> some View {
