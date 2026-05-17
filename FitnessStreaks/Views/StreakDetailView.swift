@@ -142,7 +142,7 @@ struct StreakDetailView: View {
                 .padding(.bottom, 8)
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("History is a Pro feature. Double tap to start a free trial.")
+            .accessibilityLabel("History. Unlock with Pro. Free trial available.")
         }
     }
 
@@ -159,7 +159,7 @@ struct StreakDetailView: View {
                     .allowsHitTesting(false)
                     .overlay(heatmapLockOverlay)
                     .accessibilityElement(children: .ignore)
-                    .accessibilityLabel("History heatmap is a Pro feature. Tap to start a free trial.")
+                    .accessibilityLabel("History heatmap. Unlock with Pro. Free trial available.")
             }
             .buttonStyle(.plain)
         }
@@ -171,11 +171,11 @@ struct StreakDetailView: View {
                 .font(.system(size: 22, weight: .bold))
                 .foregroundStyle(Theme.retroAmber)
                 .retroGlow(Theme.retroAmber, radius: 8)
-            Text("HISTORY · PRO")
+            Text("UNLOCK WITH PRO")
                 .font(RetroFont.pixel(11))
                 .tracking(2)
                 .foregroundStyle(Theme.retroAmber)
-            Text("Tap to start free trial")
+            Text("Free trial available")
                 .font(RetroFont.mono(10, weight: .bold))
                 .foregroundStyle(Theme.retroInk)
         }
