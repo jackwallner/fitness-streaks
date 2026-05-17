@@ -1,16 +1,19 @@
 import SwiftUI
+import RevenueCatUI
 
 struct StreakDetailView: View {
     let initialStreak: Streak
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var store: StreakStore
     @EnvironmentObject var settings: StreakSettings
+    @EnvironmentObject var storeKit: StoreKitService
     @State private var actionMessage: String? = nil
     @State private var isRecalibrating = false
 
     @State private var showingRecalibrateConfirm = false
     @State private var showingCustomBuilder = false
     @State private var showingUntrackConfirm = false
+    @State private var showingPaywall = false
     @State private var selectedHeatmapRange: HeatmapDateRange
 
     init(streak: Streak) {
@@ -55,10 +58,10 @@ struct StreakDetailView: View {
                     hourWindowExplainer.padding(.horizontal, 14)
                     statsRow.padding(.horizontal, 14)
                 } else {
-                    PixelSectionHeader(title: "HISTORY")
+                    historySectionHeader
                         .padding(.top, 4)
 
-                    heatmapCard.padding(.horizontal, 14)
+                    gatedHeatmapCard.padding(.horizontal, 14)
                     statsRow.padding(.horizontal, 14)
                 }
             }
@@ -94,6 +97,76 @@ struct StreakDetailView: View {
         }
         .toolbarBackground(Theme.retroBg, for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
+        .sheet(isPresented: $showingPaywall) {
+            if let offering = storeKit.offerings?.current {
+                PaywallView(offering: offering)
+            } else {
+                PaywallView()
+            }
+        }
+    }
+
+    // MARK: - History gating
+
+    private var historySectionHeader: some View {
+        HStack(spacing: 6) {
+            Text("■ HISTORY")
+                .font(RetroFont.pixel(10))
+                .tracking(2)
+                .foregroundStyle(Theme.retroInkDim)
+            if !storeKit.isPro {
+                Text("PRO")
+                    .font(RetroFont.pixel(8))
+                    .tracking(1)
+                    .foregroundStyle(Theme.retroAmber)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 2)
+                    .overlay(Rectangle().stroke(Theme.retroAmber, lineWidth: 1))
+            }
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 6)
+        .padding(.bottom, 8)
+    }
+
+    @ViewBuilder
+    private var gatedHeatmapCard: some View {
+        if storeKit.isPro {
+            heatmapCard
+        } else {
+            Button {
+                showingPaywall = true
+            } label: {
+                heatmapCard
+                    .blur(radius: 7)
+                    .allowsHitTesting(false)
+                    .overlay(heatmapLockOverlay)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("History heatmap is a Pro feature. Tap to start a free trial.")
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private var heatmapLockOverlay: some View {
+        VStack(spacing: 10) {
+            Image(systemName: "lock.fill")
+                .font(.system(size: 22, weight: .bold))
+                .foregroundStyle(Theme.retroAmber)
+                .retroGlow(Theme.retroAmber, radius: 8)
+            Text("HISTORY · PRO")
+                .font(RetroFont.pixel(11))
+                .tracking(2)
+                .foregroundStyle(Theme.retroAmber)
+            Text("Tap to start free trial")
+                .font(RetroFont.mono(10, weight: .bold))
+                .foregroundStyle(Theme.retroInk)
+        }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 14)
+        .background(Theme.retroBg.opacity(0.85))
+        .overlay(Rectangle().stroke(Theme.retroAmber, lineWidth: 2))
     }
 
     // MARK: - Header
