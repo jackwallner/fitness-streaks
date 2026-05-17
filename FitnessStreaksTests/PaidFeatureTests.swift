@@ -281,6 +281,9 @@ final class PaidFeatureTests: XCTestCase {
 
         // 3. Notifications: free users can't enable.
         XCTAssertFalse(isPro)
+
+        // 4. Streak history heatmap: free users see blurred + locked.
+        XCTAssertFalse(isPro, "history heatmap in StreakDetailView is gated on isPro")
     }
 
     func testFullGatingMatrixAsPro() {
@@ -307,5 +310,31 @@ final class PaidFeatureTests: XCTestCase {
 
         // 3. Notifications: Pro users can enable.
         XCTAssertTrue(isPro)
+
+        // 4. Streak history heatmap: Pro users see the full heatmap.
+        XCTAssertTrue(isPro, "history heatmap in StreakDetailView is unlocked for Pro")
     }
+
+    // ──────────────────────────────────────────────
+    // MARK: - History gate parity with isPro
+    //
+    // The StreakDetailView blurs/locks the heatmap card whenever
+    // StoreKitService.isPro is false, and presents the same RevenueCat
+    // PaywallView used elsewhere. This test pins the source of truth so a
+    // future refactor that introduces a separate flag for the history gate
+    // can't silently diverge from the rest of the Pro entitlement.
+    // ──────────────────────────────────────────────
+
+    #if DEBUG
+    func testHistoryHeatmapGateTracksStoreKitIsPro() {
+        StoreKitService.shared.debugSetPro(false)
+        XCTAssertFalse(StoreKitService.shared.isPro, "history must be locked when isPro=false")
+
+        StoreKitService.shared.debugSetPro(true)
+        XCTAssertTrue(StoreKitService.shared.isPro, "history must unlock the moment isPro=true")
+
+        StoreKitService.shared.debugSetPro(false)
+        XCTAssertFalse(StoreKitService.shared.isPro, "history must re-lock if entitlement lapses")
+    }
+    #endif
 }

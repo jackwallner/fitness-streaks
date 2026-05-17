@@ -97,7 +97,13 @@ struct StreakDetailView: View {
         }
         .toolbarBackground(Theme.retroBg, for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
-        .sheet(isPresented: $showingPaywall) {
+        .sheet(isPresented: $showingPaywall, onDismiss: {
+            // RevenueCat's PaywallView completes purchase against the SDK directly,
+            // so our cached `isPro` won't flip until we re-read entitlement. Without
+            // this, a successful purchase leaves the heatmap blurred until the user
+            // backgrounds the app.
+            Task { await storeKit.refreshEntitlement() }
+        }) {
             if let offering = storeKit.offerings?.current {
                 PaywallView(offering: offering)
             } else {
@@ -108,26 +114,36 @@ struct StreakDetailView: View {
 
     // MARK: - History gating
 
+    @ViewBuilder
     private var historySectionHeader: some View {
-        HStack(spacing: 6) {
-            Text("■ HISTORY")
-                .font(RetroFont.pixel(10))
-                .tracking(2)
-                .foregroundStyle(Theme.retroInkDim)
-            if !storeKit.isPro {
-                Text("PRO")
-                    .font(RetroFont.pixel(8))
-                    .tracking(1)
-                    .foregroundStyle(Theme.retroAmber)
-                    .padding(.horizontal, 4)
-                    .padding(.vertical, 2)
-                    .overlay(Rectangle().stroke(Theme.retroAmber, lineWidth: 1))
+        if storeKit.isPro {
+            PixelSectionHeader(title: "HISTORY")
+        } else {
+            Button {
+                showingPaywall = true
+            } label: {
+                HStack(spacing: 6) {
+                    Text("■ HISTORY")
+                        .font(RetroFont.pixel(10))
+                        .tracking(2)
+                        .foregroundStyle(Theme.retroInkDim)
+                    Text("PRO")
+                        .font(RetroFont.pixel(8))
+                        .tracking(1)
+                        .foregroundStyle(Theme.retroAmber)
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 2)
+                        .overlay(Rectangle().stroke(Theme.retroAmber, lineWidth: 1))
+                    Spacer(minLength: 0)
+                }
+                .contentShape(Rectangle())
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 6)
+                .padding(.bottom, 8)
             }
-            Spacer(minLength: 0)
+            .buttonStyle(.plain)
+            .accessibilityLabel("History is a Pro feature. Double tap to start a free trial.")
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 6)
-        .padding(.bottom, 8)
     }
 
     @ViewBuilder
