@@ -170,109 +170,128 @@ struct StreakWidgetView: View {
     private var smallView: some View {
         Group {
             if let hero = entry.hero {
+                let accent = heroAccent(hero)
+                let valueColor: Color = hero.currentUnitCompleted ? Theme.retroLime : accent
                 VStack(alignment: .leading, spacing: 0) {
-                    HStack(spacing: 5) {
-                        Image(systemName: hero.displaySymbol)
-                            .font(.system(size: 13, weight: .bold))
-                        Text(hero.displayName)
-                            .font(.system(size: 12, weight: .bold, design: .rounded))
+                    HStack(alignment: .top, spacing: 6) {
+                        Text(hero.displayName.uppercased())
+                            .font(.system(size: 12, weight: .heavy, design: .rounded))
+                            .tracking(0.8)
+                            .foregroundStyle(accent)
                             .lineLimit(1)
-                            .minimumScaleFactor(0.75)
+                            .minimumScaleFactor(0.6)
+                        Spacer(minLength: 4)
+                        Image(systemName: hero.displaySymbol)
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundStyle(accent)
                     }
-                    .foregroundStyle(.white.opacity(0.95))
 
                     Spacer(minLength: 6)
 
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
                         Text(hero.compactCurrentUnitValueLabel)
                             .font(.system(size: 44, weight: .heavy, design: .rounded))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(valueColor)
                             .monospacedDigit()
                             .lineLimit(1)
                             .minimumScaleFactor(0.5)
-                        Text(hero.unitLabel)
-                            .font(.system(size: 13, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.85))
+                        Text(hero.unitLabel.uppercased())
+                            .font(.system(size: 11, weight: .heavy, design: .rounded))
+                            .tracking(0.6)
+                            .foregroundStyle(Theme.retroInkDim)
                     }
-                    Text("of \(hero.compactGoalValueLabel) goal")
-                        .font(.system(size: 11, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.8))
+                    Text("OF \(hero.compactGoalValueLabel) GOAL")
+                        .font(.system(size: 10, weight: .bold, design: .rounded))
+                        .tracking(0.6)
+                        .foregroundStyle(Theme.retroInkDim)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
 
                     Spacer(minLength: 8)
 
-                    progressBar(clampedProgress(hero), height: 7)
+                    progressBar(clampedProgress(hero), accent: valueColor, height: 7)
 
                     HStack(spacing: 4) {
                         Image(systemName: "flame.fill")
                             .font(.system(size: 10, weight: .bold))
-                        Text(streakLengthLabel(hero))
-                            .font(.system(size: 11, weight: .bold, design: .rounded))
+                            .foregroundStyle(hero.currentUnitCompleted ? Theme.retroLime : Theme.retroAmber)
+                        Text(streakLengthLabel(hero).uppercased())
+                            .font(.system(size: 11, weight: .heavy, design: .rounded))
+                            .tracking(0.4)
+                            .foregroundStyle(Theme.retroInk)
                             .lineLimit(1)
+                        Spacer(minLength: 0)
                         if hero.currentUnitCompleted {
-                            Spacer(minLength: 0)
                             Image(systemName: "checkmark.circle.fill")
                                 .font(.system(size: 11, weight: .bold))
+                                .foregroundStyle(Theme.retroLime)
                         }
                     }
-                    .foregroundStyle(.white.opacity(0.9))
                     .padding(.top, 6)
                 }
             } else {
                 emptyState
             }
         }
-        .containerBackground(Theme.streakGradient, for: .widget)
+        .containerBackground(Theme.retroBg, for: .widget)
     }
 
     // Home-screen medium: hero + up to 3 badges
     private var mediumView: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: 12) {
             Group {
                 if let hero = entry.hero {
+                    let accent = heroAccent(hero)
+                    let valueColor: Color = hero.currentUnitCompleted ? Theme.retroLime : accent
                     VStack(alignment: .leading, spacing: 0) {
-                        HStack(spacing: 5) {
-                            Image(systemName: hero.displaySymbol)
-                                .font(.system(size: 12, weight: .bold))
-                            Text(hero.displayName)
-                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                        HStack(alignment: .top, spacing: 6) {
+                            Text(hero.displayName.uppercased())
+                                .font(.system(size: 12, weight: .heavy, design: .rounded))
+                                .tracking(0.8)
+                                .foregroundStyle(accent)
                                 .lineLimit(1)
-                                .minimumScaleFactor(0.75)
+                                .minimumScaleFactor(0.6)
+                            Spacer(minLength: 4)
+                            Image(systemName: hero.displaySymbol)
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundStyle(accent)
                         }
-                        .foregroundStyle(.white.opacity(0.95))
 
                         Spacer(minLength: 4)
 
                         HStack(alignment: .firstTextBaseline, spacing: 3) {
                             Text(hero.compactCurrentUnitValueLabel)
                                 .font(.system(size: 40, weight: .heavy, design: .rounded))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(valueColor)
                                 .monospacedDigit()
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.5)
-                            Text(hero.unitLabel)
-                                .font(.system(size: 12, weight: .bold, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.85))
+                            Text(hero.unitLabel.uppercased())
+                                .font(.system(size: 10, weight: .heavy, design: .rounded))
+                                .tracking(0.6)
+                                .foregroundStyle(Theme.retroInkDim)
                         }
-                        Text("of \(hero.compactGoalValueLabel) goal")
-                            .font(.system(size: 10, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.8))
+                        Text("OF \(hero.compactGoalValueLabel) GOAL")
+                            .font(.system(size: 9, weight: .bold, design: .rounded))
+                            .tracking(0.6)
+                            .foregroundStyle(Theme.retroInkDim)
                             .lineLimit(1)
                             .minimumScaleFactor(0.7)
 
                         Spacer(minLength: 6)
 
-                        progressBar(clampedProgress(hero), height: 6)
+                        progressBar(clampedProgress(hero), accent: valueColor, height: 6)
 
                         HStack(spacing: 4) {
                             Image(systemName: "flame.fill")
                                 .font(.system(size: 9, weight: .bold))
-                            Text(streakLengthLabel(hero))
-                                .font(.system(size: 10, weight: .bold, design: .rounded))
+                                .foregroundStyle(hero.currentUnitCompleted ? Theme.retroLime : Theme.retroAmber)
+                            Text(streakLengthLabel(hero).uppercased())
+                                .font(.system(size: 10, weight: .heavy, design: .rounded))
+                                .tracking(0.4)
+                                .foregroundStyle(Theme.retroInk)
                                 .lineLimit(1)
                         }
-                        .foregroundStyle(.white.opacity(0.9))
                         .padding(.top, 5)
                     }
                 } else {
@@ -284,12 +303,12 @@ struct StreakWidgetView: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text("MORE STREAKS")
                     .font(.system(size: 9, weight: .heavy, design: .rounded))
-                    .tracking(0.6)
-                    .foregroundStyle(.white.opacity(0.65))
+                    .tracking(1)
+                    .foregroundStyle(Theme.retroInkDim)
                 if entry.badges.isEmpty {
                     Text("Keep going to unlock more")
-                        .font(.system(size: 10, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.7))
+                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .foregroundStyle(Theme.retroInkDim)
                         .fixedSize(horizontal: false, vertical: true)
                 } else {
                     ForEach(entry.badges.prefix(3)) { b in
@@ -299,48 +318,51 @@ struct StreakWidgetView: View {
                 Spacer(minLength: 0)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(12)
+            .padding(10)
             .background(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(.white.opacity(0.14))
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Theme.retroBgRaised)
             )
         }
-        .containerBackground(Theme.streakGradient, for: .widget)
+        .containerBackground(Theme.retroBg, for: .widget)
     }
 
     private func mediumBadgeRow(_ item: StreakSnapshot.Item) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        let accent = item.streakMetric?.accent ?? Theme.streakHot
+        let valueColor: Color = item.currentUnitCompleted ? Theme.retroLime : accent
+        return VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 5) {
                 Image(systemName: item.displaySymbol)
                     .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(accent)
                     .frame(width: 14)
                 Text(item.displayName)
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .foregroundStyle(Theme.retroInk)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
                 Spacer(minLength: 2)
                 Text("\(item.compactCurrentUnitValueLabel)/\(item.compactGoalValueLabel)")
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .font(.system(size: 10, weight: .heavy, design: .rounded))
+                    .foregroundStyle(valueColor)
                     .monospacedDigit()
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
             }
-            .foregroundStyle(.white.opacity(0.95))
-            progressBar(clampedProgress(item), height: 4, trackOpacity: 0.2, fillOpacity: 0.9)
+            progressBar(clampedProgress(item), accent: valueColor, height: 4)
         }
     }
 
     // Crisp capsule progress bar — replaces the default ProgressView, which
     // renders inconsistently and can't be sized cleanly inside widgets.
     private func progressBar(_ value: Double,
-                             height: CGFloat,
-                             trackOpacity: Double = 0.25,
-                             fillOpacity: Double = 1) -> some View {
+                             accent: Color,
+                             height: CGFloat) -> some View {
         GeometryReader { geo in
             ZStack(alignment: .leading) {
-                Capsule().fill(.white.opacity(trackOpacity))
+                Capsule().fill(Theme.retroInkFaint.opacity(0.35))
                 Capsule()
-                    .fill(.white.opacity(fillOpacity))
+                    .fill(accent)
                     .frame(width: value <= 0 ? 0 : max(height, geo.size.width * value))
             }
         }
@@ -351,10 +373,10 @@ struct StreakWidgetView: View {
         VStack(spacing: 8) {
             Image(systemName: "figure.run")
                 .font(.system(size: 30, weight: .semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(Theme.retroMagenta)
             Text("Open app to sync streaks")
                 .font(.system(size: 11, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(Theme.retroInkDim)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
