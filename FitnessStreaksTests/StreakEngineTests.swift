@@ -266,6 +266,50 @@ final class StreakEngineTests: XCTestCase {
         XCTAssertEqual(totals[sleepDay] ?? 0, 8, accuracy: 0.001)
     }
 
+    func testMergeWithCacheForMissingDaysPatchesYesterdayWhenFreshIsZero() {
+        let today = DateHelpers.startOfDay()
+        let yesterday = DateHelpers.addDays(-1, to: today)
+        let twoDaysAgo = DateHelpers.addDays(-2, to: today)
+
+        let fresh = [
+            activity(twoDaysAgo, steps: 8_000),
+            activity(yesterday, steps: 0),
+            activity(today, steps: 0),
+        ]
+        let cache = [
+            activity(twoDaysAgo, steps: 8_000),
+            activity(yesterday, steps: 9_500),
+        ]
+
+        let merged = StreakStore.mergeWithCacheForMissingDays(fresh: fresh, previousCache: cache)
+        let byDay = Dictionary(uniqueKeysWithValues: merged.map { ($0.date, $0) })
+
+        XCTAssertEqual(byDay[yesterday]?.steps, 9_500, "Yesterday's zero fetch should be patched from cache")
+        XCTAssertEqual(byDay[today]?.steps, 0, "Today is allowed to be zero — never patched")
+        XCTAssertEqual(byDay[twoDaysAgo]?.steps, 8_000)
+    }
+
+    func testMergeWithCacheLeavesGenuineMissesAlone() {
+        let today = DateHelpers.startOfDay()
+        let yesterday = DateHelpers.addDays(-1, to: today)
+
+        // Both fresh and cache show zero for yesterday — a real miss, not a sync gap.
+        let fresh = [activity(yesterday, steps: 0), activity(today, steps: 0)]
+        let cache = [activity(yesterday, steps: 0)]
+
+        let merged = StreakStore.mergeWithCacheForMissingDays(fresh: fresh, previousCache: cache)
+        let byDay = Dictionary(uniqueKeysWithValues: merged.map { ($0.date, $0) })
+        XCTAssertEqual(byDay[yesterday]?.steps, 0, "Real misses must not be patched")
+    }
+
+    func testMergeWithCacheDoesNotPatchTodayEvenIfCacheHasIt() {
+        let today = DateHelpers.startOfDay()
+        let fresh = [activity(today, steps: 0)]
+        let cache = [activity(today, steps: 12_000)]
+        let merged = StreakStore.mergeWithCacheForMissingDays(fresh: fresh, previousCache: cache)
+        XCTAssertEqual(merged.first?.steps, 0, "Today is always allowed to be accumulating from zero")
+    }
+
     private func day(_ year: Int, _ month: Int, _ day: Int) -> Date {
         DateHelpers.gregorian.date(from: DateComponents(year: year, month: month, day: day))!
     }
