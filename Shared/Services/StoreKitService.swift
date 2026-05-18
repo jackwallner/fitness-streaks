@@ -3,6 +3,48 @@ import Foundation
 #if REVENUECAT
 import RevenueCat
 
+extension Package {
+    /// Human-readable trial length, e.g. "7-day free trial". Nil unless this
+    /// package's intro offer is a free trial (vs intro pricing).
+    var streaksIntroOfferLabel: String? {
+        guard let intro = storeProduct.introductoryDiscount, intro.paymentMode == .freeTrial else {
+            return nil
+        }
+        let period = intro.subscriptionPeriod
+        let unit: String
+        switch period.unit {
+        case .day:   unit = period.value == 1 ? "day"   : "days"
+        case .week:  unit = period.value == 1 ? "week"  : "weeks"
+        case .month: unit = period.value == 1 ? "month" : "months"
+        case .year:  unit = period.value == 1 ? "year"  : "years"
+        @unknown default: unit = ""
+        }
+        if period.unit == .week {
+            return "\(period.value * 7)-day free trial"
+        }
+        return "\(period.value)-\(unit.dropLast(period.value == 1 ? 0 : 1)) free trial"
+    }
+
+    /// Recurring-price label, e.g. "$29.99 / year". Used in the trial-offer sheet's
+    /// billing disclosure (Apple 3.1.2 requires price + terms before purchase).
+    var streaksRecurringPriceLabel: String {
+        guard let period = storeProduct.subscriptionPeriod else {
+            return storeProduct.localizedPriceString
+        }
+        let unit: String
+        switch period.unit {
+        case .day:   unit = period.value == 1 ? "day"   : "days"
+        case .week:  unit = period.value == 1 ? "week"  : "weeks"
+        case .month: unit = period.value == 1 ? "month" : "months"
+        case .year:  unit = period.value == 1 ? "year"  : "years"
+        @unknown default: unit = ""
+        }
+        return period.value == 1
+            ? "\(storeProduct.localizedPriceString) / \(unit)"
+            : "\(storeProduct.localizedPriceString) / \(period.value) \(unit)"
+    }
+}
+
 /// Manages RevenueCat purchases and entitlements for FitnessStreaks Pro.
 /// Single source of truth for `isPro`. Persists entitlement to App Group UserDefaults
 /// so widgets / watch can read the same value without running RevenueCat.

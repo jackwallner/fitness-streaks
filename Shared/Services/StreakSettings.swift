@@ -248,6 +248,20 @@ final class StreakSettings: ObservableObject {
         didSet { defaults.set(hasSeenTutorial, forKey: "hasSeenTutorial") }
     }
 
+    /// True after the user has seen (or dismissed) the one-time Pro free-trial
+    /// offer that fires shortly after onboarding completes.
+    @Published var hasSeenTrialOffer: Bool {
+        didSet { defaults.set(hasSeenTrialOffer, forKey: "hasSeenTrialOffer") }
+    }
+
+    /// How many streaks the user picked at the end of onboarding *before* the
+    /// free-tier cap was enforced. Drives the post-onboarding trial-offer copy:
+    /// when it exceeds the free cap, the sheet pitches "keep all N streaks you
+    /// just earned" instead of generic Pro framing.
+    @Published var lastOnboardingPickedCount: Int {
+        didSet { defaults.set(lastOnboardingPickedCount, forKey: "lastOnboardingPickedCount") }
+    }
+
     @Published var appearance: AppAppearance {
         didSet { defaults.set(appearance.rawValue, forKey: "appearance") }
     }
@@ -369,6 +383,8 @@ final class StreakSettings: ObservableObject {
         self.hasCompletedSetup = defaults.bool(forKey: "hasCompletedSetup")
         self.hasWatchCompletedSetup = defaults.bool(forKey: "hasWatchCompletedSetup")
         self.hasSeenTutorial = defaults.bool(forKey: "hasSeenTutorial")
+        self.hasSeenTrialOffer = defaults.bool(forKey: "hasSeenTrialOffer")
+        self.lastOnboardingPickedCount = defaults.integer(forKey: "lastOnboardingPickedCount")
         self.appearance = AppAppearance(rawValue: defaults.integer(forKey: "appearance")) ?? .light
         // Default OFF — never request notification permission until the user explicitly opts in.
         self.notificationsEnabled = defaults.object(forKey: "notificationsEnabled") as? Bool ?? false
