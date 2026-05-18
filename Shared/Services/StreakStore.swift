@@ -104,6 +104,30 @@ final class StreakStore: ObservableObject {
         return activitySignal(recentFresh) == 0 && activitySignal(recentCache) >= 3_000
     }
 
+    /// Patch any past day where the fresh fetch shows zero activity but the pre-fetch
+    /// cache had meaningful activity for that same day. This guards against transient
+    /// HealthKit sync gaps — most commonly yesterday's value briefly returning as zero
+    /// because the watch hasn't replayed to the phone yet, or during a flaky network
+    /// state. Without this, the engine would walk back from today, see yesterday under
+    /// threshold, reset the streak to zero, and `handleBreaks` would push a false
+    /// "streak broken" notification.
+    ///
+    /// Today is intentionally NOT patched — today is allowed to still be accumulating.
+    /// The wholesale `detectLikelyDataLoss` check still runs first and short-circuits
+    /// the entire load when the full 14-day window comes back empty, so this only
+    /// fires for narrow per-day gaps.
+    nonisolated static func mergeWithCacheForMissingDays(fresh: [ActivityDay], previousCache: [ActivityDay]) -> [ActivityDay] {
+        guard !previousCache.isEmpty else { return fresh }
+        let today = DateHelpers.startOfDay()
+        let cacheByDay: [Date: ActivityDay] = Dictionary(uniqueKeysWithValues: previousCache.map { ($0.date, $0) })
+        return fresh.map { day in
+            guard day.date < today else { return day }
+            guard activitySignal([day]) == 0 else { return day }
+            guard let cached = cacheByDay[day.date], activitySignal([cached]) > 0 else { return day }
+            return cached
+        }
+    }
+
     /// Apply manual ordering: items in manualOrder come first in that order,
     /// remaining items follow sorted by their original engine ranking.
     static func applyManualOrder(_ streaks: [Streak], manualOrder: [String]) -> [Streak] {
@@ -177,19 +201,23 @@ final class StreakStore: ObservableObject {
             // call HealthKitService.cache() with the fresh result, this comparison
             // would be against itself.
             let preFetchCached = HealthKitService.shared.cachedHistory(days: 30)
-            let fresh = try await HealthKitService.shared.fetchHistory(days: 400)
+            let rawFresh = try await HealthKitService.shared.fetchHistory(days: 400)
 
             // If the fetch came back suspiciously empty (transient cold-launch race
             // or revoked permission — Apple hides read denial), do NOT cache it,
             // run the engine, detect breaks, or overwrite displayed state. Surface
             // the soft banner and keep the last good data intact. Returning here is
             // the single most important guard against falsely killing a real streak.
-            if Self.detectLikelyDataLoss(fresh: fresh, previousCache: preFetchCached) {
+            if Self.detectLikelyDataLoss(fresh: rawFresh, previousCache: preFetchCached) {
                 log.warning("Skipping load — fresh HealthKit fetch is empty but cache had activity (likely transient/revoked)")
                 self.dataMaybeRevoked = true
                 return
             }
             self.dataMaybeRevoked = false
+            // Patch narrow per-day gaps where the fresh fetch shows zero but the cache
+            // had real activity — protects streaks from a watch->phone sync lag that
+            // would otherwise read as a missed day and break the streak.
+            let fresh = Self.mergeWithCacheForMissingDays(fresh: rawFresh, previousCache: preFetchCached)
             withAnimation(.linear(duration: 0.25)) {
                 loadProgress = 0.5
                 loadStage = .analyzingPatterns
