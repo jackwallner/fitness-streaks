@@ -580,6 +580,10 @@ struct OnboardingView: View {
 
     private func finishWithSelection() {
         guard !selection.isEmpty else { return }
+        // Record the user's *intended* count before any free-tier cap is applied,
+        // so the post-onboarding trial offer can pitch "keep all N you just earned"
+        // when the user picked more than the free cap allows.
+        settings.lastOnboardingPickedCount = selection.count
         settings.trackedStreaks = selection
         // Manual order = engine order, filtered to selection. This preserves the
         // user's chosen intensity ranking for the hero rather than overriding it
