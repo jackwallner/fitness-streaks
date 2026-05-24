@@ -236,6 +236,7 @@ struct FitnessStreaksApp: App {
 private struct RootView: View {
     @EnvironmentObject var settings: StreakSettings
     @EnvironmentObject var storeKit: StoreKitService
+    @EnvironmentObject var store: StreakStore
 
     @State private var showTrialOffer = false
     @State private var showTrialPaywall = false
@@ -297,6 +298,7 @@ private struct RootView: View {
                 errorMessage: trialPurchaseError,
                 pickedCount: settings.lastOnboardingPickedCount,
                 freeCap: Self.freeTrackedLimit,
+                longestStreak: longestStreakInfo(),
                 onStartTrial: {
                     if trialOfferPackage != nil {
                         startDirectTrialPurchase()
@@ -323,6 +325,20 @@ private struct RootView: View {
             }
         }
         #endif
+    }
+
+    /// Longest currently-tracked streak, used to personalize TrialOfferSheet copy.
+    /// Returns nil when the dashboard is empty (cold start, no data yet).
+    private func longestStreakInfo() -> TrialOfferSheet.LongestStreakInfo? {
+        let pool = store.streaks.isEmpty ? store.allCandidates : store.streaks
+        guard let top = pool.max(by: { $0.current < $1.current }), top.current > 0 else {
+            return nil
+        }
+        return .init(
+            displayName: top.displayName,
+            current: top.current,
+            cadenceLabel: top.cadence.label
+        )
     }
 
     #if REVENUECAT
