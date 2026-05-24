@@ -25,6 +25,10 @@ struct OnboardingView: View {
     @State private var selection: Set<String> = []
     @State private var authProgress: Double = 0
     @State private var showingPaywall = false
+    /// Set when a free user taps an unselected streak after hitting the free cap.
+    /// Drives `showingCapPaywall` and the contextual headline shown above the paywall.
+    @State private var capHitStreak: Streak? = nil
+    @State private var showingCapPaywall = false
 
     private static let tips: [String] = [
         "Streaks update automatically from Apple Health — no manual logging.",
@@ -40,10 +44,6 @@ struct OnboardingView: View {
     /// intentionally exceeds it so the confirm step pitches the trial: trial to
     /// keep them all, or fall back to the top N. Mirrors `freeCustomLimit`.
     static let freeTrackedLimit = 3
-
-    private var overFreeTrackedLimit: Bool {
-        !storeKit.isPro && selection.count > Self.freeTrackedLimit
-    }
 
     // Timer publishers - stored to allow proper cleanup
     private let tipTimerPublisher = Timer.publish(every: 3.5, on: .main, in: .common)
@@ -64,11 +64,13 @@ struct OnboardingView: View {
             }
         }
         .sheet(isPresented: $showingPaywall, onDismiss: {
-            // Pro or not, proceed to the app. Soft paywall: swipe-to-dismiss is
-            // intentionally allowed so a failed/slow RevenueCat load can never
-            // brick first launch. This onDismiss is the guaranteed escape hatch.
-            // Refresh entitlement first so a just-completed trial is reflected
-            // before enforceFreeTrackedCap() decides whether to trim selection.
+            // Soft paywall: swipe-to-dismiss is intentionally allowed so a failed
+            // or slow RevenueCat load can never brick first launch. This onDismiss
+            // is the guaranteed escape hatch. Selection is already capped at the
+            // free tier by the picker itself, so there is nothing to trim here.
+            // We mark the trial-offer as seen either way so the post-onboarding
+            // TrialOfferSheet does not immediately re-pitch the same thing.
+            settings.hasSeenTrialOffer = true
             Task {
                 await storeKit.refreshEntitlement()
                 completeSetup()
@@ -78,6 +80,24 @@ struct OnboardingView: View {
                 PaywallView(offering: offering)
             } else {
                 PaywallView()
+            }
+        }
+        .sheet(isPresented: $showingCapPaywall, onDismiss: {
+            Task {
+                await storeKit.refreshEntitlement()
+                // If they upgraded, auto-add the streak they were blocked on.
+                if storeKit.isPro, let streak = capHitStreak {
+                    selection.insert(streak.trackingKey)
+                }
+                capHitStreak = nil
+            }
+        }) {
+            CapPaywallSheet(streak: capHitStreak, freeCap: Self.freeTrackedLimit) {
+                if let offering = storeKit.offerings?.current {
+                    PaywallView(offering: offering)
+                } else {
+                    PaywallView()
+                }
             }
         }
         .onAppear {
@@ -384,10 +404,15 @@ struct OnboardingView: View {
                     Rectangle()
                         .fill(Theme.retroBgCard)
                         .overlay(Rectangle().stroke(Theme.retroCyan, lineWidth: 2))
-                    Rectangle()
-                        .fill(Theme.retroCyan)
-                        .frame(width: max(0, geo.size.width * CGFloat(displayedProgress)))
-                        .padding(2)
+                    ZStack {
+                        Rectangle()
+                            .fill(Theme.retroCyan)
+                        AnimatedStripes(stripeWidth: 6, gap: 8, speed: 18)
+                            .blendMode(.plusLighter)
+                    }
+                    .frame(width: max(0, geo.size.width * CGFloat(displayedProgress)))
+                    .padding(2)
+                    .clipped()
                 }
             }
             .frame(height: 18)
@@ -473,7 +498,12 @@ struct OnboardingView: View {
                 StreakPickerList(
                     candidates: store.allCandidates,
                     selection: $selection,
-                    recommendedCount: min(5, store.allCandidates.count)
+                    recommendedCount: min(5, store.allCandidates.count),
+                    enforcedMax: storeKit.isPro ? nil : Self.freeTrackedLimit,
+                    onCapHit: { streak in
+                        capHitStreak = streak
+                        showingCapPaywall = true
+                    }
                 )
                 .padding(.horizontal, 14)
                 .padding(.bottom, 16)
@@ -571,10 +601,20 @@ struct OnboardingView: View {
             withAnimation { phase = .empty }
             return
         }
-        // Pre-select Apple's Activity-ring core metrics for a familiar onboarding experience.
+        // Pre-select Apple's Activity-ring core metrics for a familiar onboarding
+        // experience. Free users get capped at `freeTrackedLimit` so they land in
+        // a valid state — no silent trim later, no over-cap "Start" button that
+        // forces a paywall they didn't ask for. Pro users see all five.
         let coreMetrics: [StreakMetric] = [.steps, .exerciseMinutes, .standHours, .activeEnergy, .workouts]
-        let defaults = store.allCandidates.filter { coreMetrics.contains($0.metric) }
-        selection = Set(defaults.map(\.trackingKey))
+        let core = store.allCandidates
+            .filter { coreMetrics.contains($0.metric) }
+            .sorted { a, b in
+                let ai = coreMetrics.firstIndex(of: a.metric) ?? Int.max
+                let bi = coreMetrics.firstIndex(of: b.metric) ?? Int.max
+                return ai < bi
+            }
+        let limit = storeKit.isPro ? core.count : min(Self.freeTrackedLimit, core.count)
+        selection = Set(core.prefix(limit).map(\.trackingKey))
         withAnimation { phase = .selecting }
     }
 
@@ -617,37 +657,19 @@ struct OnboardingView: View {
 
     private var startButtonLabel: String {
         if selection.isEmpty { return "PICK AT LEAST ONE" }
-        if overFreeTrackedLimit {
-            return "▶ TRIAL TO KEEP \(selection.count) STREAKS"
-        }
         return "▶ START · \(selection.count) STREAK\(selection.count == 1 ? "" : "S")"
     }
 
     private func completeSetup() {
-        enforceFreeTrackedCap()
         withAnimation { settings.hasCompletedSetup = true }
     }
 
-    /// Last line of defense for the free 3-streak cap. Runs on every completion
-    /// path (paywall dismissed without upgrading, no offering available, etc.).
-    /// No-ops for Pro, for the skip-tracking path (`trackedStreaks == nil`), and
-    /// when already within the limit. Keeps the user's top picks in engine order.
-    private func enforceFreeTrackedCap() {
-        guard !storeKit.isPro,
-              let tracked = settings.trackedStreaks,
-              tracked.count > Self.freeTrackedLimit else { return }
-        let kept = store.allCandidates
-            .map(\.trackingKey)
-            .filter { tracked.contains($0) }
-            .prefix(Self.freeTrackedLimit)
-        let keptSet = Set(kept)
-        settings.trackedStreaks = keptSet
-        settings.manualStreakOrder = Array(kept)
-        selection = keptSet
-        store.refilter()
-    }
-
     // MARK: - Pro Context
+
+    /// How many extra streaks the user could be tracking but can't (free cap).
+    private var lockedCount: Int {
+        max(0, store.allCandidates.count - selection.count)
+    }
 
     private var proContextCard: some View {
         HStack(spacing: 10) {
@@ -655,15 +677,13 @@ struct OnboardingView: View {
                 .font(.system(size: 18))
                 .foregroundStyle(Theme.retroMagenta)
             VStack(alignment: .leading, spacing: 2) {
-                Text(overFreeTrackedLimit
-                     ? "FREE TRACKS \(Self.freeTrackedLimit) STREAKS"
-                     : "KEEP YOUR STREAKS SAFE WITH PRO")
+                Text("FREE TRACKS \(Self.freeTrackedLimit) · \(lockedCount) MORE WITH PRO")
                     .font(RetroFont.mono(10, weight: .bold))
                     .tracking(1)
                     .foregroundStyle(Theme.retroMagenta)
-                Text(overFreeTrackedLimit
-                     ? "Start a free trial to track all \(selection.count) — or continue and we'll keep your top \(Self.freeTrackedLimit)."
-                     : "Try free · Auto-save missed days · Freeze for travel")
+                Text(lockedCount > 0
+                     ? "Tap any locked streak to start a free trial and add it."
+                     : "Pro unlocks custom streaks, auto-save, and travel freezes.")
                     .font(RetroFont.mono(9))
                     .foregroundStyle(Theme.retroInkDim)
             }
@@ -707,6 +727,53 @@ struct OnboardingView: View {
     private func openHealthAccess() {
         if let url = URL(string: UIApplication.openSettingsURLString) {
             UIApplication.shared.open(url)
+        }
+    }
+}
+
+/// Bottom sheet shown the moment a free user taps an unselected streak past the
+/// cap. Frames the pitch around the *specific* streak they just tried to add,
+/// then hosts the underlying RevenueCat `PaywallView`.
+struct CapPaywallSheet<Paywall: View>: View {
+    let streak: Streak?
+    let freeCap: Int
+    @ViewBuilder let paywall: () -> Paywall
+
+    @Environment(\.dismiss) private var dismiss
+
+    private var streakName: String {
+        streak?.displayName.uppercased() ?? "THIS STREAK"
+    }
+
+    private var headline: String {
+        if let streak, streak.current >= 3 {
+            return "KEEP YOUR \(streak.current)-\(streak.cadence.label.uppercased()) \(streakName) STREAK"
+        }
+        return "ADD \(streakName) TO YOUR PRO LINEUP"
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            VStack(spacing: 8) {
+                Text("FREE TRACKS \(freeCap)")
+                    .font(RetroFont.mono(10, weight: .bold))
+                    .tracking(2)
+                    .foregroundStyle(Theme.retroInkDim)
+                Text(headline)
+                    .font(RetroFont.mono(15, weight: .bold))
+                    .tracking(1)
+                    .foregroundStyle(Theme.retroMagenta)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(2)
+                    .retroGlow(Theme.retroMagenta)
+            }
+            .padding(.top, 18)
+            .padding(.horizontal, 24)
+            .padding(.bottom, 12)
+            .frame(maxWidth: .infinity)
+            .background(Theme.retroBg)
+
+            paywall()
         }
     }
 }

@@ -26,20 +26,34 @@ struct TrialOfferSheet: View {
     /// everything" pitch.
     let pickedCount: Int
     let freeCap: Int
+    /// Longest tracked streak the user currently has. Drives a personalized
+    /// "Keep your N-day X streak alive" pitch when available — pulled from the
+    /// live `StreakStore` at present time, not onboarding intent. Falls back to
+    /// generic copy when nil (e.g., empty dashboard).
+    let longestStreak: LongestStreakInfo?
     let onStartTrial: () -> Void
     let onSeeAllPlans: () -> Void
     let onDismiss: () -> Void
 
+    struct LongestStreakInfo {
+        let displayName: String
+        let current: Int
+        let cadenceLabel: String  // "day" / "week"
+    }
+
     private static let privacyURL = URL(string: "https://jackwallner.github.io/fitness-streaks/privacy-policy.html")!
     private static let termsURL = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
 
-    /// The user picked more streaks than free allows — onboarding *will* trim
-    /// (or already trimmed) their selection. Pivot the whole sheet around that.
-    private var capWasHit: Bool { pickedCount > freeCap }
+    /// The user has at least one meaningful run going. Drive the entire pitch
+    /// around the longest one — "keep your N-day X streak alive" beats generic
+    /// "try Pro free" by a wide margin on first-impression conversion.
+    private var hasMeaningfulStreak: Bool {
+        (longestStreak?.current ?? 0) >= 3
+    }
 
     private var headline: String {
-        if capWasHit {
-            return "KEEP ALL \(pickedCount) STREAKS."
+        if let s = longestStreak, hasMeaningfulStreak {
+            return "KEEP YOUR \(s.current)-\(s.cadenceLabel.uppercased()) \(s.displayName.uppercased()) STREAK ALIVE."
         }
         if let offerLabel {
             return "\(offerLabel.uppercased()), ON US."
@@ -48,9 +62,9 @@ struct TrialOfferSheet: View {
     }
 
     private var subheadline: String {
-        let trialClause = offerLabel.map { ", free for your \($0.replacingOccurrences(of: " free trial", with: ""))" } ?? ""
-        if capWasHit {
-            return "Free tracks the top \(freeCap) — we just trimmed \(pickedCount - freeCap) you picked. Pro keeps every one\(trialClause)."
+        let trialClause = offerLabel.map { " — free for your \($0.replacingOccurrences(of: " free trial", with: ""))" } ?? ""
+        if hasMeaningfulStreak {
+            return "One missed \(longestStreak?.cadenceLabel ?? "day") zeroes it out. Pro auto-saves the run and tracks every streak you've earned\(trialClause)."
         }
         if offerLabel != nil {
             return "Unlock the full Pro toolkit free. No charge until your trial ends."
@@ -59,14 +73,20 @@ struct TrialOfferSheet: View {
     }
 
     private var bullets: [TrialBullet] {
-        let unlimitedDetail: String = capWasHit
-            ? "Restore the \(pickedCount - freeCap) we trimmed and track them all together."
-            : "Free caps you at \(freeCap). Pro tracks every metric you've earned, including future picks."
+        let unlimitedDetail = "Free caps you at \(freeCap). Pro tracks every metric you've earned, including future picks."
         return [
+            TrialBullet(
+                icon: "flame.fill",
+                tint: Theme.retroMagenta,
+                title: hasMeaningfulStreak
+                    ? "Auto-save your \(longestStreak?.displayName ?? "streak") if you miss a day"
+                    : "Auto-save when one breaks",
+                detail: "Miss a \(longestStreak?.cadenceLabel ?? "day") later on? Pro revives the run instead of zeroing it."
+            ),
             TrialBullet(
                 icon: "infinity",
                 tint: Theme.retroCyan,
-                title: capWasHit ? "Restore all \(pickedCount) streaks" : "Track every streak",
+                title: "Track every streak",
                 detail: unlimitedDetail
             ),
             TrialBullet(
@@ -74,12 +94,6 @@ struct TrialOfferSheet: View {
                 tint: Theme.retroLime,
                 title: "Custom streaks",
                 detail: "Define your own threshold, cadence, and hour window — beyond the discovered set."
-            ),
-            TrialBullet(
-                icon: "flame.fill",
-                tint: Theme.retroMagenta,
-                title: "Auto-save when one breaks",
-                detail: "Miss a day later on? Pro revives the run instead of zeroing it."
             )
         ]
     }

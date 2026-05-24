@@ -97,6 +97,44 @@ struct PixelProgressBar: View {
     }
 }
 
+// MARK: - AnimatedStripes
+//
+// Diagonal scanlines that continuously scroll. Overlay on a filled progress bar
+// to communicate "still working" even when the percentage parks. The Canvas
+// re-renders on a TimelineView tick rather than animating SwiftUI state, so
+// motion never gets eaten by withAnimation chains around the parent view.
+
+struct AnimatedStripes: View {
+    var stripeWidth: CGFloat = 6
+    var gap: CGFloat = 8
+    /// Points per second. Higher = faster scroll.
+    var speed: CGFloat = 18
+    var color: Color = .white.opacity(0.22)
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { context in
+            Canvas { ctx, size in
+                let period = stripeWidth + gap
+                let phase = CGFloat(context.date.timeIntervalSinceReferenceDate * Double(speed))
+                    .truncatingRemainder(dividingBy: period)
+                let slant = size.height
+                var x: CGFloat = -slant - period + phase
+                while x < size.width + slant {
+                    var path = Path()
+                    path.move(to: CGPoint(x: x + slant, y: 0))
+                    path.addLine(to: CGPoint(x: x + slant + stripeWidth, y: 0))
+                    path.addLine(to: CGPoint(x: x + stripeWidth, y: size.height))
+                    path.addLine(to: CGPoint(x: x, y: size.height))
+                    path.closeSubpath()
+                    ctx.fill(path, with: .color(color))
+                    x += period
+                }
+            }
+        }
+        .allowsHitTesting(false)
+    }
+}
+
 // MARK: - PixelBarThin (smooth, used in badge cards)
 
 struct PixelBarThin: View {

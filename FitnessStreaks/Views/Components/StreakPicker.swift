@@ -14,6 +14,17 @@ struct StreakPickerList: View {
     /// Called when user taps edit on a custom streak (passes the streak ID)
     var onEditCustom: ((String) -> Void)? = nil
 
+    /// Maximum number of streaks the user is allowed to select. `nil` = unlimited
+    /// (Pro). When set, attempting to enable a streak past the cap fires
+    /// `onCapHit` *instead of* mutating the selection. Already-selected items
+    /// can always be toggled off regardless of the cap so the user is never
+    /// stuck in a state they can't escape.
+    var enforcedMax: Int? = nil
+
+    /// Fired when a free user taps an unselected row that would push them past
+    /// `enforcedMax`. Callers present a paywall here. Selection is *not* mutated.
+    var onCapHit: ((Streak) -> Void)? = nil
+
     /// Core metrics that appear first in the list, ordered to mirror Apple's Activity rings.
     private let coreMetrics: [StreakMetric] = [.steps, .exerciseMinutes, .standHours, .activeEnergy, .workouts]
 
@@ -58,9 +69,17 @@ struct StreakPickerList: View {
         let accent = streak.metric.accent
         let isCustom = streak.customID != nil
 
+        let locked = !on && (enforcedMax.map { selection.count >= $0 } ?? false)
+
         return HStack(spacing: 0) {
             Button {
-                if on { selection.remove(key) } else { selection.insert(key) }
+                if on {
+                    selection.remove(key)
+                } else if let max = enforcedMax, selection.count >= max {
+                    onCapHit?(streak)
+                } else {
+                    selection.insert(key)
+                }
             } label: {
                 HStack(alignment: .center, spacing: 12) {
                     Image(systemName: streak.metric.symbol)
@@ -96,14 +115,21 @@ struct StreakPickerList: View {
                     }
                     Spacer(minLength: 0)
 
-                    Text(on ? "◉" : "○")
-                        .font(RetroFont.mono(18, weight: .bold))
-                        .foregroundStyle(on ? accent : Theme.retroInkFaint)
+                    if locked {
+                        Image(systemName: "lock.fill")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundStyle(Theme.retroMagenta)
+                    } else {
+                        Text(on ? "◉" : "○")
+                            .font(RetroFont.mono(18, weight: .bold))
+                            .foregroundStyle(on ? accent : Theme.retroInkFaint)
+                    }
                 }
                 .padding(.vertical, 10)
                 .padding(.horizontal, 12)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .pixelPanel(color: on ? accent : Theme.retroInkFaint,
+                .opacity(locked ? 0.55 : 1)
+                .pixelPanel(color: on ? accent : (locked ? Theme.retroMagenta : Theme.retroInkFaint),
                             fill: on ? Theme.retroBgCard : Theme.retroBgRaised)
             }
             .buttonStyle(.plain)
@@ -149,9 +175,14 @@ struct StreakPickerSheet: View {
     @State private var showingBuilder = false
     @State private var editingCustomID: String? = nil
     @State private var showingPaywall = false
+    @State private var capHitStreak: Streak? = nil
+    @State private var showingCapPaywall = false
 
     /// Free tier gets one custom streak; Pro unlocks unlimited.
     static let freeCustomLimit = 3
+
+    /// Mirror of `OnboardingView.freeTrackedLimit` — kept in sync manually.
+    static let freeTrackedLimit = 3
 
     private var canBuildCustom: Bool {
         storeKit.isPro || settings.customStreaks.count < Self.freeCustomLimit
@@ -159,6 +190,13 @@ struct StreakPickerSheet: View {
 
     private var editingCustomStreak: CustomStreak? {
         editingCustomID.flatMap { id in settings.customStreaks.first(where: { $0.id == id }) }
+    }
+
+    /// True for non-Pro users whose existing selection exceeds the free cap
+    /// (e.g., they were Pro and downgraded). Surfaced as a warning so they
+    /// can deselect deliberately rather than us silently trimming on Save.
+    private var existingSelectionExceedsCap: Bool {
+        !storeKit.isPro && selection.count > Self.freeTrackedLimit
     }
 
     var body: some View {
@@ -171,6 +209,27 @@ struct StreakPickerSheet: View {
                         .lineSpacing(2)
                         .padding(.horizontal, 14)
 
+                    if existingSelectionExceedsCap {
+                        HStack(alignment: .top, spacing: 10) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.system(size: 14))
+                                .foregroundStyle(Theme.retroAmber)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("\(selection.count) SELECTED · FREE TRACKS \(Self.freeTrackedLimit)")
+                                    .font(RetroFont.mono(10, weight: .bold))
+                                    .tracking(1)
+                                    .foregroundStyle(Theme.retroAmber)
+                                Text("Deselect \(selection.count - Self.freeTrackedLimit) to save, or start a free trial to keep them all.")
+                                    .font(RetroFont.mono(10))
+                                    .foregroundStyle(Theme.retroInkDim)
+                            }
+                            Spacer(minLength: 0)
+                        }
+                        .padding(10)
+                        .pixelPanel(color: Theme.retroAmber, fill: Theme.retroBgRaised)
+                        .padding(.horizontal, 14)
+                    }
+
                     Text("ALL STREAKS")
                         .font(RetroFont.mono(10, weight: .bold))
                         .tracking(1)
@@ -182,7 +241,12 @@ struct StreakPickerSheet: View {
                         candidates: store.allCandidates,
                         selection: $selection,
                         recommendedCount: min(5, store.allCandidates.count),
-                        onEditCustom: { id in editingCustomID = id }
+                        onEditCustom: { id in editingCustomID = id },
+                        enforcedMax: storeKit.isPro ? nil : Self.freeTrackedLimit,
+                        onCapHit: { streak in
+                            capHitStreak = streak
+                            showingCapPaywall = true
+                        }
                     )
                     .padding(.horizontal, 14)
 
@@ -246,9 +310,9 @@ struct StreakPickerSheet: View {
                     Button { save() } label: {
                         Text("SAVE")
                             .font(RetroFont.mono(10, weight: .bold))
-                            .foregroundStyle(selection.isEmpty ? Theme.retroInkFaint : Theme.retroLime)
+                            .foregroundStyle(saveDisabled ? Theme.retroInkFaint : Theme.retroLime)
                     }
-                    .disabled(selection.isEmpty)
+                    .disabled(saveDisabled)
                 }
             }
             .toolbarBackground(Theme.retroBg, for: .navigationBar)
@@ -267,6 +331,23 @@ struct StreakPickerSheet: View {
                 } else {
                     PaywallView()
                         .interactiveDismissDisabled(true)
+                }
+            }
+            .sheet(isPresented: $showingCapPaywall, onDismiss: {
+                Task {
+                    await storeKit.refreshEntitlement()
+                    if storeKit.isPro, let s = capHitStreak {
+                        selection.insert(s.trackingKey)
+                    }
+                    capHitStreak = nil
+                }
+            }) {
+                CapPaywallSheet(streak: capHitStreak, freeCap: Self.freeTrackedLimit) {
+                    if let offering = storeKit.offerings?.current {
+                        PaywallView(offering: offering)
+                    } else {
+                        PaywallView()
+                    }
                 }
             }
             .sheet(isPresented: Binding(
@@ -289,6 +370,10 @@ struct StreakPickerSheet: View {
                 selection = []
             }
         }
+    }
+
+    private var saveDisabled: Bool {
+        selection.isEmpty || existingSelectionExceedsCap
     }
 
     private func save() {
