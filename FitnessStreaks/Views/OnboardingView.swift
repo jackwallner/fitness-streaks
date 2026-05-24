@@ -23,7 +23,16 @@ struct OnboardingView: View {
     @State private var flameVisible = true
     @State private var selection: Set<String> = []
     @State private var authProgress: Double = 0
+    /// Full "see all plans" paywall — reached from the trial offer or as a fallback.
     @State private var showingPaywall = false
+    /// Personalized loss-aversion trial pitch shown at Start for over-cap free users.
+    @State private var showingTrialOffer = false
+    @State private var trialPurchaseInFlight = false
+    @State private var trialPurchaseError: String? = nil
+    /// Set when the user opts into the full paywall from inside the trial sheet so
+    /// the full paywall is presented *after* the trial sheet finishes dismissing —
+    /// presenting both in the same tick is racy in SwiftUI.
+    @State private var pendingPaywallAfterTrialDismiss = false
 
     private static let tips: [String] = [
         "Streaks update automatically from Apple Health — no manual logging.",
@@ -58,6 +67,45 @@ struct OnboardingView: View {
             case .selecting: selectingScreen
             case .empty:     emptyScreen
             }
+        }
+        .sheet(isPresented: $showingTrialOffer, onDismiss: {
+            trialPurchaseInFlight = false
+            trialPurchaseError = nil
+            if pendingPaywallAfterTrialDismiss {
+                // They chose "see all plans" — hand off to the full paywall, which
+                // owns the trim-and-complete on its own dismiss.
+                pendingPaywallAfterTrialDismiss = false
+                showingPaywall = true
+            } else {
+                // They didn't action the trial. Lean into the loss: trim their
+                // over-cap picks down to the free tier and enter the app.
+                settings.hasSeenTrialOffer = true
+                Task {
+                    await storeKit.refreshEntitlement()
+                    if !storeKit.isPro { trimSelectionToFreeCap() }
+                    completeSetup()
+                }
+            }
+        }) {
+            TrialOfferSheet(
+                offerLabel: trialOfferLabel,
+                priceLabel: trialPriceLabel,
+                directPurchase: hasDirectTrialPackage,
+                isPurchasing: trialPurchaseInFlight,
+                errorMessage: trialPurchaseError,
+                pickedCount: selection.count,
+                freeCap: Self.freeTrackedLimit,
+                longestStreak: longestSelectedStreak(),
+                onStartTrial: startTrialPurchase,
+                onSeeAllPlans: {
+                    pendingPaywallAfterTrialDismiss = true
+                    showingTrialOffer = false
+                },
+                onDismiss: { showingTrialOffer = false }
+            )
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+            .interactiveDismissDisabled(trialPurchaseInFlight)
         }
         .sheet(isPresented: $showingPaywall, onDismiss: {
             // Soft paywall: swipe-to-dismiss is intentionally allowed so a failed
@@ -635,14 +683,14 @@ struct OnboardingView: View {
         // RevenueCat hasn't loaded (offline / slow / misconfigured), proceed into
         // the app rather than presenting an empty, non-actionable paywall.
         if storeKit.isPro || !showPaywall || storeKit.offerings?.current == nil {
-            // No paywall will be shown (Pro, skipped, or no offering loaded). Free
+            // No pitch will be shown (Pro, skipped, or no offering loaded). Free
             // users still need their over-cap selection trimmed to the free tier.
             if !storeKit.isPro {
                 trimSelectionToFreeCap()
             }
             completeSetup()
         } else {
-            showingPaywall = true
+            showingTrialOffer = true
         }
     }
 
@@ -653,6 +701,63 @@ struct OnboardingView: View {
 
     private func completeSetup() {
         withAnimation { settings.hasCompletedSetup = true }
+    }
+
+    // MARK: - Trial Offer
+
+    /// Strongest streak among the user's *current* selection (pre-trim). Drives
+    /// the personalized "keep your N-day X streak alive" pitch. Nil when nothing
+    /// selected has a live run yet.
+    private func longestSelectedStreak() -> TrialOfferSheet.LongestStreakInfo? {
+        let selected = store.allCandidates.filter { selection.contains($0.trackingKey) }
+        guard let top = selected.max(by: { $0.current < $1.current }), top.current > 0 else {
+            return nil
+        }
+        return .init(displayName: top.displayName, current: top.current, cadenceLabel: top.cadence.label)
+    }
+
+    /// True when a trial-bearing package loaded, so the trial sheet can buy it
+    /// directly rather than punting to the full paywall.
+    private var hasDirectTrialPackage: Bool {
+        storeKit.products.contains { $0.streaksIntroOfferLabel != nil }
+    }
+
+    private var trialOfferLabel: String? {
+        let trials = storeKit.products.filter { $0.streaksIntroOfferLabel != nil }
+        let best = trials.first(where: { $0.packageType == .annual }) ?? trials.first
+        return best?.streaksIntroOfferLabel ?? storeKit.products.compactMap(\.streaksIntroOfferLabel).first
+    }
+
+    private var trialPriceLabel: String? {
+        let trials = storeKit.products.filter { $0.streaksIntroOfferLabel != nil }
+        let best = trials.first(where: { $0.packageType == .annual }) ?? trials.first
+        return best?.streaksRecurringPriceLabel
+    }
+
+    /// Buy the trial-bearing package directly. Yearly is preferred (longer
+    /// commitment, better trial value). Falls through to the full paywall when no
+    /// trial product is available.
+    private func startTrialPurchase() {
+        let trials = storeKit.products.filter { $0.streaksIntroOfferLabel != nil }
+        guard let package = trials.first(where: { $0.packageType == .annual }) ?? trials.first else {
+            pendingPaywallAfterTrialDismiss = true
+            showingTrialOffer = false
+            return
+        }
+        trialPurchaseError = nil
+        trialPurchaseInFlight = true
+        Task { @MainActor in
+            defer { trialPurchaseInFlight = false }
+            switch await storeKit.purchase(package: package) {
+            case .purchased, .pending:
+                settings.hasSeenTrialOffer = true
+                showingTrialOffer = false
+            case .cancelled:
+                trialPurchaseError = "Trial wasn't started. Tap again, or pick a different plan."
+            case .failed:
+                trialPurchaseError = storeKit.lastError ?? "Couldn't start your trial. Please try again."
+            }
+        }
     }
 
     // MARK: - Pro Context
