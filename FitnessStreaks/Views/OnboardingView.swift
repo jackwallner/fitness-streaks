@@ -1,6 +1,5 @@
 import SwiftUI
 import Combine
-import RevenueCatUI
 
 struct OnboardingView: View {
     @EnvironmentObject var healthKit: HealthKitService
@@ -25,10 +24,6 @@ struct OnboardingView: View {
     @State private var selection: Set<String> = []
     @State private var authProgress: Double = 0
     @State private var showingPaywall = false
-    /// Set when a free user taps an unselected streak after hitting the free cap.
-    /// Drives `showingCapPaywall` and the contextual headline shown above the paywall.
-    @State private var capHitStreak: Streak? = nil
-    @State private var showingCapPaywall = false
 
     private static let tips: [String] = [
         "Streaks update automatically from Apple Health — no manual logging.",
@@ -40,9 +35,10 @@ struct OnboardingView: View {
     ]
     private static let privacyPolicyURL = URL(string: "https://jackwallner.github.io/fitness-streaks/privacy-policy.html")!
 
-    /// Free accounts track at most this many discovered streaks. Pre-selection
-    /// intentionally exceeds it so the confirm step pitches the trial: trial to
-    /// keep them all, or fall back to the top N. Mirrors `freeCustomLimit`.
+    /// Free accounts track at most this many discovered streaks. Onboarding
+    /// pre-selects *more* than this (all core metrics) and lets the user keep
+    /// them all through the selection step. The paywall at Start is the gate:
+    /// pay to keep everything, or dismiss and we trim down to the top N.
     static let freeTrackedLimit = 3
 
     // Timer publishers - stored to allow proper cleanup
@@ -66,39 +62,21 @@ struct OnboardingView: View {
         .sheet(isPresented: $showingPaywall, onDismiss: {
             // Soft paywall: swipe-to-dismiss is intentionally allowed so a failed
             // or slow RevenueCat load can never brick first launch. This onDismiss
-            // is the guaranteed escape hatch. Selection is already capped at the
-            // free tier by the picker itself, so there is nothing to trim here.
-            // We mark the trial-offer as seen either way so the post-onboarding
-            // TrialOfferSheet does not immediately re-pitch the same thing.
+            // is the guaranteed escape hatch. We mark the trial-offer as seen
+            // either way so the post-onboarding TrialOfferSheet does not
+            // immediately re-pitch the same thing.
             settings.hasSeenTrialOffer = true
             Task {
                 await storeKit.refreshEntitlement()
+                // If they didn't upgrade, trim their over-cap selection down to
+                // the free tier, preserving the order they picked.
+                if !storeKit.isPro {
+                    trimSelectionToFreeCap()
+                }
                 completeSetup()
             }
         }) {
-            if let offering = storeKit.offerings?.current {
-                PaywallView(offering: offering)
-            } else {
-                PaywallView()
-            }
-        }
-        .sheet(isPresented: $showingCapPaywall, onDismiss: {
-            Task {
-                await storeKit.refreshEntitlement()
-                // If they upgraded, auto-add the streak they were blocked on.
-                if storeKit.isPro, let streak = capHitStreak {
-                    selection.insert(streak.trackingKey)
-                }
-                capHitStreak = nil
-            }
-        }) {
-            CapPaywallSheet(streak: capHitStreak, freeCap: Self.freeTrackedLimit) {
-                if let offering = storeKit.offerings?.current {
-                    PaywallView(offering: offering)
-                } else {
-                    PaywallView()
-                }
-            }
+            PaywallView(paywallImpressionId: "streaks_onboarding_sheet")
         }
         .onAppear {
             // Start timers on appear
@@ -498,12 +476,7 @@ struct OnboardingView: View {
                 StreakPickerList(
                     candidates: store.allCandidates,
                     selection: $selection,
-                    recommendedCount: min(5, store.allCandidates.count),
-                    enforcedMax: storeKit.isPro ? nil : Self.freeTrackedLimit,
-                    onCapHit: { streak in
-                        capHitStreak = streak
-                        showingCapPaywall = true
-                    }
+                    recommendedCount: min(5, store.allCandidates.count)
                 )
                 .padding(.horizontal, 14)
                 .padding(.bottom, 16)
@@ -602,9 +575,10 @@ struct OnboardingView: View {
             return
         }
         // Pre-select Apple's Activity-ring core metrics for a familiar onboarding
-        // experience. Free users get capped at `freeTrackedLimit` so they land in
-        // a valid state — no silent trim later, no over-cap "Start" button that
-        // forces a paywall they didn't ask for. Pro users see all five.
+        // experience. Both free and Pro users start with all available core
+        // metrics selected. Free users land over the cap on purpose — the Start
+        // button routes them through the paywall (pay to keep all, or we trim to
+        // `freeTrackedLimit` on dismiss). This is the self-force funnel.
         let coreMetrics: [StreakMetric] = [.steps, .exerciseMinutes, .standHours, .activeEnergy, .workouts]
         let core = store.allCandidates
             .filter { coreMetrics.contains($0.metric) }
@@ -613,8 +587,7 @@ struct OnboardingView: View {
                 let bi = coreMetrics.firstIndex(of: b.metric) ?? Int.max
                 return ai < bi
             }
-        let limit = storeKit.isPro ? core.count : min(Self.freeTrackedLimit, core.count)
-        selection = Set(core.prefix(limit).map(\.trackingKey))
+        selection = Set(core.map(\.trackingKey))
         withAnimation { phase = .selecting }
     }
 
@@ -636,6 +609,19 @@ struct OnboardingView: View {
         advanceFromSelection()
     }
 
+    /// Free user dismissed the paywall without upgrading. Trim their over-cap
+    /// selection down to `freeTrackedLimit`, keeping the highest-ranked picks in
+    /// the order already recorded in `manualStreakOrder`.
+    private func trimSelectionToFreeCap() {
+        guard settings.trackedStreaks != nil else { return }
+        let order = settings.manualStreakOrder
+        let kept = Array(order.prefix(Self.freeTrackedLimit))
+        guard !kept.isEmpty else { return }
+        settings.trackedStreaks = Set(kept)
+        settings.manualStreakOrder = kept
+        store.refilter()
+    }
+
     private func finishWithoutTracking() {
         settings.trackedStreaks = nil
         store.refilter()
@@ -649,6 +635,11 @@ struct OnboardingView: View {
         // RevenueCat hasn't loaded (offline / slow / misconfigured), proceed into
         // the app rather than presenting an empty, non-actionable paywall.
         if storeKit.isPro || !showPaywall || storeKit.offerings?.current == nil {
+            // No paywall will be shown (Pro, skipped, or no offering loaded). Free
+            // users still need their over-cap selection trimmed to the free tier.
+            if !storeKit.isPro {
+                trimSelectionToFreeCap()
+            }
             completeSetup()
         } else {
             showingPaywall = true
@@ -733,7 +724,7 @@ struct OnboardingView: View {
 
 /// Bottom sheet shown the moment a free user taps an unselected streak past the
 /// cap. Frames the pitch around the *specific* streak they just tried to add,
-/// then hosts the underlying RevenueCat `PaywallView`.
+/// then hosts the native `PaywallView`.
 struct CapPaywallSheet<Paywall: View>: View {
     let streak: Streak?
     let freeCap: Int
