@@ -69,22 +69,22 @@ struct TrialOfferSheet: View {
         if let offerLabel {
             return "\(offerLabel.uppercased()), ON US."
         }
-        return "TRY PRO FREE."
+        return "TRY STREAKS+ FREE."
     }
 
     private var subheadline: String {
         let trialClause = offerLabel.map { ", free for your \($0.replacingOccurrences(of: " free trial", with: ""))" } ?? ""
         if hasMeaningfulStreak {
-            return "One missed \(longestStreak?.cadenceLabel ?? "day") zeroes it out. Pro auto-saves the run and tracks every streak you've earned\(trialClause)."
+            return "One missed \(longestStreak?.cadenceLabel ?? "day") zeroes it out. Streaks+ auto-saves the run and tracks every streak you've earned\(trialClause)."
         }
         if offerLabel != nil {
-            return "Unlock the full Pro toolkit free. No charge until your trial ends."
+            return "Unlock the full Streaks+ toolkit free. No charge until your trial ends."
         }
-        return "Unlock the full Pro toolkit free for eligible new subscribers."
+        return "Unlock the full Streaks+ toolkit free for eligible new subscribers."
     }
 
     private var bullets: [TrialBullet] {
-        let unlimitedDetail = "Free caps you at \(freeCap). Pro tracks every metric you've earned, including future picks."
+        let unlimitedDetail = "Free caps you at \(freeCap). Streaks+ tracks every metric you've earned, including future picks."
         return [
             TrialBullet(
                 icon: "flame.fill",
@@ -92,7 +92,7 @@ struct TrialOfferSheet: View {
                 title: hasMeaningfulStreak
                     ? "Auto-save your \(longestStreak?.displayName ?? "streak") if you miss a day"
                     : "Auto-save when one breaks",
-                detail: "Miss a \(longestStreak?.cadenceLabel ?? "day") later on? Pro revives the run instead of zeroing it."
+                detail: "Miss a \(longestStreak?.cadenceLabel ?? "day") later on? Streaks+ revives the run instead of zeroing it."
             ),
             TrialBullet(
                 icon: "infinity",

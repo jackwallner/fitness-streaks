@@ -121,7 +121,7 @@ struct StatsView: View {
                     .frame(height: 1)
 
                 HStack {
-                    Text("PRO SAVES TO DATE")
+                    Text("STREAKS+ SAVES TO DATE")
                         .font(RetroFont.pixel(10))
                         .tracking(1)
                         .foregroundStyle(Theme.retroInkDim)

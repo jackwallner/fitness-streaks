@@ -123,7 +123,7 @@ struct SettingsView: View {
 
     private var proSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: storeKit.isPro ? "Pro · Auto-save" : "Auto-save · Pro")
+            PixelSectionHeader(title: storeKit.isPro ? "Streaks+ · Auto-save" : "Auto-save · Streaks+")
 
             VStack(alignment: .leading, spacing: 12) {
                 HStack(alignment: .top, spacing: 12) {
@@ -140,7 +140,7 @@ struct SettingsView: View {
                                 PixelChip(text: "LOCKED", accent: Theme.retroMagenta)
                             }
                         }
-                        Text(storeKit.isPro ? "Unlimited · Pro" : "Pro only")
+                        Text(storeKit.isPro ? "Unlimited · Streaks+" : "Streaks+ only")
                             .font(RetroFont.mono(11, weight: .bold))
                             .foregroundStyle(storeKit.isPro ? Theme.retroLime : Theme.retroAmber)
                     }
@@ -157,7 +157,7 @@ struct SettingsView: View {
                         showingPaywall = true
                     } label: {
                         HStack {
-                            Text("UNLOCK FITNESSSTREAKS PRO")
+                            Text("UNLOCK STREAKS+")
                                 .font(RetroFont.mono(10, weight: .bold))
                                 .tracking(1)
                                 .foregroundStyle(Theme.retroBg)
@@ -170,7 +170,7 @@ struct SettingsView: View {
                         .background(Theme.retroMagenta)
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("Unlock FitnessStreaks Pro")
+                    .accessibilityLabel("Unlock Streaks+")
                 } else {
                     if !recentPreservations.isEmpty {
                         VStack(alignment: .leading, spacing: 6) {
@@ -203,9 +203,9 @@ struct SettingsView: View {
 
     private var autoSaveCopy: String {
         if storeKit.isPro {
-            return "Pro auto-saves any day you miss. Your streak survives and the count keeps climbing tomorrow. Unlimited, automatic, no action needed."
+            return "Streaks+ auto-saves any day you miss. Your streak survives and the count keeps climbing tomorrow. Unlimited, automatic, no action needed."
         }
-        return "Free streaks end on the first missed day. Start a Pro trial when it happens and we'll revive the run on the spot, then auto-save every miss after that."
+        return "Free streaks end on the first missed day. Start a Streaks+ trial when it happens and we'll revive the run on the spot, then auto-save every miss after that."
     }
 
     private var recentPreservations: [GracePreservation] {
@@ -480,9 +480,9 @@ struct SettingsView: View {
                         .tracking(1)
                         .foregroundStyle(Theme.retroInk)
                     Spacer()
-                    PixelChip(text: "PRO", accent: Theme.retroMagenta)
+                    PixelChip(text: "STREAKS+", accent: Theme.retroMagenta)
                 }
-                Text("You already see at-risk warnings inside the app for free. Pro adds a daily push reminder so a streak never slips just because you didn't open the app. Reminder time: \(notificationTimeLabel).")
+                Text("You already see at-risk warnings inside the app for free. Streaks+ adds a daily push reminder so a streak never slips just because you didn't open the app. Reminder time: \(notificationTimeLabel).")
                     .font(RetroFont.mono(10))
                     .foregroundStyle(Theme.retroInkDim)
                     .lineSpacing(2)
@@ -502,7 +502,7 @@ struct SettingsView: View {
             .pixelPanel(color: Theme.retroMagenta, fill: Theme.retroBgRaised)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Unlock Pro to enable proactive at-risk alerts")
+        .accessibilityLabel("Unlock Streaks+ to enable proactive at-risk alerts")
     }
 
     private var notificationTimeBinding: Binding<Date> {
@@ -763,7 +763,7 @@ struct SettingsView: View {
                     Image(systemName: "lock.fill")
                         .font(.system(size: 12))
                         .foregroundStyle(Theme.retroMagenta)
-                    PixelChip(text: "PRO", accent: Theme.retroMagenta)
+                    PixelChip(text: "STREAKS+", accent: Theme.retroMagenta)
                     Spacer()
                     Text("UNLOCK →")
                         .font(RetroFont.mono(9, weight: .bold))

@@ -773,13 +773,13 @@ struct OnboardingView: View {
                 .font(.system(size: 18))
                 .foregroundStyle(Theme.retroMagenta)
             VStack(alignment: .leading, spacing: 2) {
-                Text("FREE TRACKS \(Self.freeTrackedLimit) · \(lockedCount) MORE WITH PRO")
+                Text("FREE TRACKS \(Self.freeTrackedLimit) · \(lockedCount) MORE WITH STREAKS+")
                     .font(RetroFont.mono(10, weight: .bold))
                     .tracking(1)
                     .foregroundStyle(Theme.retroMagenta)
                 Text(lockedCount > 0
                      ? "Tap any locked streak to start a free trial and add it."
-                     : "Pro unlocks custom streaks, auto-save, and travel freezes.")
+                     : "Streaks+ unlocks custom streaks, auto-save, and travel freezes.")
                     .font(RetroFont.mono(9))
                     .foregroundStyle(Theme.retroInkDim)
             }
@@ -845,7 +845,7 @@ struct CapPaywallSheet<Paywall: View>: View {
         if let streak, streak.current >= 3 {
             return "KEEP YOUR \(streak.current)-\(streak.cadence.label.uppercased()) \(streakName) STREAK"
         }
-        return "ADD \(streakName) TO YOUR PRO LINEUP"
+        return "ADD \(streakName) TO YOUR STREAKS+ LINEUP"
     }
 
     var body: some View {

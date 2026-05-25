@@ -257,7 +257,7 @@ struct StreakPickerSheet: View {
                         }
                     } label: {
                         HStack {
-                            Text(canBuildCustom ? "+ BUILD YOUR OWN" : "+ BUILD YOUR OWN (PRO)")
+                            Text(canBuildCustom ? "+ BUILD YOUR OWN" : "+ BUILD YOUR OWN (STREAKS+)")
                                 .font(RetroFont.mono(10, weight: .bold))
                                 .tracking(1)
                                 .foregroundStyle(canBuildCustom ? Theme.retroLime : Theme.retroMagenta)
@@ -273,7 +273,7 @@ struct StreakPickerSheet: View {
                     .padding(.horizontal, 14)
 
                     if !canBuildCustom {
-                        Text("Free includes 1 custom streak. Unlock Pro for unlimited.")
+                        Text("Free includes 1 custom streak. Unlock Streaks+ for unlimited.")
                             .font(RetroFont.mono(10))
                             .foregroundStyle(Theme.retroInkDim)
                             .padding(.horizontal, 14)

@@ -376,7 +376,7 @@ struct DashboardView: View {
             }
             .buttonStyle(.plain)
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("At risk: \(streak.metric.displayName). \(riskText(for: streak)). Tap to unlock Pro auto-save.")
+            .accessibilityLabel("At risk: \(streak.metric.displayName). \(riskText(for: streak)). Tap to unlock Streaks+ auto-save.")
         }
     }
 
@@ -394,7 +394,7 @@ struct DashboardView: View {
                 Spacer()
             }
             if showProHint {
-                Text("Pro auto-saves this if today slips ›")
+                Text("Streaks+ auto-saves this if today slips ›")
                     .font(RetroFont.mono(9, weight: .bold))
                     .foregroundStyle(Theme.retroMagenta)
             }
@@ -452,14 +452,14 @@ struct DashboardView: View {
     }
 
     private func graceStatusTitle(for hero: Streak) -> String {
-        storeKit.isPro ? "AUTO-SAVE ON" : "TRY PRO FREE"
+        storeKit.isPro ? "AUTO-SAVE ON" : "TRY STREAKS+ FREE"
     }
 
     private func graceStatusDetail(for hero: Streak) -> String {
         if storeKit.isPro {
-            return "Pro auto-saves any missed day. Your streak survives."
+            return "Streaks+ auto-saves any missed day. Your streak survives."
         }
-        return "Start a trial. Pro auto-saves every missed day."
+        return "Start a trial. Streaks+ auto-saves every missed day."
     }
 
     private func brokenBanner(_ broken: BrokenStreak) -> some View {

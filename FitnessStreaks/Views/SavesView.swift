@@ -76,7 +76,7 @@ struct SavesView: View {
                     .foregroundStyle(accent)
                 Text(storeKit.isPro
                      ? "Miss a day, keep your streak."
-                     : "One miss ends a streak. Pro saves it.")
+                     : "One miss ends a streak. Streaks+ saves it.")
                     .font(RetroFont.mono(11, weight: .bold))
                     .foregroundStyle(Theme.retroInk)
                     .multilineTextAlignment(.center)
@@ -86,7 +86,7 @@ struct SavesView: View {
                 Button {
                     showingPaywall = true
                 } label: {
-                    Text("START PRO TRIAL")
+                    Text("START STREAKS+ TRIAL")
                         .font(RetroFont.mono(11, weight: .bold))
                         .tracking(2)
                         .foregroundStyle(Theme.retroBg)
@@ -95,7 +95,7 @@ struct SavesView: View {
                         .background(Theme.retroMagenta)
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("Start FitnessStreaks Pro trial")
+                .accessibilityLabel("Start Streaks+ trial")
             }
         }
         .padding(.vertical, 20)
@@ -282,7 +282,7 @@ struct SavesView: View {
 
     private var perksStrip: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "With Pro")
+            PixelSectionHeader(title: "With Streaks+")
             VStack(spacing: 0) {
                 perkRow("shield.lefthalf.filled", "Unlimited auto-saves", first: true)
                 perkRow("snowflake", "Planned freeze days")
