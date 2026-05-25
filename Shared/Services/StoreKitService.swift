@@ -214,6 +214,35 @@ final class StoreKitService: ObservableObject {
         return "\(formatted) / mo"
     }
 
+    /// Per-day cost of the annual plan, formatted in the storefront's currency.
+    /// Used as the anchoring micro-price on the primary paywall card
+    /// (proven to lift annual conversion vs the sticker price alone).
+    var yearlyDailyEquivalent: String? {
+        guard let product = yearly?.storeProduct,
+              let price = product.priceDecimalNumber as? NSDecimalNumber else { return nil }
+        let perDay = price.dividing(by: NSDecimalNumber(value: 365))
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = product.priceFormatter?.locale ?? .current
+        formatter.minimumFractionDigits = 2
+        formatter.maximumFractionDigits = 2
+        return formatter.string(from: perDay)
+    }
+
+    /// Percent savings of the annual plan vs paying monthly for a year.
+    /// Returns nil when either plan is missing. Floored to whole percent.
+    var yearlyVsMonthlySavingsPercent: Int? {
+        guard let yearlyPrice = yearly?.storeProduct.priceDecimalNumber as? NSDecimalNumber,
+              let monthlyPrice = monthly?.storeProduct.priceDecimalNumber as? NSDecimalNumber else {
+            return nil
+        }
+        let twelveMonths = monthlyPrice.multiplying(by: NSDecimalNumber(value: 12))
+        guard twelveMonths.doubleValue > 0 else { return nil }
+        let saved = twelveMonths.subtracting(yearlyPrice).doubleValue
+        guard saved > 0 else { return nil }
+        return Int((saved / twelveMonths.doubleValue) * 100)
+    }
+
     func introOfferDescription(for package: Package) -> String? {
         guard let discount = package.storeProduct.introductoryDiscount else { return nil }
         let unit: String = {
