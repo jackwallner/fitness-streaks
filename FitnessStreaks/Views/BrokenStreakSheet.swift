@@ -1,5 +1,4 @@
 import SwiftUI
-import RevenueCatUI
 
 struct BrokenStreakSheet: View {
     let broken: BrokenStreak
@@ -94,11 +93,7 @@ struct BrokenStreakSheet: View {
             .toolbarBackground(Theme.retroBg, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .sheet(isPresented: $showingPaywall, onDismiss: handlePaywallDismiss) {
-                if let offering = storeKit.offerings?.current {
-                    PaywallView(offering: offering)
-                } else {
-                    PaywallView()
-                }
+                PaywallView(paywallImpressionId: "streaks_broken_sheet")
             }
         }
     }

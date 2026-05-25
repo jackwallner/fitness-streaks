@@ -567,7 +567,20 @@ enum StreakEngine {
 
         let missed = DateHelpers.startOfDay(preservation.missedDate)
         let daysAfterMiss = max(0, DateHelpers.gregorian.dateComponents([.day], from: missed, to: today).day ?? 0)
-        let canBridge = daysAfterMiss == 1
+        // Bridge for as long as the run has stayed continuous since the saved miss.
+        // Day-after the save: always bridge (the new run may not have started yet, so
+        // `startDate` can be nil while we still want to show the preserved length).
+        // Later days: bridge only while the natural post-miss run reaches back to the
+        // day right after the miss — i.e. no *further* miss has happened. Once it has,
+        // the run resets and a fresh preservation is written on that break instead.
+        let canBridge: Bool
+        if daysAfterMiss <= 1 {
+            canBridge = true
+        } else if let start = streak.startDate {
+            canBridge = DateHelpers.startOfDay(start) <= DateHelpers.addDays(1, to: missed)
+        } else {
+            canBridge = false
+        }
         let bridgedCurrent = canBridge ? max(streak.current, preservation.preservedLength + streak.current) : streak.current
         let bridgedStart = canBridge ? DateHelpers.addDays(-(bridgedCurrent - 1), to: today) : streak.startDate
 

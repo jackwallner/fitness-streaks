@@ -1,5 +1,4 @@
 import SwiftUI
-import RevenueCatUI
 
 struct StreakDetailView: View {
     let initialStreak: Streak
@@ -98,17 +97,10 @@ struct StreakDetailView: View {
         .toolbarBackground(Theme.retroBg, for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
         .sheet(isPresented: $showingPaywall, onDismiss: {
-            // RevenueCat's PaywallView completes purchase against the SDK directly,
-            // so our cached `isPro` won't flip until we re-read entitlement. Without
-            // this, a successful purchase leaves the heatmap blurred until the user
-            // backgrounds the app.
+            // Refresh entitlement after dismiss so the heatmap unlocks immediately.
             Task { await storeKit.refreshEntitlement() }
         }) {
-            if let offering = storeKit.offerings?.current {
-                PaywallView(offering: offering)
-            } else {
-                PaywallView()
-            }
+            PaywallView(paywallImpressionId: "streaks_detail_sheet")
         }
     }
 

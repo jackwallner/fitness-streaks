@@ -5,7 +5,6 @@ import WidgetKit
 import os
 #if REVENUECAT
 import RevenueCat
-import RevenueCatUI
 #endif
 #if canImport(WatchConnectivity)
 @preconcurrency import WatchConnectivity
@@ -242,8 +241,8 @@ private struct RootView: View {
     @State private var showTrialPaywall = false
     @State private var trialPurchaseInFlight = false
     @State private var trialPurchaseError: String?
-    /// Set when the user opts into the hosted paywall from inside the trial sheet.
-    /// `.sheet(onDismiss:)` reads this and presents the hosted paywall *after* the
+    /// Set when the user opts into the full paywall from inside the trial sheet.
+    /// `.sheet(onDismiss:)` reads this and presents the full paywall *after* the
     /// trial sheet finishes dismissing — presenting both bindings in the same tick
     /// is racy in SwiftUI and frequently drops the second sheet.
     @State private var pendingPaywallAfterTrialDismiss = false
@@ -318,11 +317,7 @@ private struct RootView: View {
             .interactiveDismissDisabled(trialPurchaseInFlight)
         }
         .sheet(isPresented: $showTrialPaywall) {
-            if let offering = storeKit.offerings?.current {
-                PaywallView(offering: offering)
-            } else {
-                PaywallView()
-            }
+            PaywallView(paywallImpressionId: "streaks_trial_sheet")
         }
         #endif
     }

@@ -1,5 +1,4 @@
 import SwiftUI
-import RevenueCatUI
 import os
 
 private let log = Logger(subsystem: "com.jackwallner.streaks", category: "Dashboard")
@@ -99,13 +98,8 @@ struct DashboardView: View {
                 SettingsView()
             }
             .sheet(isPresented: $showingPaywall) {
-                if let offering = storeKit.offerings?.current {
-                    PaywallView(offering: offering)
-                        .interactiveDismissDisabled(true)
-                } else {
-                    PaywallView()
-                        .interactiveDismissDisabled(true)
-                }
+                PaywallView(paywallImpressionId: "streaks_dashboard_sheet")
+                    .interactiveDismissDisabled(true)
             }
             .sheet(isPresented: $showPicker) {
                 StreakPickerSheet()
