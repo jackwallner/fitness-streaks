@@ -26,7 +26,7 @@ struct TrialTimeline: View {
                     accent: Theme.retroLime,
                     icon: "lock.open.fill",
                     title: "TODAY",
-                    detail: "Pro unlocks instantly. $0.00 charged."
+                    detail: "Streaks+ unlocks instantly. $0.00 charged."
                 )
                 connector(Theme.retroInkFaint)
                 step(

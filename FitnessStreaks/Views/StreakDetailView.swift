@@ -119,7 +119,7 @@ struct StreakDetailView: View {
                         .font(RetroFont.pixel(10))
                         .tracking(2)
                         .foregroundStyle(Theme.retroInkDim)
-                    Text("PRO")
+                    Text("STREAKS+")
                         .font(RetroFont.pixel(8))
                         .tracking(1)
                         .foregroundStyle(Theme.retroAmber)
@@ -134,7 +134,7 @@ struct StreakDetailView: View {
                 .padding(.bottom, 8)
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("History. Unlock with Pro. Free trial available.")
+            .accessibilityLabel("History. Unlock with Streaks+. Free trial available.")
         }
     }
 
@@ -151,7 +151,7 @@ struct StreakDetailView: View {
                     .allowsHitTesting(false)
                     .overlay(heatmapLockOverlay)
                     .accessibilityElement(children: .ignore)
-                    .accessibilityLabel("History heatmap. Unlock with Pro. Free trial available.")
+                    .accessibilityLabel("History heatmap. Unlock with Streaks+. Free trial available.")
             }
             .buttonStyle(.plain)
         }
@@ -163,7 +163,7 @@ struct StreakDetailView: View {
                 .font(.system(size: 22, weight: .bold))
                 .foregroundStyle(Theme.retroAmber)
                 .retroGlow(Theme.retroAmber, radius: 8)
-            Text("UNLOCK WITH PRO")
+            Text("UNLOCK WITH STREAKS+")
                 .font(RetroFont.pixel(11))
                 .tracking(2)
                 .foregroundStyle(Theme.retroAmber)

@@ -129,14 +129,14 @@ struct BrokenStreakSheet: View {
                     Image(systemName: "shield.lefthalf.filled")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(Theme.retroLime)
-                    Text("REVIVE WITH A PRO TRIAL")
+                    Text("REVIVE WITH STREAKS+ TRIAL")
                         .font(RetroFont.pixel(10))
                         .tracking(1)
                         .foregroundStyle(Theme.retroLime)
                     Spacer()
-                    PixelChip(text: "PRO", accent: Theme.retroMagenta)
+                    PixelChip(text: "STREAKS+", accent: Theme.retroMagenta)
                 }
-                Text("Start a Pro trial and we'll restore your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) run on the spot. Pro auto-saves every missed day so this doesn't happen again.")
+                Text("Start a Streaks+ trial and we'll restore your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) run on the spot. Streaks+ auto-saves every missed day so this doesn't happen again.")
                     .font(RetroFont.mono(11))
                     .foregroundStyle(Theme.retroInk)
                     .lineSpacing(3)
@@ -158,6 +158,6 @@ struct BrokenStreakSheet: View {
             .pixelPanel(color: Theme.retroLime, fill: Theme.retroBgRaised)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Start a Pro trial to revive your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) streak")
+        .accessibilityLabel("Start a Streaks+ trial to revive your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) streak")
     }
 }

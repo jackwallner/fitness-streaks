@@ -55,7 +55,7 @@ struct PaywallView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Text("FITNESSSTREAKS PRO")
+                    Text("STREAKS+")
                         .font(RetroFont.pixel(11))
                         .tracking(2)
                         .foregroundStyle(Theme.retroMagenta)
@@ -137,7 +137,7 @@ struct PaywallView: View {
            let days = label.split(separator: "-").first {
             return "\(days) DAYS FREE"
         }
-        return "PRO"
+        return "STREAKS+"
     }
 
     // MARK: - Features
@@ -453,7 +453,7 @@ struct PaywallView: View {
         statusMessage = nil
         switch await storeKit.purchase(package: package) {
         case .purchased:
-            statusMessage = "WELCOME TO PRO."
+            statusMessage = "WELCOME TO STREAKS+."
         case .pending:
             statusMessage = "PURCHASE PENDING APPROVAL."
         case .cancelled:
@@ -467,7 +467,7 @@ struct PaywallView: View {
         statusMessage = "RESTORING…"
         await storeKit.restore()
         if storeKit.isPro {
-            statusMessage = "PRO RESTORED."
+            statusMessage = "STREAKS+ RESTORED."
         } else {
             statusMessage = storeKit.lastError ?? "NO ACTIVE PURCHASES FOUND."
         }
