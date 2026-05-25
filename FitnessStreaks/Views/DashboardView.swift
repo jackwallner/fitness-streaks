@@ -18,6 +18,7 @@ struct DashboardView: View {
     @State private var healthAccessErrorText: String? = nil
     @State private var tutorialIndex = 0
     @State private var tutorialActive = false
+    @State private var passiveReviewTask: Task<Void, Never>?
 
     private let grid = [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)]
     private static let relativeFormatter: RelativeDateTimeFormatter = {
@@ -140,6 +141,13 @@ struct DashboardView: View {
             .onChange(of: settings.hasSeenTutorial) { _, seen in
                 if !seen { maybeStartTutorial() }
             }
+            .onReceive(NotificationCenter.default.publisher(for: .reviewPromptPositiveMoment)) { _ in
+                schedulePassiveReviewPrompt()
+            }
+            .onDisappear {
+                passiveReviewTask?.cancel()
+                passiveReviewTask = nil
+            }
         }
         .coachmarkOverlay(
             steps: tutorialSteps,
@@ -196,6 +204,20 @@ struct DashboardView: View {
         withAnimation(.easeInOut(duration: 0.2)) { tutorialActive = false }
     }
 
+    private func schedulePassiveReviewPrompt() {
+        passiveReviewTask?.cancel()
+        passiveReviewTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 3_500_000_000)
+            guard !Task.isCancelled else { return }
+            guard settings.hasCompletedSetup else { return }
+            guard !showSettings, !showingPaywall, !showPicker, selectedBroken == nil, !tutorialActive else { return }
+            guard !trialOfferMayAppear else { return }
+            guard ReviewPromptCoordinator.shared.activePresentation == nil else { return }
+            guard ReviewPromptTracker.canPresentEnjoymentPrompt(hasCompletedSetup: true) else { return }
+            ReviewPromptCoordinator.shared.requestEnjoymentPrompt()
+        }
+    }
+
     private func scrollTutorialAnchor(into scrollProxy: ScrollViewProxy, index: Int) {
         guard tutorialActive,
               tutorialSteps.indices.contains(index),
@@ -212,6 +234,17 @@ struct DashboardView: View {
         withAnimation(.easeInOut(duration: 0.3)) {
             scrollProxy.scrollTo(scrollID, anchor: .center)
         }
+    }
+
+    /// Mirrors RootView trial-offer gates so the review sheet does not stack on the trial pitch.
+    private var trialOfferMayAppear: Bool {
+        #if REVENUECAT
+        !storeKit.isPro
+            && !settings.hasSeenTrialOffer
+            && storeKit.products.contains(where: { $0.streaksIntroOfferLabel != nil })
+        #else
+        false
+        #endif
     }
 
     private var visibleBadges: [Streak] {

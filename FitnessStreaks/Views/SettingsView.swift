@@ -963,6 +963,25 @@ struct SettingsView: View {
                     }
                 }
                 dashedLine
+                Button {
+                    ReviewPromptCoordinator.shared.requestEnjoymentPrompt(bypassPassiveGates: true)
+                    dismiss()
+                } label: {
+                    HStack {
+                        Text("RATE OR SEND FEEDBACK")
+                            .font(RetroFont.pixel(10))
+                            .foregroundStyle(Theme.retroInk)
+                        Spacer()
+                        Text("★")
+                            .font(RetroFont.pixel(11))
+                            .foregroundStyle(Theme.retroLime)
+                    }
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 14)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Rate on the App Store or send feedback")
+                dashedLine
                 if let url = URL(string: "mailto:jackwallner+fs@gmail.com") {
                     Link(destination: url) {
                         HStack {

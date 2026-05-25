@@ -297,6 +297,9 @@ final class StreakStore: ObservableObject {
             self.allCandidates = all
             self.streaks = filtered
             settings.commitThresholds(for: filtered)
+            #if os(iOS)
+            signalPositiveMomentsIfNeeded(previous: previous, newStreaks: filtered)
+            #endif
             persistCurrentSnapshot()
             recordLastKnownLengths()
             self.lastUpdated = .now
@@ -477,8 +480,26 @@ final class StreakStore: ObservableObject {
         let map = Dictionary(uniqueKeysWithValues: streaks.map { ($0.trackingKey, $0.current) })
         StreakSettings.shared.lastKnownStreakLengths = map
     }
+
+    #if os(iOS)
+    /// Fires when the hero streak grows or today's goal is newly completed — used for review prompts.
+    private func signalPositiveMomentsIfNeeded(previous: [Streak], newStreaks: [Streak]) {
+        guard let oldHero = previous.first, let newHero = newStreaks.first else { return }
+        guard oldHero.trackingKey == newHero.trackingKey else { return }
+
+        let streakGrew = newHero.current > oldHero.current && oldHero.current >= 2
+        let goalJustMet = newHero.currentUnitCompleted && !oldHero.currentUnitCompleted && newHero.current >= 2
+        guard streakGrew || goalJustMet else { return }
+
+        ReviewPromptTracker.recordPositiveMoment()
+        NotificationCenter.default.post(name: .reviewPromptPositiveMoment, object: nil)
+    }
+    #endif
 }
 
 extension Notification.Name {
     static let streakSnapshotUpdated = Notification.Name("streakSnapshotUpdated")
+    #if os(iOS)
+    static let reviewPromptPositiveMoment = Notification.Name("reviewPromptPositiveMoment")
+    #endif
 }

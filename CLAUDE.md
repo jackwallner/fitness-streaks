@@ -74,5 +74,9 @@ Weekly totals: summed per ISO week starting Monday (see `DateHelpers.startOfWeek
 - Swift 6: all HealthKit callbacks wrapped in async continuations; `@Sendable` where required.
 - `WKCompanionAppBundleIdentifier` in `FitnessStreaksWatch/Info.plist` must match the iOS bundle ID exactly.
 
+## Review prompts
+
+Five-star review funnel (`ReviewPromptTracker`, `ReviewPromptSheet`, positive moments on hero streak growth / today's goal met). App Store ID `6762699692`; playbook: `~/Desktop/app-store-5-star-review-strategy.md`.
+
 ## Workflow
 - Do NOT add Co-Authored-By lines to commits.
