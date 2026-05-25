@@ -1,5 +1,4 @@
 import SwiftUI
-import RevenueCatUI
 
 /// Reusable list of candidate streaks with toggles. Used in onboarding and Settings.
 ///
@@ -325,13 +324,8 @@ struct StreakPickerSheet: View {
                 }
             }
             .sheet(isPresented: $showingPaywall) {
-                if let offering = storeKit.offerings?.current {
-                    PaywallView(offering: offering)
-                        .interactiveDismissDisabled(true)
-                } else {
-                    PaywallView()
-                        .interactiveDismissDisabled(true)
-                }
+                PaywallView(paywallImpressionId: "streaks_picker_sheet")
+                    .interactiveDismissDisabled(true)
             }
             .sheet(isPresented: $showingCapPaywall, onDismiss: {
                 Task {
@@ -343,11 +337,7 @@ struct StreakPickerSheet: View {
                 }
             }) {
                 CapPaywallSheet(streak: capHitStreak, freeCap: Self.freeTrackedLimit) {
-                    if let offering = storeKit.offerings?.current {
-                        PaywallView(offering: offering)
-                    } else {
-                        PaywallView()
-                    }
+                    PaywallView(paywallImpressionId: "streaks_picker_cap_sheet")
                 }
             }
             .sheet(isPresented: Binding(

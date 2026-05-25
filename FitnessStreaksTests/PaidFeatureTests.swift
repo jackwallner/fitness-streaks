@@ -161,6 +161,56 @@ final class PaidFeatureTests: XCTestCase {
     }
 
     // ──────────────────────────────────────────────
+    // MARK: - Auto-save bridge persistence
+    //
+    // An auto-saved streak must keep counting on the days *after* the save, not
+    // just the single day immediately following the miss. Regression test for the
+    // bug where `applyingGrace` only bridged when the miss was exactly yesterday,
+    // causing a preserved run to collapse to the post-gap length one day later.
+    // ──────────────────────────────────────────────
+
+    func testGraceBridgePersistsMultipleDaysAfterMiss() {
+        let settings = StreakSettings.shared
+        let threshold = 10_000.0
+        let now = Date(timeIntervalSince1970: 1_715_000_000) // fixed reference
+        let today = DateHelpers.startOfDay(now)
+
+        // 10 met days, a single missed day at offset -2, then two met days (-1, today).
+        func day(_ offset: Int, steps: Double) -> ActivityDay {
+            ActivityDay(date: DateHelpers.addDays(offset, to: today), steps: steps)
+        }
+        var history: [ActivityDay] = []
+        for offset in -12...(-3) { history.append(day(offset, steps: threshold)) }
+        history.append(day(-2, steps: 0))            // the saved miss
+        history.append(day(-1, steps: threshold))
+        history.append(day(0, steps: threshold))
+
+        settings.committedThresholds = ["steps-daily": threshold]
+        settings.gracePreservations = ["steps-daily": GracePreservation(
+            key: "steps-daily",
+            missedDate: DateHelpers.addDays(-2, to: today),
+            preservedLength: 10,
+            threshold: threshold,
+            metric: .steps,
+            cadence: .daily,
+            hourWindow: nil,
+            grantedAt: now
+        )]
+
+        let streaks = StreakEngine.discover(
+            history: history,
+            committedThresholds: settings.committedThresholds,
+            gracePreservations: settings.gracePreservations,
+            now: now
+        )
+        let steps = streaks.first { $0.metric == .steps && $0.cadence == .daily }
+        XCTAssertNotNil(steps)
+        // 10 preserved + 2 post-miss days. Pre-fix this collapsed to 2.
+        XCTAssertEqual(steps?.current, 12,
+                       "Auto-saved streak should bridge the gap on every day the run stays continuous, not just the day after the miss")
+    }
+
+    // ──────────────────────────────────────────────
     // MARK: - Custom Streak Pro Gating
     // ──────────────────────────────────────────────
 
@@ -319,7 +369,7 @@ final class PaidFeatureTests: XCTestCase {
     // MARK: - History gate parity with isPro
     //
     // The StreakDetailView blurs/locks the heatmap card whenever
-    // StoreKitService.isPro is false, and presents the same RevenueCat
+    // StoreKitService.isPro is false, and presents the same native
     // PaywallView used elsewhere. This test pins the source of truth so a
     // future refactor that introduces a separate flag for the history gate
     // can't silently diverge from the rest of the Pro entitlement.

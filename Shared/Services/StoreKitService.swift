@@ -62,7 +62,12 @@ final class StoreKitService: ObservableObject {
     @Published private(set) var offerings: Offerings? = nil
     @Published private(set) var isPro: Bool = false
     @Published private(set) var purchaseInProgress: Bool = false
+    @Published private(set) var isLoadingProducts: Bool = false
     @Published private(set) var lastError: String? = nil
+    /// Per-product intro/trial eligibility for native paywall copy (Apple 3.1.2).
+    @Published private(set) var introEligibility: [String: Bool] = [:]
+
+    private var paywallImpressionsThisSession: Set<String> = []
 
     var monthly: Package? { offerings?.current?.monthly }
     var yearly: Package? { offerings?.current?.annual }
@@ -70,6 +75,19 @@ final class StoreKitService: ObservableObject {
 
     var products: [Package] {
         offerings?.current?.availablePackages ?? []
+    }
+
+    /// Yearly → monthly → lifetime, matching paywall card order.
+    var sortedPackages: [Package] {
+        var ordered: [Package] = []
+        if let yearly { ordered.append(yearly) }
+        if let monthly { ordered.append(monthly) }
+        if let lifetime { ordered.append(lifetime) }
+        let known = Set(ordered.map(\.identifier))
+        for package in products where !known.contains(package.identifier) {
+            ordered.append(package)
+        }
+        return ordered
     }
 
     private var defaults: UserDefaults {
@@ -91,12 +109,48 @@ final class StoreKitService: ObservableObject {
     // MARK: - Public API
 
     func loadProducts() async {
+        isLoadingProducts = true
+        defer { isLoadingProducts = false }
         do {
             self.lastError = nil
             self.offerings = try await Purchases.shared.offerings()
+            await refreshIntroEligibility()
         } catch {
             self.lastError = "Couldn't load products: \(error.localizedDescription)"
         }
+    }
+
+    func isEligibleForIntroOffer(_ package: Package) -> Bool {
+        guard package.streaksIntroOfferLabel != nil else { return false }
+        return introEligibility[package.storeProduct.productIdentifier] ?? true
+    }
+
+    /// Custom paywall impressions for RevenueCat analytics (hosted UI did this automatically).
+    func trackPaywallImpression(id: String, oncePerSession: Bool = false) {
+        #if DEBUG
+        if CommandLine.arguments.contains("-UITestSetPro") { return }
+        #endif
+        if oncePerSession {
+            guard !paywallImpressionsThisSession.contains(id) else { return }
+            paywallImpressionsThisSession.insert(id)
+        }
+        Purchases.shared.trackCustomPaywallImpression(
+            CustomPaywallImpressionParams(paywallId: id)
+        )
+    }
+
+    private func refreshIntroEligibility() async {
+        let identifiers = products
+            .filter { $0.storeProduct.introductoryDiscount != nil }
+            .map(\.storeProduct.productIdentifier)
+        guard !identifiers.isEmpty else {
+            introEligibility = [:]
+            return
+        }
+        let result = await Purchases.shared.checkTrialOrIntroDiscountEligibility(
+            productIdentifiers: identifiers
+        )
+        introEligibility = result.mapValues { $0.status == .eligible }
     }
 
     @discardableResult

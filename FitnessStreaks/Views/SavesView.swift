@@ -1,5 +1,4 @@
 import SwiftUI
-import RevenueCatUI
 
 /// The "Saves" tab — Pro's home turf. Shows auto-save status, recent saves history,
 /// planned freezes, and the upgrade pitch. The Pro features story lives here so the
@@ -55,13 +54,8 @@ struct SavesView: View {
             .toolbarBackground(Theme.retroBg, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .sheet(isPresented: $showingPaywall) {
-                if let offering = storeKit.offerings?.current {
-                    PaywallView(offering: offering)
-                        .interactiveDismissDisabled(true)
-                } else {
-                    PaywallView()
-                        .interactiveDismissDisabled(true)
-                }
+                PaywallView(paywallImpressionId: "streaks_saves_sheet")
+                    .interactiveDismissDisabled(true)
             }
             .sheet(isPresented: $showingFreezeDatePicker) { freezePicker }
         }

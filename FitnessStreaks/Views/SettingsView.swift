@@ -1,5 +1,4 @@
 import SwiftUI
-import RevenueCatUI
 
 struct SettingsView: View {
     @EnvironmentObject var settings: StreakSettings
@@ -85,13 +84,8 @@ struct SettingsView: View {
                     .environmentObject(store)
             }
             .sheet(isPresented: $showingPaywall) {
-                if let offering = storeKit.offerings?.current {
-                    PaywallView(offering: offering)
-                        .interactiveDismissDisabled(true)
-                } else {
-                    PaywallView()
-                        .interactiveDismissDisabled(true)
-                }
+                PaywallView(paywallImpressionId: "streaks_settings_sheet")
+                    .interactiveDismissDisabled(true)
             }
             .onChange(of: store.isLoading) { _, isLoading in
                 if !isLoading { recalibrateAllMessage = nil }

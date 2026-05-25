@@ -7,7 +7,7 @@ import RevenueCat
 /// onboarding. Hybrid behavior:
 /// - When a trial-bearing yearly package loaded, the primary CTA buys it directly
 ///   via StoreKit and the sheet shows the Apple 3.1.2-required price + auto-renew
-///   disclosure plus a "See all plans" link to the hosted paywall.
+///   disclosure plus a "See all plans" link to the full paywall.
 /// - When no trial product loaded yet, the primary CTA falls through to the hosted
 ///   paywall instead.
 struct TrialOfferSheet: View {

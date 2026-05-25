@@ -18,7 +18,7 @@
 		1E3B9B0FCE2C98347335A466 /* SavesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC74E9FD778F8E217E2F961 /* SavesView.swift */; };
 		25F21CF803DAE58D6C3ABC78 /* DateHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49F54F94A5A2BE6B4C616141 /* DateHelpers.swift */; };
 		299E9A543F3E06AD608123ED /* WorkoutType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A235BEE85624E479B2AE5BDF /* WorkoutType.swift */; };
-		2AD7BDFA7937485B53FB32B5 /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = B3A6499473C5211927E07417 /* RevenueCatUI */; };
+		2E26CBFAF2564062A08A999C /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5995F9E0F22A38471BAB08CE /* PaywallView.swift */; };
 		2E92D2050EDDB3EBE69EFE60 /* WatchTodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57548FD64897F4D07CFB9889 /* WatchTodayView.swift */; };
 		301D407B208954C2ECA470D3 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 88CD00513724423456C0A89B /* PrivacyInfo.xcprivacy */; };
 		3029F311A2F44BD52E52A820 /* StreakEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543D3D4B4FAF0A178E8805F1 /* StreakEngine.swift */; };
@@ -209,6 +209,7 @@
 		5499F56557690B4EE92A2E42 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		560A6C366B6C97CC3275012C /* JetBrainsMono-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "JetBrainsMono-Bold.ttf"; sourceTree = "<group>"; };
 		57548FD64897F4D07CFB9889 /* WatchTodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTodayView.swift; sourceTree = "<group>"; };
+		5995F9E0F22A38471BAB08CE /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		5AA06E349F8611B16EE9DC0D /* TrialOfferSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrialOfferSheet.swift; sourceTree = "<group>"; };
 		5BA88BDC9CCB6015980ECFF3 /* DailyActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyActivity.swift; sourceTree = "<group>"; };
 		5CC00364817F95876F570F12 /* BrokenStreakSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokenStreakSheet.swift; sourceTree = "<group>"; };
@@ -251,7 +252,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				77D8DFD6FC3BF0798A823D03 /* RevenueCat in Frameworks */,
-				2AD7BDFA7937485B53FB32B5 /* RevenueCatUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -275,6 +275,7 @@
 				5CC00364817F95876F570F12 /* BrokenStreakSheet.swift */,
 				F84469F4922FC57E3F0E0CEE /* DashboardView.swift */,
 				4E54FC44A8D7A428347652F2 /* OnboardingView.swift */,
+				5995F9E0F22A38471BAB08CE /* PaywallView.swift */,
 				D972AD56E4B688243C414A06 /* RootTabView.swift */,
 				CDC74E9FD778F8E217E2F961 /* SavesView.swift */,
 				71D6E754008340281F258E8A /* SettingsView.swift */,
@@ -535,7 +536,6 @@
 			name = FitnessStreaks;
 			packageProductDependencies = (
 				346451E272EA7ABF67348603 /* RevenueCat */,
-				B3A6499473C5211927E07417 /* RevenueCatUI */,
 			);
 			productName = FitnessStreaks;
 			productReference = 135A3C0A5AD7A7BA2B0A64CF /* FitnessStreaks.app */;
@@ -684,6 +684,7 @@
 				725C04D55BBA4E5582F0973E /* HealthKitService.swift in Sources */,
 				CEA8D66BF780261F75668F56 /* NotificationService.swift in Sources */,
 				8F5705E093278934C59D51DB /* OnboardingView.swift in Sources */,
+				2E26CBFAF2564062A08A999C /* PaywallView.swift in Sources */,
 				117AE494DDF91AAF1E0C01F7 /* PixelUI.swift in Sources */,
 				4036868B89ED39858BE39F18 /* RootTabView.swift in Sources */,
 				1E3B9B0FCE2C98347335A466 /* SavesView.swift in Sources */,
@@ -892,7 +893,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 107;
+				CURRENT_PROJECT_VERSION = 112;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = YXG4MP6W39;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -907,7 +908,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -969,7 +970,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 107;
+				CURRENT_PROJECT_VERSION = 112;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = YXG4MP6W39;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -990,7 +991,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1159,11 +1160,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 0B4478A86E86F757D983CE37 /* XCRemoteSwiftPackageReference "purchases-ios" */;
 			productName = RevenueCat;
-		};
-		B3A6499473C5211927E07417 /* RevenueCatUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 0B4478A86E86F757D983CE37 /* XCRemoteSwiftPackageReference "purchases-ios" */;
-			productName = RevenueCatUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
