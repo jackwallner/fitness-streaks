@@ -203,9 +203,9 @@ struct SettingsView: View {
 
     private var autoSaveCopy: String {
         if storeKit.isPro {
-            return "Pro auto-saves any day you miss — your streak survives and the count keeps climbing tomorrow. Unlimited, automatic, no action needed."
+            return "Pro auto-saves any day you miss. Your streak survives and the count keeps climbing tomorrow. Unlimited, automatic, no action needed."
         }
-        return "Free streaks end on the first missed day. Start a Pro trial when it happens — we'll revive the run on the spot and auto-save every miss after that."
+        return "Free streaks end on the first missed day. Start a Pro trial when it happens and we'll revive the run on the spot, then auto-save every miss after that."
     }
 
     private var recentPreservations: [GracePreservation] {
@@ -427,7 +427,7 @@ struct SettingsView: View {
                         UIApplication.shared.open(url)
                     }
                 } label: {
-                    Text("BLOCKED IN IOS SETTINGS — TAP TO FIX")
+                    Text("BLOCKED IN IOS SETTINGS. TAP TO FIX")
                         .font(RetroFont.mono(10, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(Theme.retroAmber)

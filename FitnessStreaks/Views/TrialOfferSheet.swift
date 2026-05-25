@@ -73,7 +73,7 @@ struct TrialOfferSheet: View {
     }
 
     private var subheadline: String {
-        let trialClause = offerLabel.map { " — free for your \($0.replacingOccurrences(of: " free trial", with: ""))" } ?? ""
+        let trialClause = offerLabel.map { ", free for your \($0.replacingOccurrences(of: " free trial", with: ""))" } ?? ""
         if hasMeaningfulStreak {
             return "One missed \(longestStreak?.cadenceLabel ?? "day") zeroes it out. Pro auto-saves the run and tracks every streak you've earned\(trialClause)."
         }
@@ -104,7 +104,7 @@ struct TrialOfferSheet: View {
                 icon: "wand.and.stars",
                 tint: Theme.retroLime,
                 title: "Custom streaks",
-                detail: "Define your own threshold, cadence, and hour window — beyond the discovered set."
+                detail: "Define your own threshold, cadence, and hour window, beyond the discovered set."
             )
         ]
     }

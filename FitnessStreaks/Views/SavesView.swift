@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// The "Saves" tab — Pro's home turf. Shows auto-save status, recent saves history,
-/// planned freezes, and the upgrade pitch. The Pro features story lives here so the
-/// Streaks tab can stay focused on actual streaks.
+/// The "Saves" tab. Auto-save status, recent saves, and planned freezes.
+/// Kept deliberately light on text: a single animated status panel does the
+/// talking, with short data rows below it.
 struct SavesView: View {
     @EnvironmentObject var settings: StreakSettings
     @EnvironmentObject var store: StreakStore
@@ -27,14 +27,14 @@ struct SavesView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    autoSaveHero
+                VStack(alignment: .leading, spacing: 18) {
+                    statusHero
                     if !recentPreservations.isEmpty {
                         savesLog
                     }
                     plannedFreezesCard
                     if !storeKit.isPro {
-                        proPitchFooter
+                        perksStrip
                     }
                 }
                 .padding(.horizontal, 14)
@@ -61,61 +61,47 @@ struct SavesView: View {
         }
     }
 
-    // MARK: - Auto-save hero
+    // MARK: - Status hero
 
-    private var autoSaveHero: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .top, spacing: 14) {
-                PixelFlame(size: 48, intensity: 0.7, tint: storeKit.isPro ? Theme.retroLime : Theme.retroMagenta)
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack(spacing: 8) {
-                        Text(storeKit.isPro ? "AUTO-SAVE ON" : "AUTO-SAVE LOCKED")
-                            .font(RetroFont.pixel(11))
-                            .tracking(2)
-                            .foregroundStyle(storeKit.isPro ? Theme.retroLime : Theme.retroMagenta)
-                        if storeKit.isPro {
-                            PixelChip(text: "PRO", accent: Theme.retroLime)
-                        }
-                    }
-                    Text(storeKit.isPro
-                         ? "Miss a day, keep your streak. Unlimited."
-                         : "One miss ends your streak — unless you trial Pro.")
-                        .font(RetroFont.mono(11, weight: .bold))
-                        .foregroundStyle(Theme.retroInk)
-                }
-                Spacer(minLength: 0)
+    private var accent: Color { storeKit.isPro ? Theme.retroLime : Theme.retroMagenta }
+
+    private var statusHero: some View {
+        VStack(spacing: 16) {
+            AutoSavePulse(tint: accent, lit: storeKit.isPro)
+
+            VStack(spacing: 6) {
+                Text(storeKit.isPro ? "AUTO-SAVE ON" : "AUTO-SAVE LOCKED")
+                    .font(RetroFont.pixel(14))
+                    .tracking(2)
+                    .foregroundStyle(accent)
+                Text(storeKit.isPro
+                     ? "Miss a day, keep your streak."
+                     : "One miss ends a streak. Pro saves it.")
+                    .font(RetroFont.mono(11, weight: .bold))
+                    .foregroundStyle(Theme.retroInk)
+                    .multilineTextAlignment(.center)
             }
-
-            Text(storeKit.isPro
-                 ? "Pro saves every missed day automatically — your streak keeps growing through travel, sick days, and life. No grace days to ration, no manual taps."
-                 : "Free streaks die on the first miss. Start a Pro trial when it happens and we'll revive the run on the spot — then every miss after is auto-saved.")
-                .font(RetroFont.mono(11))
-                .foregroundStyle(Theme.retroInkDim)
-                .lineSpacing(3)
 
             if !storeKit.isPro {
                 Button {
                     showingPaywall = true
                 } label: {
-                    HStack {
-                        Text("UNLOCK PRO")
-                            .font(RetroFont.mono(10, weight: .bold))
-                            .tracking(2)
-                            .foregroundStyle(Theme.retroBg)
-                        Spacer()
-                        Text("›")
-                            .font(RetroFont.mono(14, weight: .bold))
-                            .foregroundStyle(Theme.retroBg)
-                    }
-                    .padding(14)
-                    .background(Theme.retroMagenta)
+                    Text("START PRO TRIAL")
+                        .font(RetroFont.mono(11, weight: .bold))
+                        .tracking(2)
+                        .foregroundStyle(Theme.retroBg)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 13)
+                        .background(Theme.retroMagenta)
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("Unlock FitnessStreaks Pro")
+                .accessibilityLabel("Start FitnessStreaks Pro trial")
             }
         }
-        .padding(16)
-        .pixelPanel(color: storeKit.isPro ? Theme.retroLime : Theme.retroMagenta, fill: Theme.retroBgRaised)
+        .padding(.vertical, 20)
+        .padding(.horizontal, 16)
+        .frame(maxWidth: .infinity)
+        .pixelPanel(color: accent, fill: Theme.retroBgRaised)
     }
 
     // MARK: - Saves log
@@ -134,15 +120,13 @@ struct SavesView: View {
                         Image(systemName: "shield.lefthalf.filled")
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(Theme.retroLime)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("\(p.metric.displayName.uppercased()) · \(p.preservedLength)-DAY RUN")
-                                .font(RetroFont.pixel(10))
-                                .foregroundStyle(Theme.retroInk)
-                            Text("Saved \(Self.saveDateFormatter.string(from: p.grantedAt))")
-                                .font(RetroFont.mono(9))
-                                .foregroundStyle(Theme.retroInkDim)
-                        }
+                        Text("\(p.metric.displayName.uppercased()) · \(p.preservedLength)-DAY RUN")
+                            .font(RetroFont.pixel(10))
+                            .foregroundStyle(Theme.retroInk)
                         Spacer()
+                        Text(Self.saveDateFormatter.string(from: p.grantedAt))
+                            .font(RetroFont.mono(9))
+                            .foregroundStyle(Theme.retroInkDim)
                     }
                     .padding(.vertical, 10)
                     .padding(.horizontal, 14)
@@ -173,10 +157,9 @@ struct SavesView: View {
 
     private var proFreezesContent: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Mark days you know you'll miss (vacation, travel, sick). Freeze days don't break streaks or extend them.")
+            Text("Days you mark won't break or extend a streak.")
                 .font(RetroFont.mono(10))
                 .foregroundStyle(Theme.retroInkDim)
-                .lineSpacing(2)
 
             if settings.plannedFreezes.isEmpty {
                 Text("No freeze days set.")
@@ -230,28 +213,17 @@ struct SavesView: View {
         Button {
             showingPaywall = true
         } label: {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack(spacing: 8) {
-                    Image(systemName: "lock.fill")
-                        .font(.system(size: 12))
-                        .foregroundStyle(Theme.retroMagenta)
-                    PixelChip(text: "PRO", accent: Theme.retroMagenta)
-                    Spacer()
-                    Text("UNLOCK →")
-                        .font(RetroFont.mono(9, weight: .bold))
-                        .foregroundStyle(Theme.retroMagenta)
-                }
-
-                Text("Planned freezes let you mark vacation, travel, or sick days so they don't break your streaks.")
+            HStack(spacing: 10) {
+                Image(systemName: "snowflake")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Theme.retroMagenta)
+                Text("Freeze travel or sick days so they never break a streak.")
                     .font(RetroFont.mono(10))
                     .foregroundStyle(Theme.retroInkDim)
-                    .lineSpacing(2)
-
-                if !settings.plannedFreezes.isEmpty {
-                    Text("\(settings.plannedFreezes.count) freeze day\(settings.plannedFreezes.count == 1 ? "" : "s") set")
-                        .font(RetroFont.mono(10))
-                        .foregroundStyle(Theme.retroInkFaint)
-                }
+                Spacer(minLength: 8)
+                Text("UNLOCK ›")
+                    .font(RetroFont.mono(9, weight: .bold))
+                    .foregroundStyle(Theme.retroMagenta)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(14)
@@ -306,45 +278,72 @@ struct SavesView: View {
         }
     }
 
-    // MARK: - Pro pitch footer (free users only)
+    // MARK: - Perks strip (free users only)
 
-    private var proPitchFooter: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            PixelSectionHeader(title: "What you get with Pro")
-            VStack(alignment: .leading, spacing: 10) {
-                pitchRow(symbol: "shield.lefthalf.filled",
-                         title: "UNLIMITED AUTO-SAVES",
-                         body: "Every missed day gets saved automatically.")
-                pitchRow(symbol: "snowflake",
-                         title: "UNLIMITED PLANNED FREEZES",
-                         body: "Travel, sick, on holiday — schedule it.")
-                pitchRow(symbol: "bell.badge.fill",
-                         title: "PROACTIVE AT-RISK ALERTS",
-                         body: "Daily nudge before the day gets away.")
-                pitchRow(symbol: "plus.square",
-                         title: "UNLIMITED CUSTOM STREAKS",
-                         body: "Free is capped at 3. Pro removes the cap.")
+    private var perksStrip: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            PixelSectionHeader(title: "With Pro")
+            VStack(spacing: 0) {
+                perkRow("shield.lefthalf.filled", "Unlimited auto-saves", first: true)
+                perkRow("snowflake", "Planned freeze days")
+                perkRow("bell.badge.fill", "At-risk alerts")
+                perkRow("infinity", "Unlimited streaks")
             }
-            .padding(14)
             .pixelPanel(color: Theme.retroMagenta, fill: Theme.retroBgRaised)
         }
     }
 
-    private func pitchRow(symbol: String, title: String, body: String) -> some View {
-        HStack(alignment: .top, spacing: 10) {
-            Image(systemName: symbol)
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(Theme.retroMagenta)
-                .frame(width: 20)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(RetroFont.pixel(10))
-                    .tracking(1)
-                    .foregroundStyle(Theme.retroInk)
-                Text(body)
-                    .font(RetroFont.mono(10))
-                    .foregroundStyle(Theme.retroInkDim)
+    private func perkRow(_ symbol: String, _ title: String, first: Bool = false) -> some View {
+        VStack(spacing: 0) {
+            if !first {
+                Rectangle()
+                    .fill(Theme.retroInkFaint.opacity(0.5))
+                    .frame(height: 1)
+                    .padding(.horizontal, 14)
             }
+            HStack(spacing: 12) {
+                Image(systemName: symbol)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Theme.retroMagenta)
+                    .frame(width: 20)
+                Text(title)
+                    .font(RetroFont.mono(11, weight: .bold))
+                    .foregroundStyle(Theme.retroInk)
+                Spacer()
+            }
+            .padding(.vertical, 11)
+            .padding(.horizontal, 14)
         }
+    }
+}
+
+// MARK: - Auto-save pulse animation
+
+/// Eye-catching status sprite: a breathing pixel flame inside expanding square
+/// rings. Driven by a TimelineView tick so the motion never gets eaten by
+/// surrounding state animations.
+private struct AutoSavePulse: View {
+    var tint: Color
+    var lit: Bool
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { context in
+            let t = context.date.timeIntervalSinceReferenceDate
+            ZStack {
+                ForEach(0..<3, id: \.self) { i in
+                    let phase = ((t / 2.4) + Double(i) / 3.0)
+                        .truncatingRemainder(dividingBy: 1.0)
+                    Rectangle()
+                        .stroke(tint.opacity(0.55 * (1.0 - phase)), lineWidth: 2)
+                        .frame(width: 60, height: 60)
+                        .scaleEffect(0.5 + phase)
+                }
+                let breathe = 0.9 + 0.1 * sin(t * 2.2)
+                PixelFlame(size: 44, intensity: lit ? 1.0 : 0.45, tint: tint)
+                    .scaleEffect(breathe)
+            }
+            .frame(width: 96, height: 96)
+        }
+        .accessibilityHidden(true)
     }
 }

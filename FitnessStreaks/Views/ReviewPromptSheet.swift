@@ -85,7 +85,7 @@ struct ReviewPromptSheet: View {
                 .font(RetroFont.pixel(13))
                 .foregroundStyle(Theme.retroInk)
 
-            Text("A quick check-in — only if you have a moment.")
+            Text("A quick check-in, only if you have a moment.")
                 .font(RetroFont.mono(11))
                 .foregroundStyle(Theme.retroInkDim)
 
@@ -108,7 +108,7 @@ struct ReviewPromptSheet: View {
             Text("Built solo for streak lovers.")
                 .font(RetroFont.pixel(12))
                 .foregroundStyle(Theme.retroInk)
-            Text("No ads, no account — just your Apple Health streaks on device.")
+            Text("No ads, no account. Just your Apple Health streaks on device.")
                 .font(RetroFont.mono(11))
                 .foregroundStyle(Theme.retroInkDim)
 
@@ -140,7 +140,7 @@ struct ReviewPromptSheet: View {
                 .padding(10)
                 .pixelPanel(color: Theme.retroInkFaint, fill: Theme.retroBgRaised)
 
-            Text("Opens your mail app with this note — nothing is sent automatically.")
+            Text("Opens your mail app with this note. Nothing is sent automatically.")
                 .font(RetroFont.mono(10))
                 .foregroundStyle(Theme.retroInkDim)
 
