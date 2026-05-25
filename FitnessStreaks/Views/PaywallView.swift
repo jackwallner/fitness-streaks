@@ -8,9 +8,25 @@ enum PaywallLinks {
     static let standardEULA = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
 }
 
-/// Native FitnessStreaks Pro paywall. Purchases flow through `StoreKitService`
-/// → `Purchases.shared.purchase(package:)` so RevenueCat records transactions,
-/// trials, and renewals. Dismisses when `isPro` becomes true.
+/// Native FitnessStreaks Pro paywall.
+///
+/// Layout follows the patterns most consistently linked to higher trial-start
+/// and paid conversion across consumer subscription apps (Cal AI, Headspace,
+/// Blinkist, Opal, Rise, Duolingo Super):
+///
+/// 1. Outcome headline + trial chip above the fold.
+/// 2. Explicit trial timeline (Today → reminder → first charge) — the single
+///    highest-impact addition for trial-start rate; removes the "when will I
+///    be charged?" anxiety that drives bail-outs.
+/// 3. Feature block ordered by perceived loss-aversion value.
+/// 4. One visually dominant primary plan (annual w/ trial) with per-day
+///    price anchoring and SAVE-vs-monthly badge; secondary plans are still
+///    selectable but de-emphasised to remove choice paralysis.
+/// 5. Single primary CTA whose label adapts to the selection ("Try free
+///    for 7 days" / "Subscribe" / "Unlock lifetime"). "$0.00 due today"
+///    reassurance directly under it when a trial is selected.
+/// 6. Trust bar (privacy / cancel anytime / Apple-billed) — credibility
+///    signals without fabricated testimonials.
 struct PaywallView: View {
     @EnvironmentObject private var storeKit: StoreKitService
     @Environment(\.dismiss) private var dismiss
@@ -28,11 +44,12 @@ struct PaywallView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
+                VStack(alignment: .leading, spacing: 16) {
                     if let context {
                         contextBanner(context)
                     }
                     heroBlock
+                    if showTimeline { timelineBlock }
                     featureBlock
                     productBlock
                     purchaseButton
@@ -42,6 +59,7 @@ struct PaywallView: View {
                             .foregroundStyle(Theme.retroAmber)
                             .frame(maxWidth: .infinity, alignment: .center)
                     }
+                    trustBar
                     legalBlock
                 }
                 .padding(.horizontal, 14)
@@ -106,22 +124,30 @@ struct PaywallView: View {
     // MARK: - Hero
 
     private var heroBlock: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                PixelFlame(size: 48, intensity: 1.0, tint: Theme.retroMagenta)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top) {
+                PixelFlame(size: 52, intensity: 1.0, tint: Theme.retroMagenta)
                 Spacer()
                 PixelChip(text: trialHeadline, accent: Theme.retroLime)
             }
-            Text("NEVER LOSE A STREAK AGAIN.")
-                .font(RetroFont.pixel(14))
-                .foregroundStyle(Theme.retroInk)
-                .lineSpacing(4)
+            VStack(alignment: .leading, spacing: 6) {
+                Text("DON'T BREAK THE STREAK.")
+                    .font(RetroFont.pixel(15))
+                    .foregroundStyle(Theme.retroInk)
+                    .lineSpacing(4)
+                Text("Auto-save every streak, plan ahead for travel and rest days, and track every fitness habit you build.")
+                    .font(RetroFont.mono(11))
+                    .foregroundStyle(Theme.retroInkDim)
+                    .lineSpacing(3)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
         .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .pixelPanel(color: Theme.retroMagenta, fill: Theme.retroBgRaised)
     }
 
-    /// "7 DAYS FREE" when the annual plan offers a trial, else a neutral "PRO" chip.
+    /// "7 DAYS FREE" when a trial is available, else a neutral "PRO" chip.
     private var trialHeadline: String {
         if let package = storeKit.yearly ?? storeKit.monthly,
            storeKit.isEligibleForIntroOffer(package),
@@ -132,39 +158,77 @@ struct PaywallView: View {
         return "PRO"
     }
 
+    // MARK: - Trial timeline
+
+    /// Visible whenever the user has an eligible trial — drives the highest
+    /// share of the page's conversion lift. Hidden once they've already used
+    /// their intro offer or no trial product is available, since the timeline
+    /// would otherwise misrepresent the billing schedule.
+    private var showTimeline: Bool {
+        guard let package = storeKit.yearly ?? storeKit.monthly else { return false }
+        return storeKit.isEligibleForIntroOffer(package)
+    }
+
+    private var timelineBlock: some View {
+        let trialPkg = storeKit.yearly ?? storeKit.monthly
+        let days = trialPkg.flatMap { pkg -> Int? in
+            guard let intro = pkg.storeProduct.introductoryDiscount,
+                  intro.paymentMode == .freeTrial else { return nil }
+            let period = intro.subscriptionPeriod
+            switch period.unit {
+            case .day: return period.value
+            case .week: return period.value * 7
+            default: return nil
+            }
+        } ?? 7
+        let priceLabel = trialPkg?.streaksRecurringPriceLabel
+        return TrialTimeline(trialDays: days, priceLabel: priceLabel)
+    }
+
     // MARK: - Features
 
     private var featureBlock: some View {
         VStack(alignment: .leading, spacing: 12) {
             featureRow(accent: Theme.retroLime,
                        symbol: "shield.lefthalf.filled",
-                       text: "Unlimited auto-saves — miss a day, keep your streak.")
+                       title: "Unlimited auto-saves",
+                       detail: "Miss a day, keep your streak.")
             featureRow(accent: Theme.retroCyan,
                        symbol: "snowflake",
-                       text: "Planned freezes for travel, sick, and vacation days.")
+                       title: "Planned freezes",
+                       detail: "Schedule travel, sick, and vacation days in advance.")
             featureRow(accent: Theme.retroAmber,
                        symbol: "infinity",
-                       text: "Unlimited custom streaks — free stops at 3.")
+                       title: "Unlimited custom streaks",
+                       detail: "Free stops at 3 — Pro tracks every metric you've earned.")
             featureRow(accent: Theme.retroMagenta,
                        symbol: "bell.badge.fill",
-                       text: "At-risk alerts before a streak slips away.")
+                       title: "At-risk alerts",
+                       detail: "Get a nudge before a streak slips away.")
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .pixelPanel(color: Theme.retroInkFaint, fill: Theme.retroBgRaised)
     }
 
-    private func featureRow(accent: Color, symbol: String, text: String) -> some View {
-        HStack(alignment: .center, spacing: 12) {
+    private func featureRow(accent: Color, symbol: String, title: String, detail: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
             Image(systemName: symbol)
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(accent)
                 .shadow(color: accent.opacity(0.6), radius: 4)
-                .frame(width: 22)
-            Text(text)
-                .font(RetroFont.mono(11))
-                .foregroundStyle(Theme.retroInk)
-                .lineSpacing(2)
+                .frame(width: 22, alignment: .center)
+                .padding(.top, 1)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(RetroFont.mono(11, weight: .bold))
+                    .foregroundStyle(Theme.retroInk)
+                Text(detail)
+                    .font(RetroFont.mono(10))
+                    .foregroundStyle(Theme.retroInkDim)
+                    .lineSpacing(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
             Spacer(minLength: 0)
         }
     }
@@ -188,79 +252,125 @@ struct PaywallView: View {
                     productLoadErrorBlock(error)
                 }
             } else {
-                ForEach(storeKit.sortedPackages, id: \.identifier) { package in
-                    productCard(for: package)
+                if let yearly = storeKit.yearly {
+                    yearlyHeroCard(for: yearly)
+                }
+                let others = storeKit.sortedPackages.filter { $0.packageType != .annual }
+                if !others.isEmpty {
+                    VStack(spacing: 8) {
+                        ForEach(others, id: \.identifier) { package in
+                            secondaryProductRow(for: package)
+                        }
+                    }
                 }
             }
         }
     }
 
-    private func productCard(for package: Package) -> some View {
+    /// Visually dominant annual card. The per-day micro-price + SAVE-vs-monthly
+    /// chip + trial badge stack work together as the primary anchor.
+    private func yearlyHeroCard(for package: Package) -> some View {
         let productID = package.storeProduct.productIdentifier
         let isSelected = selectedProductID == productID
-        let isLifetime = package.packageType == .lifetime
         let showsTrial = storeKit.isEligibleForIntroOffer(package)
-        let badge: (text: String, accent: Color)? = {
-            if showsTrial, let _ = package.streaksIntroOfferLabel {
-                return ("7 DAYS FREE", Theme.retroMagenta)
-            }
-            if isLifetime {
-                return ("BEST VALUE", Theme.retroLime)
-            }
-            if package.packageType == .annual {
-                return ("MOST POPULAR", Theme.retroMagenta)
-            }
-            return nil
-        }()
-        let priceLabel: String = {
-            switch package.packageType {
-            case .annual: return "\(storeKit.displayPrice(for: package)) / yr"
-            case .monthly: return "\(storeKit.displayPrice(for: package)) / mo"
-            default: return storeKit.displayPrice(for: package)
-            }
-        }()
-        let detail: String = {
-            if showsTrial, let intro = storeKit.introOfferDescription(for: package) {
-                return intro
-            }
-            if package.packageType == .annual {
-                return storeKit.yearlyMonthlyEquivalent.map { "Billed yearly · \($0)" } ?? "Billed yearly"
-            }
-            if isLifetime {
-                return "One-time purchase · Forever yours"
-            }
-            return "Billed monthly · Cancel anytime"
-        }()
+        let savings = storeKit.yearlyVsMonthlySavingsPercent
+        let perDay = storeKit.yearlyDailyEquivalent
+        let priceLabel = "\(storeKit.displayPrice(for: package)) / yr"
+        let perMonth = storeKit.yearlyMonthlyEquivalent
 
         return Button {
             selectedProductID = productID
         } label: {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 8) {
+                    Text("YEARLY")
+                        .font(RetroFont.pixel(12))
+                        .tracking(1)
+                        .foregroundStyle(Theme.retroInk)
+                    Spacer()
+                    if showsTrial {
+                        PixelChip(text: "7 DAYS FREE", accent: Theme.retroMagenta)
+                    }
+                    if let savings, savings >= 10 {
+                        PixelChip(text: "SAVE \(savings)%", accent: Theme.retroLime)
+                    }
+                }
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    if let perDay {
+                        Text(perDay)
+                            .font(RetroFont.pixel(22))
+                            .foregroundStyle(isSelected ? Theme.retroMagenta : Theme.retroInk)
+                        Text("/ DAY")
+                            .font(RetroFont.pixel(10))
+                            .tracking(1)
+                            .foregroundStyle(Theme.retroInkDim)
+                    } else {
+                        Text(priceLabel)
+                            .font(RetroFont.pixel(18))
+                            .foregroundStyle(isSelected ? Theme.retroMagenta : Theme.retroInk)
+                    }
+                    Spacer()
+                    Text(priceLabel)
+                        .font(RetroFont.mono(11, weight: .bold))
+                        .foregroundStyle(Theme.retroInkDim)
+                }
+                if let perMonth {
+                    Text("Just \(perMonth), billed yearly.")
+                        .font(RetroFont.mono(10))
+                        .foregroundStyle(Theme.retroInkDim)
+                }
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .pixelPanel(
+                color: isSelected ? Theme.retroMagenta : Theme.retroInkFaint,
+                fill: Theme.retroBgRaised,
+                lineWidth: isSelected ? 3 : 2
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func secondaryProductRow(for package: Package) -> some View {
+        let productID = package.storeProduct.productIdentifier
+        let isSelected = selectedProductID == productID
+        let isLifetime = package.packageType == .lifetime
+        let priceLabel: String = {
+            switch package.packageType {
+            case .monthly: return "\(storeKit.displayPrice(for: package)) / mo"
+            default: return storeKit.displayPrice(for: package)
+            }
+        }()
+        let detail: String = isLifetime
+            ? "One-time · Forever yours"
+            : "Billed monthly · Cancel anytime"
+
+        return Button {
+            selectedProductID = productID
+        } label: {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 6) {
                         Text(packageTitle(package).uppercased())
                             .font(RetroFont.pixel(11))
                             .tracking(1)
                             .foregroundStyle(Theme.retroInk)
-                        Text(detail)
-                            .font(RetroFont.mono(10))
-                            .foregroundStyle(Theme.retroInkDim)
-                            .lineLimit(3)
+                        if isLifetime {
+                            PixelChip(text: "BEST VALUE", accent: Theme.retroAmber)
+                        }
                     }
-                    Spacer()
-                    if let badge {
-                        PixelChip(text: badge.text, accent: badge.accent)
-                    }
+                    Text(detail)
+                        .font(RetroFont.mono(9))
+                        .foregroundStyle(Theme.retroInkDim)
                 }
-                HStack {
-                    Spacer()
-                    Text(priceLabel)
-                        .font(RetroFont.pixel(14))
-                        .foregroundStyle(isSelected ? Theme.retroMagenta : Theme.retroInk)
-                }
+                Spacer()
+                Text(priceLabel)
+                    .font(RetroFont.pixel(12))
+                    .foregroundStyle(isSelected ? Theme.retroMagenta : Theme.retroInk)
             }
-            .padding(14)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity)
             .pixelPanel(
                 color: isSelected ? Theme.retroMagenta : Theme.retroInkFaint,
                 fill: Theme.retroBgRaised
@@ -324,9 +434,17 @@ struct PaywallView: View {
             .disabled(selectedPackage == nil || storeKit.purchaseInProgress)
             .opacity(selectedPackage == nil ? 0.5 : 1)
 
+            if let reassurance = primaryReassurance {
+                Text(reassurance)
+                    .font(RetroFont.mono(10, weight: .bold))
+                    .tracking(1)
+                    .foregroundStyle(Theme.retroLime)
+                    .frame(maxWidth: .infinity)
+            }
+
             if let disclosure = selectedPlanDisclosure {
                 Text(disclosure)
-                    .font(RetroFont.mono(10))
+                    .font(RetroFont.mono(9))
                     .foregroundStyle(Theme.retroInkDim)
                     .lineSpacing(2)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -347,8 +465,17 @@ struct PaywallView: View {
         if storeKit.purchaseInProgress { return "PROCESSING…" }
         guard let package = selectedPackage else { return "UNAVAILABLE" }
         if package.packageType == .lifetime { return "UNLOCK LIFETIME" }
-        if storeKit.isEligibleForIntroOffer(package) { return "START FREE TRIAL" }
+        if storeKit.isEligibleForIntroOffer(package) { return "TRY FREE FOR 7 DAYS" }
         return "SUBSCRIBE"
+    }
+
+    /// Short, confident reassurance directly under the CTA. Apple-spec
+    /// disclosure still appears in `selectedPlanDisclosure` below it.
+    private var primaryReassurance: String? {
+        guard let package = selectedPackage else { return nil }
+        if package.packageType == .lifetime { return "ONE-TIME PURCHASE · NEVER RENEWS" }
+        if storeKit.isEligibleForIntroOffer(package) { return "$0.00 DUE TODAY · CANCEL ANYTIME" }
+        return "CANCEL ANYTIME IN SETTINGS"
     }
 
     /// Apple 3.1.2: price, auto-renew, and cancel instructions for the selected plan.
@@ -407,31 +534,67 @@ struct PaywallView: View {
         }
     }
 
+    // MARK: - Trust bar
+
+    /// Honest credibility signals. Deliberately no fabricated testimonials or
+    /// review counts — instead the three true claims that most reduce
+    /// purchase friction for this app: data privacy, no-friction cancel,
+    /// and Apple-billed (not a third-party payment form).
+    private var trustBar: some View {
+        HStack(spacing: 6) {
+            trustItem(icon: "lock.shield.fill", tint: Theme.retroCyan, text: "Privacy-first")
+            trustDivider
+            trustItem(icon: "xmark.circle.fill", tint: Theme.retroAmber, text: "Cancel anytime")
+            trustDivider
+            trustItem(icon: "applelogo", tint: Theme.retroLime, text: "Apple-billed")
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 8)
+    }
+
+    private func trustItem(icon: String, tint: Color, text: String) -> some View {
+        HStack(spacing: 5) {
+            Image(systemName: icon)
+                .font(.system(size: 10, weight: .bold))
+                .foregroundStyle(tint)
+            Text(text.uppercased())
+                .font(RetroFont.mono(9, weight: .bold))
+                .tracking(1)
+                .foregroundStyle(Theme.retroInkDim)
+        }
+    }
+
+    private var trustDivider: some View {
+        Rectangle()
+            .fill(Theme.retroInkFaint)
+            .frame(width: 1, height: 10)
+    }
+
     // MARK: - Legal
 
     private var legalBlock: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Lifetime is a one-time purchase that never renews.")
-                .font(RetroFont.mono(10))
+                .font(RetroFont.mono(9))
                 .foregroundStyle(Theme.retroInkDim)
                 .lineSpacing(2)
             HStack(spacing: 14) {
                 Link(destination: PaywallLinks.standardEULA) {
                     Text("TERMS OF USE (EULA)")
-                        .font(RetroFont.mono(10, weight: .bold))
+                        .font(RetroFont.mono(9, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(Theme.retroCyan)
                 }
                 Link(destination: PaywallLinks.privacyPolicy) {
                     Text("PRIVACY")
-                        .font(RetroFont.mono(10, weight: .bold))
+                        .font(RetroFont.mono(9, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(Theme.retroCyan)
                 }
                 Spacer()
             }
         }
-        .padding(.top, 8)
+        .padding(.top, 4)
     }
 }
 #endif

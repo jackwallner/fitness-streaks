@@ -51,6 +51,17 @@ struct TrialOfferSheet: View {
         (longestStreak?.current ?? 0) >= 3
     }
 
+    /// Trial length parsed from `offerLabel` (e.g. "7-day free trial" → 7).
+    /// Defaults to 7 when unparseable so the timeline still renders sensibly.
+    private var trialDays: Int {
+        guard let offerLabel,
+              let first = offerLabel.split(separator: "-").first,
+              let days = Int(first) else {
+            return 7
+        }
+        return days
+    }
+
     private var headline: String {
         if let s = longestStreak, hasMeaningfulStreak {
             return "KEEP YOUR \(s.current)-\(s.cadenceLabel.uppercased()) \(s.displayName.uppercased()) STREAK ALIVE."
@@ -125,6 +136,10 @@ struct TrialOfferSheet: View {
                         ForEach(bullets) { TrialBulletRow(bullet: $0) }
                     }
 
+                    if offerLabel != nil {
+                        TrialTimeline(trialDays: trialDays, priceLabel: priceLabel)
+                    }
+
                     if directPurchase, let priceLabel {
                         Text("Free during your trial, then \(priceLabel). Auto-renews unless cancelled at least 24 hours before the trial ends.")
                             .font(.system(.footnote, design: .rounded))
@@ -164,6 +179,13 @@ struct TrialOfferSheet: View {
                         }
                         .buttonStyle(.plain)
                         .disabled(isPurchasing)
+
+                        if offerLabel != nil {
+                            Text("$0.00 DUE TODAY · CANCEL ANYTIME")
+                                .font(.system(.caption, design: .monospaced, weight: .bold))
+                                .foregroundStyle(Theme.retroLime)
+                                .multilineTextAlignment(.center)
+                        }
 
                         Text("Apple-managed subscription. Cancel anytime.")
                             .font(.system(.caption, design: .rounded))
