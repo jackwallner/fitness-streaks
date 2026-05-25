@@ -323,7 +323,7 @@ struct StreakDetailView: View {
                     .tracking(2)
                     .foregroundStyle(Theme.retroAmber)
             }
-            Text("Streak Finder spotted a hidden pattern: you consistently hit this target within a single hour of the day. Keep it alive — the next window starts at \(streak.window?.label ?? "").")
+            Text("Streak Finder spotted a hidden pattern: you consistently hit this target within a single hour of the day. Keep it alive. The next window starts at \(streak.window?.label ?? "").")
                 .font(RetroFont.mono(11))
                 .foregroundStyle(Theme.retroInk)
                 .lineSpacing(3)
@@ -473,7 +473,7 @@ struct StreakDetailView: View {
                 Button("Untrack", role: .destructive) { untrack() }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("It will disappear from your dashboard. Your Apple Health history is unchanged — you can re-add it from Settings → Tracked Streaks.")
+                Text("It will disappear from your dashboard. Your Apple Health history is unchanged. You can re-add it from Settings, Tracked Streaks.")
             }
         }
         .padding(14)
@@ -556,7 +556,7 @@ struct StreakDetailView: View {
                     Button("Untrack", role: .destructive) { untrack() }
                     Button("Cancel", role: .cancel) {}
                 } message: {
-                    Text("It will disappear from your dashboard. Your Apple Health history is unchanged — you can re-add it from Settings → Tracked Streaks.")
+                    Text("It will disappear from your dashboard. Your Apple Health history is unchanged. You can re-add it from Settings, Tracked Streaks.")
                 }
             }
         }

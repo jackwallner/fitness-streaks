@@ -257,7 +257,7 @@ struct StreakPickerSheet: View {
                         }
                     } label: {
                         HStack {
-                            Text(canBuildCustom ? "+ BUILD YOUR OWN" : "+ BUILD YOUR OWN — PRO")
+                            Text(canBuildCustom ? "+ BUILD YOUR OWN" : "+ BUILD YOUR OWN (PRO)")
                                 .font(RetroFont.mono(10, weight: .bold))
                                 .tracking(1)
                                 .foregroundStyle(canBuildCustom ? Theme.retroLime : Theme.retroMagenta)
@@ -280,7 +280,7 @@ struct StreakPickerSheet: View {
                     }
 
                     if store.allCandidates.isEmpty {
-                        Text("No streaks discovered yet — pull to refresh once Apple Health has some activity.")
+                        Text("No streaks discovered yet. Pull to refresh once Apple Health has some activity.")
                             .font(RetroFont.mono(11))
                             .foregroundStyle(Theme.retroInkDim)
                             .padding(.horizontal, 14)

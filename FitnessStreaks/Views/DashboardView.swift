@@ -163,7 +163,7 @@ struct DashboardView: View {
             CoachmarkStep(
                 anchorID: "hero",
                 title: "YOUR HERO STREAK",
-                body: "The longest active run we found in your Apple Health history. Today doesn't break it — stay above the threshold and the count climbs tomorrow."
+                body: "The longest active run we found in your Apple Health history. Today doesn't break it. Stay above the threshold and the count climbs tomorrow."
             )
         ]
         if !visibleBadges.isEmpty {
@@ -457,9 +457,9 @@ struct DashboardView: View {
 
     private func graceStatusDetail(for hero: Streak) -> String {
         if storeKit.isPro {
-            return "Pro auto-saves any missed day — your streak survives."
+            return "Pro auto-saves any missed day. Your streak survives."
         }
-        return "Start a trial — Pro auto-saves every missed day."
+        return "Start a trial. Pro auto-saves every missed day."
     }
 
     private func brokenBanner(_ broken: BrokenStreak) -> some View {

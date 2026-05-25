@@ -35,7 +35,7 @@ struct OnboardingView: View {
     @State private var pendingPaywallAfterTrialDismiss = false
 
     private static let tips: [String] = [
-        "Streaks update automatically from Apple Health — no manual logging.",
+        "Streaks update automatically from Apple Health. No manual logging.",
         "Sleep streaks are credited to the day a sleep sample ends.",
         "Weekly streaks reset on Mondays, ISO-style.",
         "Today doesn't break your streak until the day actually ends.",
