@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 import BackgroundTasks
 import WidgetKit
+import StoreKit
 import os
 #if REVENUECAT
 import RevenueCat
@@ -129,6 +130,7 @@ struct FitnessStreaksApp: App {
     @State private var snapshotObserver: NSObjectProtocol?
 
     init() {
+        ReviewPromptTracker.recordAppLaunch()
         BGTaskScheduler.shared.register(forTaskWithIdentifier: refreshTaskID, using: DispatchQueue.main) { task in
             guard let task = task as? BGAppRefreshTask else { return }
             Self.handleAppRefresh(task)
@@ -236,6 +238,9 @@ private struct RootView: View {
     @EnvironmentObject var settings: StreakSettings
     @EnvironmentObject var storeKit: StoreKitService
     @EnvironmentObject var store: StreakStore
+    @Environment(\.requestReview) private var requestReview
+
+    @ObservedObject private var reviewCoordinator = ReviewPromptCoordinator.shared
 
     @State private var showTrialOffer = false
     @State private var showTrialPaywall = false
@@ -262,6 +267,14 @@ private struct RootView: View {
             } else {
                 OnboardingView()
             }
+        }
+        .sheet(item: $reviewCoordinator.activePresentation, onDismiss: {
+            if ReviewPromptTracker.pendingNativeReviewRequested() {
+                ReviewPromptTracker.setPendingNativeReview(false)
+                requestReview()
+            }
+        }) { presentation in
+            ReviewPromptSheet(initialPresentation: presentation)
         }
         #if REVENUECAT
         .task {
