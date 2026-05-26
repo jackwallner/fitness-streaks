@@ -722,12 +722,21 @@ struct OnboardingView: View {
 
     // MARK: - Trial Offer
 
-    /// Strongest streak among the user's *current* selection (pre-trim). Drives
-    /// the personalized "keep your N-day X streak alive" pitch. Nil when nothing
-    /// selected has a live run yet.
+    /// Strongest streak the *free cap would drop* from the user's selection.
+    /// The loss-aversion pitch must reference a streak Streaks+ would save —
+    /// not one the user keeps under the free tier anyway. Returns nil when the
+    /// selection fits inside the free cap (nothing would be lost).
     private func longestSelectedStreak() -> TrialOfferSheet.LongestStreakInfo? {
-        let selected = store.allCandidates.filter { selection.contains($0.trackingKey) }
-        guard let top = selected.max(by: { $0.current < $1.current }), top.current > 0 else {
+        guard selection.count > Self.freeTrackedLimit else { return nil }
+        // Determine which of the user's picks would survive the free-tier trim,
+        // mirroring `trimSelectionToFreeCap`. Anything outside `kept` is at risk.
+        let orderedKeys = settings.manualStreakOrder.filter { selection.contains($0) }
+        let pickOrder = orderedKeys.isEmpty ? Array(selection) : orderedKeys
+        let kept = Set(pickOrder.prefix(Self.freeTrackedLimit))
+        let atRisk = store.allCandidates.filter {
+            selection.contains($0.trackingKey) && !kept.contains($0.trackingKey)
+        }
+        guard let top = atRisk.max(by: { $0.current < $1.current }), top.current > 0 else {
             return nil
         }
         return .init(displayName: top.displayName, current: top.current, cadenceLabel: top.cadence.label)
