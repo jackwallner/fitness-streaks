@@ -278,9 +278,23 @@ private struct RootView: View {
         }
         #if REVENUECAT
         .task {
+            if settings.hasCompletedSetup, storeKit.isPro {
+                settings.restoreOnboardingTrackedStreaksIfNeeded()
+                store.refilter()
+            }
             // Re-evaluate once products have a chance to load on this session.
             if storeKit.offerings == nil { await storeKit.loadProducts() }
             evaluateTrialOffer()
+        }
+        .onChange(of: storeKit.purchaseGrantsFullStreakAccess) { _, grants in
+            if grants {
+                showTrialOffer = false
+                showTrialPaywall = false
+                pendingPaywallAfterTrialDismiss = false
+                settings.hasSeenTrialOffer = true
+                settings.restoreOnboardingTrackedStreaksIfNeeded()
+                store.refilter()
+            }
         }
         .onChange(of: settings.hasCompletedSetup) { _, done in
             if done { evaluateTrialOffer() }
@@ -289,14 +303,25 @@ private struct RootView: View {
             evaluateTrialOffer()
         }
         .onChange(of: storeKit.isPro) { _, isPro in
-            if isPro { showTrialOffer = false }
+            if isPro {
+                showTrialOffer = false
+                showTrialPaywall = false
+                pendingPaywallAfterTrialDismiss = false
+                settings.hasSeenTrialOffer = true
+                settings.restoreOnboardingTrackedStreaksIfNeeded()
+                store.refilter()
+            }
         }
         .sheet(isPresented: $showTrialOffer, onDismiss: {
             settings.hasSeenTrialOffer = true
             trialPurchaseInFlight = false
             trialPurchaseError = nil
             trialOfferPackage = nil
-            if pendingPaywallAfterTrialDismiss {
+            // If the user paid inside the trial sheet, skip the hand-off to the
+            // full paywall — one payment unlocks everything.
+            if storeKit.grantsUnlimitedTrackedStreaks {
+                pendingPaywallAfterTrialDismiss = false
+            } else if pendingPaywallAfterTrialDismiss {
                 pendingPaywallAfterTrialDismiss = false
                 showTrialPaywall = true
             }
@@ -364,7 +389,7 @@ private struct RootView: View {
     /// - at least one trial-bearing product loaded
     private func evaluateTrialOffer() {
         guard settings.hasCompletedSetup,
-              !storeKit.isPro,
+              !storeKit.grantsUnlimitedTrackedStreaks,
               !settings.hasSeenTrialOffer,
               storeKit.products.contains(where: { $0.streaksIntroOfferLabel != nil })
         else { return }
@@ -374,7 +399,8 @@ private struct RootView: View {
             // converts worse and collides with the dashboard's onAppear coachmark.
             try? await Task.sleep(nanoseconds: 4_000_000_000)
             guard !showTrialOffer, !showTrialPaywall,
-                  !settings.hasSeenTrialOffer, !storeKit.isPro,
+                  !settings.hasSeenTrialOffer,
+                  !storeKit.grantsUnlimitedTrackedStreaks,
                   storeKit.products.contains(where: { $0.streaksIntroOfferLabel != nil })
             else { return }
             trialOfferPackage = directTrialPackage

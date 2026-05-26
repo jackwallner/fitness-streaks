@@ -71,20 +71,21 @@ struct OnboardingView: View {
         .sheet(isPresented: $showingTrialOffer, onDismiss: {
             trialPurchaseInFlight = false
             trialPurchaseError = nil
-            if pendingPaywallAfterTrialDismiss {
+            // If a purchase succeeded inside the trial sheet, the entitlement
+            // (or pending grant) makes any further paywall pointless. Skip the
+            // hand-off and finish onboarding directly.
+            if storeKit.grantsUnlimitedTrackedStreaks {
+                pendingPaywallAfterTrialDismiss = false
+                settings.hasSeenTrialOffer = true
+                finishOnboardingAfterPaywallDismiss()
+            } else if pendingPaywallAfterTrialDismiss {
                 // They chose "see all plans" — hand off to the full paywall, which
                 // owns the trim-and-complete on its own dismiss.
                 pendingPaywallAfterTrialDismiss = false
                 showingPaywall = true
             } else {
-                // They didn't action the trial. Lean into the loss: trim their
-                // over-cap picks down to the free tier and enter the app.
                 settings.hasSeenTrialOffer = true
-                Task {
-                    await storeKit.refreshEntitlement()
-                    if !storeKit.isPro { trimSelectionToFreeCap() }
-                    completeSetup()
-                }
+                finishOnboardingAfterPaywallDismiss()
             }
         }) {
             TrialOfferSheet(
@@ -109,22 +110,20 @@ struct OnboardingView: View {
         }
         .sheet(isPresented: $showingPaywall, onDismiss: {
             // Soft paywall: swipe-to-dismiss is intentionally allowed so a failed
-            // or slow RevenueCat load can never brick first launch. This onDismiss
-            // is the guaranteed escape hatch. We mark the trial-offer as seen
-            // either way so the post-onboarding TrialOfferSheet does not
-            // immediately re-pitch the same thing.
+            // or slow RevenueCat load can never brick first launch.
             settings.hasSeenTrialOffer = true
-            Task {
-                await storeKit.refreshEntitlement()
-                // If they didn't upgrade, trim their over-cap selection down to
-                // the free tier, preserving the order they picked.
-                if !storeKit.isPro {
-                    trimSelectionToFreeCap()
-                }
-                completeSetup()
-            }
+            finishOnboardingAfterPaywallDismiss()
         }) {
             PaywallView(paywallImpressionId: "streaks_onboarding_sheet")
+        }
+        .onChange(of: storeKit.grantsUnlimitedTrackedStreaks) { _, granted in
+            // Entitlement (or pending entitlement) landed — kill any pitch surface
+            // so the user never sees a second paywall after paying.
+            guard granted else { return }
+            pendingPaywallAfterTrialDismiss = false
+            showingTrialOffer = false
+            showingPaywall = false
+            settings.hasSeenTrialOffer = true
         }
         .onAppear {
             // Start timers on appear
@@ -653,8 +652,25 @@ struct OnboardingView: View {
             .map(\.trackingKey)
             .filter { selection.contains($0) }
         settings.manualStreakOrder = order
+        settings.lastOnboardingTrackedKeys = order
         store.refilter()
         advanceFromSelection()
+    }
+
+    /// After any onboarding paywall/trial sheet closes, enforce the free cap only
+    /// when the user did not purchase. Restores the full onboarding pick list when
+    /// they did (including pending entitlement activation).
+    private func finishOnboardingAfterPaywallDismiss() {
+        Task {
+            await storeKit.refreshEntitlement()
+            if storeKit.grantsUnlimitedTrackedStreaks {
+                settings.restoreOnboardingTrackedStreaksIfNeeded()
+                store.refilter()
+            } else {
+                trimSelectionToFreeCap()
+            }
+            completeSetup()
+        }
     }
 
     /// Free user dismissed the paywall without upgrading. Trim their over-cap
@@ -682,10 +698,11 @@ struct OnboardingView: View {
         // Only gate on the paywall when there's actually an offering to show. If
         // RevenueCat hasn't loaded (offline / slow / misconfigured), proceed into
         // the app rather than presenting an empty, non-actionable paywall.
-        if storeKit.isPro || !showPaywall || storeKit.offerings?.current == nil {
-            // No pitch will be shown (Pro, skipped, or no offering loaded). Free
-            // users still need their over-cap selection trimmed to the free tier.
-            if !storeKit.isPro {
+        if storeKit.grantsUnlimitedTrackedStreaks || !showPaywall || storeKit.offerings?.current == nil {
+            if storeKit.grantsUnlimitedTrackedStreaks {
+                settings.restoreOnboardingTrackedStreaksIfNeeded()
+                store.refilter()
+            } else {
                 trimSelectionToFreeCap()
             }
             completeSetup()
