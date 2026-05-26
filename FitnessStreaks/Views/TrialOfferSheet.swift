@@ -186,10 +186,18 @@ struct TrialOfferSheet: View {
 
             Button(action: onStartTrial) {
                 ZStack {
-                    Text("START MY FREE TRIAL")
-                        .font(.system(.headline, design: .monospaced, weight: .heavy))
-                        .foregroundStyle(Theme.retroBg)
-                        .opacity(isPurchasing ? 0 : 1)
+                    VStack(spacing: 2) {
+                        Text(primaryCTATitle)
+                            .font(.system(.headline, design: .monospaced, weight: .heavy))
+                            .foregroundStyle(Theme.retroBg)
+                        if let subtitle = primaryCTASubtitle {
+                            Text(subtitle)
+                                .font(.system(.caption2, design: .monospaced, weight: .bold))
+                                .foregroundStyle(Theme.retroBg.opacity(0.85))
+                                .tracking(0.5)
+                        }
+                    }
+                    .opacity(isPurchasing ? 0 : 1)
                     if isPurchasing {
                         ProgressView().tint(Theme.retroBg)
                     }
@@ -268,6 +276,22 @@ struct TrialOfferSheet: View {
         return trials.first(where: { $0.packageType == .annual }) ?? trials.first
     }
     #endif
+
+    /// CTA names the plan + recurring price (Apple 3.1.2). "Start my free trial"
+    /// alone has been rejected for not disclosing the subscription term.
+    private var primaryCTATitle: String {
+        if !directPurchase { return "SEE PLANS" }
+        if offerLabel != nil { return "START FREE TRIAL" }
+        return "SUBSCRIBE"
+    }
+
+    private var primaryCTASubtitle: String? {
+        guard directPurchase, let priceLabel else { return nil }
+        if offerLabel != nil {
+            return "THEN \(priceLabel.uppercased())"
+        }
+        return priceLabel.uppercased()
+    }
 
     private func restorePurchases() async {
         restoreStatus = "Restoring…"
