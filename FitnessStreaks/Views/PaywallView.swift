@@ -454,12 +454,28 @@ struct PaywallView: View {
         )
     }
 
+    /// CTA copy must name the plan and recurring price (Apple 3.1.2) so the user
+    /// knows exactly what they're buying before tapping. Plain "START FREE TRIAL"
+    /// has been rejected for ambiguity on subscription term.
     private var ctaTitle: String {
         if storeKit.purchaseInProgress { return "PROCESSING…" }
         guard let package = selectedPackage else { return "UNAVAILABLE" }
-        if package.packageType == .lifetime { return "UNLOCK LIFETIME" }
-        if storeKit.isEligibleForIntroOffer(package) { return "START FREE TRIAL" }
-        return "SUBSCRIBE"
+        if package.packageType == .lifetime {
+            return "UNLOCK LIFETIME · \(storeKit.displayPrice(for: package))"
+        }
+        let termSuffix: String = {
+            switch package.packageType {
+            case .annual:  return "YEARLY"
+            case .monthly: return "MONTHLY"
+            default: return package.streaksRecurringPriceLabel.uppercased()
+            }
+        }()
+        if storeKit.isEligibleForIntroOffer(package),
+           let label = package.streaksIntroOfferLabel,
+           let chip = PaywallDisclosure.trialChipDays(from: label) {
+            return "START \(chip) · \(termSuffix) \(storeKit.displayPrice(for: package))"
+        }
+        return "SUBSCRIBE · \(termSuffix) \(storeKit.displayPrice(for: package))"
     }
 
     /// Short, confident reassurance directly under the CTA.
