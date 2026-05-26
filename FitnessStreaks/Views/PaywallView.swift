@@ -8,6 +8,30 @@ enum PaywallLinks {
     static let standardEULA = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
 }
 
+/// App Store 3.1.2 subscription disclosure copy (Guideline 3.1.2).
+enum PaywallDisclosure {
+    static func trialChipDays(from introLabel: String) -> String? {
+        guard let first = introLabel.split(separator: "-").first,
+              let days = Int(first) else { return nil }
+        return "\(days) DAYS FREE"
+    }
+
+    static func subscriptionFootnote(
+        package: Package,
+        displayPrice: String,
+        isEligibleForIntro: Bool
+    ) -> String {
+        let recurring = package.streaksRecurringPriceLabel
+        if package.packageType == .lifetime {
+            return "\(displayPrice). One-time purchase, no subscription."
+        }
+        if isEligibleForIntro, let trial = package.streaksIntroOfferLabel {
+            return "\(trial.capitalized), then \(recurring). Renews automatically unless you cancel at least 24 hours before the trial ends."
+        }
+        return "\(recurring). Renews automatically; cancel in Settings → Subscriptions."
+    }
+}
+
 /// Native FitnessStreaks Pro paywall.
 ///
 /// Designed to fit a single screen without scrolling on any device: compact
@@ -38,20 +62,16 @@ struct PaywallView: View {
                     heroBlock
                     featureBlock
                     productBlock
-                    purchaseButton
-                    if let statusMessage {
-                        Text(statusMessage)
-                            .font(RetroFont.mono(10))
-                            .foregroundStyle(Theme.retroAmber)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                    }
                     trustBar
-                    legalBlock
                 }
                 .padding(.horizontal, 14)
-                .padding(.vertical, 12)
+                .padding(.top, 12)
+                .padding(.bottom, 8)
             }
             .background(Theme.retroBg.ignoresSafeArea())
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                stickyCTABlock
+            }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
@@ -129,13 +149,13 @@ struct PaywallView: View {
         .pixelPanel(color: Theme.retroMagenta, fill: Theme.retroBgRaised)
     }
 
-    /// "7 DAYS FREE" when a trial is available, else a neutral "PRO" chip.
+    /// Dynamic trial chip from the storefront intro offer (never hardcoded).
     private var trialHeadline: String {
         if let package = storeKit.yearly ?? storeKit.monthly,
            storeKit.isEligibleForIntroOffer(package),
            let label = package.streaksIntroOfferLabel,
-           let days = label.split(separator: "-").first {
-            return "\(days) DAYS FREE"
+           let chip = PaywallDisclosure.trialChipDays(from: label) {
+            return chip
         }
         return "STREAKS+"
     }
@@ -229,8 +249,9 @@ struct PaywallView: View {
                         .tracking(1)
                         .foregroundStyle(Theme.retroInk)
                     Spacer()
-                    if showsTrial {
-                        PixelChip(text: "7 DAYS FREE", accent: Theme.retroMagenta)
+                    if showsTrial, let label = package.streaksIntroOfferLabel,
+                       let chip = PaywallDisclosure.trialChipDays(from: label) {
+                        PixelChip(text: chip, accent: Theme.retroMagenta)
                     }
                     if let savings, savings >= 10 {
                         PixelChip(text: "SAVE \(savings)%", accent: Theme.retroLime)
@@ -364,8 +385,17 @@ struct PaywallView: View {
 
     // MARK: - Purchase
 
-    private var purchaseButton: some View {
+    /// Pinned bottom CTA so the purchase button is always visible regardless of
+    /// scroll position — fixes the prior layout where features + product cards
+    /// pushed the CTA off-screen on smaller phones.
+    private var stickyCTABlock: some View {
         VStack(spacing: 8) {
+            if let statusMessage {
+                Text(statusMessage)
+                    .font(RetroFont.mono(10))
+                    .foregroundStyle(Theme.retroAmber)
+                    .frame(maxWidth: .infinity, alignment: .center)
+            }
             PixelButton(title: ctaTitle, accent: Theme.retroLime) {
                 guard let package = selectedPackage, !storeKit.purchaseInProgress else { return }
                 Task { await purchase(package) }
@@ -381,14 +411,28 @@ struct PaywallView: View {
                     .frame(maxWidth: .infinity)
             }
 
-            HStack(spacing: 16) {
-                if let disclosure = selectedPlanDisclosure {
-                    Text(disclosure)
-                        .font(RetroFont.mono(9))
-                        .foregroundStyle(Theme.retroInkDim)
-                        .lineSpacing(2)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+            if let disclosure = selectedPlanDisclosure {
+                Text(disclosure)
+                    .font(RetroFont.mono(9))
+                    .foregroundStyle(Theme.retroInkDim)
+                    .lineSpacing(2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            HStack(spacing: 14) {
+                Link(destination: PaywallLinks.standardEULA) {
+                    Text("TERMS")
+                        .font(RetroFont.mono(9, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(Theme.retroCyan)
                 }
+                Link(destination: PaywallLinks.privacyPolicy) {
+                    Text("PRIVACY")
+                        .font(RetroFont.mono(9, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(Theme.retroCyan)
+                }
+                Spacer()
                 Button("RESTORE") {
                     Task { await restore() }
                 }
@@ -397,16 +441,24 @@ struct PaywallView: View {
                 .foregroundStyle(Theme.retroCyan)
                 .buttonStyle(.plain)
                 .disabled(storeKit.purchaseInProgress)
-                .fixedSize()
             }
         }
+        .padding(.horizontal, 14)
+        .padding(.top, 10)
+        .padding(.bottom, 8)
+        .frame(maxWidth: .infinity)
+        .background(
+            Theme.retroBg
+                .overlay(Rectangle().fill(Theme.retroInkFaint).frame(height: 1), alignment: .top)
+                .ignoresSafeArea(edges: .bottom)
+        )
     }
 
     private var ctaTitle: String {
         if storeKit.purchaseInProgress { return "PROCESSING…" }
         guard let package = selectedPackage else { return "UNAVAILABLE" }
         if package.packageType == .lifetime { return "UNLOCK LIFETIME" }
-        if storeKit.isEligibleForIntroOffer(package) { return "TRY FREE FOR 7 DAYS" }
+        if storeKit.isEligibleForIntroOffer(package) { return "START FREE TRIAL" }
         return "SUBSCRIBE"
     }
 
@@ -421,14 +473,11 @@ struct PaywallView: View {
     /// Apple 3.1.2: price and auto-renew disclosure for the selected plan.
     private var selectedPlanDisclosure: String? {
         guard let package = selectedPackage else { return nil }
-        let price = package.streaksRecurringPriceLabel
-        if package.packageType == .lifetime {
-            return "\(storeKit.displayPrice(for: package)). One-time purchase, no subscription."
-        }
-        if storeKit.isEligibleForIntroOffer(package), let trial = package.streaksIntroOfferLabel {
-            return "\(trial.capitalized), then \(price). Auto-renews until cancelled."
-        }
-        return "\(price). Auto-renews until cancelled."
+        return PaywallDisclosure.subscriptionFootnote(
+            package: package,
+            displayPrice: storeKit.displayPrice(for: package),
+            isEligibleForIntro: storeKit.isEligibleForIntroOffer(package)
+        )
     }
 
     private var selectedPackage: Package? {
@@ -505,24 +554,5 @@ struct PaywallView: View {
             .frame(width: 1, height: 10)
     }
 
-    // MARK: - Legal
-
-    private var legalBlock: some View {
-        HStack(spacing: 14) {
-            Link(destination: PaywallLinks.standardEULA) {
-                Text("TERMS (EULA)")
-                    .font(RetroFont.mono(9, weight: .bold))
-                    .tracking(1)
-                    .foregroundStyle(Theme.retroCyan)
-            }
-            Link(destination: PaywallLinks.privacyPolicy) {
-                Text("PRIVACY")
-                    .font(RetroFont.mono(9, weight: .bold))
-                    .tracking(1)
-                    .foregroundStyle(Theme.retroCyan)
-            }
-            Spacer()
-        }
-    }
 }
 #endif
