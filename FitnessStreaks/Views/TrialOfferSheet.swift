@@ -8,9 +8,9 @@ import RevenueCat
 /// - When a trial-bearing yearly package loaded, the primary CTA buys it directly
 ///   via StoreKit and the sheet shows the Apple 3.1.2-required price + auto-renew
 ///   disclosure plus a "See all plans" link to the full paywall.
-/// - When no trial product loaded yet, the primary CTA falls through to the hosted
-///   paywall instead.
+/// - When no trial product loaded yet, the primary CTA opens the full native paywall.
 struct TrialOfferSheet: View {
+    @EnvironmentObject private var storeKit: StoreKitService
     /// Trial length copy, e.g. "7-day free trial". May be nil if products haven't loaded.
     let offerLabel: String?
     /// Recurring price after the trial. Required when `directPurchase` is true.
@@ -34,6 +34,8 @@ struct TrialOfferSheet: View {
     let onStartTrial: () -> Void
     let onSeeAllPlans: () -> Void
     let onDismiss: () -> Void
+
+    @State private var restoreStatus: String?
 
     struct LongestStreakInfo {
         let displayName: String
@@ -114,13 +116,13 @@ struct TrialOfferSheet: View {
             Theme.retroBg.ignoresSafeArea()
 
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 18) {
+                VStack(spacing: 16) {
                     hero
-                        .padding(.top, 24)
+                        .padding(.top, 18)
 
                     VStack(spacing: 8) {
                         Text(headline)
-                            .font(.system(.title2, design: .monospaced, weight: .heavy))
+                            .font(.system(.title3, design: .monospaced, weight: .heavy))
                             .foregroundStyle(Theme.retroInk)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 8)
@@ -139,94 +141,141 @@ struct TrialOfferSheet: View {
                     if offerLabel != nil {
                         TrialTimeline(trialDays: trialDays, priceLabel: priceLabel)
                     }
-
-                    if directPurchase, let priceLabel {
-                        Text("Free during your trial, then \(priceLabel). Auto-renews unless cancelled at least 24 hours before the trial ends.")
-                            .font(.system(.footnote, design: .rounded))
-                            .foregroundStyle(Theme.retroInkDim)
-                            .multilineTextAlignment(.center)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .padding(.horizontal, 8)
-                    }
-
-                    if let errorMessage {
-                        Text(errorMessage)
-                            .font(.system(.footnote, design: .rounded))
-                            .foregroundStyle(Theme.retroRed)
-                            .multilineTextAlignment(.center)
-                            .transition(.opacity)
-                    }
-
-                    VStack(spacing: 10) {
-                        Button(action: onStartTrial) {
-                            ZStack {
-                                Text("START MY FREE TRIAL")
-                                    .font(.system(.headline, design: .monospaced, weight: .heavy))
-                                    .foregroundStyle(Theme.retroBg)
-                                    .opacity(isPurchasing ? 0 : 1)
-                                if isPurchasing {
-                                    ProgressView().tint(Theme.retroBg)
-                                }
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(Theme.retroLime, in: RoundedRectangle(cornerRadius: 4, style: .continuous))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 4, style: .continuous)
-                                    .stroke(Theme.retroInk, lineWidth: 2)
-                            )
-                            .shadow(color: Theme.retroInk, radius: 0, x: 3, y: 3)
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(isPurchasing)
-
-                        if offerLabel != nil {
-                            Text("$0.00 DUE TODAY · CANCEL ANYTIME")
-                                .font(.system(.caption, design: .monospaced, weight: .bold))
-                                .foregroundStyle(Theme.retroLime)
-                                .multilineTextAlignment(.center)
-                        }
-
-                        Text("Apple-managed subscription. Cancel anytime.")
-                            .font(.system(.caption, design: .rounded))
-                            .foregroundStyle(Theme.retroInkFaint)
-                            .multilineTextAlignment(.center)
-
-                        if directPurchase {
-                            Button(action: onSeeAllPlans) {
-                                Text("See all plans")
-                                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
-                                    .foregroundStyle(Theme.retroMagenta)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 6)
-                            }
-                            .buttonStyle(.plain)
-                            .disabled(isPurchasing)
-                        }
-
-                        Button(action: onDismiss) {
-                            Text("Not now")
-                                .font(.system(.subheadline, design: .rounded, weight: .semibold))
-                                .foregroundStyle(Theme.retroInkDim)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 8)
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(isPurchasing)
-                    }
-                    .padding(.top, 4)
-
-                    HStack(spacing: 6) {
-                        Link("Terms", destination: Self.termsURL)
-                        Text("·").foregroundStyle(Theme.retroInkFaint)
-                        Link("Privacy Policy", destination: Self.privacyURL)
-                    }
-                    .font(.system(.caption2, design: .rounded))
-                    .foregroundStyle(Theme.retroInkFaint)
-                    .padding(.bottom, 16)
                 }
                 .padding(.horizontal, 24)
+                .padding(.bottom, 16)
             }
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            stickyActionBlock
+        }
+    }
+
+    /// Pinned action stack: CTA + disclosure + secondary links. Always visible so
+    /// the user never has to scroll to find "Start my free trial".
+    private var stickyActionBlock: some View {
+        VStack(spacing: 8) {
+            if directPurchase, let priceLabel, let offerLabel {
+                let footnote: String = {
+                    #if REVENUECAT
+                    if let package = trialPackage {
+                        return PaywallDisclosure.subscriptionFootnote(
+                            package: package,
+                            displayPrice: priceLabel,
+                            isEligibleForIntro: true
+                        )
+                    }
+                    #endif
+                    return "\(offerLabel.capitalized), then \(priceLabel). Renews automatically unless you cancel at least 24 hours before the trial ends."
+                }()
+                Text(footnote)
+                    .font(.system(.caption2, design: .rounded))
+                    .foregroundStyle(Theme.retroInkDim)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, 4)
+            }
+
+            if let errorMessage {
+                Text(errorMessage)
+                    .font(.system(.footnote, design: .rounded))
+                    .foregroundStyle(Theme.retroRed)
+                    .multilineTextAlignment(.center)
+                    .transition(.opacity)
+            }
+
+            Button(action: onStartTrial) {
+                ZStack {
+                    Text("START MY FREE TRIAL")
+                        .font(.system(.headline, design: .monospaced, weight: .heavy))
+                        .foregroundStyle(Theme.retroBg)
+                        .opacity(isPurchasing ? 0 : 1)
+                    if isPurchasing {
+                        ProgressView().tint(Theme.retroBg)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(Theme.retroLime, in: RoundedRectangle(cornerRadius: 4, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 4, style: .continuous)
+                        .stroke(Theme.retroInk, lineWidth: 2)
+                )
+                .shadow(color: Theme.retroInk, radius: 0, x: 3, y: 3)
+            }
+            .buttonStyle(.plain)
+            .disabled(isPurchasing)
+
+            if offerLabel != nil {
+                Text("$0.00 DUE TODAY · Billed by Apple")
+                    .font(.system(.caption2, design: .monospaced, weight: .bold))
+                    .foregroundStyle(Theme.retroLime)
+                    .multilineTextAlignment(.center)
+            }
+
+            HStack(spacing: 18) {
+                if directPurchase {
+                    Button(action: onSeeAllPlans) {
+                        Text("See all plans")
+                            .font(.system(.footnote, design: .rounded, weight: .semibold))
+                            .foregroundStyle(Theme.retroMagenta)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(isPurchasing)
+                }
+                Button(action: onDismiss) {
+                    Text("Not now")
+                        .font(.system(.footnote, design: .rounded, weight: .semibold))
+                        .foregroundStyle(Theme.retroInkDim)
+                }
+                .buttonStyle(.plain)
+                .disabled(isPurchasing)
+            }
+
+            HStack(spacing: 6) {
+                Link("Terms", destination: Self.termsURL)
+                Text("·").foregroundStyle(Theme.retroInkFaint)
+                Link("Privacy", destination: Self.privacyURL)
+                Text("·").foregroundStyle(Theme.retroInkFaint)
+                Button("Restore") {
+                    Task { await restorePurchases() }
+                }
+                .foregroundStyle(Theme.retroMagenta)
+            }
+            .font(.system(.caption2, design: .rounded))
+
+            if let restoreStatus {
+                Text(restoreStatus)
+                    .font(.system(.caption2, design: .rounded))
+                    .foregroundStyle(Theme.retroAmber)
+                    .multilineTextAlignment(.center)
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 10)
+        .padding(.bottom, 6)
+        .frame(maxWidth: .infinity)
+        .background(
+            Theme.retroBg
+                .overlay(Rectangle().fill(Theme.retroInkFaint).frame(height: 1), alignment: .top)
+                .ignoresSafeArea(edges: .bottom)
+        )
+    }
+
+    #if REVENUECAT
+    private var trialPackage: Package? {
+        let trials = storeKit.products.filter { $0.streaksIntroOfferLabel != nil }
+        return trials.first(where: { $0.packageType == .annual }) ?? trials.first
+    }
+    #endif
+
+    private func restorePurchases() async {
+        restoreStatus = "Restoring…"
+        await storeKit.restore()
+        if storeKit.isPro {
+            restoreStatus = "Streaks+ restored."
+        } else {
+            restoreStatus = storeKit.lastError ?? "No active subscription found."
         }
     }
 
