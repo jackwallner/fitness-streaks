@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import WidgetKit
 import os
 
 private let log = Logger(subsystem: "com.jackwallner.streaks", category: "StreakStore")
@@ -153,6 +154,9 @@ final class StreakStore: ObservableObject {
         var snapshot = StreakEngine.snapshot(from: streaks)
         snapshot.recentlyBroken = StreakSettings.shared.recentlyBroken
         SnapshotStore.save(snapshot)
+        // Tell WidgetKit to re-read the snapshot; otherwise widgets only refresh
+        // on their own daily timeline policy and look stale after each app refresh.
+        WidgetCenter.shared.reloadAllTimelines()
         // Notify iOS app to sync to watch (iOS-only, watch ignores this)
         NotificationCenter.default.post(name: .streakSnapshotUpdated, object: nil)
     }
