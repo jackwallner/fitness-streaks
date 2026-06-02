@@ -100,7 +100,6 @@ struct DashboardView: View {
             }
             .sheet(isPresented: $showingPaywall) {
                 PaywallView(paywallImpressionId: "streaks_dashboard_sheet")
-                    .interactiveDismissDisabled(true)
             }
             .sheet(isPresented: $showPicker) {
                 StreakPickerSheet()
@@ -415,23 +414,33 @@ struct DashboardView: View {
         return "\(v) \(unit) to finish today"
     }
 
+    private var streaksPlusActive: Bool { storeKit.isPro }
+
+    private var streaksPlusActivating: Bool {
+        #if REVENUECAT
+        storeKit.purchaseGrantsFullStreakAccess && !storeKit.isPro
+        #else
+        false
+        #endif
+    }
+
     private func graceStatusBanner(for hero: Streak) -> some View {
         Button {
-            if storeKit.isPro {
+            if streaksPlusActive {
                 showSettings = true
-            } else {
+            } else if !streaksPlusActivating {
                 showingPaywall = true
             }
         } label: {
             HStack(spacing: 10) {
-                Image(systemName: storeKit.isPro ? "shield.lefthalf.filled" : "shield")
+                Image(systemName: streaksPlusActive || streaksPlusActivating ? "shield.lefthalf.filled" : "shield")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(storeKit.isPro ? Theme.retroLime : Theme.retroMagenta)
+                    .foregroundStyle(streaksPlusActive || streaksPlusActivating ? Theme.retroLime : Theme.retroMagenta)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(graceStatusTitle(for: hero))
                         .font(RetroFont.mono(9, weight: .bold))
                         .tracking(1)
-                        .foregroundStyle(storeKit.isPro ? Theme.retroLime : Theme.retroMagenta)
+                        .foregroundStyle(streaksPlusActive || streaksPlusActivating ? Theme.retroLime : Theme.retroMagenta)
                     Text(graceStatusDetail(for: hero))
                         .font(RetroFont.mono(10))
                         .foregroundStyle(Theme.retroInkDim)
@@ -439,25 +448,33 @@ struct DashboardView: View {
                         .minimumScaleFactor(0.75)
                 }
                 Spacer()
-                Text("›")
-                    .font(RetroFont.mono(14, weight: .bold))
-                    .foregroundStyle(Theme.retroInkDim)
+                if !streaksPlusActivating {
+                    Text("›")
+                        .font(RetroFont.mono(14, weight: .bold))
+                        .foregroundStyle(Theme.retroInkDim)
+                }
             }
             .padding(.vertical, 8)
             .padding(.horizontal, 12)
-            .pixelPanel(color: storeKit.isPro ? Theme.retroLime : Theme.retroMagenta, fill: Theme.retroBg)
+            .pixelPanel(color: streaksPlusActive || streaksPlusActivating ? Theme.retroLime : Theme.retroMagenta, fill: Theme.retroBg)
         }
         .buttonStyle(.plain)
+        .disabled(streaksPlusActivating)
         .accessibilityLabel("\(graceStatusTitle(for: hero)). \(graceStatusDetail(for: hero))")
     }
 
     private func graceStatusTitle(for hero: Streak) -> String {
-        storeKit.isPro ? "AUTO-SAVE ON" : "TRY STREAKS+ FREE"
+        if streaksPlusActive { return "AUTO-SAVE ON" }
+        if streaksPlusActivating { return "ACTIVATING STREAKS+" }
+        return "TRY STREAKS+ FREE"
     }
 
     private func graceStatusDetail(for hero: Streak) -> String {
-        if storeKit.isPro {
+        if streaksPlusActive {
             return "Streaks+ auto-saves any missed day. Your streak survives."
+        }
+        if streaksPlusActivating {
+            return "Your purchase is syncing. Streak picks restore in a moment."
         }
         return "Start a trial. Streaks+ auto-saves every missed day."
     }

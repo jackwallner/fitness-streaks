@@ -375,7 +375,44 @@ final class PaidFeatureTests: XCTestCase {
     // can't silently diverge from the rest of the Pro entitlement.
     // ──────────────────────────────────────────────
 
+    func testRestoreOnboardingTrackedStreaksWhenTrimmedBelowSavedIntent() {
+        let settings = StreakSettings.shared
+        settings.lastOnboardingTrackedKeys = ["steps-daily", "exerciseMinutes-daily", "standHours-daily", "activeEnergy-daily", "workouts-daily"]
+        settings.trackedStreaks = Set(settings.lastOnboardingTrackedKeys.prefix(3))
+        settings.manualStreakOrder = Array(settings.lastOnboardingTrackedKeys.prefix(3))
+        settings.lastOnboardingPickedCount = 5
+
+        settings.restoreOnboardingTrackedStreaksIfNeeded()
+
+        XCTAssertEqual(settings.trackedStreaks?.count, 5)
+        XCTAssertEqual(settings.manualStreakOrder.count, 5)
+        XCTAssertEqual(settings.trackedStreaks, Set(settings.lastOnboardingTrackedKeys))
+    }
+
+    func testRestoreOnboardingTrackedStreaksNoOpWhenAlreadyFull() {
+        let settings = StreakSettings.shared
+        let keys = ["steps-daily", "exerciseMinutes-daily", "standHours-daily"]
+        settings.lastOnboardingTrackedKeys = keys
+        settings.trackedStreaks = Set(keys)
+        settings.manualStreakOrder = keys
+
+        settings.restoreOnboardingTrackedStreaksIfNeeded()
+
+        XCTAssertEqual(settings.trackedStreaks?.count, 3)
+    }
+
     #if DEBUG
+    func testPurchaseGrantsFullStreakAccessUntilProActivates() {
+        StoreKitService.shared.debugSetPro(false)
+        StoreKitService.shared.debugSetPurchaseGrantsFullStreakAccess(true)
+        XCTAssertTrue(StoreKitService.shared.grantsUnlimitedTrackedStreaks)
+        XCTAssertFalse(StoreKitService.shared.isPro)
+
+        StoreKitService.shared.debugSetPro(true)
+        XCTAssertFalse(StoreKitService.shared.purchaseGrantsFullStreakAccess)
+        XCTAssertTrue(StoreKitService.shared.grantsUnlimitedTrackedStreaks)
+    }
+
     func testHistoryHeatmapGateTracksStoreKitIsPro() {
         StoreKitService.shared.debugSetPro(false)
         XCTAssertFalse(StoreKitService.shared.isPro, "history must be locked when isPro=false")

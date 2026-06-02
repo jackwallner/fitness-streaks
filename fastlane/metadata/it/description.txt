@@ -1,0 +1,41 @@
+Inizia a creare abitudini senza ricominciare da zero.
+
+Streak Finder analizza in modo sicuro la cronologia di Apple Health per scoprire le serie di allenamento che hai già costruito e ti dà la spinta esatta per mantenerle vive.
+
+Non c’è niente di più motivante che rendersi conto di essere già in una serie vincente. Che tu stia chiudendo gli anelli, raggiungendo 10.000 passi o dando priorità alla consapevolezza quotidiana, Streak Finder elimina l’attrito del “ricominciare da capo” tracciando automaticamente il tuo slancio.
+
+FUNZIONALITÀ PRINCIPALI:
+
+* Scopri automaticamente il tuo slancio
+Trova all’istante le serie attive in 9 metriche chiave di Apple Health: passi, minuti di esercizio, ore in piedi, energia attiva, allenamenti, consapevolezza, sonno, distanza e piani saliti.
+
+* Hero Streak e badge
+Metti il tuo obiettivo più importante in primo piano con la vista Hero Streak e colleziona splendidi badge man mano che le tue abitudini si rafforzano.
+
+* Heatmap calendario
+Visualizza i tuoi progressi nel tempo con straordinarie heatmap del calendario che rendono innegabile la tua costanza quotidiana.
+
+* Responsabilità ovunque
+Tieni gli obiettivi sempre sott’occhio con widget iOS curati per la schermata Home, la schermata di blocco e la modalità StandBy.
+
+* Pronto per Apple Watch
+Controlla le tue serie direttamente dal polso con un’app watchOS completamente nativa e ricche complicazioni.
+
+* Promemoria intelligenti
+Non perdere il ritmo. Ricevi un promemoria automatico alle 19:00 se la tua Hero Streak è a rischio di interrompersi quel giorno.
+
+* Privacy rigorosa (per design)
+I tuoi dati sulla salute sono profondamente personali e appartengono a te. Streak Finder è stato progettato con una base incentrata sulla privacy:
+- Accesso Apple HealthKit in sola lettura
+- Elaborazione locale al 100% sul dispositivo
+- Nessun account utente o registrazione richiesta
+- Nessuna chiamata di rete
+- Nessuna analisi o tracciamento
+
+Non interrompere la catena. Scarica Streak Finder oggi e mantieni il tuo slancio!
+
+Dettagli sull’abbonamento
+Streak Finder Pro è disponibile come abbonamento con rinnovo automatico (mensile 1,99 $ / annuale 14,99 $ con prova gratuita di 7 giorni) o come acquisto Lifetime una tantum (29,99 $). Il pagamento viene addebitato sul tuo ID Apple alla conferma. Gli abbonamenti si rinnovano automaticamente a meno che non vengano annullati almeno 24 ore prima della fine del periodo. Puoi gestire o annullare in qualsiasi momento in Impostazioni → ID Apple → Abbonamenti.
+
+Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

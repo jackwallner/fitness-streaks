@@ -1,0 +1,41 @@
+Începe să-ți construiești obiceiuri fără să o iei mereu de la zero.
+
+Streak Finder îți analizează în siguranță istoricul Apple Health pentru a descoperi seriile de mișcare pe care le ai deja și îți oferă exact impulsul de care ai nevoie ca să le menții.
+
+Nu există motivație mai mare decât să realizezi că ești deja pe o serie câștigătoare. Fie că îți închizi inelele, atingi 10.000 de pași sau acorzi prioritate mindfulness‑ului zilnic, Streak Finder elimină frustrarea „luatului de la capăt” prin urmărirea automată a progresului tău.
+
+FUNCȚII PRINCIPALE:
+
+* Descoperă-ți automat ritmul
+Găsește instant serii active în 9 metrici esențiali Apple Health: Pași, Minute de exerciții, Ore în picioare, Energie activă, Antrenamente, Mindfulness, Somn, Distanță și Etaje urcate.
+
+* Serii „Erou” & insigne
+Pune-ți cel mai important obiectiv în prim‑plan cu vizualizarea Hero Streak și adună insigne atent create pe măsură ce obiceiurile tale se întăresc.
+
+* Heatmap-uri calendar
+Vizualizează-ți evoluția în timp cu heatmap‑uri de calendar impresionante, care îți fac consistența zilnică de necontestat.
+
+* Responsabilitate peste tot
+Ține-ți obiectivele mereu la vedere cu widgeturi iOS elegante pentru Ecranul de pornire, Ecranul blocat și modul StandBy.
+
+* Pregătit pentru Apple Watch
+Verifică-ți seriile direct de la încheietură cu o aplicație watchOS nativă și complicații bogate.
+
+* Mementouri inteligente
+Nu lăsa mingea să cadă. Primești automat un memento blând la ora 19:00 dacă Hero Streak este în pericol să se întrerupă în acea zi.
+
+* Confidențialitate strictă (prin design)
+Datele tale de sănătate sunt profund personale și îți aparțin. Streak Finder este construit pe o fundație orientată spre confidențialitate:
+- Acces Apple HealthKit doar în citire
+- Procesare 100% locală, pe dispozitiv
+- Fără conturi de utilizator sau înregistrare
+- Zero apeluri de rețea
+- Zero analiză sau urmărire
+
+Nu rupe seria. Descarcă Streak Finder acum și păstrează-ți ritmul!
+
+Detalii abonament
+Streak Finder Pro este disponibil ca abonament cu reînnoire automată (Lunar 1,99 USD / Anual 14,99 USD, cu perioadă de probă gratuită de 7 zile) sau ca achiziție unică „Lifetime” (29,99 USD). Plata este debitata din Apple ID la confirmare. Abonamentele se reînnoiesc automat, exceptând cazul în care sunt anulate cu cel puțin 24 de ore înainte de finalul perioadei. Poți gestiona sau anula oricând în Configurări → Apple ID → Abonamente.
+
+Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

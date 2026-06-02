@@ -1,0 +1,41 @@
+Börja bygga vanor utan att börja om från dag ett.
+
+Streak Finder granskar säkert din Apple Health-historik för att avslöja träningsserierna du redan har byggt upp och ger dig precis den puff du behöver för att hålla dem vid liv.
+
+Inget är mer motiverande än att inse att du redan är inne i ett vinnarstreak. Oavsett om du stänger dina ringar, når 10 000 steg eller prioriterar daglig mindfulness tar Streak Finder bort friktionen i att ”börja om” genom att automatiskt följa din momentum.
+
+VIKTIGA FUNKTIONER:
+
+* Upptäck din momentum automatiskt
+Hitta direkt aktiva streaks i 9 viktiga Apple Health-mått: steg, träningsminuter, stå-timmar, aktiv energi, träningspass, mindfulness, sömn, distans och våningar upp.
+
+* Hero Streaks & märken
+Sätt ditt viktigaste mål i fokus med Hero Streak-vyn och samla vackert utformade märken när dina vanor blir starkare.
+
+* Kalender-heatmaps
+Visualisera dina framsteg över tid med imponerande kalender-heatmaps som gör din dagliga konsekvens odiskutabel.
+
+* Ansvar överallt
+Ha dina mål direkt i blickfånget med snyggt utformade iOS-widgets för hemskärmen, låsskärmen och StandBy-läget.
+
+* Redo för Apple Watch
+Kolla dina streaks direkt från handleden med en helt inbyggd watchOS-app och rika komplikationer.
+
+* Smarta påminnelser
+Tappa inte bollen. Få en mild, automatisk påminnelse kl. 19 om din Hero Streak riskerar att brytas den dagen.
+
+* Hårt privat (med flit)
+Dina hälsodata är djupt personliga och de tillhör dig. Streak Finder är byggd med integritet först:
+- Skrivskyddad Apple HealthKit-åtkomst
+- 100 % lokal bearbetning på enheten
+- Inga användarkonton eller registreringar
+- Noll nätverksanrop
+- Noll analys eller spårning
+
+Bryt inte kedjan. Hämta Streak Finder idag och behåll din momentum!
+
+Prenumerationsinformation
+Streak Finder Pro finns som en automatiskt förnyad prenumeration (månad 1,99 USD / år 14,99 USD med 7 dagars gratis provperiod) eller ett engångsköp för Lifetime (29,99 USD). Betalning debiteras ditt Apple-ID vid bekräftelse. Prenumerationer förnyas automatiskt om de inte sägs upp minst 24 timmar före periodens slut. Hantera eller avsluta när som helst via Inställningar → Apple-ID → Prenumerationer.
+
+Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

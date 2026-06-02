@@ -29,3 +29,9 @@ Pods/
 *~
 xcuserdata/
 fastlane/report.xml
+
+# ASO/metadata tooling artifacts
+fastlane/metadata.bak.*/
+scripts/*.log
+scripts/.asc-state.json
+scripts/.astro-app.json

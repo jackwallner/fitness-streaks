@@ -1,0 +1,41 @@
+Start building habits without feeling like you’re always beginning from day one.
+
+Streak Finder securely reviews your Apple Health history to uncover the fitness streaks you’ve already built, then gives you the exact nudge you need to keep them alive.
+
+Nothing is more motivating than realising you’re already on a winning streak. Whether you’re closing your rings, hitting 10,000 steps, or prioritising daily mindfulness, Streak Finder removes the friction of “starting over” by automatically tracking your momentum.
+
+KEY FEATURES:
+
+* Auto-discover your momentum
+Instantly find active streaks across 9 key Apple Health metrics: Steps, Exercise Minutes, Stand Hours, Active Energy, Workouts, Mindfulness, Sleep, Distance, and Flights Climbed.
+
+* Hero Streaks & badges
+Put your most important goal front and centre with the Hero Streak view, and collect beautifully designed badges as your habits grow stronger.
+
+* Calendar heatmaps
+Visualise your progress over time with stunning calendar heatmaps that make your daily consistency undeniable.
+
+* Accountability everywhere
+Keep your goals in view with beautifully crafted iOS widgets for your Home Screen, Lock Screen, and StandBy mode.
+
+* Apple Watch ready
+Check your streaks straight from your wrist with a fully native watchOS app and rich complications.
+
+* Smart reminders
+Never drop the ball. Get a gentle, automatic nudge at 7pm if your Hero Streak is at risk of breaking that day.
+
+* Fiercely private (by design)
+Your health data is deeply personal, and it belongs to you. Streak Finder was built with a privacy-first foundation:
+- Read-only Apple HealthKit access
+- 100% on-device, local processing
+- No user accounts or sign-ups required
+- Zero network calls
+- Zero analytics or tracking
+
+Don’t break the chain. Download Streak Finder today and keep your momentum going!
+
+Subscription details
+Streak Finder Pro is available as an auto-renewing subscription (Monthly $1.99 / Yearly $14.99 with a 7-day free trial) or a one-off Lifetime purchase ($29.99). Payment is charged to your Apple ID at confirmation. Subscriptions auto-renew unless cancelled at least 24 hours before the end of the period. Manage or cancel any time in Settings → Apple ID → Subscriptions.
+
+Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
