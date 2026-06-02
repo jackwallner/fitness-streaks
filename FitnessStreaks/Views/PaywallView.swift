@@ -94,6 +94,13 @@ struct PaywallView: View {
             .toolbarBackground(.visible, for: .navigationBar)
         }
         .task {
+            // Already entitled when the paywall opens? onChange won't fire (no
+            // transition), so dismiss here — otherwise a subscriber who reaches
+            // this surface is trapped with no way past it.
+            if storeKit.grantsUnlimitedTrackedStreaks {
+                dismiss()
+                return
+            }
             if let id = paywallImpressionId {
                 storeKit.trackPaywallImpression(id: id, oncePerSession: impressionOncePerSession)
             }
@@ -533,6 +540,10 @@ struct PaywallView: View {
         await storeKit.restore()
         if storeKit.isPro {
             statusMessage = "STREAKS+ RESTORED."
+            // isPro was already true (restore confirmed an existing sub), so the
+            // onChange dismiss never fires — dismiss explicitly so the user isn't
+            // stuck staring at a paywall they've already paid for.
+            dismiss()
         } else {
             statusMessage = storeKit.lastError ?? "NO ACTIVE PURCHASES FOUND."
         }
