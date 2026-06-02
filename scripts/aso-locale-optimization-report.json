@@ -1,0 +1,431 @@
+{
+  "ar-SA": {
+    "keywords": {
+      "old": "تحفيز,عادة,حلقات,healthkit,حركة,خطوات,تمرين,تأمل,نوم,وقوف,سلسلة,خريطة,نشاط",
+      "new": "تحفيز,عادة,حلقات,healthkit,ساعة,حركة,خطوات,تمرين,تأمل,نوم,وقوف,سلسلة,خريطة,نشاط,badge",
+      "len": 85
+    },
+    "subtitle": {
+      "old": "سلاسل وودجت وWatch",
+      "new": "سلاسل وودجت وWatch"
+    }
+  },
+  "ca": {
+    "keywords": {
+      "old": "motivar,hàbit,anells,healthkit,moure,passos,entrenament,mindfulness,son,peu,cadena,mapa,activitat",
+      "new": "motivar,hàbit,anells,healthkit,rellotge,moure,passos,entrenament,mindfulness,son,peu,cadena,mapa",
+      "len": 96
+    },
+    "subtitle": {
+      "old": "Ratxes, widgets i Apple Watch",
+      "new": "Ratxes, widgets i Apple Watch"
+    }
+  },
+  "cs": {
+    "keywords": {
+      "old": "motivace,návyk,kruhy,healthkit,pohyb,kroky,trénink,mindfulness,spánek,stát,řetěz,heatmap,aktivita",
+      "new": "motivace,návyk,kruhy,healthkit,hodinky,pohyb,kroky,trénink,mindfulness,spánek,stát,řetěz,heatmap",
+      "len": 96
+    },
+    "subtitle": {
+      "old": "Série, widgety a Apple Watch",
+      "new": "Série, widgety a Apple Watch"
+    }
+  },
+  "da": {
+    "keywords": {
+      "old": "motivere,vane,ringe,healthkit,bevægelse,skridt,træning,mindfulness,søvn,stå,kæde,heatmap,aktivitet",
+      "new": "motivere,ringe,healthkit,ur,bevægelse,skridt,træning,mindfulness,søvn,stå,kæde,heatmap,aktivitet",
+      "len": 96
+    },
+    "subtitle": {
+      "old": "Serier, widgets og Watch",
+      "new": "Serier, widgets og Watch"
+    }
+  },
+  "de-DE": {
+    "keywords": {
+      "old": "motivation,gewohnheit,ringe,healthkit,bewegung,schritte,training,achtsamkeit,schlaf,stehen,kette",
+      "new": "motivation,ringe,healthkit,uhr,bewegung,schritte,training,achtsamkeit,schlaf,stehen,kette,heatmap",
+      "len": 97
+    },
+    "subtitle": {
+      "old": "Serien, Widgets & Apple Watch",
+      "new": "Serien, Widgets & Apple Watch"
+    }
+  },
+  "el": {
+    "keywords": {
+      "old": "κίνητρο,συνήθεια,δαχτυλίδια,healthkit,κίνηση,βήματα,προπόνηση,mindfulness,ύπνος,όρθιος,αλυσίδα",
+      "new": "κίνητρο,συνήθεια,δαχτυλίδια,healthkit,ρολόι,κίνηση,βήματα,προπόνηση,mindfulness,ύπνος,όρθιος,αλυσίδα",
+      "len": 100
+    },
+    "subtitle": {
+      "old": "Σειρές, widgets & Watch",
+      "new": "Σειρές, widgets & Watch"
+    }
+  },
+  "en-AU": {
+    "keywords": {
+      "old": "motivate,habit,rings,healthkit,move,steps,workout,mindful,sleep,stand,chain,heatmap,activity",
+      "new": "motivate,rings,healthkit,move,steps,workout,mindful,sleep,stand,chain,heatmap,activity,exercise",
+      "len": 95
+    },
+    "subtitle": {
+      "old": "Streaks, Widgets & Apple Watch",
+      "new": "Streaks, Widgets & Apple Watch"
+    }
+  },
+  "en-CA": {
+    "keywords": {
+      "old": "motivate,habit,rings,healthkit,move,steps,workout,mindful,sleep,stand,chain,heatmap,activity",
+      "new": "motivate,rings,healthkit,move,steps,workout,mindful,sleep,stand,chain,heatmap,activity,exercise",
+      "len": 95
+    },
+    "subtitle": {
+      "old": "Streaks, Widgets & Apple Watch",
+      "new": "Streaks, Widgets & Apple Watch"
+    }
+  },
+  "en-GB": {
+    "keywords": {
+      "old": "motivate,habit,rings,healthkit,move,steps,workout,mindful,sleep,stand,chain,heatmap,activity",
+      "new": "motivate,rings,healthkit,move,steps,workout,mindful,sleep,stand,chain,heatmap,activity,exercise",
+      "len": 95
+    },
+    "subtitle": {
+      "old": "Streaks, Widgets & Apple Watch",
+      "new": "Streaks, Widgets & Apple Watch"
+    }
+  },
+  "en-US": {
+    "keywords": {
+      "old": "motivate,habit,rings,healthkit,move,steps,workout,mindful,sleep,stand,chain,heatmap,activity",
+      "new": "motivate,rings,healthkit,move,steps,workout,mindful,sleep,stand,chain,heatmap,activity,exercise",
+      "len": 95
+    },
+    "subtitle": {
+      "old": "Streaks, Widgets & Apple Watch",
+      "new": "Streaks, Widgets & Apple Watch"
+    }
+  },
+  "es-ES": {
+    "keywords": {
+      "old": "motivar,hábito,anillos,healthkit,mover,pasos,entreno,mindfulness,sueño,depie,cadena,mapa,actividad",
+      "new": "motivar,hábito,anillos,healthkit,reloj,mover,pasos,entreno,mindfulness,sueño,depie,cadena,mapa",
+      "len": 94
+    },
+    "subtitle": {
+      "old": "Rachas, widgets y Apple Watch",
+      "new": "Rachas, widgets y Apple Watch"
+    }
+  },
+  "es-MX": {
+    "keywords": {
+      "old": "motivar,hábito,anillos,healthkit,mover,pasos,entreno,mindfulness,sueño,depie,cadena,mapa,actividad",
+      "new": "motivar,anillos,healthkit,reloj,mover,pasos,entreno,mindfulness,sueño,depie,cadena,mapa,actividad",
+      "len": 97
+    },
+    "subtitle": {
+      "old": "Rachas, widgets y Apple Watch",
+      "new": "Rachas, widgets y Apple Watch"
+    }
+  },
+  "fi": {
+    "keywords": {
+      "old": "motivoida,tottumus,renkaat,healthkit,liike,askeleet,treeni,mindfulness,uni,seisoa,ketju,heatmap",
+      "new": "motivoida,tottumus,renkaat,healthkit,kello,liike,askeleet,treeni,mindfulness,uni,seisoa,ketju",
+      "len": 93
+    },
+    "subtitle": {
+      "old": "Putket, widgetit ja Watch",
+      "new": "Putket, widgetit ja Watch"
+    }
+  },
+  "fr-CA": {
+    "keywords": {
+      "old": "motiver,habitude,anneaux,healthkit,mouvement,pas,entraînement,méditation,sommeil,debout,chaîne,carte",
+      "new": "motiver,habitude,anneaux,healthkit,montre,mouvement,pas,entraînement,méditation,sommeil,debout",
+      "len": 94
+    },
+    "subtitle": {
+      "old": "Séries, widgets et Apple Watch",
+      "new": "Séries, widgets et Apple Watch"
+    }
+  },
+  "fr-FR": {
+    "keywords": {
+      "old": "motiver,habitude,anneaux,healthkit,mouvement,pas,entraînement,méditation,sommeil,debout,chaîne,carte",
+      "new": "motiver,anneaux,healthkit,montre,mouvement,pas,entraînement,méditation,sommeil,debout,chaîne,carte",
+      "len": 98
+    },
+    "subtitle": {
+      "old": "Séries, widgets et Apple Watch",
+      "new": "Séries, widgets et Apple Watch"
+    }
+  },
+  "he": {
+    "keywords": {
+      "old": "מוטיבציה,הרגל,טבעות,healthkit,תנועה,צעדים,אימון,מיינדפולנס,שינה,עמידה,שרשרת,מפתחום,פעילות",
+      "new": "מוטיבציה,הרגל,טבעות,healthkit,שעון,תנועה,צעדים,אימון,מיינדפולנס,שינה,עמידה,שרשרת,מפתחום,פעילות,רצף",
+      "len": 98
+    },
+    "subtitle": {
+      "old": "רצפים, ווידג'ט ו-Watch",
+      "new": "רצפים, ווידג'ט ו-Watch"
+    }
+  },
+  "hi": {
+    "keywords": {
+      "old": "प्रेरणा,आदत,रिंग,healthkit,चाल,कदम,वर्कआउट,माइंडफुल,नींद,खड़े,श्रृंखला,हीटमैप,गतिविधि",
+      "new": "प्रेरणा,आदत,रिंग,healthkit,घड़ी,चाल,कदम,वर्कआउट,माइंडफुल,नींद,खड़े,श्रृंखला,हीटमैप,गतिविधि,badge",
+      "len": 96
+    },
+    "subtitle": {
+      "old": "स्ट्रीक, विजेट और Watch",
+      "new": "स्ट्रीक, विजेट और Watch"
+    }
+  },
+  "hr": {
+    "keywords": {
+      "old": "motivacija,navika,prstenovi,healthkit,pokret,koraci,trening,mindfulness,spavanje,stajanje,lanac",
+      "new": "motivacija,navika,prstenovi,healthkit,sat,pokret,koraci,trening,mindfulness,spavanje,stajanje,lanac",
+      "len": 99
+    },
+    "subtitle": {
+      "old": "Nizovi, widgeti i Watch",
+      "new": "Nizovi, widgeti i Watch"
+    }
+  },
+  "hu": {
+    "keywords": {
+      "old": "motiváció,szokás,gyűrűk,healthkit,mozgás,lépések,edzés,mindfulness,alvás,állás,lánc,heatmap",
+      "new": "motiváció,gyűrűk,healthkit,óra,mozgás,lépések,edzés,mindfulness,alvás,állás,lánc,heatmap,aktivitás",
+      "len": 98
+    },
+    "subtitle": {
+      "old": "Sorozatok, widgetek, Watch",
+      "new": "Sorozatok, widgetek, Watch"
+    }
+  },
+  "id": {
+    "keywords": {
+      "old": "motivasi,kebiasaan,cincin,healthkit,gerak,langkah,latihan,mindfulness,tidur,berdiri,rantai,heatmap",
+      "new": "motivasi,kebiasaan,cincin,healthkit,jam,gerak,langkah,latihan,mindfulness,tidur,berdiri,rantai",
+      "len": 94
+    },
+    "subtitle": {
+      "old": "Streak, widget & Apple Watch",
+      "new": "Streak, widget & Apple Watch"
+    }
+  },
+  "it": {
+    "keywords": {
+      "old": "motivare,abitudine,anelli,healthkit,muovere,passi,allenamento,mindfulness,sonno,inpiedi,catena,mappa",
+      "new": "motivare,abitudine,anelli,healthkit,orologio,muovere,passi,allenamento,mindfulness,sonno,inpiedi",
+      "len": 96
+    },
+    "subtitle": {
+      "old": "Serie, widget e Apple Watch",
+      "new": "Serie, widget e Apple Watch"
+    }
+  },
+  "ja": {
+    "keywords": {
+      "old": "やる気,習慣,リング,healthkit,ムーブ,歩数,ワークアウト,マインドフル,睡眠,スタンド,チェーン,ヒートマップ,アクティビティ",
+      "new": "やる気,習慣,リング,healthkit,ウォッチ,ムーブ,歩数,ワークアウト,マインドフル,睡眠,スタンド,チェーン,ヒートマップ,アクティビティ,連続,badge",
+      "len": 83
+    },
+    "subtitle": {
+      "old": "連続記録・ウィジェット・Watch",
+      "new": "連続記録・ウィジェット・Watch"
+    }
+  },
+  "ko": {
+    "keywords": {
+      "old": "동기,습관,링,healthkit,이동,걸음,운동,마음챙김,수면,스탠드,체인,히트맵,활동",
+      "new": "동기,링,healthkit,위젯,워치,이동,걸음,운동,마음챙김,수면,스탠드,체인,히트맵,활동,badge",
+      "len": 57
+    },
+    "subtitle": {
+      "old": "연속 기록·위젯·Watch",
+      "new": "연속 기록·위젯·Watch"
+    }
+  },
+  "ms": {
+    "keywords": {
+      "old": "motivasi,tabiat,cincin,healthkit,gerak,langkah,latihan,mindfulness,tidur,berdiri,rantaian,heatmap",
+      "new": "motivasi,cincin,healthkit,jam,gerak,langkah,latihan,mindfulness,tidur,berdiri,rantaian,heatmap",
+      "len": 94
+    },
+    "subtitle": {
+      "old": "Streak, widget & Apple Watch",
+      "new": "Streak, widget & Apple Watch"
+    }
+  },
+  "nl-NL": {
+    "keywords": {
+      "old": "motiveren,gewoonte,ringen,healthkit,bewegen,stappen,training,mindfulness,slaap,staan,keten,heatmap",
+      "new": "motiveren,ringen,healthkit,horloge,bewegen,stappen,training,mindfulness,slaap,staan,keten,heatmap",
+      "len": 97
+    },
+    "subtitle": {
+      "old": "Reeksen, widgets en Watch",
+      "new": "Reeksen, widgets en Watch"
+    }
+  },
+  "no": {
+    "keywords": {
+      "old": "motivere,vane,ringe,healthkit,bevegelse,skritt,trening,mindfulness,søvn,stå,kjede,heatmap,aktivitet",
+      "new": "motivere,ringe,healthkit,klokke,bevegelse,skritt,mindfulness,søvn,stå,kjede,heatmap,aktivitet,badge",
+      "len": 99
+    },
+    "subtitle": {
+      "old": "Serier, widgets og Watch",
+      "new": "Serier, widgets og Watch"
+    }
+  },
+  "pl": {
+    "keywords": {
+      "old": "motywacja,nawyk,pierścienie,healthkit,ruch,kroki,trening,mindfulness,sen,stawanie,łańcuch,mapa",
+      "new": "motywacja,pierścienie,healthkit,zegarek,ruch,kroki,trening,mindfulness,sen,stawanie,łańcuch,mapa",
+      "len": 96
+    },
+    "subtitle": {
+      "old": "Serie, widgety i Apple Watch",
+      "new": "Serie, widgety i Apple Watch"
+    }
+  },
+  "pt-BR": {
+    "keywords": {
+      "old": "motivar,hábito,anéis,healthkit,mover,passos,treino,mindfulness,sono,empé,cadeia,mapa,atividade",
+      "new": "motivar,anéis,healthkit,relógio,mover,passos,treino,mindfulness,sono,empé,cadeia,mapa,atividade",
+      "len": 95
+    },
+    "subtitle": {
+      "old": "Sequências, widgets e Watch",
+      "new": "Sequências, widgets e Watch"
+    }
+  },
+  "pt-PT": {
+    "keywords": {
+      "old": "motivar,hábito,anéis,healthkit,mover,passos,treino,mindfulness,sono,empé,cadeia,mapa,atividade",
+      "new": "motivar,anéis,healthkit,relógio,mover,passos,treino,mindfulness,sono,empé,cadeia,mapa,atividade",
+      "len": 95
+    },
+    "subtitle": {
+      "old": "Sequências, widgets e Watch",
+      "new": "Sequências, widgets e Watch"
+    }
+  },
+  "ro": {
+    "keywords": {
+      "old": "motivație,obicei,inele,healthkit,mișcare,pași,antrenament,mindfulness,somn,înpicioare,lanț,hartă",
+      "new": "motivație,obicei,inele,healthkit,ceas,mișcare,pași,antrenament,mindfulness,somn,înpicioare,lanț",
+      "len": 95
+    },
+    "subtitle": {
+      "old": "Serii, widgeturi și Watch",
+      "new": "Serii, widgeturi și Watch"
+    }
+  },
+  "ru": {
+    "keywords": {
+      "old": "мотивация,привычка,кольца,healthkit,движение,шаги,тренировка,осознанность,сон,стоя,цепь,теплокарта",
+      "new": "мотивация,привычка,кольца,healthkit,widget,часы,движение,шаги,тренировка,осознанность,сон,стоя,цепь",
+      "len": 99
+    },
+    "subtitle": {
+      "old": "Серии, виджеты и Watch",
+      "new": "Серии, виджеты и Watch"
+    }
+  },
+  "sk": {
+    "keywords": {
+      "old": "motivácia,návyk,kruhy,healthkit,pohyb,kroky,tréning,mindfulness,spánok,stát,reťaz,heatmap,aktivita",
+      "new": "motivácia,kruhy,healthkit,hodinky,pohyb,kroky,tréning,mindfulness,spánok,stát,reťaz,heatmap,aktivita",
+      "len": 100
+    },
+    "subtitle": {
+      "old": "Série, widgety a Apple Watch",
+      "new": "Série, widgety a Apple Watch"
+    }
+  },
+  "sv": {
+    "keywords": {
+      "old": "motivera,vana,ringar,healthkit,rörelse,steg,träning,mindfulness,sömn,stå,kedja,heatmap,aktivitet",
+      "new": "motivera,vana,ringar,healthkit,klocka,rörelse,steg,träning,mindfulness,sömn,stå,kedja,heatmap",
+      "len": 93
+    },
+    "subtitle": {
+      "old": "Serier, widgets och Watch",
+      "new": "Serier, widgets och Watch"
+    }
+  },
+  "th": {
+    "keywords": {
+      "old": "แรงจูงใจ,นิสัย,วงแหวน,healthkit,เคลื่อนไหว,ก้าว,ออกกำลัง,สติ,นอน,ยืน,สายโซ่,แผนที่ความร้อน,กิจกรรม",
+      "new": "แรงจูงใจ,นิสัย,วงแหวน,healthkit,นาฬิกา,เคลื่อนไหว,ก้าว,ออกกำลัง,สติ,นอน,ยืน,สายโซ่,แผนที่ความร้อน",
+      "len": 97
+    },
+    "subtitle": {
+      "old": "สตรีค, วิดเจ็ต และ Watch",
+      "new": "สตรีค, วิดเจ็ต และ Watch"
+    }
+  },
+  "tr": {
+    "keywords": {
+      "old": "motivasyon,alışkanlık,halkalar,healthkit,hareket,adım,antrenman,mindfulness,uyku,ayakta,zincir",
+      "new": "motivasyon,halkalar,healthkit,saat,hareket,adım,antrenman,mindfulness,uyku,ayakta,zincir,heatmap",
+      "len": 96
+    },
+    "subtitle": {
+      "old": "Seriler, widget ve Watch",
+      "new": "Seriler, widget ve Watch"
+    }
+  },
+  "uk": {
+    "keywords": {
+      "old": "мотивація,звичка,кільця,healthkit,рух,кроки,тренування,усвідомленість,сон,стоячи,ланцюг,теплокарта",
+      "new": "мотивація,звичка,кільця,healthkit,widget,годинник,рух,кроки,тренування,усвідомленість,сон,стоячи",
+      "len": 96
+    },
+    "subtitle": {
+      "old": "Серії, віджети та Watch",
+      "new": "Серії, віджети та Watch"
+    }
+  },
+  "vi": {
+    "keywords": {
+      "old": "độnglực,thóiquen,vòng,healthkit,dichuyển,bước,tậpluyện,chánhniệm,ngủ,đứng,chuỗi,bảnđồnhiệt,hoạtđộng",
+      "new": "độnglực,thóiquen,vòng,healthkit,đồnghồ,dichuyển,bước,tậpluyện,chánhniệm,ngủ,đứng,bảnđồnhiệt,hoạtđộng",
+      "len": 100
+    },
+    "subtitle": {
+      "old": "Chuỗi, widget và Watch",
+      "new": "Chuỗi, widget và Watch"
+    }
+  },
+  "zh-Hans": {
+    "keywords": {
+      "old": "激励,习惯,圆环,healthkit,移动,步数,锻炼,正念,睡眠,站立,链条,热力图,活动",
+      "new": "激励,习惯,圆环,healthkit,小组件,手表,移动,步数,锻炼,正念,睡眠,站立,链条,热力图,活动,连续,badge",
+      "len": 62
+    },
+    "subtitle": {
+      "old": "连续记录、小组件与Watch",
+      "new": "连续记录、小组件与Watch"
+    }
+  },
+  "zh-Hant": {
+    "keywords": {
+      "old": "激勵,習慣,圓環,healthkit,移動,步數,鍛煉,正念,睡眠,站立,鏈條,熱力圖,活動",
+      "new": "激勵,習慣,圓環,healthkit,小工具,手錶,移動,步數,鍛煉,正念,睡眠,站立,鏈條,熱力圖,活動,連續,badge",
+      "len": 62
+    },
+    "subtitle": {
+      "old": "連續記錄、小工具與Watch",
+      "new": "連續記錄、小工具與Watch"
+    }
+  }
+}

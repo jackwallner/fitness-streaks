@@ -262,6 +262,13 @@ final class StreakSettings: ObservableObject {
         didSet { defaults.set(lastOnboardingPickedCount, forKey: "lastOnboardingPickedCount") }
     }
 
+    /// Full tracking-key list from the onboarding selection step, captured before
+    /// any free-tier trim. Restored when the user completes a purchase (including
+    /// pending approval) so paid onboarding intent is not lost.
+    @Published var lastOnboardingTrackedKeys: [String] {
+        didSet { saveCodable(lastOnboardingTrackedKeys, key: "lastOnboardingTrackedKeys") }
+    }
+
     @Published var appearance: AppAppearance {
         didSet { defaults.set(appearance.rawValue, forKey: "appearance") }
     }
@@ -385,6 +392,7 @@ final class StreakSettings: ObservableObject {
         self.hasSeenTutorial = defaults.bool(forKey: "hasSeenTutorial")
         self.hasSeenTrialOffer = defaults.bool(forKey: "hasSeenTrialOffer")
         self.lastOnboardingPickedCount = defaults.integer(forKey: "lastOnboardingPickedCount")
+        self.lastOnboardingTrackedKeys = Self.loadCodable([String].self, key: "lastOnboardingTrackedKeys", defaults: defaults) ?? []
         self.appearance = AppAppearance(rawValue: defaults.integer(forKey: "appearance")) ?? .light
         // Default OFF — never request notification permission until the user explicitly opts in.
         self.notificationsEnabled = defaults.object(forKey: "notificationsEnabled") as? Bool ?? false
@@ -481,6 +489,17 @@ final class StreakSettings: ObservableObject {
 
     func dismissBroken(_ broken: BrokenStreak) {
         recentlyBroken.removeAll { $0.id == broken.id }
+    }
+
+    /// Re-applies the user's full onboarding streak picks when they upgraded but
+    /// were trimmed to the free cap before RevenueCat reported an active entitlement.
+    func restoreOnboardingTrackedStreaksIfNeeded() {
+        let keys = lastOnboardingTrackedKeys
+        guard !keys.isEmpty else { return }
+        let current = trackedStreaks?.count ?? Int.max
+        guard current < keys.count else { return }
+        trackedStreaks = Set(keys)
+        manualStreakOrder = keys
     }
 
     func pruneBroken(now: Date = .now) {

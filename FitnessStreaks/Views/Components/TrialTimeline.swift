@@ -42,8 +42,8 @@ struct TrialTimeline: View {
                     accent: Theme.retroMagenta,
                     icon: "creditcard.fill",
                     title: "DAY \(trialDays)",
-                    detail: priceLabel.map { "Trial ends. \($0) unless cancelled." }
-                        ?? "Trial ends unless cancelled. Cancel anytime."
+                    detail: priceLabel.map { "Trial ends · \($0) renews." }
+                        ?? "Trial ends · subscription renews."
                 )
             }
         }

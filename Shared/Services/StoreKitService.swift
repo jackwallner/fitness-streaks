@@ -49,7 +49,7 @@ extension Package {
 /// Single source of truth for `isPro`. Persists entitlement to App Group UserDefaults
 /// so widgets / watch can read the same value without running RevenueCat.
 @MainActor
-final class StoreKitService: ObservableObject {
+final class StoreKitService: NSObject, ObservableObject {
     static let shared = StoreKitService()
 
     // Product identifiers — must match App Store Connect AND RevenueCat dashboard.
@@ -61,6 +61,9 @@ final class StoreKitService: ObservableObject {
 
     @Published private(set) var offerings: Offerings? = nil
     @Published private(set) var isPro: Bool = false
+    /// True after a successful purchase until `isPro` becomes active. Covers the
+    /// window where StoreKit completed but RevenueCat entitlement is still pending.
+    @Published private(set) var purchaseGrantsFullStreakAccess: Bool = false
     @Published private(set) var purchaseInProgress: Bool = false
     @Published private(set) var isLoadingProducts: Bool = false
     @Published private(set) var lastError: String? = nil
@@ -94,7 +97,8 @@ final class StoreKitService: ObservableObject {
         UserDefaults(suiteName: streaksAppGroupID) ?? .standard
     }
 
-    private init() {
+    private override init() {
+        super.init()
         guard let apiKey = Self.loadAPIKey(), !apiKey.isEmpty, apiKey != "REVENUECAT_API_KEY" else {
             self.isPro = defaults.bool(forKey: Self.entitlementKey)
             return
@@ -103,7 +107,13 @@ final class StoreKitService: ObservableObject {
         Purchases.logLevel = .error
         Purchases.configure(with: .init(withAPIKey: apiKey)
             .with(usesStoreKit2IfAvailable: true))
+        Purchases.shared.delegate = self
         Task { await refreshState() }
+    }
+
+    /// Pro entitlement, or a purchase just completed (entitlement may still be pending).
+    var grantsUnlimitedTrackedStreaks: Bool {
+        isPro || purchaseGrantsFullStreakAccess
     }
 
     // MARK: - Public API
@@ -164,7 +174,11 @@ final class StoreKitService: ObservableObject {
                 return .cancelled
             }
             updateProStatus(from: customerInfo)
-            return customerInfo.entitlements["pro"]?.isActive == true ? .purchased : .pending
+            let outcome: PurchaseOutcome = customerInfo.entitlements["pro"]?.isActive == true ? .purchased : .pending
+            if outcome == .purchased || outcome == .pending {
+                purchaseGrantsFullStreakAccess = true
+            }
+            return outcome
         } catch {
             lastError = error.localizedDescription
             return .failed
@@ -269,6 +283,7 @@ final class StoreKitService: ObservableObject {
     }
 
     private func setIsPro(_ value: Bool) {
+        if value { purchaseGrantsFullStreakAccess = false }
         if isPro != value { isPro = value }
         defaults.set(value, forKey: Self.entitlementKey)
     }
@@ -286,7 +301,19 @@ final class StoreKitService: ObservableObject {
     func debugSetPro(_ value: Bool) {
         setIsPro(value)
     }
+
+    func debugSetPurchaseGrantsFullStreakAccess(_ value: Bool) {
+        purchaseGrantsFullStreakAccess = value
+    }
     #endif
+}
+
+extension StoreKitService: PurchasesDelegate {
+    nonisolated func purchases(_ purchases: Purchases, receivedUpdated customerInfo: CustomerInfo) {
+        Task { @MainActor in
+            updateProStatus(from: customerInfo)
+        }
+    }
 }
 
 #else
@@ -302,8 +329,13 @@ final class StoreKitService: ObservableObject {
     static let monthlyID = "com.jackwallner.streaks.monthly"
 
     @Published private(set) var isPro: Bool = false
+    @Published private(set) var purchaseGrantsFullStreakAccess: Bool = false
     @Published private(set) var purchaseInProgress: Bool = false
     @Published private(set) var lastError: String? = nil
+
+    var grantsUnlimitedTrackedStreaks: Bool {
+        isPro || purchaseGrantsFullStreakAccess
+    }
 
     private var defaults: UserDefaults {
         UserDefaults(suiteName: streaksAppGroupID) ?? .standard
@@ -324,8 +356,13 @@ final class StoreKitService: ObservableObject {
 
     #if DEBUG
     func debugSetPro(_ value: Bool) {
+        if value { purchaseGrantsFullStreakAccess = false }
         isPro = value
         defaults.set(value, forKey: "isProEntitled.v1")
+    }
+
+    func debugSetPurchaseGrantsFullStreakAccess(_ value: Bool) {
+        purchaseGrantsFullStreakAccess = value
     }
     #endif
 }

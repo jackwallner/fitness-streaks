@@ -1,0 +1,371 @@
+{
+  "syncedAt": "2026-05-26T19:52:13Z",
+  "appId": "6762699692",
+  "storeCount": 91,
+  "stores": {
+    "ae": {
+      "planned": 22,
+      "added": 0
+    },
+    "al": {
+      "planned": 21,
+      "added": 0
+    },
+    "am": {
+      "planned": 19,
+      "added": 0
+    },
+    "ar": {
+      "planned": 25,
+      "added": 0
+    },
+    "at": {
+      "planned": 18,
+      "added": 0
+    },
+    "au": {
+      "planned": 27,
+      "added": 0
+    },
+    "az": {
+      "planned": 33,
+      "added": 0
+    },
+    "be": {
+      "planned": 45,
+      "added": 0
+    },
+    "bg": {
+      "planned": 21,
+      "added": 0
+    },
+    "bh": {
+      "planned": 22,
+      "added": 0
+    },
+    "bo": {
+      "planned": 25,
+      "added": 0
+    },
+    "br": {
+      "planned": 19,
+      "added": 0
+    },
+    "ca": {
+      "planned": 36,
+      "added": 0
+    },
+    "ch": {
+      "planned": 45,
+      "added": 0
+    },
+    "cl": {
+      "planned": 25,
+      "added": 0
+    },
+    "cn": {
+      "planned": 19,
+      "added": 0
+    },
+    "co": {
+      "planned": 25,
+      "added": 0
+    },
+    "cr": {
+      "planned": 25,
+      "added": 0
+    },
+    "cy": {
+      "planned": 19,
+      "added": 0
+    },
+    "cz": {
+      "planned": 20,
+      "added": 0
+    },
+    "de": {
+      "planned": 18,
+      "added": 0
+    },
+    "dk": {
+      "planned": 19,
+      "added": 0
+    },
+    "do": {
+      "planned": 25,
+      "added": 0
+    },
+    "dz": {
+      "planned": 39,
+      "added": 0
+    },
+    "ec": {
+      "planned": 25,
+      "added": 0
+    },
+    "ee": {
+      "planned": 21,
+      "added": 0
+    },
+    "eg": {
+      "planned": 27,
+      "added": 0
+    },
+    "es": {
+      "planned": 33,
+      "added": 0
+    },
+    "fi": {
+      "planned": 18,
+      "added": 0
+    },
+    "fr": {
+      "planned": 19,
+      "added": 0
+    },
+    "gb": {
+      "planned": 27,
+      "added": 0
+    },
+    "gh": {
+      "planned": 27,
+      "added": 0
+    },
+    "gr": {
+      "planned": 19,
+      "added": 0
+    },
+    "gt": {
+      "planned": 25,
+      "added": 0
+    },
+    "hk": {
+      "planned": 21,
+      "added": 0
+    },
+    "hn": {
+      "planned": 25,
+      "added": 0
+    },
+    "hr": {
+      "planned": 18,
+      "added": 0
+    },
+    "hu": {
+      "planned": 21,
+      "added": 0
+    },
+    "id": {
+      "planned": 20,
+      "added": 0
+    },
+    "ie": {
+      "planned": 27,
+      "added": 0
+    },
+    "il": {
+      "planned": 21,
+      "added": 0
+    },
+    "in": {
+      "planned": 19,
+      "added": 0
+    },
+    "iq": {
+      "planned": 22,
+      "added": 0
+    },
+    "is": {
+      "planned": 21,
+      "added": 0
+    },
+    "it": {
+      "planned": 18,
+      "added": 0
+    },
+    "jo": {
+      "planned": 22,
+      "added": 0
+    },
+    "jp": {
+      "planned": 20,
+      "added": 0
+    },
+    "ke": {
+      "planned": 27,
+      "added": 0
+    },
+    "kg": {
+      "planned": 19,
+      "added": 0
+    },
+    "kh": {
+      "planned": 18,
+      "added": 0
+    },
+    "kr": {
+      "planned": 19,
+      "added": 0
+    },
+    "kw": {
+      "planned": 22,
+      "added": 0
+    },
+    "kz": {
+      "planned": 19,
+      "added": 0
+    },
+    "lb": {
+      "planned": 39,
+      "added": 0
+    },
+    "lk": {
+      "planned": 21,
+      "added": 0
+    },
+    "lu": {
+      "planned": 35,
+      "added": 0
+    },
+    "lv": {
+      "planned": 21,
+      "added": 0
+    },
+    "ma": {
+      "planned": 39,
+      "added": 0
+    },
+    "mn": {
+      "planned": 21,
+      "added": 0
+    },
+    "mo": {
+      "planned": 21,
+      "added": 0
+    },
+    "mx": {
+      "planned": 20,
+      "added": 0
+    },
+    "my": {
+      "planned": 20,
+      "added": 0
+    },
+    "nl": {
+      "planned": 18,
+      "added": 0
+    },
+    "no": {
+      "planned": 19,
+      "added": 0
+    },
+    "np": {
+      "planned": 21,
+      "added": 0
+    },
+    "nz": {
+      "planned": 27,
+      "added": 0
+    },
+    "om": {
+      "planned": 22,
+      "added": 0
+    },
+    "pa": {
+      "planned": 25,
+      "added": 0
+    },
+    "pe": {
+      "planned": 25,
+      "added": 0
+    },
+    "ph": {
+      "planned": 27,
+      "added": 0
+    },
+    "pk": {
+      "planned": 27,
+      "added": 0
+    },
+    "pl": {
+      "planned": 19,
+      "added": 0
+    },
+    "pt": {
+      "planned": 19,
+      "added": 0
+    },
+    "py": {
+      "planned": 25,
+      "added": 0
+    },
+    "qa": {
+      "planned": 22,
+      "added": 0
+    },
+    "ro": {
+      "planned": 18,
+      "added": 0
+    },
+    "ru": {
+      "planned": 19,
+      "added": 0
+    },
+    "sa": {
+      "planned": 22,
+      "added": 0
+    },
+    "se": {
+      "planned": 21,
+      "added": 0
+    },
+    "sg": {
+      "planned": 27,
+      "added": 0
+    },
+    "si": {
+      "planned": 34,
+      "added": 0
+    },
+    "sk": {
+      "planned": 29,
+      "added": 0
+    },
+    "sv": {
+      "planned": 25,
+      "added": 0
+    },
+    "th": {
+      "planned": 18,
+      "added": 0
+    },
+    "tr": {
+      "planned": 15,
+      "added": 0
+    },
+    "tw": {
+      "planned": 21,
+      "added": 0
+    },
+    "ua": {
+      "planned": 33,
+      "added": 0
+    },
+    "us": {
+      "planned": 45,
+      "added": 0
+    },
+    "uz": {
+      "planned": 19,
+      "added": 0
+    },
+    "vn": {
+      "planned": 19,
+      "added": 0
+    },
+    "za": {
+      "planned": 27,
+      "added": 0
+    }
+  }
+}

@@ -1,0 +1,41 @@
+Comença a crear hàbits sense tornar a començar des del dia u.
+
+Streak Finder revisa de manera segura l’historial de Salut d’Apple per descobrir les ratxes de forma física que ja has creat i et dona l’empenta exacta que necessites per mantenir-les vives.
+
+No hi ha res més motivador que adonar-se que ja estàs en una bona ratxa. Tant si tanques els anells, arribes als 10.000 passos o dones prioritat a l’atenció plena diària, Streak Finder elimina la fricció de «tornar a començar» fent un seguiment automàtic del teu impuls.
+
+FUNCIONS PRINCIPALS:
+
+* Descobreix automàticament el teu impuls
+Troba a l’instant ratxes actives en 9 mètriques clau de Salut d’Apple: passos, minuts d’exercici, hores dret, energia activa, entrenaments, atenció plena, son, distància i pisos pujats.
+
+* Ratxes principals i insígnies
+Col·loca el teu objectiu més important al centre amb la vista Hero Streak i aconsegueix insígnies dissenyades amb cura a mesura que els teus hàbits es fan més forts.
+
+* Mapes de calor de calendari
+Visualitza el teu progrés amb mapes de calor en format calendari que fan innegable la teva constància diària.
+
+* Responsabilitat a tot arreu
+Tingues sempre presents els teus objectius amb widgets d’iOS acuradament dissenyats per a la pantalla d’inici, la pantalla de bloqueig i el mode StandBy.
+
+* Preparat per a Apple Watch
+Consulta les teves ratxes directament al canell amb una app watchOS totalment nativa i complicacions riques en informació.
+
+* Recordatoris intel·ligents
+No deixis caure la pilota. Rep una empenta automàtica i suau a les 19:00 si la teva Hero Streak corre el risc de trencar-se aquell dia.
+
+* Privadesa ferma (per disseny)
+Les teves dades de salut són profundament personals i et pertanyen. Streak Finder s’ha creat amb una base centrada en la privadesa:
+- Accés només de lectura a Apple HealthKit
+- 100 % de processament local al dispositiu
+- Sense comptes d’usuari ni registres
+- Zero trucades de xarxa
+- Zero analítiques o seguiment
+
+No trenquis la cadena. Descarrega Streak Finder avui mateix i mantén el teu impuls!
+
+Detalls de la subscripció
+Streak Finder Pro està disponible com a subscripció de renovació automàtica (mensual 1,99 $ / anual 14,99 $ amb prova gratuïta de 7 dies) o com a compra única de per vida (29,99 $). El pagament es carregarà al teu ID d’Apple en confirmar-ho. Les subscripcions es renoven automàticament tret que es cancel·lin com a mínim 24 hores abans que acabi el període. Pots gestionar o cancel·lar la subscripció en qualsevol moment a Configuració → ID d’Apple → Subscripcions.
+
+Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

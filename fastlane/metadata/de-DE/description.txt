@@ -1,0 +1,41 @@
+Beginne, Gewohnheiten aufzubauen – ohne wieder bei Tag eins zu starten.
+
+Streak Finder analysiert sicher deinen Apple Health‑Verlauf, um die Fitness‑Serien aufzudecken, die du bereits aufgebaut hast, und gibt dir genau den nötigen Anstoß, um sie am Leben zu halten.
+
+Nichts motiviert mehr, als zu merken, dass du dich schon auf einer Gewinnserie befindest. Ob du deine Ringe schließt, 10.000 Schritte erreichst oder tägliche Achtsamkeit priorisierst – Streak Finder nimmt dir die Hürde des „Neuanfangs“, indem deine Dynamik automatisch verfolgt wird.
+
+WICHTIGE FUNKTIONEN:
+
+* Deine Dynamik automatisch entdecken
+Finde sofort aktive Serien über 9 zentrale Apple Health‑Metriken: Schritte, Trainingsminuten, Stehstunden, aktive Energie, Workouts, Achtsamkeit, Schlaf, Distanz und gestiegene Etagen.
+
+* Hero Streaks & Abzeichen
+Rücke dein wichtigstes Ziel mit der Hero‑Streak‑Ansicht in den Mittelpunkt und sammle liebevoll gestaltete Abzeichen, während deine Gewohnheiten stärker werden.
+
+* Kalender‑Heatmaps
+Visualisiere deinen Fortschritt im Zeitverlauf mit eindrucksvollen Kalender‑Heatmaps, die deine tägliche Konsequenz unübersehbar machen.
+
+* Verantwortung überall
+Behalte deine Ziele im Blick mit elegant gestalteten iOS‑Widgets für den Home‑Bildschirm, Sperrbildschirm und den StandBy‑Modus.
+
+* Bereit für Apple Watch
+Prüfe deine Serien direkt am Handgelenk mit einer vollständig nativen watchOS‑App und vielseitigen Komplikationen.
+
+* Intelligente Erinnerungen
+Lass nichts schleifen. Erhalte automatisch um 19 Uhr einen dezenten Hinweis, wenn deine Hero Streak am selben Tag zu reißen droht.
+
+* Konsequent privat (von Grund auf)
+Deine Gesundheitsdaten sind höchst persönlich und gehören dir. Streak Finder wurde mit einem kompromisslos datenschutzorientierten Fundament entwickelt:
+- Nur Lesezugriff auf Apple HealthKit
+- 100 % lokale Verarbeitung auf dem Gerät
+- Keine Benutzerkonten oder Registrierungen erforderlich
+- Keine Netzwerkaufrufe
+- Keine Analysen oder Tracking
+
+Unterbrich die Kette nicht. Lade Streak Finder noch heute herunter und halte deine Dynamik am Laufen!
+
+Abo‑Details
+Streak Finder Pro ist als automatisch verlängerndes Abo verfügbar (Monatlich 1,99 $ / Jährlich 14,99 $ mit 7‑tägiger kostenloser Testphase) oder als einmaliger Lifetime‑Kauf (29,99 $). Die Zahlung wird bei Bestätigung deinem Apple‑ID‑Konto belastet. Abos verlängern sich automatisch, sofern sie nicht mindestens 24 Stunden vor Ablauf des aktuellen Zeitraums gekündigt werden. Verwalte oder kündige dein Abo jederzeit unter Einstellungen → Apple ID → Abonnements.
+
+Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

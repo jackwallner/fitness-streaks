@@ -1,0 +1,1 @@
+motivere,ringe,healthkit,klokke,bevegelse,skritt,mindfulness,søvn,stå,kjede,heatmap,aktivitet,badge

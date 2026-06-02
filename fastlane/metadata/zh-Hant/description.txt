@@ -1,0 +1,41 @@
+從你已經建立的習慣開始，而不是從第 1 天重來。
+
+「Streak Finder」會安全分析你的 Apple Health 歷史紀錄，找出你早已累積的健身連勝紀錄，並在關鍵時刻給你剛剛好的提醒，幫你把這份動能延續下去。
+
+沒有什麼比發現「自己其實已經在連勝中」更有動力了。無論你是在關閉 Apple Watch 圈圈、達成 10,000 步，還是每天練習正念，「Streak Finder」都會自動追蹤你的動能，消除「重新開始」的阻力。
+
+主要功能：
+
+* 自動發現你的動能
+即時找出 9 個關鍵 Apple Health 指標中的進行中連勝：步數、運動分鐘數、站立小時數、主動能量、訓練、正念、睡眠、距離與爬樓層數。
+
+* Hero Streak 與徽章
+用 Hero Streak 檢視模式把最重要的目標放在最顯眼的位置，並在習慣變強時收集設計精美的徽章。
+
+* 行事曆熱力圖
+透過漂亮的行事曆熱力圖檢視長期進度，讓你的每日堅持一目了然。
+
+* 隨處保持自律
+利用精心設計的 iOS 小工具，將目標放在主畫面、鎖定畫面與待機顯示模式中，抬手就能看到。
+
+* 支援 Apple Watch
+使用完整原生的 watchOS App 與豐富複雜功能（Complications），直接在手腕上查看連勝。
+
+* 聰明提醒
+不再掉球。如果當天 Hero Streak 有中斷風險，晚上 7 點會自動給你溫和提醒。
+
+* 強悍隱私（從設計開始）
+你的健康資料非常私密，而且只屬於你。「Streak Finder」從一開始就以隱私優先為核心設計：
+- 僅具備 Apple HealthKit 唯讀存取權
+- 100% 在裝置上本地處理
+- 不需要建立帳號或註冊
+- 沒有任何網路請求
+- 沒有任何分析或追蹤
+
+別讓連勝斷掉。立即下載「Streak Finder」，讓你的動能持續向前！
+
+訂閱詳情
+「Streak Finder Pro」提供自動續訂方案（月訂 US$1.99 / 年訂 US$14.99，含 7 天免費試用），以及一次性「終身版」購買（US$29.99）。付款會在你透過 Apple ID 確認後收取。訂閱會自動續訂，除非在到期前至少 24 小時取消。你可前往「設定」→「Apple ID」→「訂閱項目」隨時管理或取消。
+
+Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
