@@ -1,1 +1,5 @@
-Save your streaks: you can now save a streak so you can keep up your important momentum.
+We're now Fitness Streak Tracker! Same app that surfaces the streaks hiding in your Apple Health history — now with a clearer name and a sharper focus on keeping your momentum alive.
+
+• Save your most important streak so your momentum is always protected
+• Refreshed branding across the app, widgets, and Apple Watch
+• Stability and performance improvements

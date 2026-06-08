@@ -1,41 +1,33 @@
-Bắt đầu xây dựng thói quen mà không phải bắt đầu lại từ ngày đầu.
+Các ứng dụng theo dõi chuỗi khác bắt bạn phải bắt đầu lại từ ngày một. Fitness Streak Tracker đọc lịch sử Apple Health của bạn và tiết lộ những chuỗi mà bạn ĐÃ gây dựng từ trước — dài 40, 120, thậm chí 300 ngày, ngay hôm nay.
 
-Streak Finder xem lịch sử Apple Health của bạn một cách an toàn để tìm ra những chuỗi rèn luyện (streak) bạn đã xây dựng, và đưa cho bạn đúng cú hích cần thiết để giữ chúng tiếp tục.
+Không gì tạo động lực mạnh hơn việc nhận ra bạn đang nắm giữ một chuỗi thắng. Thay vì ghi lại thói quen bằng tay, Streaks tự động làm hiện rõ đà tiến ẩn giấu trong dữ liệu của bạn — để ngày một đã là ngày thứ 100.
 
-Không gì tạo động lực hơn việc nhận ra bạn đã ở trong một chuỗi chiến thắng. Dù bạn đang đóng vòng, đạt 10.000 bước hay ưu tiên chánh niệm hằng ngày, Streak Finder loại bỏ cảm giác phải “bắt đầu lại” bằng cách tự động theo dõi đà tiến của bạn.
+TỰ ĐỘNG KHÁM PHÁ CHUỖI CỦA BẠN
+Tìm các chuỗi đang hoạt động trên 9 chỉ số Apple Health mà không cần ghi chép gì: Số bước, Phút Tập luyện, Giờ Đứng, Năng lượng Hoạt động, Bài tập, Chánh niệm, Giấc ngủ, Quãng đường và Số tầng đã leo. Phát hiện những chuỗi ẩn mà bạn chưa từng nghĩ đến việc theo dõi.
 
-TÍNH NĂNG CHÍNH:
+ĐỪNG BAO GIỜ ĐỨT CHUỖI
+Đặt mục tiêu quan trọng nhất của bạn lên hàng đầu với Hero Streak, theo dõi chuỗi của bạn lớn dần trên bản đồ nhiệt dạng lịch, và nhận huy hiệu khi sự kiên định của bạn được vun đắp. Nhận một lời nhắc nhẹ nhàng lúc 7 giờ tối nếu chuỗi hôm nay đang gặp nguy cơ — chúng tôi báo cho bạn trước khi một chuỗi chấm dứt.
 
-* Tự động phát hiện đà tiến
-Tức thì tìm các streak đang hoạt động trên 9 chỉ số Apple Health quan trọng: Bước đi, Phút tập luyện, Giờ đứng, Năng lượng hoạt động, Buổi tập, Chánh niệm, Giấc ngủ, Quãng đường và Tầng đã leo.
+Ở MỌI NƠI BẠN NHÌN
+• Widget Màn hình chính, Màn hình khóa và StandBy
+• Một ứng dụng Apple Watch gốc với các tính năng phức tạp phong phú
+• Số đếm chuỗi của bạn, luôn trong tầm mắt
 
-* Hero Streak & huy hiệu
-Đặt mục tiêu quan trọng nhất ở vị trí trung tâm với chế độ xem Hero Streak và sưu tầm các huy hiệu được thiết kế đẹp mắt khi thói quen của bạn mạnh dần.
+KHÔNG PHẢI MỘT ỨNG DỤNG THEO DÕI THÓI QUEN KHÁC
+Không ô đánh dấu. Không ghi chép thủ công. Không điểm hồi phục. Chỉ có những chuỗi mà chính con người bạn trong quá khứ đã giành được — được làm hiện rõ, được tôn vinh và được bảo vệ.
 
-* Heatmap theo lịch
-Hình dung tiến bộ theo thời gian với các heatmap dạng lịch sống động, giúp sự đều đặn mỗi ngày của bạn trở nên rõ ràng.
+RIÊNG TƯ TUYỆT ĐỐI (NGAY TỪ THIẾT KẾ)
+Dữ liệu sức khỏe của bạn thuộc về bạn:
+• Quyền truy cập Apple Health chỉ đọc
+• Xử lý 100% trên thiết bị
+• Không tài khoản hay đăng ký
+• Không có lệnh gọi mạng, không theo dõi
+Lịch sử sức khỏe của bạn không bao giờ rời khỏi điện thoại.
 
-* Trách nhiệm mọi lúc
-Giữ mục tiêu luôn trong tầm mắt với widget iOS được thiết kế tinh tế cho Màn hình chính, Màn hình khóa và chế độ StandBy.
+Đừng làm đứt chuỗi. Hãy tải Fitness Streak Tracker và giữ cho đà tiến của bạn tiếp tục!
 
-* Sẵn sàng cho Apple Watch
-Xem các streak ngay trên cổ tay với ứng dụng watchOS thuần và nhiều kiểu complication phong phú.
-
-* Nhắc thông minh
-Không để “rơi bóng”. Nhận một lời nhắc nhẹ nhàng, tự động lúc 19:00 nếu Hero Streak của bạn có nguy cơ bị ngắt trong ngày.
-
-* Riêng tư tuyệt đối (theo thiết kế)
-Dữ liệu sức khỏe là riêng tư sâu sắc và thuộc về bạn. Streak Finder được xây dựng với nền tảng ưu tiên quyền riêng tư:
-- Quyền truy cập Apple HealthKit chỉ đọc
-- 100% xử lý cục bộ trên thiết bị
-- Không tài khoản người dùng, không đăng ký
-- Không gọi mạng
-- Không phân tích hay theo dõi
-
-Đừng để đứt chuỗi. Tải Streak Finder hôm nay và giữ đà tiến của bạn tiếp tục!
-
-Chi tiết gói đăng ký
-Streak Finder Pro có sẵn dưới dạng đăng ký tự gia hạn (hằng tháng 1,99 USD / hằng năm 14,99 USD với 7 ngày dùng thử miễn phí) hoặc mua trọn đời một lần (29,99 USD). Thanh toán được tính vào Apple ID của bạn khi xác nhận. Gói đăng ký tự gia hạn trừ khi bạn hủy ít nhất 24 giờ trước khi kết thúc chu kỳ. Quản lý hoặc hủy bất cứ lúc nào trong Cài đặt → Apple ID → Đăng ký.
+Chi tiết Đăng ký
+Streaks Pro được cung cấp dưới dạng gói đăng ký tự động gia hạn (Hàng tháng $1.99 / Hàng năm $14.99 kèm dùng thử miễn phí 7 ngày) hoặc một lần mua Lifetime trọn đời ($29.99). Khoản thanh toán sẽ được tính vào Apple ID của bạn khi xác nhận. Gói đăng ký sẽ tự động gia hạn trừ khi bị hủy ít nhất 24 giờ trước khi kết thúc kỳ hạn. Quản lý hoặc hủy bất cứ lúc nào trong Cài đặt → Apple ID → Đăng ký.
 
 Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
 Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

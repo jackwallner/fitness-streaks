@@ -11,9 +11,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Streak Finder Watch Widget</string>
+	<string>Streaks Watch Widget</string>
 	<key>CFBundleDisplayName</key>
-	<string>Streak Finder</string>
+	<string>Streaks</string>
 	<key>CFBundlePackageType</key>
 	<string>XPC!</string>
 	<key>CFBundleShortVersionString</key>

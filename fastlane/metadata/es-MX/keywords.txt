@@ -1,1 +1,1 @@
-motivar,anillos,healthkit,reloj,mover,pasos,entreno,mindfulness,sueño,depie,cadena,mapa,actividad
+widget,complication,watch,distance,flights,wellness,daily,routine,reminder,progress,counter,chain

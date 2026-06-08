@@ -1,1 +1,5 @@
-Mentsd a sorozataidat: mostantól elmenthetsz egy sorozatot, hogy tovább vihesd a számodra fontos lendületet.
+Mostantól Fitness Streak Tracker a nevünk! Ugyanaz az alkalmazás, amely felszínre hozza az Apple Health előzményeidben rejtőző sorozatokat – most tisztább névvel és élesebb fókusszal arra, hogy fenntartsd a lendületedet.
+
+• Mentsd el a legfontosabb sorozatodat, hogy a lendületed mindig védve legyen
+• Megújult arculat az egész alkalmazásban, a widgetekben és az Apple Watch-on
+• Stabilitási és teljesítménybeli fejlesztések

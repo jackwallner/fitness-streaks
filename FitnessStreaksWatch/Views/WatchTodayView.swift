@@ -67,7 +67,7 @@ struct WatchTodayView: View {
             Image(systemName: "iphone.and.arrow.forward")
                 .font(.system(size: 28))
                 .foregroundStyle(.secondary)
-            Text("Open Streak Finder on iPhone")
+            Text("Open Streaks on iPhone")
                 .font(.system(size: 14, weight: .bold, design: .rounded))
                 .multilineTextAlignment(.center)
             Text("Your watch will show the latest streak snapshot automatically.")

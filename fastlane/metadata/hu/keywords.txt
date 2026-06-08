@@ -1,1 +1,1 @@
-motiváció,gyűrűk,healthkit,óra,mozgás,lépések,edzés,mindfulness,alvás,állás,lánc,heatmap,aktivitás
+gyűrű,állóóra,heatmap,tudatosság,alvás,edzés,aktivitás,lépés,cél,szokás,naptár,energia,óra,widget

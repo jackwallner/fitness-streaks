@@ -1,41 +1,33 @@
-Počnite graditi navike bez ponovnog početka od prvog dana.
+Druge aplikacije za nizove tjeraju vas da krenete ispočetka od prvog dana. Fitness Streak Tracker čita vašu Apple Health povijest i otkriva nizove koje VEĆ gradite — 40, 120, čak i 300 dana duge, već danas.
 
-Streak Finder sigurno pregledava vašu Apple Health povijest kako bi otkrio fitness nizove koje ste već izgradili i dao vam baš onaj poticaj koji vam treba da ih zadržite.
+Nema ništa motivirajuće kao spoznaja da ste već u pobjedničkom nizu. Umjesto ručnog bilježenja navika, Streaks automatski otkriva zamah skriven u vašim podacima — pa je prvi dan zapravo već stoti.
 
-Nema ništa motivirajuće kao spoznaja da ste već u pobjedničkom nizu. Bilo da zatvarate prstenove, dosežete 10.000 koraka ili stavljate svakodnevnu svjesnost u prvi plan, Streak Finder uklanja napor „novog početka” automatskim praćenjem vašeg zamaha.
+AUTOMATSKO OTKRIVANJE NIZOVA
+Pronađite aktivne nizove kroz 9 Apple Health mjernih podataka bez ikakvog bilježenja: koraci, minute vježbanja, sati stajanja, aktivna energija, treninzi, svjesnost, san, udaljenost i prijeđene stepenice. Otkrijte skrivene nizove kojih niste ni bili svjesni.
 
-KLJUČNE ZNAČAJKE:
+NIKAD NE PREKINITE LANAC
+Stavite svoj najvažniji cilj u prvi plan uz Hero Streak, gledajte kako vaš niz raste na kalendarskoj toplinskoj mapi i osvajajte bedževe kako vaša dosljednost jača. Primite blag poticaj u 19:00 ako je današnji niz u opasnosti — javljamo vam prije nego što niz prekine.
 
-* Automatsko otkrivanje zamaha
-Trenutno pronađite aktivne nizove kroz 9 ključnih Apple Health mjernih podataka: koraci, minute vježbanja, sati stajanja, aktivna energija, treninzi, svjesnost, san, udaljenost i prijeđene stepenice.
+POSVUDA KAMO POGLEDATE
+• Widgeti za početni zaslon, zaključani zaslon i StandBy
+• Izvorna Apple Watch aplikacija s bogatim komplikacijama
+• Vaš broj nizova, uvijek na dohvat pogleda
 
-* Glavni nizovi i bedževi
-Istaknite svoj najvažniji cilj u prikazu Hero Streak i skupljajte prekrasno dizajnirane bedževe kako vaše navike jačaju.
+NIJE OBIČAN PRATITELJ NAVIKA
+Bez kućica za označavanje. Bez ručnog bilježenja. Bez ocjene oporavka. Samo nizovi koje je vaše prošlo ja već zaslužilo — otkriveni, proslavljeni i zaštićeni.
 
-* Kalendar toplinskih mapa
-Vizualizirajte napredak kroz vrijeme uz dojmljive kalendarske toplinske mape koje vašoj dnevnoj dosljednosti ne ostavljaju prostor za sumnju.
+NEPOPUSTLJIVO PRIVATNO (PO DIZAJNU)
+Vaši zdravstveni podaci pripadaju vama:
+• Apple Health pristup samo za čitanje
+• 100 % obrada na uređaju
+• Bez korisničkih računa ili registracija
+• Nula mrežnih poziva, nula praćenja
+Vaša zdravstvena povijest nikad ne napušta vaš telefon.
 
-* Održivost svuda
-Držite ciljeve na dohvat oka uz pažljivo izrađene iOS widgete za početni zaslon, zaključani zaslon i StandBy način rada.
-
-* Spremno za Apple Watch
-Provjerite svoje nizove izravno sa zapešća putem potpuno izvorne watchOS aplikacije i bogatih komplikacija.
-
-* Pametni podsjetnici
-Ne ispuštajte loptu. Primite blag, automatski podsjetnik u 19:00 ako je vaš Hero Streak tog dana u opasnosti od prekida.
-
-* Beskompromisna privatnost (po dizajnu)
-Vaši zdravstveni podaci su duboko osobni i pripadaju vama. Streak Finder izgrađen je na temeljima privatnosti:
-- samo za čitanje Apple HealthKit pristup
-- 100 % lokalna obrada na uređaju
-- bez korisničkih računa ili registracija
-- nula mrežnih poziva
-- nula analitike ili praćenja
-
-Ne prekidajte lanac. Preuzmite Streak Finder danas i zadržite svoj zamah!
+Ne prekidajte lanac. Preuzmite Fitness Streak Tracker i zadržite svoj zamah!
 
 Detalji pretplate
-Streak Finder Pro dostupan je kao pretplata s automatskom obnovom (mjesečno 1,99 USD / godišnje 14,99 USD uz 7-dnevno besplatno probno razdoblje) ili jednokratna doživotna kupnja (29,99 USD). Plaćanje se tereti na vaš Apple ID pri potvrdi. Pretplate se automatski obnavljaju osim ako ne otkažete najmanje 24 sata prije isteka razdoblja. Upravlja­jte pretplatom ili je otkažite u bilo kojem trenutku u Postavke → Apple ID → Subscriptions.
+Streaks Pro dostupan je kao pretplata s automatskom obnovom (mjesečno $1.99 / godišnje $14.99 uz 7-dnevno besplatno probno razdoblje) ili kao jednokratna doživotna kupnja ($29.99). Plaćanje se tereti na vaš Apple ID pri potvrdi. Pretplate se automatski obnavljaju osim ako se ne otkažu najmanje 24 sata prije isteka razdoblja. Upravljajte pretplatom ili je otkažite u bilo kojem trenutku u Postavke → Apple ID → Subscriptions.
 
 Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
 Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

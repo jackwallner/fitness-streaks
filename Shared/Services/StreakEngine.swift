@@ -271,7 +271,7 @@ enum StreakEngine {
     /// streaks across our tiered hourly thresholds, and return up to 3 non-adjacent
     /// hours ranked by vibe score.
     ///
-    /// This is the "Streak Finder" magic — surface surprising rhythms like
+    /// This is the "Streaks" magic — surface surprising rhythms like
     /// "you always get 1000+ steps between 5–6pm".
     static func discoverHourWindows(
         hourlySteps: [Date: [Int: Double]],

@@ -323,7 +323,7 @@ struct StreakDetailView: View {
                     .tracking(2)
                     .foregroundStyle(Theme.retroAmber)
             }
-            Text("Streak Finder spotted a hidden pattern: you consistently hit this target within a single hour of the day. Keep it alive. The next window starts at \(streak.window?.label ?? "").")
+            Text("Streaks spotted a hidden pattern: you consistently hit this target within a single hour of the day. Keep it alive. The next window starts at \(streak.window?.label ?? "").")
                 .font(RetroFont.mono(11))
                 .foregroundStyle(Theme.retroInk)
                 .lineSpacing(3)

@@ -1,1 +1,1 @@
-motywacja,pierścienie,healthkit,zegarek,ruch,kroki,trening,mindfulness,sen,stawanie,łańcuch,mapa
+pierścień,stanie,mapa,uważność,sen,ćwiczenie,aktywność,trening,krok,cel,nawyk,kalendarz,energia

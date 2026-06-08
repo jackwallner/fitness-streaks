@@ -1,41 +1,33 @@
-Mula bina tabiat tanpa perlu bermula dari hari pertama.
+Aplikasi siri lain memaksa anda bermula semula dari hari pertama. Fitness Streak Tracker membaca sejarah Apple Health anda dan mendedahkan siri yang anda SUDAH pun bina — 40, 120, malah 300 hari panjangnya, hari ini.
 
-Streak Finder menyemak sejarah Apple Health anda dengan selamat untuk mendedahkan siri kecergasan yang sudah anda bina, dan memberi dorongan tepat untuk mengekalkannya.
+Tiada yang lebih memotivasikan daripada sedar anda sudah berada dalam siri kemenangan. Daripada mencatat tabiat secara manual, aplikasi ini menampilkan momentum yang tersembunyi dalam data anda secara automatik — jadi hari pertama sebenarnya sudah hari ke-100.
 
-Tiada yang lebih memotivasikan daripada sedar anda sudah berada dalam siri kemenangan. Sama ada anda menutup cincin, capai 10,000 langkah, atau mengutamakan ketenangan harian, Streak Finder menghapuskan rasa "mula semula" dengan menjejak momentum anda secara automatik.
+TEMU KEMBALI SIRI ANDA SECARA AUTOMATIK
+Temui siri aktif merentasi 9 metrik Apple Health tanpa perlu mencatat apa-apa: Langkah, Minit Senaman, Jam Berdiri, Tenaga Aktif, Senaman, Kesedaran Minda, Tidur, Jarak dan Anak Tangga Didaki. Dedahkan siri tersembunyi yang anda tidak pernah terfikir untuk dijejak.
 
-CIRI UTAMA:
+JANGAN PUTUSKAN RANTAI
+Letakkan matlamat paling penting di hadapan dengan Hero Streak, lihat siri anda berkembang pada peta haba kalendar, dan kumpul lencana apabila konsistensi anda semakin kukuh. Terima dorongan lembut pada 7 malam jika siri hari ini berisiko terputus — kami beritahu anda sebelum sesuatu siri mati.
 
-* Temu Kembali Momentum Anda
-Segera temui siri aktif merentasi 9 metrik utama Apple Health: Langkah, Minit Senaman, Jam Berdiri, Tenaga Aktif, Senaman, Kesedaran Minda, Tidur, Jarak dan Anak Tangga Didaki.
+DI MANA-MANA SAHAJA ANDA MELIHAT
+• Widget Skrin Utama, Skrin Kunci & StandBy
+• Aplikasi Apple Watch asli dengan komplikasi yang kaya
+• Kiraan siri anda, sentiasa sepintas lalu
 
-* Hero Streak & Lencana
-Letakkan matlamat paling penting di hadapan dengan paparan Hero Streak, dan kumpul lencana cantik apabila tabiat anda semakin kukuh.
+BUKAN SEKADAR PENJEJAK TABIAT
+Tiada kotak tanda. Tiada catatan manual. Tiada skor pemulihan. Hanya siri yang diri anda dahulu sudah peroleh — didedahkan, diraikan dan dilindungi.
 
-* Peta Haba Kalendar
-Lihat perkembangan anda dari masa ke masa dengan peta haba kalendar yang jelas menunjukkan konsistensi harian anda.
+SANGAT PERIBADI (MENGIKUT REKA BENTUK)
+Data kesihatan anda adalah milik anda:
+• Akses Apple Health baca sahaja
+• 100% pemprosesan setempat pada peranti
+• Tiada akaun atau pendaftaran
+• Sifar panggilan rangkaian, sifar penjejakan
+Sejarah kesihatan anda tidak pernah meninggalkan telefon anda.
 
-* Akauntabiliti Di Mana-mana
-Kekalkan matlamat sentiasa kelihatan dengan widget iOS yang direka cantik untuk Skrin Utama, Skrin Kunci dan mod StandBy.
-
-* Sedia Untuk Apple Watch
-Semak siri anda terus dari pergelangan tangan dengan aplikasi watchOS asli dan komplikasi yang kaya.
-
-* Peringatan Pintar
-Jangan terlepas. Terima peringatan lembut automatik pada 7 malam jika Hero Streak anda berisiko terputus hari itu.
-
-* Sangat Peribadi (Mengikut Reka Bentuk)
-Data kesihatan anda amat peribadi dan milik anda. Streak Finder dibina dengan asas privasi diutamakan:
-- Akses Apple HealthKit baca sahaja
-- 100% pemprosesan setempat pada peranti
-- Tiada akaun pengguna atau pendaftaran diperlukan
-- Sifar panggilan rangkaian
-- Sifar analitik atau penjejakan
-
-Jangan putuskan rantai. Muat turun Streak Finder hari ini dan kekalkan momentum anda!
+Jangan putuskan rantai. Muat turun Fitness Streak Tracker dan kekalkan momentum anda!
 
 Butiran Langganan
-Streak Finder Pro tersedia sebagai langganan pembaharuan automatik (Bulanan $1.99 / Tahunan $14.99 dengan percubaan percuma 7 hari) atau pembelian Seumur Hidup sekali sahaja ($29.99). Bayaran dicaj kepada Apple ID anda semasa pengesahan. Langganan diperbaharui secara automatik melainkan dibatalkan sekurang-kurangnya 24 jam sebelum tempoh tamat. Urus atau batalkan pada bila-bila masa di Tetapan → Apple ID → Subscriptions.
+Streaks Pro tersedia sebagai langganan pembaharuan automatik (Bulanan $1.99 / Tahunan $14.99 dengan percubaan percuma 7 hari) atau pembelian Seumur Hidup sekali sahaja ($29.99). Bayaran dicaj kepada Apple ID anda semasa pengesahan. Langganan diperbaharui secara automatik melainkan dibatalkan sekurang-kurangnya 24 jam sebelum tempoh tamat. Urus atau batalkan pada bila-bila masa di Tetapan → Apple ID → Subscriptions.
 
 Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
 Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

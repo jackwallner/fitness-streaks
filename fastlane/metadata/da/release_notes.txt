@@ -1,1 +1,5 @@
-Gem dine serier: Du kan nu gemme en serie, så du kan fastholde din vigtige fremdrift.
+Vi hedder nu Fitness Streak Tracker! Samme app, der afslører de serier, der gemmer sig i din Apple Health-historik — nu med et klarere navn og endnu skarpere fokus på at holde din fremdrift i live.
+
+• Gem din vigtigste serie, så din fremdrift altid er beskyttet
+• Opdateret branding på tværs af appen, widgets og Apple Watch
+• Forbedringer af stabilitet og ydeevne

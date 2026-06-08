@@ -1,41 +1,33 @@
-Begynd at bygge vaner uden at starte helt forfra.
+Andre serie-apps tvinger dig til at starte forfra på dag ét. Fitness Streak Tracker læser din Apple Health-historik og afslører de serier, du ALLEREDE har opbygget — 40, 120, ja, helt op til 300 dage lange, allerede i dag.
 
-Streak Finder gennemgår sikkert din Apple Health-historik for at afsløre de træningsserier, du allerede har opbygget, og giver dig det præcise skub, du har brug for til at holde dem i live.
+Der er intet mere motiverende end at opdage, at du allerede er i gang med en sejrsrække. I stedet for at logge vaner i hånden afslører Streaks automatisk den fremdrift, der gemmer sig i dine data — så dag ét allerede er dag 100.
 
-Der er intet mere motiverende end at opdage, at du allerede er i gang med en sejrsrække. Uanset om du lukker dine ringe, når 10.000 skridt eller prioriterer daglig mindfulness, fjerner Streak Finder friktionen ved at skulle “starte forfra” ved automatisk at spore din fremdrift.
+OPDAG DINE SERIER AUTOMATISK
+Find aktive serier på tværs af 9 Apple Health-målinger uden nogen logning: Skridt, Træningsminutter, Stå-timer, Aktiv energi, Træninger, Mindfulness, Søvn, Distance og Etager gået. Afslør skjulte serier, du aldrig havde tænkt på at spore.
 
-VIGTIGE FUNKTIONER:
+BRYD ALDRIG KÆDEN
+Sæt dit vigtigste mål i centrum med Hero-serien, se din række vokse på et kalender-heatmap, og optjen badges, efterhånden som din stabilitet bygger sig op. Få et blidt skub kl. 19, hvis dagens serie er i risiko — vi fortæller dig det, før en serie dør.
 
-* Find automatisk din fremdrift
-Find øjeblikkeligt aktive serier på 9 vigtige Apple Health-målinger: Skridt, Træningsminutter, Stå-timer, Aktiv energi, Træninger, Mindfulness, Søvn, Distance og Etager gået.
+OVERALT HVOR DU KIGGER
+• Widgets til hjemmeskærm, låseskærm og StandBy
+• En indbygget Apple Watch-app med rige komplikationer
+• Dit serieantal, altid kun ét blik væk
 
-* Hero-serier og badges
-Sæt dit vigtigste mål i centrum med Hero-serievisningen, og saml smukt designede badges, efterhånden som dine vaner bliver stærkere.
+IKKE ENDNU EN VANE-TRACKER
+Ingen afkrydsningsfelter. Ingen manuel logning. Ingen recovery-score. Kun de serier, dit tidligere jeg allerede har optjent — afsløret, fejret og beskyttet.
 
-* Kalender-heatmaps
-Visualisér din udvikling over tid med flotte kalender-heatmaps, der gør din daglige stabilitet umiskendelig.
+BENHÅRD PRIVATLIVSBESKYTTELSE (FRA STARTEN)
+Dine helbredsdata tilhører dig:
+• Skrivebeskyttet Apple Health-adgang
+• 100 % databehandling på enheden
+• Ingen konti eller tilmeldinger
+• Ingen netværkskald, ingen sporing
+Din helbredshistorik forlader aldrig din telefon.
 
-* Ansvarlighed overalt
-Hold dine mål lige ved hånden med smukt udformede iOS-widgets til hjemmeskærm, låseskærm og StandBy-tilstand.
-
-* Klar til Apple Watch
-Se dine serier direkte fra håndleddet med en fuldt indbygget watchOS-app og rige komplikationer.
-
-* Smarte påmindelser
-Glem intet. Få et blidt, automatisk skub kl. 19, hvis din Hero-serie er i risiko for at blive brudt den dag.
-
-* Benhård privatlivsbeskyttelse
-Dine helbredsdata er dybt personlige og tilhører dig. Streak Finder er bygget med privatliv først:
-- Skrivebeskyttet Apple HealthKit-adgang
-- 100 % lokal databehandling på enheden
-- Ingen brugerkonti eller tilmeldinger
-- Ingen netværkskald
-- Ingen analytics eller sporing
-
-Bryd ikke kæden. Download Streak Finder i dag, og behold din fremdrift!
+Bryd ikke kæden. Download Fitness Streak Tracker, og behold din fremdrift!
 
 Abonnementsoplysninger
-Streak Finder Pro fås som et automatisk fornyende abonnement (månedligt 1,99 $ / årligt 14,99 $ med 7 dages gratis prøveperiode) eller som et engangskøb Lifetime (29,99 $). Betaling trækkes på dit Apple-id ved bekræftelse. Abonnementer fornyes automatisk, medmindre de opsiges mindst 24 timer før periodens udløb. Administrer eller annullér til enhver tid i Indstillinger → Apple-id → Abonnementer.
+Streaks Pro fås som et automatisk fornyende abonnement (månedligt 1,99 $ / årligt 14,99 $ med 7 dages gratis prøveperiode) eller som et engangskøb Lifetime (29,99 $). Betaling trækkes på dit Apple-id ved bekræftelse. Abonnementer fornyes automatisk, medmindre de opsiges mindst 24 timer før periodens udløb. Administrer eller annullér til enhver tid i Indstillinger → Apple-id → Abonnementer.
 
 Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
 Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

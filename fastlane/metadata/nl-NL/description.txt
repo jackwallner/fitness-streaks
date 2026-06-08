@@ -1,41 +1,33 @@
-Begin met gewoonten opbouwen zonder weer vanaf dag één te hoeven starten.
+Andere reeks-apps laten je weer bij dag één beginnen. Fitness Streak Tracker leest je Apple Health-geschiedenis en onthult de reeksen die je AL aan het opbouwen bent — 40, 120, zelfs 300 dagen lang, vandaag.
 
-Streak Finder bekijkt veilig je Apple Health‑geschiedenis om de fitnessreeksen te ontdekken die je al hebt opgebouwd, en geeft je precies het zetje dat je nodig hebt om ze levend te houden.
+Er is niets dat zo motiveert als beseffen dat je al op een winnende reeks zit. In plaats van gewoonten handmatig bij te houden, brengt Streaks automatisch het momentum naar boven dat verborgen zit in je gegevens — zodat dag één al dag 100 is.
 
-Niets werkt zo motiverend als beseffen dat je al op een winnende reeks zit. Of je nu je ringen sluit, 10.000 stappen haalt of dagelijks aan mindfulness doet, Streak Finder haalt de drempel van "opnieuw beginnen" weg door je momentum automatisch bij te houden.
+ONTDEK JE REEKSEN AUTOMATISCH
+Vind actieve reeksen in 9 Apple Health-metingen zonder iets bij te houden: stappen, minuten beweging, sta-uren, actieve energie, workouts, mindfulness, slaap, afstand en trappen. Breng verborgen reeksen naar boven die je nooit had gedacht bij te houden.
 
-BELANGRIJKSTE FUNCTIES:
+BREEK DE KETEN NOOIT
+Zet je belangrijkste doel centraal met de Hero Streak, zie je reeks groeien op een kalender-heatmap en verdien badges naarmate je consistentie toeneemt. Krijg om 19.00 uur een subtiel duwtje als de reeks van vandaag gevaar loopt — we waarschuwen je voordat een reeks sneuvelt.
 
-* Ontdek automatisch je momentum
-Vind direct actieve reeksen in 9 belangrijke Apple Health‑metingen: stappen, minuten beweging, sta-uren, actieve energie, workouts, mindfulness, slaap, afstand en trappen.
+OVERAL WAAR JE KIJKT
+• Widgets voor beginscherm, toegangsscherm en StandBy
+• Een native Apple Watch-app met rijke complicaties
+• Je reekstelling, altijd binnen handbereik
 
-* Hero Streaks & badges
-Zet je belangrijkste doel centraal met de Hero Streak‑weergave en verzamel prachtig ontworpen badges terwijl je gewoonten sterker worden.
+NIET ZOMAAR EEN GEWOONTE-TRACKER
+Geen vinkjes. Geen handmatig bijhouden. Geen herstelscore. Alleen de reeksen die je vroegere zelf al heeft verdiend — naar boven gebracht, gevierd en beschermd.
 
-* Kalender-heatmaps
-Visualiseer je vooruitgang in de tijd met schitterende kalender‑heatmaps die je dagelijkse consistentie onmiskenbaar maken.
+KEIHARD PRIVÉ (VAN NATURE)
+Je gezondheidsgegevens zijn van jou:
+• Alleen-lezen toegang tot Apple Health
+• 100% verwerking op het apparaat
+• Geen accounts of aanmeldingen
+• Nul netwerkaanroepen, nul tracking
+Je gezondheidsgeschiedenis verlaat je telefoon nooit.
 
-* Altijd verantwoordelijkheid
-Houd je doelen in één oogopslag zichtbaar met prachtig vormgegeven iOS‑widgets voor je beginscherm, toegangsscherm en StandBy‑modus.
-
-* Klaar voor Apple Watch
-Check je reeksen direct vanaf je pols met een volledig native watchOS‑app en rijke complicaties.
-
-* Slimme herinneringen
-Laat niets vallen. Krijg rond 19.00 uur een subtiele, automatische herinnering als je Hero Streak die dag dreigt te breken.
-
-* Sterke privacy (standaard)
-Je gezondheidsgegevens zijn persoonlijk en horen bij jou. Streak Finder is gebouwd met privacy als basis:
-- Alleen-lezen Apple HealthKit‑toegang
-- 100% on‑device, lokale verwerking
-- Geen gebruikersaccounts of aanmeldingen nodig
-- Geen netwerkaanroepen
-- Geen analytics of tracking
-
-Breek de keten niet. Download Streak Finder vandaag nog en houd je momentum vast!
+Breek de keten niet. Download Fitness Streak Tracker en houd je momentum vast!
 
 Abonnementsinformatie
-Streak Finder Pro is beschikbaar als automatisch verlengend abonnement (maandelijks $1,99 / jaarlijks $14,99 met een gratis proefperiode van 7 dagen) of als eenmalige Lifetime‑aankoop ($29,99). Betaling wordt in rekening gebracht op je Apple ID bij bevestiging. Abonnementen worden automatisch verlengd, tenzij je ze minimaal 24 uur vóór het einde van de periode opzegt. Beheer of annuleer je abonnement op elk moment via Instellingen → Apple ID → Abonnementen.
+Streaks Pro is beschikbaar als automatisch verlengend abonnement (maandelijks $1,99 / jaarlijks $14,99 met een gratis proefperiode van 7 dagen) of als eenmalige Lifetime-aankoop ($29,99). Betaling wordt in rekening gebracht op je Apple ID bij bevestiging. Abonnementen worden automatisch verlengd, tenzij je ze minimaal 24 uur vóór het einde van de periode opzegt. Beheer of annuleer je abonnement op elk moment via Instellingen → Apple ID → Abonnementen.
 
 Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
 Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

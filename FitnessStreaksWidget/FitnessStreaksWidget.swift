@@ -414,7 +414,7 @@ struct FitnessStreaksWidget: Widget {
         StaticConfiguration(kind: kind, provider: StreakTimelineProvider()) { entry in
             StreakWidgetView(entry: entry)
         }
-        .configurationDisplayName("Streak Finder")
+        .configurationDisplayName("Streaks")
         .description("Your hottest streak, at a glance.")
         .supportedFamilies([
             .systemSmall,

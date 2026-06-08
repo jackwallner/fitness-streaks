@@ -1,41 +1,33 @@
-Start building habits without starting from day one.
+دوسری اسٹریک ایپس آپ کو پہلے دن سے دوبارہ شروع کرنے پر مجبور کرتی ہیں۔ Fitness Streak Tracker آپ کی Apple Health کی تاریخ پڑھتی ہے اور وہ اسٹریکس ظاہر کرتی ہے جو آپ پہلے ہی بنا چکے ہیں — 40، 120، حتیٰ کہ 300 دن لمبی، آج۔
 
-Streak Finder securely reviews your Apple Health history to uncover the fitness streaks you’ve already built, and gives you the exact nudge you need to keep them alive.
+اس سے بڑی کوئی ترغیب نہیں کہ آپ کو احساس ہو کہ آپ پہلے ہی ایک کامیاب اسٹریک پر ہیں۔ عادات کو ہاتھ سے درج کرنے کے بجائے، Streaks خود بخود آپ کے ڈیٹا میں چھپی رفتار کو سامنے لے آتی ہے — تاکہ پہلا دن پہلے ہی سواں دن ہو۔
 
-There is nothing more motivating than realizing you're already on a winning streak. Whether you’re closing your rings, hitting 10,000 steps, or prioritizing daily mindfulness, Streak Finder removes the friction of "starting over" by automatically tracking your momentum.
+اپنی اسٹریکس خود بخود دریافت کریں
+بغیر کسی اندراج کے 9 Apple Health میٹرکس میں فعال اسٹریکس تلاش کریں: قدم، ورزش کے منٹ، کھڑے رہنے کے گھنٹے، ایکٹو انرجی، ورک آؤٹس، ذہنی سکون، نیند، فاصلہ، اور چڑھی ہوئی منزلیں۔ وہ چھپی ہوئی اسٹریکس سامنے لائیں جنہیں ٹریک کرنے کا آپ نے کبھی سوچا بھی نہ تھا۔
 
-KEY FEATURES:
+سلسلہ کبھی نہ ٹوٹنے دیں
+Hero Streak کے ساتھ اپنا سب سے اہم ہدف نمایاں کریں، کیلنڈر ہیٹ میپ پر اپنے سلسلے کو بڑھتے دیکھیں، اور جیسے جیسے آپ کی استقامت بڑھے ویسے ویسے بیجز کمائیں۔ اگر آج کی اسٹریک خطرے میں ہو تو شام 7 بجے ایک ہلکی سی یاد دہانی پائیں — ہم آپ کو اسٹریک ختم ہونے سے پہلے بتا دیتے ہیں۔
 
-* Auto-Discover Your Momentum
-Instantly find active streaks across 9 key Apple Health metrics: Steps, Exercise Minutes, Stand Hours, Active Energy, Workouts, Mindfulness, Sleep, Distance, and Flights Climbed.
+جہاں بھی نظر ڈالیں
+• ہوم اسکرین، لاک اسکرین اور StandBy وجٹس
+• بھرپور کمپلیکیشنز کے ساتھ ایک مقامی Apple Watch ایپ
+• آپ کی اسٹریک کا شمار، ہمیشہ ایک نظر کی دوری پر
 
-* Hero Streaks & Badges
-Put your most important goal front and center with the Hero Streak view, and collect beautifully designed badges as your habits grow stronger.
+یہ کوئی عام عادت ٹریکر نہیں
+کوئی چیک باکس نہیں۔ کوئی دستی اندراج نہیں۔ کوئی ریکوری اسکور نہیں۔ صرف وہ اسٹریکس جو آپ کے ماضی نے پہلے ہی کما رکھی ہیں — سامنے لائی گئیں، منائی گئیں، اور محفوظ رکھی گئیں۔
 
-* Calendar Heatmaps
-Visualize your progress over time with stunning calendar heatmaps that make your daily consistency undeniable.
+سختی سے نجی (بنیادی ڈیزائن کے طور پر)
+آپ کا صحت کا ڈیٹا آپ کا اپنا ہے:
+• صرف پڑھنے کی Apple Health رسائی
+• 100% آلے پر ہی پروسیسنگ
+• کوئی اکاؤنٹ یا سائن اپ نہیں
+• کوئی نیٹ ورک کال نہیں، کوئی ٹریکنگ نہیں
+آپ کی صحت کی تاریخ کبھی آپ کے فون سے باہر نہیں جاتی۔
 
-* Accountability Everywhere
-Keep your goals at a glance with beautifully crafted iOS widgets for your Home Screen, Lock Screen, and StandBy mode.
+سلسلہ نہ توڑیں۔ Fitness Streak Tracker ڈاؤن لوڈ کریں اور اپنی رفتار قائم رکھیں!
 
-* Apple Watch Ready
-Check your streaks right from your wrist with a fully native watchOS app and rich complications.
-
-* Smart Reminders
-Never drop the ball. Get a gentle, automatic nudge at 7 PM if your Hero Streak is at risk of breaking that day.
-
-* Fiercely Private (By Design)
-Your health data is deeply personal, and it belongs to you. Streak Finder was built with a privacy-first foundation:
-- Read-only Apple HealthKit access
-- 100% on-device, local processing
-- No user accounts or sign-ups required
-- Zero network calls
-- Zero analytics or tracking
-
-Don't break the chain. Download Streak Finder today and keep your momentum going!
-
-Subscription Details
-Streak Finder Pro is available as an auto-renewing subscription (Monthly $1.99 / Yearly $14.99 with a 7-day free trial) or a one-time Lifetime purchase ($29.99). Payment is charged to your Apple ID at confirmation. Subscriptions auto-renew unless canceled at least 24 hours before the end of the period. Manage or cancel anytime in Settings → Apple ID → Subscriptions.
+سبسکرپشن کی تفصیلات
+Streaks Pro ایک خودکار تجدید ہونے والی سبسکرپشن (ماہانہ $1.99 / سالانہ $14.99 کے ساتھ 7 دن کی مفت آزمائش) یا ایک بار کی Lifetime خریداری ($29.99) کے طور پر دستیاب ہے۔ ادائیگی تصدیق کے وقت آپ کے Apple ID پر وصول کی جاتی ہے۔ سبسکرپشنز خودکار طور پر تجدید ہو جاتی ہیں جب تک کہ مدت ختم ہونے سے کم از کم 24 گھنٹے پہلے منسوخ نہ کر دی جائیں۔ کسی بھی وقت Settings → Apple ID → Subscriptions میں ان کا انتظام کریں یا منسوخ کریں۔
 
 Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
 Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

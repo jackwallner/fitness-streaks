@@ -1,41 +1,33 @@
-Ala rakentaa tapoja ilman, että tunnet aloittavasi alusta.
+Muut sarjasovellukset pakottavat sinut aloittamaan alusta päivästä yksi. Fitness Streak Tracker lukee Apple Health -historiaasi ja paljastaa sarjat, joita olet JO rakentanut — 40, 120, jopa 300 päivän pituisia, jo tänään.
 
-Streak Finder tarkastelee turvallisesti Apple Health -historiaasi ja paljastaa liikuntasarjat, jotka olet jo rakentanut, sekä antaa juuri oikean tuuppauksen, jotta pidät ne elossa.
+Mikään ei motivoi enemmän kuin oivallus, että olet jo voittoputkessa. Sen sijaan että kirjaisit tapoja käsin, Streaks tuo automaattisesti esiin datassasi piilevän vauhdin — niin että päivä yksi on jo päivä 100.
 
-Mikään ei motivoi yhtä paljon kuin oivallus, että olet jo voittoputkessa. Suljetpa renkaita, saavutat 10 000 askelta tai panostat päivittäiseen tietoiseen läsnäoloon, Streak Finder poistaa "alusta aloittamisen" kitkan seuraamalla vauhtiasi automaattisesti.
+LÖYDÄ SARJASI AUTOMAATTISESTI
+Löydä aktiiviset sarjat 9 Apple Health -mittarista ilman lainkaan kirjaamista: askeleet, liikuntaminuutit, seisontatunnit, aktiivinen energia, treenit, tietoinen läsnäolo, uni, etäisyys ja kiivetyt kerrokset. Tuo esiin piilossa olevat sarjat, joita et tullut koskaan ajatelleeksi seurata.
 
-TÄRKEIMMÄT OMINAISUUDET:
+ÄLÄ KOSKAAN KATKAISE KETJUA
+Nosta tärkein tavoitteesi keskiöön Hero Streak -näkymässä, seuraa putkesi kasvua kalenterilämpökartalla ja ansaitse merkkejä johdonmukaisuutesi vahvistuessa. Saat lempeän tuuppauksen klo 19, jos tämän päivän sarja on vaarassa — kerromme sinulle ennen kuin sarja katkeaa.
 
-* Löydä vauhtisi automaattisesti
-Löydä heti aktiiviset sarjat 9 keskeisessä Apple Health -mittarissa: Steps, Exercise Minutes, Stand Hours, Active Energy, Workouts, Mindfulness, Sleep, Distance ja Flights Climbed.
+KAIKKIALLA MINNE KATSOTKIN
+• Koti-valikon, lukitusnäytön ja StandBy-tilan widgetit
+• Natiivi Apple Watch -sovellus rikkailla komplikaatioilla
+• Sarjojesi lukumäärä, aina yhden vilkaisun päässä
 
-* Sankarisarjat ja merkit
-Nosta tärkein tavoitteesi keskiöön Hero Streak -näkymässä ja kerää tyylikkäästi suunniteltuja merkkejä tapojesi vahvistuessa.
+EI TAAS YKSI TAPASEURANTA
+Ei valintaruutuja. Ei käsin kirjaamista. Ei palautumispisteitä. Vain sarjat, jotka menneisyytesi minä on jo ansainnut — esiin tuotuina, juhlittuina ja suojattuina.
 
-* Kalenterilämpökartat
-Havainnollista edistymistäsi ajan mittaan näyttävillä kalenterilämpökartoilla, jotka tekevät päivittäisestä johdonmukaisuudestasi kiistattoman.
+RAIVOKKAASTI YKSITYINEN (TARKKAAN SUUNNITELTU)
+Terveystietosi kuuluvat sinulle:
+• Vain luku -oikeus Apple Health -tietoihin
+• 100 % laitteella tapahtuva käsittely
+• Ei käyttäjätilejä tai rekisteröitymistä
+• Ei verkkokutsuja, ei seurantaa
+Terveyshistoriasi ei koskaan poistu puhelimestasi.
 
-* Vastuu joka paikassa
-Pidä tavoitteet aina näkösällä kauniisti viimeistellyillä iOS-widgeteillä Koti-valikkoon, lukitusnäyttöön ja StandBy-tilaan.
-
-* Valmis Apple Watchille
-Tarkista sarjasi suoraan ranteestasi täysin natiivilla watchOS-sovelluksella ja rikkailla komplikaatioilla.
-
-* Älykkäät muistutukset
-Älä pudota palloa. Saat lempeän, automaattisen muistutuksen klo 19, jos Hero Streak on vaarassa katketa sinä päivänä.
-
-* Raivokkaasti yksityinen (tarkkaan suunniteltu)
-Terveystietosi ovat hyvin henkilökohtaisia ja kuuluvat sinulle. Streak Finder on rakennettu yksityisyys edellä:
-- Vain luku -oikeus Apple HealthKit -tietoihin
-- 100 % laitteella tapahtuva, paikallinen käsittely
-- Ei käyttäjätilejä tai rekisteröitymistä
-- Ei verkkokutsuja
-- Ei analytiikkaa tai seurantaa
-
-Älä katkaise ketjua. Lataa Streak Finder jo tänään ja jatka vauhtia!
+Älä katkaise ketjua. Lataa Fitness Streak Tracker ja jatka vauhtiasi!
 
 Tilauksen tiedot
-Streak Finder Pro on saatavilla automaattisesti uusiutuvana tilauksena (kuukausi 1,99 $ / vuosi 14,99 $ ja 7 päivän ilmainen kokeilu) tai kertaluonteisena Lifetime-ostona (29,99 $). Maksu veloitetaan Apple ID -tililtäsi vahvistuksen yhteydessä. Tilaukset uusiutuvat automaattisesti, ellei niitä peruta vähintään 24 tuntia ennen jakson päättymistä. Voit hallita tilausta tai perua sen milloin tahansa: Asetukset → Apple ID → Tilaukset.
+Streaks Pro on saatavilla automaattisesti uusiutuvana tilauksena (kuukausi $1.99 / vuosi $14.99 ja 7 päivän ilmainen kokeilu) tai kertaluonteisena Lifetime-ostona ($29.99). Maksu veloitetaan Apple ID -tililtäsi vahvistuksen yhteydessä. Tilaukset uusiutuvat automaattisesti, ellei niitä peruta vähintään 24 tuntia ennen jakson päättymistä. Voit hallita tilausta tai perua sen milloin tahansa: Asetukset → Apple ID → Tilaukset.
 
 Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
 Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
