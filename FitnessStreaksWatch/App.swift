@@ -160,7 +160,7 @@ struct WatchOnboardingView: View {
                 Image(systemName: "flame.fill")
                     .font(.system(size: 40))
                     .foregroundStyle(Theme.streakHot)
-                Text("Streak Finder")
+                Text("Streaks")
                     .font(.system(size: 16, weight: .bold, design: .rounded))
                 Text("Open the iPhone app to set up your streaks. They'll sync to your watch automatically.")
                     .font(.system(size: 12, weight: .medium, design: .rounded))

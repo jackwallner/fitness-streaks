@@ -1,41 +1,33 @@
-Comença a crear hàbits sense tornar a començar des del dia u.
+Altres apps de ratxes t’obliguen a tornar a començar des del dia u. Fitness Streak Tracker llegeix el teu historial d’Apple Health i revela les ratxes que JA estaves creant: de 40, 120 o fins i tot 300 dies, avui mateix.
 
-Streak Finder revisa de manera segura l’historial de Salut d’Apple per descobrir les ratxes de forma física que ja has creat i et dona l’empenta exacta que necessites per mantenir-les vives.
+No hi ha res més motivador que adonar-se que ja estàs en una bona ratxa. En lloc de registrar hàbits a mà, Streaks treu automàticament a la llum l’impuls amagat a les teves dades, de manera que el dia u ja és el dia 100.
 
-No hi ha res més motivador que adonar-se que ja estàs en una bona ratxa. Tant si tanques els anells, arribes als 10.000 passos o dones prioritat a l’atenció plena diària, Streak Finder elimina la fricció de «tornar a començar» fent un seguiment automàtic del teu impuls.
+DESCOBREIX AUTOMÀTICAMENT LES TEVES RATXES
+Troba ratxes actives en 9 mètriques d’Apple Health sense registrar res: passos, minuts d’exercici, hores dret, energia activa, entrenaments, atenció plena, son, distància i pisos pujats. Treu a la llum ratxes amagades que mai no havies pensat a seguir.
 
-FUNCIONS PRINCIPALS:
+NO TRENQUIS MAI LA CADENA
+Posa el teu objectiu més important al centre amb la Hero Streak, mira créixer la teva ratxa en un mapa de calor de calendari i aconsegueix insígnies a mesura que augmenta la teva constància. Rep una empenta suau a les 19:00 si la ratxa d’avui corre el risc de trencar-se: t’avisem abans que una ratxa mori.
 
-* Descobreix automàticament el teu impuls
-Troba a l’instant ratxes actives en 9 mètriques clau de Salut d’Apple: passos, minuts d’exercici, hores dret, energia activa, entrenaments, atenció plena, son, distància i pisos pujats.
+ARREU ON MIRIS
+• Widgets per a la pantalla d’inici, la pantalla de bloqueig i el mode StandBy
+• Una app nativa per a Apple Watch amb complicacions riques en informació
+• El recompte de la teva ratxa, sempre a un cop d’ull
 
-* Ratxes principals i insígnies
-Col·loca el teu objectiu més important al centre amb la vista Hero Streak i aconsegueix insígnies dissenyades amb cura a mesura que els teus hàbits es fan més forts.
+NO ÉS UN ALTRE SEGUIDOR D’HÀBITS
+Sense caselles de verificació. Sense registre manual. Sense puntuació de recuperació. Només les ratxes que el teu jo del passat ja s’ha guanyat: tretes a la llum, celebrades i protegides.
 
-* Mapes de calor de calendari
-Visualitza el teu progrés amb mapes de calor en format calendari que fan innegable la teva constància diària.
+FEROTGEMENT PRIVAT (PER DISSENY)
+Les teves dades de salut et pertanyen:
+• Accés només de lectura a Apple Health
+• 100 % de processament al dispositiu
+• Sense comptes ni registres
+• Zero trucades de xarxa, zero seguiment
+El teu historial de salut no surt mai del teu telèfon.
 
-* Responsabilitat a tot arreu
-Tingues sempre presents els teus objectius amb widgets d’iOS acuradament dissenyats per a la pantalla d’inici, la pantalla de bloqueig i el mode StandBy.
-
-* Preparat per a Apple Watch
-Consulta les teves ratxes directament al canell amb una app watchOS totalment nativa i complicacions riques en informació.
-
-* Recordatoris intel·ligents
-No deixis caure la pilota. Rep una empenta automàtica i suau a les 19:00 si la teva Hero Streak corre el risc de trencar-se aquell dia.
-
-* Privadesa ferma (per disseny)
-Les teves dades de salut són profundament personals i et pertanyen. Streak Finder s’ha creat amb una base centrada en la privadesa:
-- Accés només de lectura a Apple HealthKit
-- 100 % de processament local al dispositiu
-- Sense comptes d’usuari ni registres
-- Zero trucades de xarxa
-- Zero analítiques o seguiment
-
-No trenquis la cadena. Descarrega Streak Finder avui mateix i mantén el teu impuls!
+No trenquis la cadena. Descarrega Fitness Streak Tracker i mantén viu el teu impuls!
 
 Detalls de la subscripció
-Streak Finder Pro està disponible com a subscripció de renovació automàtica (mensual 1,99 $ / anual 14,99 $ amb prova gratuïta de 7 dies) o com a compra única de per vida (29,99 $). El pagament es carregarà al teu ID d’Apple en confirmar-ho. Les subscripcions es renoven automàticament tret que es cancel·lin com a mínim 24 hores abans que acabi el període. Pots gestionar o cancel·lar la subscripció en qualsevol moment a Configuració → ID d’Apple → Subscripcions.
+Streaks Pro està disponible com a subscripció de renovació automàtica (mensual 1,99 $ / anual 14,99 $ amb prova gratuïta de 7 dies) o com a compra única de per vida (29,99 $). El pagament es carregarà al teu ID d’Apple en confirmar-ho. Les subscripcions es renoven automàticament tret que es cancel·lin com a mínim 24 hores abans que acabi el període. Pots gestionar o cancel·lar la subscripció en qualsevol moment a Configuració → ID d’Apple → Subscripcions.
 
 Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
 Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

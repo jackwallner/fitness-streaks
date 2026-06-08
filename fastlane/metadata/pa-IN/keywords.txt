@@ -1,1 +1,1 @@
-steps,workout,widget,activity,motivate,consistent,progress,trend,watch,health,energy,change,calorie
+ਰਿੰਗ,ਸਟੈਂਡ,ਹੀਟਮੈਪ,ਧਿਆਨ,ਨੀਂਦ,ਕਸਰਤ,ਗਤੀਵਿਧੀ,ਵਰਕਆਊਟ,ਕਦਮ,ਟੀਚਾ,ਆਦਤ,ਕੈਲੰਡਰ,ਊਰਜਾ,ਇਤਿਹਾਸ,ਵਿਜੇਟ,ਵਾਚ

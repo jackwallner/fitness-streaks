@@ -1,41 +1,33 @@
-Comece a criar hábitos sem voltar ao dia zero.
+Outras apps de sequências obrigam-no a recomeçar no dia um. O Fitness Streak Tracker lê o seu histórico da Apple Health e revela as sequências que JÁ tem vindo a construir — de 40, 120, até 300 dias, hoje mesmo.
 
-Streak Finder analisa com segurança o histórico da sua Apple Health para revelar as sequências de exercício que já construiu e dá-lhe o impulso certo para as manter vivas.
+Não há nada mais motivador do que perceber que já está numa sequência vencedora. Em vez de registar hábitos à mão, o Streaks revela automaticamente o ritmo escondido nos seus dados — por isso o dia um já é o dia 100.
 
-Nada é mais motivador do que perceber que já está numa sequência vencedora. Quer esteja a fechar os anéis, a atingir 10 000 passos ou a priorizar momentos diários de atenção plena, o Streak Finder elimina a fricção de “recomeçar” ao acompanhar automaticamente o seu progresso.
+DESCUBRA AS SUAS SEQUÊNCIAS AUTOMATICAMENTE
+Encontre sequências ativas em 9 métricas da Apple Health sem qualquer registo: passos, minutos de exercício, horas em pé, energia ativa, treinos, atenção plena, sono, distância e pisos subidos. Revele sequências escondidas que nunca pensou em acompanhar.
 
-FUNCIONALIDADES PRINCIPAIS:
+NUNCA QUEBRE A CADEIA
+Coloque o seu objetivo mais importante em destaque com a Hero Streak, veja a sua série crescer num mapa de calor no calendário e ganhe emblemas à medida que a sua consistência aumenta. Receba um lembrete discreto às 19h se a sequência de hoje estiver em risco — avisamo-lo antes de uma sequência morrer.
 
-* Descubra automaticamente o seu ritmo
-Encontre de imediato sequências ativas em 9 métricas essenciais da Apple Health: passos, minutos de exercício, horas em pé, energia ativa, treinos, atenção plena, sono, distância e pisos subidos.
+EM TODO O LADO ONDE OLHA
+• Widgets para o ecrã principal, ecrã bloqueado e StandBy
+• Uma app nativa para Apple Watch com complicações ricas
+• A contagem da sua sequência, sempre a um relance
 
-* Sequências Hero & emblemas
-Coloque o objetivo mais importante em destaque com a vista Hero Streak e colecione emblemas lindamente desenhados à medida que os seus hábitos se tornam mais fortes.
+NÃO É MAIS UM REGISTADOR DE HÁBITOS
+Sem caixas de verificação. Sem registos manuais. Sem pontuação de recuperação. Apenas as sequências que o seu eu do passado já conquistou — reveladas, celebradas e protegidas.
 
-* Mapa de calor no calendário
-Visualize o seu progresso ao longo do tempo com mapas de calor em calendário que tornam a sua consistência diária inegável.
+FEROZMENTE PRIVADO (POR DESIGN)
+Os seus dados de saúde pertencem-lhe:
+• Acesso só de leitura à Apple Health
+• 100% de processamento no dispositivo
+• Sem contas ou registos
+• Zero chamadas de rede, zero rastreamento
+O seu histórico de saúde nunca sai do seu telemóvel.
 
-* Responsabilidade em todo o lado
-Mantenha os seus objetivos sempre visíveis com widgets iOS cuidadosamente concebidos para o ecrã principal, ecrã bloqueado e modo StandBy.
-
-* Preparado para Apple Watch
-Veja as suas sequências diretamente no pulso com uma app watchOS totalmente nativa e complicações ricas.
-
-* Lembretes inteligentes
-Não perca o ritmo. Receba um lembrete automático e discreto às 19h se a sua Hero Streak estiver em risco de ser interrompida nesse dia.
-
-* Privacidade rigorosa (por design)
-Os seus dados de saúde são profundamente pessoais e pertencem-lhe. O Streak Finder foi criado com uma base centrada na privacidade:
-- Acesso Apple HealthKit só de leitura
-- 100% processamento local, no dispositivo
-- Sem contas de utilizador ou registos
-- Zero chamadas de rede
-- Zero análises ou rastreamento
-
-Não quebre a cadeia. Transfira o Streak Finder hoje e mantenha o seu ritmo em movimento!
+Não quebre a cadeia. Transfira o Fitness Streak Tracker e mantenha o seu ritmo em movimento!
 
 Detalhes da subscrição
-Streak Finder Pro está disponível como subscrição com renovação automática (mensal 1,99 $ / anual 14,99 $ com período experimental de 7 dias) ou compra vitalícia única (29,99 $). O pagamento é debitado no seu ID Apple na confirmação. As subscrições renovam automaticamente, salvo cancelamento pelo menos 24 horas antes do fim do período. Pode gerir ou cancelar em Definições → ID Apple → Subscrições.
+O Streaks Pro está disponível como subscrição com renovação automática (Mensal $1.99 / Anual $14.99 com período experimental gratuito de 7 dias) ou como compra vitalícia única ($29.99). O pagamento é debitado no seu Apple ID na confirmação. As subscrições renovam-se automaticamente, salvo cancelamento pelo menos 24 horas antes do fim do período. Faça a gestão ou cancele a qualquer momento em Definições → Apple ID → Subscrições.
 
 Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
 Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

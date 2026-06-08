@@ -1,41 +1,33 @@
-Start building habits without starting from day one.
+மற்ற ஸ்ட்ரீக் செயலிகள் உங்களை முதல் நாளிலிருந்து மீண்டும் தொடங்க வைக்கின்றன. ஃபிட்னஸ் ஸ்ட்ரீக் டிராக்கர் உங்கள் Apple Health வரலாற்றைப் படித்து, நீங்கள் ஏற்கனவே உருவாக்கி வைத்துள்ள ஸ்ட்ரீக்குகளை — இன்றே 40, 120, ஏன் 300 நாட்கள் வரை நீளமானவற்றை — வெளிக்கொணர்கிறது.
 
-Streak Finder securely reviews your Apple Health history to uncover the fitness streaks you’ve already built, and gives you the exact nudge you need to keep them alive.
+நீங்கள் ஏற்கனவே ஒரு வெற்றிகரமான ஸ்ட்ரீக்கில் இருக்கிறீர்கள் என்பதை உணர்வதைவிட ஊக்கமளிக்கும் வேறு எதுவும் இல்லை. பழக்கங்களைக் கையால் பதிவு செய்வதற்குப் பதிலாக, இந்தச் செயலி உங்கள் தரவில் மறைந்துள்ள வேகத்தைத் தானாகவே வெளிக்கொணர்கிறது — எனவே முதல் நாளே ஏற்கனவே நூறாவது நாளாகிறது.
 
-There is nothing more motivating than realizing you're already on a winning streak. Whether you’re closing your rings, hitting 10,000 steps, or prioritizing daily mindfulness, Streak Finder removes the friction of "starting over" by automatically tracking your momentum.
+உங்கள் ஸ்ட்ரீக்குகளைத் தானாகக் கண்டறியுங்கள்
+எந்தப் பதிவும் இல்லாமல் 9 Apple Health அளவீடுகளில் செயலில் உள்ள ஸ்ட்ரீக்குகளைக் கண்டறியுங்கள்: அடிகள், உடற்பயிற்சி நிமிடங்கள், நிற்கும் மணிநேரங்கள், செயல்மிகு ஆற்றல், உடற்பயிற்சிகள், நிதானம் (மைண்ட்ஃபுல்னெஸ்), தூக்கம், தூரம், மற்றும் ஏறிய படிக்கட்டுகள். நீங்கள் கண்காணிக்க நினைத்தே இராத மறைந்த ஸ்ட்ரீக்குகளை வெளிக்கொணருங்கள்.
 
-KEY FEATURES:
+சங்கிலியை ஒருபோதும் உடைக்காதீர்கள்
+Hero Streak மூலம் உங்கள் மிக முக்கியமான இலக்கை முன்னணியில் வைத்திருங்கள், காலண்டர் ஹீட்மேப்பில் உங்கள் வரிசை வளர்வதைப் பாருங்கள், உங்கள் நிலைத்தன்மை உருவாகும்போது பேட்ஜ்களைப் பெறுங்கள். இன்றைய ஸ்ட்ரீக் ஆபத்தில் இருந்தால் மாலை 7 மணிக்கு ஒரு மென்மையான நினைவூட்டலைப் பெறுங்கள் — ஒரு ஸ்ட்ரீக் மடியும் முன்பே நாங்கள் உங்களிடம் சொல்கிறோம்.
 
-* Auto-Discover Your Momentum
-Instantly find active streaks across 9 key Apple Health metrics: Steps, Exercise Minutes, Stand Hours, Active Energy, Workouts, Mindfulness, Sleep, Distance, and Flights Climbed.
+நீங்கள் எங்கு பார்த்தாலும்
+• முகப்புத் திரை, பூட்டுத் திரை மற்றும் StandBy விட்ஜெட்டுகள்
+• வளமான காம்ப்ளிகேஷன்களுடன் கூடிய ஒரு சொந்த Apple Watch செயலி
+• உங்கள் ஸ்ட்ரீக் எண்ணிக்கை, எப்போதும் ஒரே பார்வையில்
 
-* Hero Streaks & Badges
-Put your most important goal front and center with the Hero Streak view, and collect beautifully designed badges as your habits grow stronger.
+இது இன்னொரு பழக்கக் கண்காணிப்பான் அல்ல
+செக்-பாக்ஸ்கள் இல்லை. கையேடு பதிவு இல்லை. மீட்சி மதிப்பெண் இல்லை. உங்கள் கடந்தகால சுயம் ஏற்கனவே சம்பாதித்த ஸ்ட்ரீக்குகள் மட்டுமே — வெளிக்கொணரப்பட்டு, கொண்டாடப்பட்டு, பாதுகாக்கப்படுகின்றன.
 
-* Calendar Heatmaps
-Visualize your progress over time with stunning calendar heatmaps that make your daily consistency undeniable.
+வடிவமைப்பாலேயே கடுமையான தனியுரிமை
+உங்கள் உடல்நல தரவு உங்களுக்கே சொந்தம்:
+• படிக்க-மட்டுமே Apple Health அணுகல்
+• 100% சாதனத்திலேயே செயலாக்கம்
+• கணக்குகள் அல்லது பதிவுகள் இல்லை
+• பூஜ்ஜிய நெட்வொர்க் அழைப்புகள், பூஜ்ஜிய கண்காணிப்பு
+உங்கள் உடல்நல வரலாறு உங்கள் தொலைபேசியை விட்டு வெளியேறுவதே இல்லை.
 
-* Accountability Everywhere
-Keep your goals at a glance with beautifully crafted iOS widgets for your Home Screen, Lock Screen, and StandBy mode.
+சங்கிலியை உடைக்காதீர்கள். ஃபிட்னஸ் ஸ்ட்ரீக் டிராக்கரைப் பதிவிறக்கி, உங்கள் வேகத்தைத் தொடர்ந்து வைத்திருங்கள்!
 
-* Apple Watch Ready
-Check your streaks right from your wrist with a fully native watchOS app and rich complications.
-
-* Smart Reminders
-Never drop the ball. Get a gentle, automatic nudge at 7 PM if your Hero Streak is at risk of breaking that day.
-
-* Fiercely Private (By Design)
-Your health data is deeply personal, and it belongs to you. Streak Finder was built with a privacy-first foundation:
-- Read-only Apple HealthKit access
-- 100% on-device, local processing
-- No user accounts or sign-ups required
-- Zero network calls
-- Zero analytics or tracking
-
-Don't break the chain. Download Streak Finder today and keep your momentum going!
-
-Subscription Details
-Streak Finder Pro is available as an auto-renewing subscription (Monthly $1.99 / Yearly $14.99 with a 7-day free trial) or a one-time Lifetime purchase ($29.99). Payment is charged to your Apple ID at confirmation. Subscriptions auto-renew unless canceled at least 24 hours before the end of the period. Manage or cancel anytime in Settings → Apple ID → Subscriptions.
+சந்தா விவரங்கள்
+Streaks Pro ஒரு தானாகப் புதுப்பிக்கும் சந்தாவாக (மாதம் $1.99 / ஆண்டு $14.99, 7-நாள் இலவச சோதனையுடன்) அல்லது ஒரு முறை செலுத்தும் Lifetime கொள்முதலாக ($29.99) கிடைக்கிறது. உறுதிப்படுத்தும்போது உங்கள் Apple ID-க்குக் கட்டணம் விதிக்கப்படும். காலம் முடிவதற்கு குறைந்தது 24 மணிநேரத்திற்கு முன்பு ரத்து செய்யாவிட்டால் சந்தாக்கள் தானாகவே புதுப்பிக்கப்படும். Settings → Apple ID → Subscriptions இல் எந்த நேரத்திலும் நிர்வகிக்கலாம் அல்லது ரத்து செய்யலாம்.
 
 Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
 Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

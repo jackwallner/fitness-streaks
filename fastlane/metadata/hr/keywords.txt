@@ -1,1 +1,1 @@
-motivacija,navika,prstenovi,healthkit,sat,pokret,koraci,trening,mindfulness,spavanje,stajanje,lanac
+prsten,stajanje,toplinska,svjesnost,spavanje,vjezba,aktivnost,trening,korak,cilj,navika,kalendar,sat

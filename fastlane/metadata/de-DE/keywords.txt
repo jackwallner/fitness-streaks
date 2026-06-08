@@ -1,1 +1,1 @@
-motivation,ringe,healthkit,uhr,bewegung,schritte,training,achtsamkeit,schlaf,stehen,kette,heatmap
+ring,heatmap,achtsamkeit,schlaf,training,workout,schritt,ziel,gewohnheit,kalender,energie,widget,uhr

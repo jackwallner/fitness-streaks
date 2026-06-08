@@ -829,10 +829,10 @@ struct OnboardingView: View {
                 authProgress = max(authProgress, 0.45)
             }
         } catch is HealthKitError {
-            errorText = "Couldn't request Health access from iOS. Open the Health app or Settings and enable access for Streak Finder."
+            errorText = "Couldn't request Health access from iOS. Open the Health app or Settings and enable access for Streaks."
             return
         } catch {
-            errorText = "Couldn't connect to Apple Health. Open the Health app and enable access for Streak Finder."
+            errorText = "Couldn't connect to Apple Health. Open the Health app and enable access for Streaks."
             return
         }
 
@@ -842,7 +842,7 @@ struct OnboardingView: View {
         // them to Settings rather than parking on a data-less dashboard.
         let postStatus = await healthKit.authorizationRequestStatus()
         if postStatus == .shouldRequest {
-            errorText = "Health access needed. Open the Health app or Settings to enable Streak Finder's access to Apple Health."
+            errorText = "Health access needed. Open the Health app or Settings to enable Streaks's access to Apple Health."
         }
     }
 

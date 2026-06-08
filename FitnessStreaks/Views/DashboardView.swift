@@ -645,10 +645,10 @@ struct DashboardView: View {
             await store.load()
         } catch is HealthKitError {
             log.error("Manual health access request failed with HealthKitError")
-            healthAccessErrorText = "Could not request Health access from iOS. If the prompt does not appear, open Health or Settings and enable access for Streak Finder."
+            healthAccessErrorText = "Could not request Health access from iOS. If the prompt does not appear, open Health or Settings and enable access for Streaks."
         } catch {
             log.error("Manual health access request failed: \(String(describing: error))")
-            healthAccessErrorText = "Could not request Health access from iOS. Open Settings and enable Health access for Streak Finder."
+            healthAccessErrorText = "Could not request Health access from iOS. Open Settings and enable Health access for Streaks."
         }
     }
 }

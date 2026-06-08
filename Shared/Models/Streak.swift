@@ -2,7 +2,7 @@ import Foundation
 
 /// A single-hour slice of the day (e.g. 17 → "5–6pm").
 /// When present on a Streak, we're tracking activity WITHIN that hour every day,
-/// not the whole-day total. This is how Streak Finder surfaces hidden rhythms.
+/// not the whole-day total. This is how Streaks surfaces hidden rhythms.
 struct HourWindow: Hashable, Sendable, Codable {
     let startHour: Int   // 0...23
 

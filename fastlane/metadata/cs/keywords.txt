@@ -1,1 +1,1 @@
-motivace,návyk,kruhy,healthkit,hodinky,pohyb,kroky,trénink,mindfulness,spánek,stát,řetěz,heatmap
+kruh,heatmapa,mindfulness,spánek,cvičení,aktivita,trénink,krok,cíl,návyk,kalendář,widget,hodinky

@@ -1,1 +1,5 @@
-Säästä sarjasi: voit nyt tallentaa sarjan ja jatkaa tärkeän vauhtisi ylläpitämistä.
+Olemme nyt Fitness Streak Tracker! Sama sovellus, joka tuo esiin Apple Health -historiaasi piiloutuneet sarjat — nyt selkeämmällä nimellä ja terävämmällä keskittymisellä vauhtisi ylläpitämiseen.
+
+• Tallenna tärkein sarjasi, jotta vauhtisi on aina suojattu
+• Uudistettu ilme koko sovelluksessa, widgeteissä ja Apple Watchissa
+• Vakaus- ja suorituskykyparannuksia

@@ -1,41 +1,33 @@
-Start building habits without starting from day one.
+ਹੋਰ ਸਟ੍ਰੀਕ ਐਪਾਂ ਤੁਹਾਨੂੰ ਪਹਿਲੇ ਦਿਨ ਤੋਂ ਦੁਬਾਰਾ ਸ਼ੁਰੂ ਕਰਾਉਂਦੀਆਂ ਹਨ। ਫਿਟਨੈੱਸ ਸਟ੍ਰੀਕ ਟ੍ਰੈਕਰ ਤੁਹਾਡੀ Apple Health ਦੀ ਹਿਸਟਰੀ ਪੜ੍ਹਦਾ ਹੈ ਅਤੇ ਉਹ ਸਟ੍ਰੀਕਾਂ ਉਜਾਗਰ ਕਰਦਾ ਹੈ ਜੋ ਤੁਸੀਂ ਪਹਿਲਾਂ ਹੀ ਬਣਾ ਚੁੱਕੇ ਹੋ — 40, 120, ਇੱਥੋਂ ਤੱਕ ਕਿ 300 ਦਿਨ ਲੰਬੀਆਂ, ਅੱਜ ਹੀ।
 
-Streak Finder securely reviews your Apple Health history to uncover the fitness streaks you’ve already built, and gives you the exact nudge you need to keep them alive.
+ਇਹ ਜਾਣਨ ਨਾਲੋਂ ਵੱਧ ਪ੍ਰੇਰਨਾਦਾਇਕ ਕੁਝ ਨਹੀਂ ਕਿ ਤੁਸੀਂ ਪਹਿਲਾਂ ਹੀ ਇੱਕ ਜਿੱਤਣ ਵਾਲੀ ਸਟ੍ਰੀਕ 'ਤੇ ਹੋ। ਹੱਥੀਂ ਆਦਤਾਂ ਲਿਖਣ ਦੀ ਬਜਾਏ, ਫਿਟਨੈੱਸ ਸਟ੍ਰੀਕ ਟ੍ਰੈਕਰ ਆਪਣੇ-ਆਪ ਤੁਹਾਡੇ ਡੇਟਾ ਵਿੱਚ ਛੁਪੀ ਹੋਈ ਰਫ਼ਤਾਰ ਸਾਹਮਣੇ ਲਿਆਉਂਦਾ ਹੈ — ਤਾਂ ਜੋ ਪਹਿਲਾ ਦਿਨ ਪਹਿਲਾਂ ਹੀ ਸੌਵਾਂ ਦਿਨ ਹੋਵੇ।
 
-There is nothing more motivating than realizing you're already on a winning streak. Whether you’re closing your rings, hitting 10,000 steps, or prioritizing daily mindfulness, Streak Finder removes the friction of "starting over" by automatically tracking your momentum.
+ਆਪਣੀਆਂ ਸਟ੍ਰੀਕਾਂ ਆਪਣੇ-ਆਪ ਖੋਜੋ
+9 Apple Health ਮੈਟ੍ਰਿਕਸ ਵਿੱਚ ਬਿਨਾਂ ਕੁਝ ਲਿਖੇ ਚੱਲ ਰਹੀਆਂ ਸਟ੍ਰੀਕਾਂ ਲੱਭੋ: ਕਦਮ, ਕਸਰਤ ਦੇ ਮਿੰਟ, ਖੜ੍ਹੇ ਹੋਣ ਦੇ ਘੰਟੇ, ਸਰਗਰਮ ਊਰਜਾ, ਵਰਕਆਊਟ, ਮਾਈਂਡਫੁਲਨੈੱਸ, ਨੀਂਦ, ਦੂਰੀ, ਅਤੇ ਚੜ੍ਹੀਆਂ ਮੰਜ਼ਿਲਾਂ। ਉਹ ਛੁਪੀਆਂ ਸਟ੍ਰੀਕਾਂ ਉਜਾਗਰ ਕਰੋ ਜਿਨ੍ਹਾਂ ਨੂੰ ਟ੍ਰੈਕ ਕਰਨ ਬਾਰੇ ਤੁਸੀਂ ਕਦੇ ਸੋਚਿਆ ਵੀ ਨਹੀਂ ਸੀ।
 
-KEY FEATURES:
+ਚੇਨ ਨੂੰ ਕਦੇ ਨਾ ਤੋੜੋ
+ਆਪਣੇ ਸਭ ਤੋਂ ਮਹੱਤਵਪੂਰਨ ਟੀਚੇ ਨੂੰ Hero Streak ਨਾਲ ਸਭ ਤੋਂ ਅੱਗੇ ਅਤੇ ਕੇਂਦਰ ਵਿੱਚ ਰੱਖੋ, ਕੈਲੰਡਰ ਹੀਟਮੈਪ 'ਤੇ ਆਪਣੀ ਚੱਲ ਰਹੀ ਸਟ੍ਰੀਕ ਨੂੰ ਵਧਦੇ ਦੇਖੋ, ਅਤੇ ਜਿਵੇਂ-ਜਿਵੇਂ ਤੁਹਾਡੀ ਨਿਰੰਤਰਤਾ ਵਧਦੀ ਹੈ ਬੈਜ ਕਮਾਓ। ਜੇ ਅੱਜ ਦੀ ਸਟ੍ਰੀਕ ਖ਼ਤਰੇ ਵਿੱਚ ਹੋਵੇ ਤਾਂ ਸ਼ਾਮ 7 ਵਜੇ ਇੱਕ ਨਰਮ ਯਾਦ-ਦਿਹਾਨੀ ਮਿਲਦੀ ਹੈ — ਸਟ੍ਰੀਕ ਟੁੱਟਣ ਤੋਂ ਪਹਿਲਾਂ ਅਸੀਂ ਤੁਹਾਨੂੰ ਦੱਸ ਦਿੰਦੇ ਹਾਂ।
 
-* Auto-Discover Your Momentum
-Instantly find active streaks across 9 key Apple Health metrics: Steps, Exercise Minutes, Stand Hours, Active Energy, Workouts, Mindfulness, Sleep, Distance, and Flights Climbed.
+ਜਿੱਥੇ ਵੀ ਤੁਸੀਂ ਦੇਖੋ
+• ਹੋਮ ਸਕ੍ਰੀਨ, ਲੌਕ ਸਕ੍ਰੀਨ ਅਤੇ StandBy ਵਿਜੇਟ
+• ਅਮੀਰ ਕੰਪਲੀਕੇਸ਼ਨਾਂ ਵਾਲੀ ਇੱਕ ਨੇਟਿਵ Apple Watch ਐਪ
+• ਤੁਹਾਡੀ ਸਟ੍ਰੀਕ ਦੀ ਗਿਣਤੀ, ਹਮੇਸ਼ਾ ਇੱਕ ਨਜ਼ਰ ਦੀ ਦੂਰੀ 'ਤੇ
 
-* Hero Streaks & Badges
-Put your most important goal front and center with the Hero Streak view, and collect beautifully designed badges as your habits grow stronger.
+ਇੱਕ ਹੋਰ ਆਦਤ ਟ੍ਰੈਕਰ ਨਹੀਂ
+ਕੋਈ ਚੈੱਕ-ਬਾਕਸ ਨਹੀਂ। ਕੋਈ ਹੱਥੀਂ ਲੌਗਿੰਗ ਨਹੀਂ। ਕੋਈ ਰਿਕਵਰੀ ਸਕੋਰ ਨਹੀਂ। ਬੱਸ ਉਹ ਸਟ੍ਰੀਕਾਂ ਜੋ ਤੁਹਾਡੇ ਬੀਤੇ ਖ਼ੁਦ ਨੇ ਪਹਿਲਾਂ ਹੀ ਕਮਾਈਆਂ ਹਨ — ਉਜਾਗਰ ਕੀਤੀਆਂ, ਮਨਾਈਆਂ, ਅਤੇ ਸੁਰੱਖਿਅਤ ਕੀਤੀਆਂ।
 
-* Calendar Heatmaps
-Visualize your progress over time with stunning calendar heatmaps that make your daily consistency undeniable.
+ਪੂਰੀ ਤਰ੍ਹਾਂ ਨਿੱਜੀ (ਡਿਜ਼ਾਈਨ ਅਨੁਸਾਰ)
+ਤੁਹਾਡਾ ਸਿਹਤ ਡੇਟਾ ਤੁਹਾਡਾ ਹੈ:
+• ਸਿਰਫ਼-ਪੜ੍ਹਨ ਵਾਲੀ Apple Health ਪਹੁੰਚ
+• 100% ਡਿਵਾਈਸ 'ਤੇ ਹੀ ਪ੍ਰੋਸੈਸਿੰਗ
+• ਕੋਈ ਖਾਤੇ ਜਾਂ ਸਾਈਨ-ਅੱਪ ਨਹੀਂ
+• ਜ਼ੀਰੋ ਨੈੱਟਵਰਕ ਕਾਲਾਂ, ਜ਼ੀਰੋ ਟ੍ਰੈਕਿੰਗ
+ਤੁਹਾਡੀ ਸਿਹਤ ਦੀ ਹਿਸਟਰੀ ਕਦੇ ਤੁਹਾਡੇ ਫ਼ੋਨ ਤੋਂ ਬਾਹਰ ਨਹੀਂ ਜਾਂਦੀ।
 
-* Accountability Everywhere
-Keep your goals at a glance with beautifully crafted iOS widgets for your Home Screen, Lock Screen, and StandBy mode.
+ਚੇਨ ਨੂੰ ਨਾ ਤੋੜੋ। ਫਿਟਨੈੱਸ ਸਟ੍ਰੀਕ ਟ੍ਰੈਕਰ ਡਾਊਨਲੋਡ ਕਰੋ ਅਤੇ ਆਪਣੀ ਰਫ਼ਤਾਰ ਕਾਇਮ ਰੱਖੋ!
 
-* Apple Watch Ready
-Check your streaks right from your wrist with a fully native watchOS app and rich complications.
-
-* Smart Reminders
-Never drop the ball. Get a gentle, automatic nudge at 7 PM if your Hero Streak is at risk of breaking that day.
-
-* Fiercely Private (By Design)
-Your health data is deeply personal, and it belongs to you. Streak Finder was built with a privacy-first foundation:
-- Read-only Apple HealthKit access
-- 100% on-device, local processing
-- No user accounts or sign-ups required
-- Zero network calls
-- Zero analytics or tracking
-
-Don't break the chain. Download Streak Finder today and keep your momentum going!
-
-Subscription Details
-Streak Finder Pro is available as an auto-renewing subscription (Monthly $1.99 / Yearly $14.99 with a 7-day free trial) or a one-time Lifetime purchase ($29.99). Payment is charged to your Apple ID at confirmation. Subscriptions auto-renew unless canceled at least 24 hours before the end of the period. Manage or cancel anytime in Settings → Apple ID → Subscriptions.
+ਸਬਸਕ੍ਰਿਪਸ਼ਨ ਵੇਰਵੇ
+Streaks Pro ਇੱਕ ਆਪਣੇ-ਆਪ ਨਵਿਆਉਣ ਵਾਲੀ ਸਬਸਕ੍ਰਿਪਸ਼ਨ (ਮਾਸਿਕ $1.99 / ਸਾਲਾਨਾ $14.99, 7-ਦਿਨ ਦੀ ਮੁਫ਼ਤ ਅਜ਼ਮਾਇਸ਼ ਨਾਲ) ਜਾਂ ਇੱਕ-ਵਾਰੀ Lifetime ਖਰੀਦ ($29.99) ਵਜੋਂ ਉਪਲਬਧ ਹੈ। ਪੁਸ਼ਟੀ ਵੇਲੇ ਤੁਹਾਡੀ Apple ID 'ਤੇ ਭੁਗਤਾਨ ਲਿਆ ਜਾਂਦਾ ਹੈ। ਸਬਸਕ੍ਰਿਪਸ਼ਨਾਂ ਆਪਣੇ-ਆਪ ਨਵਿਆਉਂਦੀਆਂ ਹਨ ਜਦੋਂ ਤੱਕ ਮਿਆਦ ਖ਼ਤਮ ਹੋਣ ਤੋਂ ਘੱਟੋ-ਘੱਟ 24 ਘੰਟੇ ਪਹਿਲਾਂ ਰੱਦ ਨਾ ਕੀਤੀਆਂ ਜਾਣ। Settings → Apple ID → Subscriptions ਵਿੱਚ ਕਦੇ ਵੀ ਪ੍ਰਬੰਧ ਕਰੋ ਜਾਂ ਰੱਦ ਕਰੋ।
 
 Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
 Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

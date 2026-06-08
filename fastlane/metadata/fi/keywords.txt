@@ -1,1 +1,1 @@
-motivoida,tottumus,renkaat,healthkit,kello,liike,askeleet,treeni,mindfulness,uni,seisoa,ketju
+rengas,uni,liikunta,treeni,askel,tavoite,tottumus,kalenteri,energia,terveys,widget,kello,lämpökartta
