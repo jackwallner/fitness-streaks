@@ -109,8 +109,13 @@ struct PaywallView: View {
             }
             selectDefaultPackageIfNeeded()
         }
-        .onChange(of: storeKit.isPro) { _, isPro in
-            if isPro { dismiss() }
+        // Dismiss the moment access is granted. Keyed on grantsUnlimitedTrackedStreaks
+        // (isPro || purchaseGrantsFullStreakAccess), not isPro alone: a completed
+        // StoreKit purchase grants access immediately, before RevenueCat reports the
+        // 'pro' entitlement — without this the buyer is trapped on the paywall during
+        // that window. Mirrors OnboardingView.
+        .onChange(of: storeKit.grantsUnlimitedTrackedStreaks) { _, granted in
+            if granted { dismiss() }
         }
         .onChange(of: storeKit.products.count) { _, _ in
             selectDefaultPackageIfNeeded()
