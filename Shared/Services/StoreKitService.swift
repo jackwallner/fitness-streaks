@@ -174,7 +174,7 @@ final class StoreKitService: NSObject, ObservableObject {
                 return .cancelled
             }
             updateProStatus(from: customerInfo)
-            let outcome: PurchaseOutcome = customerInfo.entitlements["pro"]?.isActive == true ? .purchased : .pending
+            let outcome: PurchaseOutcome = isEntitled(customerInfo) ? .purchased : .pending
             if outcome == .purchased || outcome == .pending {
                 purchaseGrantsFullStreakAccess = true
             }
@@ -277,9 +277,18 @@ final class StoreKitService: NSObject, ObservableObject {
 
     // MARK: - Internals
 
+    /// Whether the customer currently owns the paid tier. This project has a
+    /// single entitlement, so any active RevenueCat entitlement means full access.
+    /// We deliberately do NOT key on a specific entitlement identifier: the
+    /// dashboard's is "Fitness Habits - Streak Finder Pro" (not "pro"), and
+    /// matching a brittle display string is exactly how this silently failed —
+    /// purchases charged but never activated.
+    private func isEntitled(_ customerInfo: CustomerInfo) -> Bool {
+        !customerInfo.entitlements.active.isEmpty
+    }
+
     private func updateProStatus(from customerInfo: CustomerInfo) {
-        let entitled = customerInfo.entitlements["pro"]?.isActive == true
-        setIsPro(entitled)
+        setIsPro(isEntitled(customerInfo))
     }
 
     private func setIsPro(_ value: Bool) {
