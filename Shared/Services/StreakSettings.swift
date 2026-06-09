@@ -251,7 +251,26 @@ final class StreakSettings: ObservableObject {
     /// True after the user has seen (or dismissed) the one-time Pro free-trial
     /// offer that fires shortly after onboarding completes.
     @Published var hasSeenTrialOffer: Bool {
-        didSet { defaults.set(hasSeenTrialOffer, forKey: "hasSeenTrialOffer") }
+        didSet {
+            defaults.set(hasSeenTrialOffer, forKey: "hasSeenTrialOffer")
+            // Stamp the moment the user first saw any trial offer so the one-time
+            // re-engagement re-offer can fire a week later for still-free users.
+            if hasSeenTrialOffer, firstTrialOfferShownAt == nil {
+                firstTrialOfferShownAt = .now
+            }
+        }
+    }
+
+    /// When the user first saw (or dismissed) a trial offer. Drives the single
+    /// 7-day re-offer for users who skipped the trial and never subscribed.
+    @Published var firstTrialOfferShownAt: Date? {
+        didSet { defaults.set(firstTrialOfferShownAt, forKey: "firstTrialOfferShownAt") }
+    }
+
+    /// True once the one-time re-engagement trial re-offer has been shown, so we
+    /// never pester a declined user more than a single follow-up.
+    @Published var hasReofferedTrial: Bool {
+        didSet { defaults.set(hasReofferedTrial, forKey: "hasReofferedTrial") }
     }
 
     /// How many streaks the user picked at the end of onboarding *before* the
@@ -391,6 +410,8 @@ final class StreakSettings: ObservableObject {
         self.hasWatchCompletedSetup = defaults.bool(forKey: "hasWatchCompletedSetup")
         self.hasSeenTutorial = defaults.bool(forKey: "hasSeenTutorial")
         self.hasSeenTrialOffer = defaults.bool(forKey: "hasSeenTrialOffer")
+        self.firstTrialOfferShownAt = defaults.object(forKey: "firstTrialOfferShownAt") as? Date
+        self.hasReofferedTrial = defaults.bool(forKey: "hasReofferedTrial")
         self.lastOnboardingPickedCount = defaults.integer(forKey: "lastOnboardingPickedCount")
         self.lastOnboardingTrackedKeys = Self.loadCodable([String].self, key: "lastOnboardingTrackedKeys", defaults: defaults) ?? []
         self.appearance = AppAppearance(rawValue: defaults.integer(forKey: "appearance")) ?? .light

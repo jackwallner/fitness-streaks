@@ -143,11 +143,7 @@ struct PaywallView: View {
 
     private var heroBlock: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .center) {
-                PixelFlame(size: 40, intensity: 1.0, tint: Theme.retroMagenta)
-                Spacer()
-                PixelChip(text: trialHeadline, accent: Theme.retroLime)
-            }
+            PixelFlame(size: 40, intensity: 1.0, tint: Theme.retroMagenta)
             Text("DON'T BREAK THE STREAK.")
                 .font(RetroFont.pixel(14))
                 .foregroundStyle(Theme.retroInk)
@@ -161,28 +157,17 @@ struct PaywallView: View {
         .pixelPanel(color: Theme.retroMagenta, fill: Theme.retroBgRaised)
     }
 
-    /// Dynamic trial chip from the storefront intro offer (never hardcoded).
-    private var trialHeadline: String {
-        if let package = storeKit.yearly ?? storeKit.monthly,
-           storeKit.isEligibleForIntroOffer(package),
-           let label = package.streaksIntroOfferLabel,
-           let chip = PaywallDisclosure.trialChipDays(from: label) {
-            return chip
-        }
-        return "STREAKS+"
-    }
-
     // MARK: - Features
 
     private var featureBlock: some View {
         VStack(alignment: .leading, spacing: 0) {
             featureRow(accent: Theme.retroLime, symbol: "shield.lefthalf.filled",
                        title: "Unlimited auto-saves", first: true)
-            featureRow(accent: Theme.retroCyan, symbol: "snowflake",
+            featureRow(accent: Theme.retroLime, symbol: "snowflake",
                        title: "Planned freeze days")
-            featureRow(accent: Theme.retroAmber, symbol: "infinity",
+            featureRow(accent: Theme.retroLime, symbol: "infinity",
                        title: "Unlimited custom streaks")
-            featureRow(accent: Theme.retroMagenta, symbol: "bell.badge.fill",
+            featureRow(accent: Theme.retroLime, symbol: "bell.badge.fill",
                        title: "At-risk alerts")
         }
         .padding(.vertical, 4)
@@ -250,6 +235,17 @@ struct PaywallView: View {
         let perDay = storeKit.yearlyDailyEquivalent
         let priceLabel = "\(storeKit.displayPrice(for: package)) / yr"
         let perMonth = storeKit.yearlyMonthlyEquivalent
+        let trialChip: String? = {
+            guard showsTrial, let label = package.streaksIntroOfferLabel else { return nil }
+            return PaywallDisclosure.trialChipDays(from: label)
+        }()
+        // One calm subline carries the secondary framing (per-month + savings) so
+        // the card header holds a single chip instead of two competing badges.
+        let subline: String = {
+            var s = perMonth.map { "Just \($0)/mo, billed yearly" } ?? "Billed yearly"
+            if trialChip != nil, let savings, savings >= 10 { s += " · save \(savings)%" }
+            return s
+        }()
 
         return Button {
             selectedProductID = productID
@@ -261,11 +257,9 @@ struct PaywallView: View {
                         .tracking(1)
                         .foregroundStyle(Theme.retroInk)
                     Spacer()
-                    if showsTrial, let label = package.streaksIntroOfferLabel,
-                       let chip = PaywallDisclosure.trialChipDays(from: label) {
-                        PixelChip(text: chip, accent: Theme.retroMagenta)
-                    }
-                    if let savings, savings >= 10 {
+                    if let trialChip {
+                        PixelChip(text: trialChip, accent: Theme.retroMagenta)
+                    } else if let savings, savings >= 10 {
                         PixelChip(text: "SAVE \(savings)%", accent: Theme.retroLime)
                     }
                 }
@@ -288,11 +282,9 @@ struct PaywallView: View {
                         .font(RetroFont.mono(11, weight: .bold))
                         .foregroundStyle(Theme.retroInkDim)
                 }
-                if let perMonth {
-                    Text("Just \(perMonth), billed yearly.")
-                        .font(RetroFont.mono(10))
-                        .foregroundStyle(Theme.retroInkDim)
-                }
+                Text(subline)
+                    .font(RetroFont.mono(10))
+                    .foregroundStyle(Theme.retroInkDim)
             }
             .padding(14)
             .frame(maxWidth: .infinity, alignment: .leading)

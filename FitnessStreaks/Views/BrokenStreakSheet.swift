@@ -1,4 +1,7 @@
 import SwiftUI
+#if REVENUECAT
+import RevenueCat
+#endif
 
 struct BrokenStreakSheet: View {
     let broken: BrokenStreak
@@ -12,6 +15,10 @@ struct BrokenStreakSheet: View {
 
     @Environment(\.dismiss) private var close
     @State private var showingPaywall = false
+    @State private var showingTrialOffer = false
+    @State private var trialInFlight = false
+    @State private var trialError: String?
+    @State private var pendingPaywallAfterTrial = false
 
     var body: some View {
         NavigationStack {
@@ -95,7 +102,109 @@ struct BrokenStreakSheet: View {
             .sheet(isPresented: $showingPaywall, onDismiss: handlePaywallDismiss) {
                 PaywallView(paywallImpressionId: "streaks_broken_sheet")
             }
+            .sheet(isPresented: $showingTrialOffer, onDismiss: {
+                trialInFlight = false
+                trialError = nil
+                // Hand off to the full plan list only if the user explicitly asked
+                // for it; a plain dismiss just closes the revive pitch.
+                if pendingPaywallAfterTrial {
+                    pendingPaywallAfterTrial = false
+                    showingPaywall = true
+                }
+            }) {
+                TrialOfferSheet(
+                    offerLabel: trialOfferLabel,
+                    priceLabel: trialOfferPriceLabel,
+                    directPurchase: hasDirectTrial,
+                    isPurchasing: trialInFlight,
+                    errorMessage: trialError,
+                    pickedCount: 0,
+                    freeCap: 3,
+                    longestStreak: .init(
+                        displayName: broken.metric.displayName,
+                        current: broken.brokenLength,
+                        cadenceLabel: broken.cadence.label
+                    ),
+                    headlineOverride: "REVIVE YOUR \(broken.brokenLength)-\(broken.cadence.label.uppercased()) \(broken.metric.displayName.uppercased()) STREAK.",
+                    subheadlineOverride: "Your run just ended. Start a Streaks+ trial and we'll restore it on the spot — then auto-save every future miss so it can't happen again.",
+                    onStartTrial: { startReviveTrialPurchase() },
+                    onSeeAllPlans: {
+                        pendingPaywallAfterTrial = true
+                        showingTrialOffer = false
+                    },
+                    onDismiss: { showingTrialOffer = false }
+                )
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+                .interactiveDismissDisabled(trialInFlight)
+            }
         }
+    }
+
+    // MARK: - Direct trial purchase (revive context)
+
+    private var hasDirectTrial: Bool {
+        #if REVENUECAT
+        return directTrialPackage != nil
+        #else
+        return false
+        #endif
+    }
+
+    private var trialOfferLabel: String? {
+        #if REVENUECAT
+        return directTrialPackage?.streaksIntroOfferLabel
+            ?? storeKit.products.compactMap(\.streaksIntroOfferLabel).first
+        #else
+        return nil
+        #endif
+    }
+
+    private var trialOfferPriceLabel: String? {
+        #if REVENUECAT
+        return directTrialPackage?.streaksRecurringPriceLabel
+        #else
+        return nil
+        #endif
+    }
+
+    #if REVENUECAT
+    /// Yearly trial-bearing package, else any trial-bearing package — mirrors the
+    /// app-level post-onboarding offer so both surfaces buy the same product.
+    private var directTrialPackage: Package? {
+        let trials = storeKit.products.filter { $0.streaksIntroOfferLabel != nil }
+        return trials.first(where: { $0.packageType == .annual }) ?? trials.first
+    }
+    #endif
+
+    /// Buy the trial in-context and revive the broken run on success. Falls back to
+    /// the full paywall when no trial product is available.
+    private func startReviveTrialPurchase() {
+        #if REVENUECAT
+        guard let package = directTrialPackage else {
+            pendingPaywallAfterTrial = true
+            showingTrialOffer = false
+            return
+        }
+        trialError = nil
+        trialInFlight = true
+        Task { @MainActor in
+            defer { trialInFlight = false }
+            switch await storeKit.purchase(package: package) {
+            case .purchased, .pending:
+                await store.reviveBrokenStreak(broken)
+                showingTrialOffer = false
+                close()
+            case .cancelled:
+                trialError = "Trial wasn't started. Tap again, or see all plans."
+            case .failed:
+                trialError = storeKit.lastError ?? "Couldn't start your trial. Please try again."
+            }
+        }
+        #else
+        pendingPaywallAfterTrial = true
+        showingTrialOffer = false
+        #endif
     }
 
     private var shouldShowUpsell: Bool {
@@ -122,7 +231,7 @@ struct BrokenStreakSheet: View {
 
     private var revivalUpsell: some View {
         Button {
-            showingPaywall = true
+            showingTrialOffer = true
         } label: {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(spacing: 8) {
