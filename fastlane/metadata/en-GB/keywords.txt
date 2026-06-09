@@ -1,1 +1,1 @@
-ring,stand,heatmap,mindful,sleep,exercise,activity,workout,step,goal,habit,calendar,energy,history
+stand,ring,step,sleep,exercise,workout,mindful,activity,watch,widget,heatmap,energy,move,calendar
