@@ -31,6 +31,11 @@ struct TrialOfferSheet: View {
     /// live `StreakStore` at present time, not onboarding intent. Falls back to
     /// generic copy when nil (e.g., empty dashboard).
     let longestStreak: LongestStreakInfo?
+    /// Optional copy overrides for contexts where the default "keep alive" framing
+    /// is wrong (e.g. the broken-streak revival, where the run has *already* ended).
+    /// Default nil preserves the onboarding pitch verbatim.
+    var headlineOverride: String? = nil
+    var subheadlineOverride: String? = nil
     let onStartTrial: () -> Void
     let onSeeAllPlans: () -> Void
     let onDismiss: () -> Void
@@ -65,6 +70,7 @@ struct TrialOfferSheet: View {
     }
 
     private var headline: String {
+        if let headlineOverride { return headlineOverride }
         if let s = longestStreak, hasMeaningfulStreak {
             return "KEEP YOUR \(s.current)-\(s.cadenceLabel.uppercased()) \(s.displayName.uppercased()) STREAK ALIVE."
         }
@@ -75,6 +81,7 @@ struct TrialOfferSheet: View {
     }
 
     private var subheadline: String {
+        if let subheadlineOverride { return subheadlineOverride }
         let trialClause = offerLabel.map { ", free for your \($0.replacingOccurrences(of: " free trial", with: ""))" } ?? ""
         if hasMeaningfulStreak {
             return "One missed \(longestStreak?.cadenceLabel ?? "day") zeroes it out. Streaks+ auto-saves the run and tracks every streak you've earned\(trialClause)."

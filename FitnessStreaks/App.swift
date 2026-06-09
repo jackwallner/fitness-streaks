@@ -285,6 +285,7 @@ private struct RootView: View {
             // Re-evaluate once products have a chance to load on this session.
             if storeKit.offerings == nil { await storeKit.loadProducts() }
             evaluateTrialOffer()
+            evaluateTrialReoffer()
         }
         .onChange(of: storeKit.purchaseGrantsFullStreakAccess) { _, grants in
             if grants {
@@ -301,6 +302,7 @@ private struct RootView: View {
         }
         .onChange(of: storeKit.offerings != nil) { _, _ in
             evaluateTrialOffer()
+            evaluateTrialReoffer()
         }
         .onChange(of: storeKit.isPro) { _, isPro in
             if isPro {
@@ -403,6 +405,31 @@ private struct RootView: View {
                   !storeKit.grantsUnlimitedTrackedStreaks,
                   storeKit.products.contains(where: { $0.streaksIntroOfferLabel != nil })
             else { return }
+            trialOfferPackage = directTrialPackage
+            showTrialOffer = true
+        }
+    }
+
+    /// One-time re-engagement nudge for users who saw the first trial offer, never
+    /// subscribed, and still have a meaningful streak to protect a week later.
+    /// Mirrors the Headaches app's existing-user re-offer. Fires at most once.
+    private func evaluateTrialReoffer() {
+        guard settings.hasCompletedSetup,
+              settings.hasSeenTrialOffer,
+              !settings.hasReofferedTrial,
+              !storeKit.grantsUnlimitedTrackedStreaks,
+              let firstShown = settings.firstTrialOfferShownAt,
+              Date.now.timeIntervalSince(firstShown) >= 7 * 24 * 60 * 60,
+              storeKit.products.contains(where: { $0.streaksIntroOfferLabel != nil }),
+              let longest = longestStreakInfo(), longest.current >= 3
+        else { return }
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 4_000_000_000)
+            guard !showTrialOffer, !showTrialPaywall,
+                  !settings.hasReofferedTrial,
+                  !storeKit.grantsUnlimitedTrackedStreaks
+            else { return }
+            settings.hasReofferedTrial = true
             trialOfferPackage = directTrialPackage
             showTrialOffer = true
         }
