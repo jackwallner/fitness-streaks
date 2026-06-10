@@ -225,14 +225,15 @@ struct PaywallView: View {
         }
     }
 
-    /// Visually dominant annual card. The per-day micro-price + SAVE-vs-monthly
-    /// chip + trial badge stack work together as the primary anchor.
+    /// Visually dominant annual card. Apple 3.1.2(c): the billed amount must be
+    /// the most clear and conspicuous pricing element — it owns the large price
+    /// slot. Calculated equivalents (per-month) and savings live only in the
+    /// small dim subline, subordinate in both position and size.
     private func yearlyHeroCard(for package: Package) -> some View {
         let productID = package.storeProduct.productIdentifier
         let isSelected = selectedProductID == productID
         let showsTrial = storeKit.isEligibleForIntroOffer(package)
         let savings = storeKit.yearlyVsMonthlySavingsPercent
-        let perDay = storeKit.yearlyDailyEquivalent
         let priceLabel = "\(storeKit.displayPrice(for: package)) / yr"
         let perMonth = storeKit.yearlyMonthlyEquivalent
         let trialChip: String? = {
@@ -242,7 +243,7 @@ struct PaywallView: View {
         // One calm subline carries the secondary framing (per-month + savings) so
         // the card header holds a single chip instead of two competing badges.
         let subline: String = {
-            var s = perMonth.map { "Just \($0)/mo, billed yearly" } ?? "Billed yearly"
+            var s = perMonth.map { "Just \($0), billed yearly" } ?? "Billed yearly"
             if trialChip != nil, let savings, savings >= 10 { s += " · save \(savings)%" }
             return s
         }()
@@ -263,25 +264,9 @@ struct PaywallView: View {
                         PixelChip(text: "SAVE \(savings)%", accent: Theme.retroLime)
                     }
                 }
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    if let perDay {
-                        Text(perDay)
-                            .font(RetroFont.pixel(20))
-                            .foregroundStyle(isSelected ? Theme.retroMagenta : Theme.retroInk)
-                        Text("/ DAY")
-                            .font(RetroFont.pixel(10))
-                            .tracking(1)
-                            .foregroundStyle(Theme.retroInkDim)
-                    } else {
-                        Text(priceLabel)
-                            .font(RetroFont.pixel(18))
-                            .foregroundStyle(isSelected ? Theme.retroMagenta : Theme.retroInk)
-                    }
-                    Spacer()
-                    Text(priceLabel)
-                        .font(RetroFont.mono(11, weight: .bold))
-                        .foregroundStyle(Theme.retroInkDim)
-                }
+                Text(priceLabel)
+                    .font(RetroFont.pixel(18))
+                    .foregroundStyle(isSelected ? Theme.retroMagenta : Theme.retroInk)
                 Text(subline)
                     .font(RetroFont.mono(10))
                     .foregroundStyle(Theme.retroInkDim)
@@ -407,11 +392,13 @@ struct PaywallView: View {
             .disabled(selectedPackage == nil || storeKit.purchaseInProgress)
             .opacity(selectedPackage == nil ? 0.5 : 1)
 
+            // Subordinate to the billed amount in the CTA and plan card
+            // (Apple 3.1.2(c)): dim, no accent color.
             if let reassurance = primaryReassurance {
                 Text(reassurance)
-                    .font(RetroFont.mono(10, weight: .bold))
+                    .font(RetroFont.mono(9, weight: .bold))
                     .tracking(1)
-                    .foregroundStyle(Theme.retroLime)
+                    .foregroundStyle(Theme.retroInkDim)
                     .frame(maxWidth: .infinity)
             }
 
