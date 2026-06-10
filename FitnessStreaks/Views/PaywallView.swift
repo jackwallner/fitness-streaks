@@ -151,10 +151,26 @@ struct PaywallView: View {
                 .font(RetroFont.mono(11))
                 .foregroundStyle(Theme.retroInkDim)
                 .fixedSize(horizontal: false, vertical: true)
+            if let heroTrialLine {
+                Text(heroTrialLine)
+                    .font(RetroFont.mono(11, weight: .bold))
+                    .foregroundStyle(Theme.retroLime)
+            }
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .pixelPanel(color: Theme.retroMagenta, fill: Theme.retroBgRaised)
+    }
+
+    /// Trial hook in the hero when any plan still has an unused intro offer.
+    /// Subordinate in size/position to the billed amounts below (Apple 3.1.2(c)).
+    private var heroTrialLine: String? {
+        let trial = storeKit.sortedPackages.first {
+            storeKit.isEligibleForIntroOffer($0) && $0.streaksIntroOfferLabel != nil
+        }
+        guard let label = trial?.streaksIntroOfferLabel,
+              let chip = PaywallDisclosure.trialChipDays(from: label) else { return nil }
+        return "Start with \(chip.lowercased()) — cancel anytime."
     }
 
     // MARK: - Features
@@ -292,7 +308,20 @@ struct PaywallView: View {
             default: return storeKit.displayPrice(for: package)
             }
         }()
-        let detail: String = isLifetime ? "One-time · Forever yours" : "Billed monthly"
+        // Advertise the trial on every plan that carries one (chip + detail line),
+        // kept subordinate to the billed price on the right (Apple 3.1.2(c)).
+        let trialChip: String? = {
+            guard storeKit.isEligibleForIntroOffer(package),
+                  let label = package.streaksIntroOfferLabel else { return nil }
+            return PaywallDisclosure.trialChipDays(from: label)
+        }()
+        let detail: String = {
+            if isLifetime { return "One-time · Forever yours" }
+            if let trialChip {
+                return "\(trialChip.lowercased()), then billed monthly"
+            }
+            return "Billed monthly"
+        }()
 
         return Button {
             selectedProductID = productID
@@ -304,7 +333,9 @@ struct PaywallView: View {
                             .font(RetroFont.pixel(11))
                             .tracking(1)
                             .foregroundStyle(Theme.retroInk)
-                        if isLifetime {
+                        if let trialChip {
+                            PixelChip(text: trialChip, accent: Theme.retroMagenta)
+                        } else if isLifetime {
                             PixelChip(text: "BEST VALUE", accent: Theme.retroAmber)
                         }
                     }
