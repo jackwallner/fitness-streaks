@@ -228,21 +228,6 @@ final class StoreKitService: NSObject, ObservableObject {
         return "\(formatted) / mo"
     }
 
-    /// Per-day cost of the annual plan, formatted in the storefront's currency.
-    /// Used as the anchoring micro-price on the primary paywall card
-    /// (proven to lift annual conversion vs the sticker price alone).
-    var yearlyDailyEquivalent: String? {
-        guard let product = yearly?.storeProduct,
-              let price = product.priceDecimalNumber as? NSDecimalNumber else { return nil }
-        let perDay = price.dividing(by: NSDecimalNumber(value: 365))
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = product.priceFormatter?.locale ?? .current
-        formatter.minimumFractionDigits = 2
-        formatter.maximumFractionDigits = 2
-        return formatter.string(from: perDay)
-    }
-
     /// Percent savings of the annual plan vs paying monthly for a year.
     /// Returns nil when either plan is missing. Floored to whole percent.
     var yearlyVsMonthlySavingsPercent: Int? {
