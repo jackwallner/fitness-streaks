@@ -1,1 +1,1 @@
-Spara dina streaks: Du kan nu spara en streak så att du kan behålla din viktiga momentum.
+Bug fixes and performance improvements across the app, widgets, and Apple Watch.

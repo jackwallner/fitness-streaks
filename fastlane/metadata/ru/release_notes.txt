@@ -1,1 +1,1 @@
-Сохраняйте свои серии: теперь вы можете закрепить серию, чтобы не терять важный разгон.
+Bug fixes and performance improvements across the app, widgets, and Apple Watch.

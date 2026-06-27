@@ -1,5 +1,1 @@
-Nyní jsme Fitness Streak Tracker! Stejná aplikace, která odhaluje série skryté ve vaší historii Apple Health — nyní s jasnějším názvem a ostřejším zaměřením na udržení vašeho tempa.
-
-• Uložte si svou nejdůležitější sérii, aby vaše tempo bylo vždy chráněné
-• Osvěžený vzhled napříč aplikací, widgety a Apple Watch
-• Vylepšení stability a výkonu
+Bug fixes and performance improvements across the app, widgets, and Apple Watch.

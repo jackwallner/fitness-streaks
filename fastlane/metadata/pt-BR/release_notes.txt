@@ -1,5 +1,1 @@
-Agora somos o Fitness Streak Tracker! O mesmo app que revela as sequências escondidas no seu histórico do Apple Health — agora com um nome mais claro e foco mais afiado em manter seu impulso vivo.
-
-• Salve sua sequência mais importante para que seu impulso esteja sempre protegido
-• Identidade visual renovada no app, nos widgets e no Apple Watch
-• Melhorias de estabilidade e desempenho
+Bug fixes and performance improvements across the app, widgets, and Apple Watch.

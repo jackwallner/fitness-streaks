@@ -1,1 +1,1 @@
-Serilerinizi kaydedin: Artık bir seriyi kaydedebilir ve sizin için önemli olan ivmeyi kesintisiz sürdürebilirsiniz.
+Bug fixes and performance improvements across the app, widgets, and Apple Watch.

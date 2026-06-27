@@ -1,5 +1,1 @@
-Sada smo Fitness Streak Tracker! Ista aplikacija koja otkriva nizove skrivene u vašoj Apple Health povijesti, sada s jasnijim imenom i izoštrenim fokusom na održavanje vašeg zamaha.
-
-• Spremite svoj najvažniji niz kako bi vaš zamah uvijek bio zaštićen
-• Osvježen identitet u aplikaciji, widgetima i na Apple Watchu
-• Poboljšanja stabilnosti i performansi
+Bug fixes and performance improvements across the app, widgets, and Apple Watch.

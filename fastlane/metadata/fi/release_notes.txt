@@ -1,5 +1,1 @@
-Olemme nyt Fitness Streak Tracker! Sama sovellus, joka tuo esiin Apple Health -historiaasi piiloutuneet sarjat — nyt selkeämmällä nimellä ja terävämmällä keskittymisellä vauhtisi ylläpitämiseen.
-
-• Tallenna tärkein sarjasi, jotta vauhtisi on aina suojattu
-• Uudistettu ilme koko sovelluksessa, widgeteissä ja Apple Watchissa
-• Vakaus- ja suorituskykyparannuksia
+Bug fixes and performance improvements across the app, widgets, and Apple Watch.

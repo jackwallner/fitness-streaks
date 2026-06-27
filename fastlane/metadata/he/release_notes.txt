@@ -1,5 +1,1 @@
-אנחנו עכשיו Fitness Streak Tracker! אותה אפליקציה שחושפת את הרצפים המסתתרים בהיסטוריית Apple Health שלך — עכשיו עם שם ברור יותר ומיקוד חד יותר בשמירה על התנופה שלך.
-
-• שמור את הרצף החשוב ביותר שלך כך שהתנופה שלך תמיד מוגנת
-• מיתוג מחודש ברחבי האפליקציה, הווידג'טים ו-Apple Watch
-• שיפורי יציבות וביצועים
+Bug fixes and performance improvements across the app, widgets, and Apple Watch.

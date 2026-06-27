@@ -1,1 +1,1 @@
-Lưu streak của bạn: Giờ đây bạn có thể lưu một streak để duy trì đà tiến quan trọng của mình.
+Bug fixes and performance improvements across the app, widgets, and Apple Watch.

@@ -1,1 +1,1 @@
-บันทึกสตรีคของคุณ: ตอนนี้คุณสามารถบันทึกสตรีคเพื่อรักษาโมเมนตัมที่สำคัญของคุณต่อไปได้แล้ว
+Bug fixes and performance improvements across the app, widgets, and Apple Watch.
