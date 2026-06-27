@@ -126,7 +126,7 @@ struct BrokenStreakSheet: View {
                         cadenceLabel: broken.cadence.label
                     ),
                     headlineOverride: "REVIVE YOUR \(broken.brokenLength)-\(broken.cadence.label.uppercased()) \(broken.metric.displayName.uppercased()) STREAK.",
-                    subheadlineOverride: "Your run just ended. Start a Streaks+ trial and we'll restore it on the spot — then auto-save every future miss so it can't happen again.",
+                    subheadlineOverride: "Your run just ended. Start a Streaks+ trial and we'll restore it on the spot. Then auto-save every future miss so it can't happen again.",
                     onStartTrial: { startReviveTrialPurchase() },
                     onSeeAllPlans: {
                         pendingPaywallAfterTrial = true

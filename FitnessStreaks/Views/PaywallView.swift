@@ -34,10 +34,8 @@ enum PaywallDisclosure {
 
 /// Native FitnessStreaks Pro paywall.
 ///
-/// Designed to fit a single screen without scrolling on any device: compact
-/// hero, four one-line feature rows, a dominant annual plan with two
-/// de-emphasised alternates, one adaptive CTA, and a slim trust + legal row.
-/// A ScrollView remains as a safety net for large Dynamic Type only.
+/// Designed to fit a single screen without scrolling: compact hero, four
+/// one-line feature rows, dominant annual plan, pinned CTA, slim trust + legal.
 struct PaywallView: View {
     @EnvironmentObject private var storeKit: StoreKitService
     @Environment(\.dismiss) private var dismiss
@@ -54,24 +52,15 @@ struct PaywallView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
-                    if let context {
-                        contextBanner(context)
-                    }
-                    heroBlock
-                    featureBlock
-                    productBlock
-                    trustBar
+            VStack(spacing: 0) {
+                if let context {
+                    contextBanner(context)
+                        .padding(.horizontal, 14)
+                        .padding(.top, 8)
                 }
-                .padding(.horizontal, 14)
-                .padding(.top, 12)
-                .padding(.bottom, 8)
+                paywallContent
             }
             .background(Theme.retroBg.ignoresSafeArea())
-            .safeAreaInset(edge: .bottom, spacing: 0) {
-                stickyCTABlock
-            }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
@@ -122,6 +111,22 @@ struct PaywallView: View {
         }
     }
 
+    /// Single viewport — hero, features, plans, and CTA always visible together.
+    private var paywallContent: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            heroBlock
+            featureBlock
+            productBlock
+            trustBar
+            Spacer(minLength: 0)
+            purchaseBlock
+        }
+        .padding(.horizontal, 14)
+        .padding(.top, 10)
+        .padding(.bottom, 10)
+        .frame(maxHeight: .infinity)
+    }
+
     // MARK: - Context
 
     private func contextBanner(_ text: String) -> some View {
@@ -142,22 +147,26 @@ struct PaywallView: View {
     // MARK: - Hero
 
     private var heroBlock: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            PixelFlame(size: 40, intensity: 1.0, tint: Theme.retroMagenta)
+        VStack(alignment: .leading, spacing: 6) {
+            PixelFlame(size: 34, intensity: 1.0, tint: Theme.retroMagenta)
             Text("DON'T BREAK THE STREAK.")
-                .font(RetroFont.pixel(14))
+                .font(RetroFont.pixel(13))
                 .foregroundStyle(Theme.retroInk)
-            Text("Auto-save every streak and track every habit you build.")
-                .font(RetroFont.mono(11))
+            Text("Auto-save every streak. Track every habit you build.")
+                .font(RetroFont.mono(10))
                 .foregroundStyle(Theme.retroInkDim)
+                .lineLimit(3)
+                .minimumScaleFactor(0.9)
                 .fixedSize(horizontal: false, vertical: true)
             if let heroTrialLine {
                 Text(heroTrialLine)
-                    .font(RetroFont.mono(11, weight: .bold))
+                    .font(RetroFont.mono(10, weight: .bold))
                     .foregroundStyle(Theme.retroLime)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
             }
         }
-        .padding(14)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .pixelPanel(color: Theme.retroMagenta, fill: Theme.retroBgRaised)
     }
@@ -170,7 +179,7 @@ struct PaywallView: View {
         }
         guard let label = trial?.streaksIntroOfferLabel,
               let chip = PaywallDisclosure.trialChipDays(from: label) else { return nil }
-        return "Start with \(chip.lowercased()) — cancel anytime."
+        return "Start with \(chip.lowercased()). Cancel anytime."
     }
 
     // MARK: - Features
@@ -178,32 +187,39 @@ struct PaywallView: View {
     private var featureBlock: some View {
         VStack(alignment: .leading, spacing: 0) {
             featureRow(accent: Theme.retroLime, symbol: "shield.lefthalf.filled",
-                       title: "Unlimited auto-saves", first: true)
+                       title: "Auto-saves", detail: "Never lose a streak to a missed tap.", first: true)
             featureRow(accent: Theme.retroLime, symbol: "snowflake",
-                       title: "Planned freeze days")
-            featureRow(accent: Theme.retroLime, symbol: "infinity",
-                       title: "Unlimited custom streaks")
+                       title: "Freeze days", detail: "Plan breaks without breaking the chain.")
             featureRow(accent: Theme.retroLime, symbol: "bell.badge.fill",
-                       title: "At-risk alerts")
+                       title: "At-risk alerts", detail: "Heads-up before a streak slips.")
         }
         .padding(.vertical, 4)
         .frame(maxWidth: .infinity, alignment: .leading)
         .pixelPanel(color: Theme.retroInkFaint, fill: Theme.retroBgRaised)
     }
 
-    private func featureRow(accent: Color, symbol: String, title: String, first: Bool = false) -> some View {
-        HStack(spacing: 12) {
+    private func featureRow(accent: Color, symbol: String, title: String, detail: String, first: Bool = false) -> some View {
+        HStack(alignment: .top, spacing: 12) {
             Image(systemName: symbol)
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(accent)
                 .shadow(color: accent.opacity(0.6), radius: 4)
                 .frame(width: 22, alignment: .center)
-            Text(title)
-                .font(RetroFont.mono(11, weight: .bold))
-                .foregroundStyle(Theme.retroInk)
+                .padding(.top, 1)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(RetroFont.mono(10, weight: .bold))
+                    .foregroundStyle(Theme.retroInk)
+                    .lineLimit(1)
+                Text(detail)
+                    .font(RetroFont.mono(9))
+                    .foregroundStyle(Theme.retroInkDim)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.85)
+            }
             Spacer(minLength: 0)
         }
-        .padding(.vertical, 9)
+        .padding(.vertical, 6)
         .padding(.horizontal, 12)
     }
 
@@ -405,10 +421,8 @@ struct PaywallView: View {
 
     // MARK: - Purchase
 
-    /// Pinned bottom CTA so the purchase button is always visible regardless of
-    /// scroll position — fixes the prior layout where features + product cards
-    /// pushed the CTA off-screen on smaller phones.
-    private var stickyCTABlock: some View {
+    /// Pinned bottom CTA — always visible with plans on one screen.
+    private var purchaseBlock: some View {
         VStack(spacing: 8) {
             if let statusMessage {
                 Text(statusMessage)
@@ -423,23 +437,24 @@ struct PaywallView: View {
             .disabled(selectedPackage == nil || storeKit.purchaseInProgress)
             .opacity(selectedPackage == nil ? 0.5 : 1)
 
-            // Subordinate to the billed amount in the CTA and plan card
-            // (Apple 3.1.2(c)): dim, no accent color.
-            if let reassurance = primaryReassurance {
-                Text(reassurance)
-                    .font(RetroFont.mono(9, weight: .bold))
-                    .tracking(1)
-                    .foregroundStyle(Theme.retroInkDim)
-                    .frame(maxWidth: .infinity)
-            }
+            Text(primaryReassurance ?? " ")
+                .font(RetroFont.mono(9, weight: .bold))
+                .tracking(1)
+                .foregroundStyle(Theme.retroInkDim)
+                .frame(maxWidth: .infinity)
+                .frame(minHeight: 14)
+                .opacity(primaryReassurance == nil ? 0 : 1)
+                .accessibilityHidden(primaryReassurance == nil)
 
-            if let disclosure = selectedPlanDisclosure {
-                Text(disclosure)
-                    .font(RetroFont.mono(9))
-                    .foregroundStyle(Theme.retroInkDim)
-                    .lineSpacing(2)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
+            Text(selectedPlanDisclosure ?? " ")
+                .font(RetroFont.mono(9))
+                .foregroundStyle(Theme.retroInkDim)
+                .lineSpacing(2)
+                .lineLimit(4)
+                .minimumScaleFactor(0.9)
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                .opacity(selectedPlanDisclosure == nil ? 0 : 1)
+                .accessibilityHidden(selectedPlanDisclosure == nil)
 
             HStack(spacing: 14) {
                 Link(destination: PaywallLinks.standardEULA) {
@@ -465,15 +480,6 @@ struct PaywallView: View {
                 .disabled(storeKit.purchaseInProgress)
             }
         }
-        .padding(.horizontal, 14)
-        .padding(.top, 10)
-        .padding(.bottom, 8)
-        .frame(maxWidth: .infinity)
-        .background(
-            Theme.retroBg
-                .overlay(Rectangle().fill(Theme.retroInkFaint).frame(height: 1), alignment: .top)
-                .ignoresSafeArea(edges: .bottom)
-        )
     }
 
     /// CTA copy must name the plan and recurring price (Apple 3.1.2) so the user
@@ -526,6 +532,18 @@ struct PaywallView: View {
     }
 
     private func selectDefaultPackageIfNeeded() {
+        #if DEBUG
+        if let mode = PaywallScreenshotMode.current {
+            switch mode {
+            case .monthly:
+                if let id = storeKit.monthly?.storeProduct.productIdentifier { selectedProductID = id; return }
+            case .lifetime:
+                if let id = storeKit.lifetime?.storeProduct.productIdentifier { selectedProductID = id; return }
+            case .yearly, .trial:
+                if let id = storeKit.yearly?.storeProduct.productIdentifier { selectedProductID = id; return }
+            }
+        }
+        #endif
         guard storeKit.yearly != nil || storeKit.monthly != nil || storeKit.lifetime != nil else { return }
         if storeKit.sortedPackages.contains(where: { $0.storeProduct.productIdentifier == selectedProductID }) {
             return
