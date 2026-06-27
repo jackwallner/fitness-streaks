@@ -1,1 +1,1 @@
-motivera,vana,ringar,healthkit,klocka,rörelse,steg,träning,mindfulness,sömn,stå,kedja,heatmap
+motivera,vana,ringar,healthkit,widget,klocka,rörelse,steg,träning,mindfulness,sömn,stå,kedja,heatmap

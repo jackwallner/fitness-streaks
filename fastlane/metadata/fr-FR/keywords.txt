@@ -1,1 +1,1 @@
-anneau,debout,carte,méditation,sommeil,exercice,activité,entraînement,pas,objectif,habitude,montre
+motiver,habitude,anneaux,healthkit,widget,montre,mouvement,entraînement,méditation,sommeil,debout

@@ -1,1 +1,1 @@
-রিং,স্ট্যান্ড,ঘুম,ব্যায়াম,ওয়ার্কআউট,পদক্ষেপ,লক্ষ্য,অভ্যাস,এনার্জি,উইজেট,ওয়াচ,হিটম্যাপ,ক্যালেন্ডার
+motivate,habit,rings,healthkit,widget,watch,move,steps,workout,mindful,sleep,stand,chain,heatmap

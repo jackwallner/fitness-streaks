@@ -1,1 +1,1 @@
-obroči,stoj,heatmap,čuječnost,spanje,vadba,aktivnost,trening,koraki,cilj,navada,koledar,zgodovina
+motivacija,navada,prstani,healthkit,widget,ura,gibanje,koraki,trening,mindfulness,spavanje,stajanje
