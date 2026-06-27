@@ -143,6 +143,23 @@ struct FitnessStreaksApp: App {
 
     var body: some Scene {
         WindowGroup {
+            #if DEBUG
+            if let mode = PaywallScreenshotMode.current {
+                PaywallScreenshotHarness(mode: mode)
+                    .preferredColorScheme(settings.appearance.colorScheme)
+                    .environmentObject(storeKit)
+            } else {
+                streaksRoot
+            }
+            #else
+            streaksRoot
+            #endif
+        }
+        .modelContainer(DataService.sharedModelContainer)
+    }
+
+    @ViewBuilder
+    private var streaksRoot: some View {
             RootView()
                 .preferredColorScheme(settings.appearance.colorScheme)
                 .environmentObject(healthKit)
@@ -203,8 +220,6 @@ struct FitnessStreaksApp: App {
                     }
                     #endif
                 }
-        }
-        .modelContainer(DataService.sharedModelContainer)
     }
 
     static func scheduleAppRefresh() {
