@@ -1,1 +1,1 @@
-stand,ring,step,sleep,exercise,workout,watch,widget,move,apple,countdown,counter,goal,day,progress
+motivate,habit,rings,healthkit,widget,watch,move,steps,workout,mindful,sleep,stand,chain,heatmap

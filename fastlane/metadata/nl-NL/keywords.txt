@@ -1,1 +1,1 @@
-ring,sta-uur,heatmap,mindful,slaap,beweging,activiteit,training,stap,doel,gewoonte,kalender,energie
+motiveren,gewoonte,ringen,healthkit,widget,horloge,bewegen,stappen,training,mindfulness,slaap,staan

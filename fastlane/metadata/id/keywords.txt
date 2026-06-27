@@ -1,1 +1,1 @@
-cincin,jam,berdiri,heatmap,tidur,latihan,aktivitas,langkah,target,kebiasaan,kalender,riwayat,widget
+motivasi,kebiasaan,cincin,healthkit,widget,jam,gerak,langkah,latihan,mindfulness,tidur,berdiri,badge

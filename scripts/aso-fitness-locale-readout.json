@@ -1,0 +1,912 @@
+{
+  "locales": {
+    "ar-SA": {
+      "store": "sa",
+      "title": "سلاسل اللياقة · تتبع تلقائي",
+      "subtitle": "اكتشف عاداتك الصحية فوراً",
+      "keywords": "تحفيز,عادة,حلقات,healthkit,ودجت,ساعة,حركة,خطوات,تمرين,تأمل,نوم,وقوف,سلسلة,خريطة,نشاط,badge,تمارين",
+      "title_len": 27,
+      "subtitle_len": 25,
+      "keywords_len": 97,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 97/100.",
+      "ok": true
+    },
+    "bn-BD": {
+      "store": "in",
+      "title": "স্ট্রিক ফিটনেস · স্বাস্থ্য ট্র",
+      "subtitle": "স্বাস্থ্য ধারা অটো খুঁজুন",
+      "keywords": "motivate,habit,rings,healthkit,widget,watch,move,steps,workout,mindful,sleep,stand,chain,heatmap",
+      "title_len": 30,
+      "subtitle_len": 25,
+      "keywords_len": 96,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "reminder(55)",
+        "fitness(55)",
+        "wellness(43)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: reminder(55), fitness(55), wellness(43)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 96/100.",
+      "ok": true
+    },
+    "ca": {
+      "store": "es",
+      "title": "Ratxes fitness · Salut activa",
+      "subtitle": "Ratxes automàtiques de salut",
+      "keywords": "motivar,hàbit,anells,healthkit,widget,rellotge,moure,passos,entrenament,mindfulness,son,peu,cadena",
+      "title_len": 29,
+      "subtitle_len": 28,
+      "keywords_len": 98,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "steps(35)",
+        "reminder(34)",
+        "wellness(32)",
+        "routine(9)",
+        "chain(9)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: steps(35), reminder(34), wellness(32), routine(9), chain(9)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 98/100.",
+      "ok": true
+    },
+    "cs": {
+      "store": "cz",
+      "title": "Fitness série · Zdraví a pohyb",
+      "subtitle": "Automatické série ze zdraví",
+      "keywords": "motivace,návyk,kruhy,healthkit,widget,hodinky,kroky,trénink,mindfulness,spánek,stát,řetěz,heatmap",
+      "title_len": 30,
+      "subtitle_len": 27,
+      "keywords_len": 97,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 97/100.",
+      "ok": true
+    },
+    "da": {
+      "store": "dk",
+      "title": "Fitness-serier · Sundhedstjek",
+      "subtitle": "Auto serier fra sundhedsdata",
+      "keywords": "motivere,vane,ringe,healthkit,widget,ur,bevægelse,skridt,træning,mindfulness,søvn,stå,kæde,heatmap",
+      "title_len": 29,
+      "subtitle_len": 28,
+      "keywords_len": 98,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 98/100.",
+      "ok": true
+    },
+    "de-DE": {
+      "store": "de",
+      "title": "Fitness-Serien: Gesundheitstra",
+      "subtitle": "Auto-Serien aus Health-Daten",
+      "keywords": "motivation,gewohnheit,ringe,healthkit,widget,uhr,bewegung,schritte,training,achtsamkeit,schlaf,kette",
+      "title_len": 30,
+      "subtitle_len": 28,
+      "keywords_len": 100,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "steps(51)",
+        "reminder(43)",
+        "wellness(37)",
+        "routine(37)",
+        "chain(32)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: steps(51), reminder(43), wellness(37), routine(37), chain(32)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 100/100.",
+      "ok": true
+    },
+    "el": {
+      "store": "gr",
+      "title": "Σερί fitness · Παρακολούθηση",
+      "subtitle": "Αυτόματη εύρεση από Health",
+      "keywords": "κίνητρο,συνήθεια,δαχτυλίδια,healthkit,widget,ρολόι,κίνηση,βήματα,προπόνηση,mindfulness,ύπνος,όρθιος",
+      "title_len": 28,
+      "subtitle_len": 26,
+      "keywords_len": 99,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 99/100.",
+      "ok": true
+    },
+    "en-AU": {
+      "store": "au",
+      "title": "Streak Tracker: Fitness Habits",
+      "subtitle": "Auto Streaks From Health Data",
+      "keywords": "motivate,habit,rings,healthkit,widget,watch,move,steps,workout,mindful,sleep,stand,chain,heatmap",
+      "title_len": 30,
+      "subtitle_len": 29,
+      "keywords_len": 96,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Streak Tracker brand in title (en-*). HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 96/100.",
+      "ok": true
+    },
+    "en-CA": {
+      "store": "ca",
+      "title": "Streak Tracker: Fitness Habits",
+      "subtitle": "Auto Streaks From Health Data",
+      "keywords": "motivate,habit,rings,healthkit,widget,watch,move,steps,workout,mindful,sleep,stand,chain,heatmap",
+      "title_len": 30,
+      "subtitle_len": 29,
+      "keywords_len": 96,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Streak Tracker brand in title (en-*). HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 96/100.",
+      "ok": true
+    },
+    "en-GB": {
+      "store": "gb",
+      "title": "Streak Tracker: Fitness Habits",
+      "subtitle": "Auto Streaks From Health Data",
+      "keywords": "motivate,habit,rings,healthkit,widget,watch,move,steps,workout,mindful,sleep,stand,chain,heatmap",
+      "title_len": 30,
+      "subtitle_len": 29,
+      "keywords_len": 96,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Streak Tracker brand in title (en-*). HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 96/100.",
+      "ok": true
+    },
+    "en-US": {
+      "store": "us",
+      "title": "Streak Tracker: Fitness Habits",
+      "subtitle": "Auto Streaks From Health Data",
+      "keywords": "motivate,habit,rings,healthkit,widget,watch,move,steps,workout,mindful,sleep,stand,chain,heatmap",
+      "title_len": 30,
+      "subtitle_len": 29,
+      "keywords_len": 96,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Streak Tracker brand in title (en-*). HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 96/100.",
+      "ok": true
+    },
+    "es-ES": {
+      "store": "es",
+      "title": "Rachas fitness · Salud activa",
+      "subtitle": "Rachas auto desde tu salud",
+      "keywords": "motivar,hábito,anillos,healthkit,widget,reloj,mover,pasos,entreno,mindfulness,sueño,de pie,cadena",
+      "title_len": 29,
+      "subtitle_len": 26,
+      "keywords_len": 97,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "steps(35)",
+        "reminder(34)",
+        "wellness(32)",
+        "routine(9)",
+        "chain(9)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: steps(35), reminder(34), wellness(32), routine(9), chain(9)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 97/100.",
+      "ok": true
+    },
+    "es-MX": {
+      "store": "mx",
+      "title": "Rachas Fitness: Salud Activa",
+      "subtitle": "Rachas auto desde datos salud",
+      "keywords": "motivar,hábito,anillos,healthkit,widget,reloj,mover,pasos,entreno,mindfulness,sueño,de pie,cadena",
+      "title_len": 28,
+      "subtitle_len": 29,
+      "keywords_len": 97,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "habits(31)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: habits(31)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 97/100.",
+      "ok": true
+    },
+    "fi": {
+      "store": "fi",
+      "title": "Kunto-putket · Terveysdata",
+      "subtitle": "Auto-putket terveysdatasta",
+      "keywords": "motivoida,tottumus,renkaat,healthkit,widget,kello,liike,askeleet,treeni,mindfulness,uni,seisoa,ketju",
+      "title_len": 26,
+      "subtitle_len": 26,
+      "keywords_len": 100,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 100/100.",
+      "ok": true
+    },
+    "fr-CA": {
+      "store": "ca",
+      "title": "Séries fitness · Santé & Pas",
+      "subtitle": "Séries auto de données santé",
+      "keywords": "motiver,habitude,anneaux,healthkit,widget,montre,mouvement,entraînement,méditation,sommeil,debout",
+      "title_len": 28,
+      "subtitle_len": 28,
+      "keywords_len": 97,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 97/100.",
+      "ok": true
+    },
+    "fr-FR": {
+      "store": "fr",
+      "title": "Séries fitness · Santé & Pas",
+      "subtitle": "Séries auto via données santé",
+      "keywords": "motiver,habitude,anneaux,healthkit,widget,montre,mouvement,entraînement,méditation,sommeil,debout",
+      "title_len": 28,
+      "subtitle_len": 29,
+      "keywords_len": 97,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "wellness(52)",
+        "steps(39)",
+        "routine(39)",
+        "reminder(38)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: wellness(52), steps(39), routine(39), reminder(38)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 97/100.",
+      "ok": true
+    },
+    "gu-IN": {
+      "store": "in",
+      "title": "સ્ટ્રીક ફિટનેસ · આરોગ્ય ટ્રેકર",
+      "subtitle": "આરોગ્ય ડેટામાંથી સળંગ આપોઆપ શો",
+      "keywords": "રિંગ,સ્ટેન્ડ,હીટમેપ,માઇન્ડફુલ,ઊંઘ,કસરત,પ્રવૃત્તિ,વર્કઆઉટ,પગલાં,લક્ષ્ય,આદત,કેલેન્ડર,ઇતિહાસ,વિજેટ,વોચ",
+      "title_len": 30,
+      "subtitle_len": 30,
+      "keywords_len": 99,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "reminder(55)",
+        "fitness(55)",
+        "steps(49)",
+        "wellness(43)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: reminder(55), fitness(55), steps(49), wellness(43)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 99/100.",
+      "ok": true
+    },
+    "he": {
+      "store": "il",
+      "title": "רצפי כושר · מעקב אוטומטי",
+      "subtitle": "רצפים אוטומטיים מנתוני בריאות",
+      "keywords": "מוטיבציה,הרגל,טבעות,healthkit,ווידג'ט,שעון,תנועה,צעדים,אימון,מיינדפולנס,שינה,עמידה,שרשרת,מפתחום,רצף",
+      "title_len": 24,
+      "subtitle_len": 29,
+      "keywords_len": 99,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 99/100.",
+      "ok": true
+    },
+    "hi": {
+      "store": "in",
+      "title": "स्ट्रीक फिटनेस · स्वास्थ्य ट्र",
+      "subtitle": "हेल्थ से अपने-आप सिलसिले खोजें",
+      "keywords": "प्रेरणा,आदत,रिंग,healthkit,विजेट,घड़ी,चाल,कदम,वर्कआउट,माइंडफुल,नींद,खड़े,श्रृंखला,हीटमैप,गतिविधि",
+      "title_len": 30,
+      "subtitle_len": 30,
+      "keywords_len": 96,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "reminder(55)",
+        "fitness(55)",
+        "steps(49)",
+        "wellness(43)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: reminder(55), fitness(55), steps(49), wellness(43)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 96/100.",
+      "ok": true
+    },
+    "hr": {
+      "store": "hr",
+      "title": "Fitness nizovi · Zdravlje",
+      "subtitle": "Auto nizovi iz Apple Health",
+      "keywords": "motivacija,navika,prstenovi,healthkit,widget,sat,pokret,koraci,trening,mindfulness,spavanje,stajanje",
+      "title_len": 25,
+      "subtitle_len": 27,
+      "keywords_len": 100,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 100/100.",
+      "ok": true
+    },
+    "hu": {
+      "store": "hu",
+      "title": "Fitness sorozat · Egészség",
+      "subtitle": "Sorozatok az egészségadatból",
+      "keywords": "motiváció,szokás,gyűrűk,healthkit,widget,óra,mozgás,lépések,edzés,mindfulness,alvás,állás,lánc,badge",
+      "title_len": 26,
+      "subtitle_len": 28,
+      "keywords_len": 100,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 100/100.",
+      "ok": true
+    },
+    "id": {
+      "store": "id",
+      "title": "Streak fitness · Data kesehata",
+      "subtitle": "Otomatis dari data kesehatan",
+      "keywords": "motivasi,kebiasaan,cincin,healthkit,widget,jam,gerak,langkah,latihan,mindfulness,tidur,berdiri,badge",
+      "title_len": 30,
+      "subtitle_len": 28,
+      "keywords_len": 100,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 100/100.",
+      "ok": true
+    },
+    "it": {
+      "store": "it",
+      "title": "Serie fitness · Salute attiva",
+      "subtitle": "Serie auto dai dati salute",
+      "keywords": "motivare,abitudine,anelli,healthkit,widget,orologio,muovere,passi,allenamento,mindfulness,sonno",
+      "title_len": 29,
+      "subtitle_len": 26,
+      "keywords_len": 95,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "wellness(48)",
+        "steps(36)",
+        "routine(36)",
+        "reminder(36)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: wellness(48), steps(36), routine(36), reminder(36)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 95/100.",
+      "ok": true
+    },
+    "ja": {
+      "store": "jp",
+      "title": "フィットネス連続記録トラッカー · 健康習慣管理",
+      "subtitle": "ヘルスケアデータから継続記録を自動で見つけ出します",
+      "keywords": "やる気,リング,healthkit,ウィジェット,ウォッチ,ムーブ,歩数,ワークアウト,マインドフル,睡眠,スタンド,チェーン,ヒートマップ,アクティビティ,badge,fitness,steps",
+      "title_len": 24,
+      "subtitle_len": 25,
+      "keywords_len": 98,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "fitness(62)",
+        "steps(49)",
+        "reminder(40)",
+        "wellness(37)",
+        "streak(9)",
+        "routine(8)",
+        "habits(7)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: fitness(62), steps(49), reminder(40), wellness(37), streak(9), routine(8), habits(7)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 98/100.",
+      "ok": true
+    },
+    "kn-IN": {
+      "store": "in",
+      "title": "ಸ್ಟ್ರೀಕ್ ಫಿಟ್‌ನೆಸ್ · ಆರೋಗ್ಯ ಟ್",
+      "subtitle": "ನಿಮ್ಮ ಆರೋಗ್ಯ ಸರಣಿ ಸ್ವಯಂ ಹುಡುಕಿ",
+      "keywords": "ರಿಂಗ್,ಸ್ಟ್ಯಾಂಡ್,ಹೀಟ್‌ಮ್ಯಾಪ್,ಮೈಂಡ್‌ಫುಲ್,ನಿದ್ರೆ,ವ್ಯಾಯಾಮ,ಚಟುವಟಿಕೆ,ವರ್ಕ್‌ಔಟ್,ಹೆಜ್ಜೆಗಳು,ಗುರಿ,ಆದತೆ,ಇತಿಹಾಸ",
+      "title_len": 30,
+      "subtitle_len": 30,
+      "keywords_len": 99,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "reminder(55)",
+        "fitness(55)",
+        "steps(49)",
+        "wellness(43)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: reminder(55), fitness(55), steps(49), wellness(43)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 99/100.",
+      "ok": true
+    },
+    "ko": {
+      "store": "kr",
+      "title": "스트릭 피트니스 트래커 · 헬스 연속 기록 앱",
+      "subtitle": "헬스케어 데이터에서 연속 기록을 자동으로 찾아줍니다",
+      "keywords": "동기,습관,링,healthkit,위젯,워치,이동,걸음,운동,마음챙김,수면,스탠드,체인,히트맵,활동,badge,루틴,진행,칼로리,활동량,동기부여,습관추적,momentum,nudge",
+      "title_len": 25,
+      "subtitle_len": 28,
+      "keywords_len": 99,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "reminder(25)",
+        "routine(18)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: reminder(25), routine(18)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 99/100.",
+      "ok": true
+    },
+    "ml-IN": {
+      "store": "in",
+      "title": "സ്ട്രീക്ക് ഫിറ്റ്നസ് · ആരോഗ്യ ",
+      "subtitle": "ആരോഗ്യ ശ്രേണി സ്വയം കണ്ടെത്തൂ",
+      "keywords": "റിംഗ്,സ്റ്റാൻഡ്,ഹീറ്റ്‌മാപ്,മൈൻഡ്‌ഫുൾ,ഉറക്കം,വ്യായാമം,പ്രവർത്തനം,വർക്കൗട്ട്,ഘട്ടങ്ങൾ,ലക്ഷ്യം,ശീലം",
+      "title_len": 30,
+      "subtitle_len": 29,
+      "keywords_len": 97,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "reminder(55)",
+        "fitness(55)",
+        "steps(49)",
+        "wellness(43)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: reminder(55), fitness(55), steps(49), wellness(43)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 97/100.",
+      "ok": true
+    },
+    "mr-IN": {
+      "store": "in",
+      "title": "स्ट्रीक फिटनेस · आरोग्य ट्रॅकर",
+      "subtitle": "आरोग्य डेटातून आपोआप शोध",
+      "keywords": "रिंग,स्टँड,हीटमॅप,माइंडफुल,झोप,व्यायाम,क्रियाकलाप,वर्कआउट,पाऊल,ध्येय,सवय,कॅलेंडर,इतिहास,विजेट,वॉच",
+      "title_len": 30,
+      "subtitle_len": 24,
+      "keywords_len": 97,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "reminder(55)",
+        "fitness(55)",
+        "steps(49)",
+        "wellness(43)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: reminder(55), fitness(55), steps(49), wellness(43)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 97/100.",
+      "ok": true
+    },
+    "ms": {
+      "store": "my",
+      "title": "Siri kecergasan · Data kesihat",
+      "subtitle": "Siri Auto Dari Data Sihat",
+      "keywords": "motivasi,tabiat,cincin,healthkit,widget,jam,gerak,langkah,latihan,mindfulness,tidur,berdiri,rantaian",
+      "title_len": 30,
+      "subtitle_len": 25,
+      "keywords_len": 100,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 100/100.",
+      "ok": true
+    },
+    "nl-NL": {
+      "store": "nl",
+      "title": "Fitness reeksen · Gezondheid",
+      "subtitle": "Reeksen automatisch herkend",
+      "keywords": "motiveren,gewoonte,ringen,healthkit,widget,horloge,bewegen,stappen,training,mindfulness,slaap,staan",
+      "title_len": 28,
+      "subtitle_len": 27,
+      "keywords_len": 99,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "steps(52)",
+        "reminder(41)",
+        "routine(30)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: steps(52), reminder(41), routine(30)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 99/100.",
+      "ok": true
+    },
+    "no": {
+      "store": "no",
+      "title": "Fitness-serier · Helsedata",
+      "subtitle": "Auto streaks fra helsedata",
+      "keywords": "motivere,vane,ringe,healthkit,widget,klokke,bevegelse,skritt,trening,mindfulness,søvn,stå,kjede",
+      "title_len": 26,
+      "subtitle_len": 26,
+      "keywords_len": 95,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 95/100.",
+      "ok": true
+    },
+    "or-IN": {
+      "store": "in",
+      "title": "ଷ୍ଟ୍ରିକ୍ ଫିଟନେସ୍ · ସ୍ୱାସ୍ଥ୍ୟ ଟ",
+      "subtitle": "ସ୍ୱାସ୍ଥ୍ୟ ଡାଟାରୁ ସ୍ୱୟଂ ଖୋଜ",
+      "keywords": "ରିଂ,ଷ୍ଟାଣ୍ଡ,ହିଟମ୍ୟାପ,ମାଇଣ୍ଡଫୁଲ,ଶୋଇବା,ବ୍ୟାୟାମ,କାର୍ଯ୍ୟକଳାପ,ୱର୍କଆଉଟ,ପାଦଗୁଡି,ଲକ୍ଷ୍ୟ,ଅଭ୍ୟାସ,କ୍ୟାଲେଣ୍ଡର",
+      "title_len": 30,
+      "subtitle_len": 26,
+      "keywords_len": 97,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "reminder(55)",
+        "fitness(55)",
+        "steps(49)",
+        "wellness(43)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: reminder(55), fitness(55), steps(49), wellness(43)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 97/100.",
+      "ok": true
+    },
+    "pa-IN": {
+      "store": "in",
+      "title": "ਸਟ੍ਰੀਕ ਫਿਟਨੈਸ · ਸਿਹਤ ਟ੍ਰੈਕਰ",
+      "subtitle": "ਸਿਹਤ ਡੇਟਾ ਤੋਂ ਆਪੋ ਆਪ ਲੜੀਆਂ ਲੱਭ",
+      "keywords": "ਰਿੰਗ,ਸਟੈਂਡ,ਹੀਟਮੈਪ,ਮਾਈਂਡਫੁਲ,ਨੀਂਦ,ਕਸਰਤ,ਗਤੀਵਿਧੀ,ਵਰਕਆਉਟ,ਕਦਮ,ਲਕ੍ਯ,ਆਦਤ,ਕੈਲੰਡਰ,ਇਤਿਹਾਸ,ਵਿਜੇਟ,ਵਾਚ,healthkit",
+      "title_len": 27,
+      "subtitle_len": 30,
+      "keywords_len": 98,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "reminder(55)",
+        "fitness(55)",
+        "steps(49)",
+        "wellness(43)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: reminder(55), fitness(55), steps(49), wellness(43)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 98/100.",
+      "ok": true
+    },
+    "pl": {
+      "store": "pl",
+      "title": "Serie fitness · Zdrowie i krok",
+      "subtitle": "Auto serie z danych zdrowia",
+      "keywords": "motywacja,nawyk,pierścienie,healthkit,widget,zegarek,ruch,kroki,trening,mindfulness,sen,stawanie",
+      "title_len": 30,
+      "subtitle_len": 27,
+      "keywords_len": 96,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 96/100.",
+      "ok": true
+    },
+    "pt-BR": {
+      "store": "br",
+      "title": "Sequências fitness · Saúde ati",
+      "subtitle": "Sequências auto da saúde",
+      "keywords": "motivar,hábito,anéis,healthkit,widget,relógio,mover,passos,treino,mindfulness,sono,em pé,cadeia,mapa",
+      "title_len": 30,
+      "subtitle_len": 24,
+      "keywords_len": 100,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "reminder(46)",
+        "wellness(37)",
+        "routine(9)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: reminder(46), wellness(37), routine(9)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 100/100.",
+      "ok": true
+    },
+    "pt-PT": {
+      "store": "pt",
+      "title": "Sequências fitness · Saúde ati",
+      "subtitle": "Sequências auto. da saúde",
+      "keywords": "motivar,hábito,anéis,healthkit,widget,relógio,mover,passos,treino,mindfulness,sono,em pé,cadeia,mapa",
+      "title_len": 30,
+      "subtitle_len": 25,
+      "keywords_len": 100,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "reminder(34)",
+        "steps(32)",
+        "routine(28)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: reminder(34), steps(32), routine(28)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 100/100.",
+      "ok": true
+    },
+    "ro": {
+      "store": "ro",
+      "title": "Serii fitness · Tracker pași",
+      "subtitle": "Serii auto din date sănătate",
+      "keywords": "motivație,obicei,inele,healthkit,widget,ceas,mișcare,antrenament,mindfulness,somn,în picioare,lanț",
+      "title_len": 28,
+      "subtitle_len": 28,
+      "keywords_len": 98,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 98/100.",
+      "ok": true
+    },
+    "ru": {
+      "store": "ru",
+      "title": "Фитнес-серии: трекер шагов",
+      "subtitle": "Авто-серии из данных здоровья",
+      "keywords": "мотивация,привычка,кольца,healthkit,widget,часы,движение,шаги,тренировка,осознанность,сон,стоя,цепь",
+      "title_len": 26,
+      "subtitle_len": 29,
+      "keywords_len": 99,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 99/100.",
+      "ok": true
+    },
+    "sk": {
+      "store": "sk",
+      "title": "Fitness série · Zdravie a pohy",
+      "subtitle": "Automatické série zo zdravia",
+      "keywords": "motivácia,návyk,kruhy,healthkit,widget,hodinky,pohyb,kroky,tréning,mindfulness,spánok,stát,reťaz",
+      "title_len": 30,
+      "subtitle_len": 28,
+      "keywords_len": 96,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 96/100.",
+      "ok": true
+    },
+    "sl-SI": {
+      "store": "si",
+      "title": "Fitness Streaks: nizi gibanja",
+      "subtitle": "Samodejni nizi iz Apple Health",
+      "keywords": "motivacija,navada,prstani,healthkit,widget,ura,gibanje,koraki,trening,mindfulness,spavanje,stajanje",
+      "title_len": 29,
+      "subtitle_len": 30,
+      "keywords_len": 99,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 99/100.",
+      "ok": true
+    },
+    "sv": {
+      "store": "se",
+      "title": "Streak-koll: Träning & hälsa",
+      "subtitle": "Auto-serier från hälsodata",
+      "keywords": "motivera,vana,ringar,healthkit,widget,klocka,rörelse,steg,träning,mindfulness,sömn,stå,kedja,heatmap",
+      "title_len": 28,
+      "subtitle_len": 26,
+      "keywords_len": 100,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 100/100.",
+      "ok": true
+    },
+    "ta-IN": {
+      "store": "in",
+      "title": "ஃபிட்னஸ் ஸ்ட்ரீக் · உடல்நல டிர",
+      "subtitle": "ஹெல்த்தில் தானியங்கு தொடர்கள்",
+      "keywords": "ரிங்,ஸ்டாண்ட்,ஹீட்மேப்,மைண்ட்ஃபுல்,தூக்கம்,உடற்பயிற்சி,செயல்பாடு,வொர்க்அவுட்,படிகள்,இலக்கு,பழக்கம்",
+      "title_len": 30,
+      "subtitle_len": 29,
+      "keywords_len": 98,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "reminder(55)",
+        "fitness(55)",
+        "steps(49)",
+        "wellness(43)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: reminder(55), fitness(55), steps(49), wellness(43)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 98/100.",
+      "ok": true
+    },
+    "te-IN": {
+      "store": "in",
+      "title": "ఫిట్‌నెస్ స్ట్రీక్ · ఆరోగ్య ట్",
+      "subtitle": "హెల్త్ డేటాతో ఆటో స్ట్రీక్‌లు",
+      "keywords": "రింగ్,స్టాండ్,హీట్‌మ్యాప్,మైండ్‌ఫుల్,నిద్ర,వ్యాయామం,కార్యకలాపం,వర్కౌట్,అడుగులు,లక్ష్యం,అలవాటు,చరిత్ర",
+      "title_len": 30,
+      "subtitle_len": 29,
+      "keywords_len": 100,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "reminder(55)",
+        "fitness(55)",
+        "steps(49)",
+        "wellness(43)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: reminder(55), fitness(55), steps(49), wellness(43)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 100/100.",
+      "ok": true
+    },
+    "th": {
+      "store": "th",
+      "title": "ตัวติดตามสตรีคฟิตเนส · สุขภาพ",
+      "subtitle": "สตรีคอัตโนมัติจากข้อมูลสุขภาพ",
+      "keywords": "แรงจูงใจ,นิสัย,วงแหวน,healthkit,วิดเจ็ต,นาฬิกา,เคลื่อนไหว,ก้าว,ออกกำลัง,สติ,นอน,ยืน,สายโซ่,กิจกรรม",
+      "title_len": 29,
+      "subtitle_len": 29,
+      "keywords_len": 98,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 98/100.",
+      "ok": true
+    },
+    "tr": {
+      "store": "tr",
+      "title": "Fitness seri takibi · Sağlık",
+      "subtitle": "Sağlık verisinden otomatik ser",
+      "keywords": "motivasyon,alışkanlık,halkalar,healthkit,widget,saat,hareket,adım,antrenman,mindfulness,uyku,ayakta",
+      "title_len": 28,
+      "subtitle_len": 30,
+      "keywords_len": 99,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 99/100.",
+      "ok": true
+    },
+    "uk": {
+      "store": "ua",
+      "title": "Трекер фітнес-серій · Рух",
+      "subtitle": "Авто-серії з даних здоров'я",
+      "keywords": "мотивація,звичка,кільця,healthkit,widget,годинник,рух,кроки,тренування,усвідомленість,сон,стоячи",
+      "title_len": 25,
+      "subtitle_len": 27,
+      "keywords_len": 96,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 96/100.",
+      "ok": true
+    },
+    "ur-PK": {
+      "store": "sa",
+      "title": "فٹنس اسٹریک ٹریکر · صحت ٹریکر",
+      "subtitle": "ہیلتھ ڈیٹا سے خودکار اسٹریکس",
+      "keywords": "رنگ,اسٹینڈ,ہیٹ میپ,مائنڈفل,نیند,ورزش,سرگرمی,ورک آؤٹ,قدم,ہدف,عادت,کیلنڈر,تاریخ,وجیٹ,واچ,healthkit",
+      "title_len": 29,
+      "subtitle_len": 28,
+      "keywords_len": 96,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 96/100.",
+      "ok": true
+    },
+    "vi": {
+      "store": "vn",
+      "title": "Theo dõi chuỗi tập luyện · Sức",
+      "subtitle": "Chuỗi tự động từ dữ liệu sức k",
+      "keywords": "động lực,thói quen,vòng,healthkit,widget,đồng hồ,di chuyển,bước,chánh niệm,ngủ,đứng,bản đồ nhiệt",
+      "title_len": 30,
+      "subtitle_len": 30,
+      "keywords_len": 96,
+      "keyword_overlaps": [],
+      "astro_en_kept": [],
+      "astro_proof": [
+        "Native/transliterated keywords only; no EN loanwords met pop≥6 in this store."
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 96/100.",
+      "ok": true
+    },
+    "zh-Hans": {
+      "store": "cn",
+      "title": "健身连胜打卡习惯追踪器 · 运动与健康数据管理器",
+      "subtitle": "从健康数据自动发现运动连续记录与日常习惯追踪助手",
+      "keywords": "激励,圆环,healthkit,小组件,手表,移动,步数,锻炼,正念,睡眠,站立,链条,热力图,活动,badge,卡路里,活动量,运动环,ring,stand,momentum,nudge,steps",
+      "title_len": 24,
+      "subtitle_len": 24,
+      "keywords_len": 100,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "reminder(46)",
+        "routine(8)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: reminder(46), routine(8)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 100/100.",
+      "ok": true
+    },
+    "zh-Hant": {
+      "store": "tw",
+      "title": "健身連勝打卡習慣追蹤器 · 運動與健康數據管理器",
+      "subtitle": "從健康資料自動發現運動連續記錄與日常習慣追蹤助手",
+      "keywords": "激勵,圓環,healthkit,小工具,手錶,移動,步數,鍛煉,正念,睡眠,站立,鏈條,熱力圖,活動,badge,卡路里,活動量,運動環,ring,stand,momentum,nudge,steps",
+      "title_len": 24,
+      "subtitle_len": 24,
+      "keywords_len": 100,
+      "keyword_overlaps": [],
+      "astro_en_kept": [
+        "reminder(39)"
+      ],
+      "astro_proof": [
+        "EN loanwords Astro pop≥6: reminder(39)"
+      ],
+      "rationale": "Localized title; no English brand paste. HealthKit auto-streak positioning; keywords deduped vs title+subtitle, packed 100/100.",
+      "ok": true
+    }
+  },
+  "issues": []
+}
