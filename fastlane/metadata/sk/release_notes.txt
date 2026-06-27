@@ -1,1 +1,1 @@
-Uložte si série: Teraz môžete sériu uložiť, aby ste si udržali dôležitú dynamiku.
+Bug fixes and performance improvements across the app, widgets, and Apple Watch.

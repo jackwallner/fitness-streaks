@@ -1,5 +1,1 @@
-Kami kini Fitness Streak Tracker! Aplikasi yang sama yang menampilkan siri tersembunyi dalam sejarah Apple Health anda — kini dengan nama yang lebih jelas dan fokus yang lebih tajam untuk mengekalkan momentum anda.
-
-• Simpan siri paling penting anda supaya momentum anda sentiasa dilindungi
-• Penjenamaan baharu merentasi aplikasi, widget dan Apple Watch
-• Penambahbaikan kestabilan dan prestasi
+Bug fixes and performance improvements across the app, widgets, and Apple Watch.

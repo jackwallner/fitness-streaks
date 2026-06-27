@@ -1,5 +1,1 @@
-Ora siamo Fitness Streak Tracker! La stessa app che fa emergere le serie nascoste nella tua cronologia di Apple Health, ora con un nome più chiaro e un focus più netto sul mantenere vivo il tuo slancio.
-
-• Salva la tua serie più importante così il tuo slancio è sempre protetto
-• Identità rinnovata in tutta l'app, nei widget e su Apple Watch
-• Miglioramenti di stabilità e prestazioni
+Bug fixes and performance improvements across the app, widgets, and Apple Watch.

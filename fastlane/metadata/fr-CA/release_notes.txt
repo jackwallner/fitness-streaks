@@ -1,5 +1,1 @@
-Nous sommes désormais Fitness Streak Tracker! La même app qui révèle les séries cachées dans votre historique Apple Health — maintenant avec un nom plus clair et une concentration accrue sur le maintien de votre élan.
-
-• Enregistrez votre série la plus importante pour que votre élan soit toujours protégé
-• Image de marque rafraîchie dans l'app, les widgets et l'Apple Watch
-• Améliorations de la stabilité et des performances
+Bug fixes and performance improvements across the app, widgets, and Apple Watch.

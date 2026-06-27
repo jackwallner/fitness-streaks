@@ -1,5 +1,1 @@
-Vi heter nå Fitness Streak Tracker! Samme app som finner streakene som gjemmer seg i Apple Health-historikken din – nå med et tydeligere navn og et skarpere fokus på å holde fremgangen din i live.
-
-• Lagre den viktigste streaken din, så fremgangen din alltid er beskyttet
-• Oppfrisket profil på tvers av appen, widgetene og Apple Watch
-• Forbedringer av stabilitet og ytelse
+Bug fixes and performance improvements across the app, widgets, and Apple Watch.

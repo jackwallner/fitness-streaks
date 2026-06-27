@@ -30,7 +30,7 @@ enum ReviewPromptTracker {
     #endif
 
     private static let notNowCooldownDays = 120
-    private static let minimumPositiveMoments = 1
+    private static let minimumPositiveMoments = 3
 
     static var skipsAutomation: Bool {
         ProcessInfo.processInfo.arguments.contains(where: {
