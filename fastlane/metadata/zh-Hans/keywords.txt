@@ -1,1 +1,1 @@
-激励,圆环,healthkit,小组件,手表,移动,步数,锻炼,正念,睡眠,站立,链条,热力图,活动,badge,卡路里,活动量,运动环,ring,stand,momentum,nudge,steps
+激励,圆环,小组件,手表,移动,步数,锻炼,正念,睡眠,站立,活动,badge,卡路里,活动量,运动环,ring,stand,momentum,nudge,steps,计步器,健身,提醒

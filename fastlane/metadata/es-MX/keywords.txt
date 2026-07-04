@@ -1,1 +1,1 @@
-motivar,hábito,anillos,healthkit,widget,reloj,mover,pasos,entreno,mindfulness,sueño,de pie,cadena
+motivar,hábito,anillos,widget,reloj,mover,pasos,entreno,mindfulness,sueño,de pie,podómetro,bienestar

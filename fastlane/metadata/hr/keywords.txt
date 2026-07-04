@@ -1,1 +1,1 @@
-motivacija,navika,prstenovi,healthkit,widget,sat,pokret,koraci,trening,mindfulness,spavanje,stajanje
+motivacija,navika,prstenovi,widget,sat,pokret,koraci,trening,mindfulness,spavanje,stajanje

@@ -1,1 +1,1 @@
-motivar,hábito,anéis,healthkit,widget,relógio,mover,passos,treino,mindfulness,sono,em pé,cadeia,mapa
+motivar,hábito,widget,relógio,mover,treino,mindfulness,sono,em pé,podômetro,bem-estar

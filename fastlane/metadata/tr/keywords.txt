@@ -1,1 +1,1 @@
-motivasyon,alışkanlık,halkalar,healthkit,widget,saat,hareket,adım,antrenman,mindfulness,uyku,ayakta
+motivasyon,alışkanlık,halkalar,widget,saat,hareket,adım,antrenman,mindfulness,uyku,ayakta,adımsayar
