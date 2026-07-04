@@ -1,12 +1,12 @@
-Other streak apps make you start over at day one. Fitness Streak Tracker reads your Apple Health history and reveals the streaks you've ALREADY been building — 40, 120, even 300 days long, today.
+Other streak apps make you start over at day one. Streak Counter reads your Apple Health history and reveals the streaks you've ALREADY been building, 40, 120, even 300 days long, today.
 
-There's nothing more motivating than realising you're already on a winning streak. Instead of logging habits by hand, Streaks automatically surfaces the momentum hidden in your data — so day one is already day 100.
+There's nothing more motivating than realizing you're already on a winning streak. Instead of logging habits by hand, Streak Counter surfaces the momentum hidden in your data, so day one is already day 100.
 
 AUTO-DISCOVER YOUR STREAKS
 Find active streaks across 9 Apple Health metrics with zero logging: Steps, Exercise Minutes, Stand Hours, Active Energy, Workouts, Mindfulness, Sleep, Distance, and Flights Climbed. Surface hidden streaks you never thought to track.
 
 NEVER BREAK THE CHAIN
-Put your most important goal front and centre with the Hero Streak, watch your run grow on a calendar heatmap, and earn badges as your consistency builds. Get a gentle nudge at 7 PM if today's streak is at risk — we tell you before a streak dies.
+Put your most important goal front and center with the Hero Streak, watch your run grow on a calendar heatmap, and earn badges as your consistency builds. Get a gentle nudge before a streak is about to break, so you can save it in time.
 
 EVERYWHERE YOU LOOK
 • Home Screen, Lock Screen & StandBy widgets
@@ -14,7 +14,7 @@ EVERYWHERE YOU LOOK
 • Your streak count, always one glance away
 
 NOT ANOTHER HABIT TRACKER
-No check-boxes. No manual logging. No recovery score. Just the streaks your past self already earned — surfaced, celebrated, and protected.
+No check-boxes. No manual logging. No recovery score. Just the streaks your past self already earned, surfaced, celebrated, and protected.
 
 FIERCELY PRIVATE (BY DESIGN)
 Your health data belongs to you:
@@ -24,10 +24,10 @@ Your health data belongs to you:
 • Zero network calls, zero tracking
 Your health history never leaves your phone.
 
-Don't break the chain. Download Fitness Streak Tracker and keep your momentum going!
+Don't break the chain. Download Streak Counter and keep your momentum going!
 
 Subscription Details
-Streaks Pro is available as an auto-renewing subscription (Monthly $1.99 / Yearly $14.99 with a 7-day free trial) or a one-time Lifetime purchase ($29.99). Payment is charged to your Apple ID at confirmation. Subscriptions auto-renew unless cancelled at least 24 hours before the end of the period. Manage or cancel anytime in Settings → Apple ID → Subscriptions.
+Streaks Pro is available as an auto-renewing subscription (Monthly $1.99 / Yearly $14.99 with a 7-day free trial) or a one-time Lifetime purchase ($29.99). Payment is charged to your Apple ID at confirmation. Subscriptions auto-renew unless canceled at least 24 hours before the end of the period. Manage or cancel anytime in Settings.
 
 Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
 Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

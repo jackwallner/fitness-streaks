@@ -17,6 +17,7 @@
 		14DE9C98D5E4DEDB8E38FEB6 /* WatchComplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A96B250A2CB89C8A8D01A8 /* WatchComplication.swift */; };
 		151101019766B51B1776361E /* TrialOfferSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA06E349F8611B16EE9DC0D /* TrialOfferSheet.swift */; };
 		156578A6A30A9176A4CFB1BC /* DataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F34D2FE6D3914BB5A4D903 /* DataService.swift */; };
+		16F5169F89DC57B11E429B8B /* PaywallScreenshotMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = A02AE01E60817348D254A9A1 /* PaywallScreenshotMode.swift */; };
 		17C1D8A0245535E964FF1051 /* AppStoreReviewLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8216AB8F772D3FF173751B46 /* AppStoreReviewLinks.swift */; };
 		1E3B9B0FCE2C98347335A466 /* SavesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC74E9FD778F8E217E2F961 /* SavesView.swift */; };
 		222DC786E05BAD3F3102F428 /* AppStoreReviewLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8216AB8F772D3FF173751B46 /* AppStoreReviewLinks.swift */; };
@@ -40,6 +41,7 @@
 		3A26B173CDA85C0FA02EFE09 /* JetBrainsMono-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 560A6C366B6C97CC3275012C /* JetBrainsMono-Bold.ttf */; };
 		3A59A93F659234843A004B88 /* FitnessStreaksWatchWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 78A7FE53D948CD897854EB67 /* FitnessStreaksWatchWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3D3A5F899C36439D1C49A27D /* StreakSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537E2A9D042442EE2656139A /* StreakSettings.swift */; };
+		3F36801CA2AA0CD32E998105 /* PaywallScreenshotHarness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EC246DB6A65D83F291286C7 /* PaywallScreenshotHarness.swift */; };
 		4036868B89ED39858BE39F18 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D972AD56E4B688243C414A06 /* RootTabView.swift */; };
 		40AD79B6755974DBC926F4D7 /* Streak.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF5B8C88482BC235E56075E /* Streak.swift */; };
 		41E0638A5D9332513F2382FE /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5499F56557690B4EE92A2E42 /* NotificationService.swift */; };
@@ -245,6 +247,8 @@
 		8AD92EA0D2588A0993BCFB1F /* CoachmarkOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachmarkOverlay.swift; sourceTree = "<group>"; };
 		9C302E6F3992442B6C651F13 /* StreakStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakStore.swift; sourceTree = "<group>"; };
 		9C80A4826A373B331E583A1E /* StreakMetric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakMetric.swift; sourceTree = "<group>"; };
+		9EC246DB6A65D83F291286C7 /* PaywallScreenshotHarness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallScreenshotHarness.swift; sourceTree = "<group>"; };
+		A02AE01E60817348D254A9A1 /* PaywallScreenshotMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallScreenshotMode.swift; sourceTree = "<group>"; };
 		A05515A54F5B25D57C150872 /* JetBrainsMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "JetBrainsMono-Regular.ttf"; sourceTree = "<group>"; };
 		A235BEE85624E479B2AE5BDF /* WorkoutType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutType.swift; sourceTree = "<group>"; };
 		AA270B28BC95CC6A51C31565 /* StreakSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakSettingsTests.swift; sourceTree = "<group>"; };
@@ -293,6 +297,7 @@
 				5CC00364817F95876F570F12 /* BrokenStreakSheet.swift */,
 				F84469F4922FC57E3F0E0CEE /* DashboardView.swift */,
 				4E54FC44A8D7A428347652F2 /* OnboardingView.swift */,
+				9EC246DB6A65D83F291286C7 /* PaywallScreenshotHarness.swift */,
 				5995F9E0F22A38471BAB08CE /* PaywallView.swift */,
 				C86BF36637A431854BBED3CE /* ReviewPromptSheet.swift */,
 				D972AD56E4B688243C414A06 /* RootTabView.swift */,
@@ -315,6 +320,14 @@
 				43A96B250A2CB89C8A8D01A8 /* WatchComplication.swift */,
 			);
 			path = FitnessStreaksWatchWidget;
+			sourceTree = "<group>";
+		};
+		1FD39F90D764816DDB666504 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				A02AE01E60817348D254A9A1 /* PaywallScreenshotMode.swift */,
+			);
+			path = Utilities;
 			sourceTree = "<group>";
 		};
 		220FAF5435772B0BAFCE4EA8 /* Services */ = {
@@ -376,6 +389,7 @@
 				0F4F5633F83589C8EB674ADE /* PrivacyInfo.xcprivacy */,
 				FEF0A80CEBA522C6253A7930 /* RevenueCat.plist */,
 				732FA7559622623B646F7A94 /* Services */,
+				1FD39F90D764816DDB666504 /* Utilities */,
 				1257F7EF20D99C56AE358598 /* Views */,
 			);
 			path = FitnessStreaks;
@@ -718,6 +732,8 @@
 				725C04D55BBA4E5582F0973E /* HealthKitService.swift in Sources */,
 				CEA8D66BF780261F75668F56 /* NotificationService.swift in Sources */,
 				8F5705E093278934C59D51DB /* OnboardingView.swift in Sources */,
+				3F36801CA2AA0CD32E998105 /* PaywallScreenshotHarness.swift in Sources */,
+				16F5169F89DC57B11E429B8B /* PaywallScreenshotMode.swift in Sources */,
 				2E26CBFAF2564062A08A999C /* PaywallView.swift in Sources */,
 				117AE494DDF91AAF1E0C01F7 /* PixelUI.swift in Sources */,
 				BF04B76F52A4A1A7833024C8 /* ReviewPromptCoordinator.swift in Sources */,
@@ -937,7 +953,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 136;
+				CURRENT_PROJECT_VERSION = 138;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = YXG4MP6W39;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -952,7 +968,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 1.2.3;
+				MARKETING_VERSION = 1.2.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1014,7 +1030,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 136;
+				CURRENT_PROJECT_VERSION = 138;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = YXG4MP6W39;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1035,7 +1051,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 1.2.3;
+				MARKETING_VERSION = 1.2.4;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1074,7 +1090,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.jackwallner.streaks;
 				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = REVENUECAT;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) REVENUECAT";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -1124,7 +1140,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.jackwallner.streaks;
 				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = REVENUECAT;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) REVENUECAT";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;

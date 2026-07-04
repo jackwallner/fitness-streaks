@@ -23,6 +23,14 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 Upload screenshots and metadata to App Store Connect (fastlane 2.234+)
 
+### ios ship_review
+
+```sh
+[bundle exec] fastlane ios ship_review
+```
+
+Upload metadata + screenshots, select build, and submit 1.2.4 for review
+
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
