@@ -1,1 +1,1 @@
-motivácia,návyk,kruhy,healthkit,widget,hodinky,pohyb,kroky,tréning,mindfulness,spánok,stát,reťaz
+motivácia,návyk,kruhy,widget,hodinky,tréning,mindfulness,spánok,stát,krokomer

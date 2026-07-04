@@ -1,1 +1,1 @@
-motivere,vane,ringe,healthkit,widget,ur,bevægelse,skridt,træning,mindfulness,søvn,stå,kæde,heatmap
+motivere,vane,ringe,widget,ur,bevægelse,skridt,træning,mindfulness,søvn,stå,skridttæller,fitness

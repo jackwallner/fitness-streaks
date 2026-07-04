@@ -1,1 +1,1 @@
-motivation,gewohnheit,ringe,healthkit,widget,uhr,bewegung,schritte,training,achtsamkeit,schlaf,kette
+motivation,gewohnheit,widget,uhr,bewegung,training,achtsamkeit,schlaf,schrittzähler

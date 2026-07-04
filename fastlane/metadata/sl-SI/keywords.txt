@@ -1,1 +1,1 @@
-motivacija,navada,prstani,healthkit,widget,ura,gibanje,koraki,trening,mindfulness,spavanje,stajanje
+motivacija,navada,prstani,widget,ura,gibanje,koraki,trening,mindfulness,spavanje,stajanje

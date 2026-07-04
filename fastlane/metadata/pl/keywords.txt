@@ -1,1 +1,1 @@
-motywacja,nawyk,pierścienie,healthkit,widget,zegarek,ruch,kroki,trening,mindfulness,sen,stawanie
+motywacja,nawyk,pierścienie,widget,zegarek,trening,mindfulness,sen,stawanie,krokomierz

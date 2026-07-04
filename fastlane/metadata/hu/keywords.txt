@@ -1,1 +1,1 @@
-motiváció,szokás,gyűrűk,healthkit,widget,óra,mozgás,lépések,edzés,mindfulness,alvás,állás,lánc,badge
+motiváció,szokás,gyűrűk,widget,óra,mozgás,lépések,edzés,mindfulness,alvás,állás,badge,lépésszámláló

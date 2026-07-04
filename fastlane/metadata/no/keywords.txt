@@ -1,1 +1,1 @@
-motivere,vane,ringe,healthkit,widget,klokke,bevegelse,skritt,trening,mindfulness,søvn,stå,kjede
+motivere,vane,ringe,widget,klokke,bevegelse,skritt,trening,mindfulness,søvn,stå,skritteller,fitness

@@ -1,1 +1,1 @@
-motiver,habitude,anneaux,healthkit,widget,montre,mouvement,entraînement,méditation,sommeil,debout
+motiver,habitude,anneaux,widget,montre,mouvement,entraînement,méditation,sommeil,debout,podomètre

@@ -1,1 +1,1 @@
-motivare,abitudine,anelli,healthkit,widget,orologio,muovere,passi,allenamento,mindfulness,sonno
+motivare,abitudine,anelli,widget,orologio,muovere,passi,allenamento,mindfulness,sonno,contapassi
