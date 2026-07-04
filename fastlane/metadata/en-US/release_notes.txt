@@ -1,1 +1,1 @@
-Bug fixes and performance improvements across the app, widgets, and Apple Watch.
+Behind-the-scenes improvements to keep your streaks fast and accurate across the app, widgets, and Apple Watch.

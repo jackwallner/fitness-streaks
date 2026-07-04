@@ -169,10 +169,12 @@ struct PixelButton: View {
             Text(title.uppercased())
                 .font(RetroFont.pixel(12))
                 .tracking(1)
+                .lineLimit(2)
+                .minimumScaleFactor(0.7)
                 .foregroundStyle(Theme.retroBg)
                 .padding(.horizontal, 18)
                 .padding(.vertical, 12)
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, minHeight: 44)
                 .background(accent)
                 .overlay(
                     Rectangle().stroke(Color.white.opacity(pressed ? 0 : 0.25), lineWidth: 2)

@@ -1,1 +1,1 @@
-motivate,habit,rings,healthkit,widget,watch,move,steps,workout,mindful,sleep,stand,chain,heatmap
+health,widget,motivation,habit,sleep,fitness,pedometer,activity,tracker,move,goal,workout,stand
