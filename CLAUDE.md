@@ -2,26 +2,17 @@
 
 iPhone + Apple Watch app that mines Apple Health history for active streaks and encourages the user to keep them alive.
 
+XcodeGen project/scheme: `FitnessStreaks`, simulator device `agent-fitness-streaks`.
+
 ## Tech Stack
 
 - Swift 6 / SwiftUI (strict concurrency)
 - HealthKit (read-only: stepCount, appleExerciseTime, appleStandTime, activeEnergyBurned, distanceWalkingRunning, flightsClimbed, workoutType, mindfulSession, sleepAnalysis)
 - SwiftData (local cache shared via App Group)
 - WidgetKit (iOS widgets + watchOS complications)
-- XcodeGen (`project.yml` → `.xcodeproj`)
-- Targets: iOS 17+, watchOS 10+
+- XcodeGen (`project.yml`). Targets: iOS 17+, watchOS 10+
 
-## Build & Run
-
-```bash
-xcodegen generate  # required after project.yml or file-structure changes
-xcodebuild -project FitnessStreaks.xcodeproj -scheme FitnessStreaks -destination 'generic/platform=iOS' build
-./scripts/testflight.sh  # archive + upload to TestFlight
-```
-
-## Architecture
-
-### Targets
+## Targets
 
 | Target | Type | Bundle ID | Platform |
 |---|---|---|---|
@@ -32,7 +23,7 @@ xcodebuild -project FitnessStreaks.xcodeproj -scheme FitnessStreaks -destination
 
 App group: `group.com.jackwallner.streaks`.
 
-### Data flow
+## Data flow
 
 ```
 HealthKit → HealthKitService.fetchHistory(days:) → StreakEngine.discover(...)
@@ -46,7 +37,7 @@ HealthKit → HealthKitService.fetchHistory(days:) → StreakEngine.discover(...
 
 Widgets never query HealthKit. They render from the `StreakSnapshot` that the main app writes to App Group UserDefaults after each refresh.
 
-### The streak engine
+## The streak engine
 
 `StreakEngine.discover(history:hiddenMetrics:now:)` returns sorted `[Streak]`. Per `(metric, cadence)`:
 - Evaluates every threshold tier (e.g. `steps.dailyThresholds = [3k, 5k, 7.5k, 10k, 12.5k, 15k]`).
@@ -54,54 +45,13 @@ Widgets never query HealthKit. They render from the `StreakSnapshot` that the ma
 - Falls back to the lowest threshold with `current ≥ 2` if nothing higher qualifies.
 
 Today / this-week is treated as "live" — doesn't break the streak until the unit actually ends.
-
 Sleep attribution: an asleep sample is credited to the day it *ended*.
-
 Weekly totals: summed per ISO week starting Monday (see `DateHelpers.startOfWeek`).
 
-### Signing
+## App-specific notes
 
-- Team: `YXG4MP6W39` (free Apple Dev account — max 3 apps installed)
-- Automatic signing, set in `project.yml`
-- Short bundle IDs (free accounts reject deeply nested IDs)
+- Review funnel: positive moments on hero-streak growth / today's goal met (`ReviewPromptTracker`, `ReviewPromptSheet`). App Store ID `6762699692`. (Shared funnel mechanics + playbook in the `ios-dev` skill.)
 
-## Gotchas
-
-- After adding/removing any `.swift`, run `xcodegen generate`.
-- `UILaunchScreen` key is mandatory in `FitnessStreaks/Info.plist`.
-- Widgets use the module-level `streaksAppGroupID` constant since `DataService` is `@MainActor`.
-- watchOS `Theme`: no UIKit semantic colors — handled via `#if os(watchOS)`.
-- Swift 6: all HealthKit callbacks wrapped in async continuations; `@Sendable` where required.
-- `WKCompanionAppBundleIdentifier` in `FitnessStreaksWatch/Info.plist` must match the iOS bundle ID exactly.
-
-## Review prompts
-
-Five-star review funnel (`ReviewPromptTracker`, `ReviewPromptSheet`, positive moments on hero streak growth / today's goal met). App Store ID `6762699692`; playbook: `~/Desktop/app-store-5-star-review-strategy.md`.
-
-## Workflow
-- Do NOT add Co-Authored-By lines to commits.
-
-## Simulator — dedicated, headless (required)
-
-This project owns the simulator device `agent-fitness-streaks`. Multiple agents work in
-parallel on this machine: NEVER build/test against a shared named destination
-(e.g. `name=iPhone 17 Pro`) and NEVER open Simulator.app — it steals Jack's
-mouse/keyboard. Everything runs headless. Full guide: `~/docs/ios-agent-simulators.md`
-
-```bash
-UDID=$(agent-sim boot fitness-streaks)        # create if needed + boot headless; prints UDID
-xcodebuild -project FitnessStreaks.xcodeproj -scheme FitnessStreaks -destination "id=$UDID" build
-xcodebuild test -project FitnessStreaks.xcodeproj -scheme FitnessStreaks -destination "id=$UDID"
-APP=$(find ~/Library/Developer/Xcode/DerivedData/FitnessStreaks-*/Build/Products -maxdepth 2 -name "*.app" -path "*iphonesimulator*" | head -1)
-xcrun simctl install "$UDID" "$APP" && xcrun simctl launch "$UDID" "$(defaults read "$APP/Info" CFBundleIdentifier)"
-axe describe-ui --udid "$UDID"        # inspect UI via accessibility tree
-axe tap --label "Continue" --udid "$UDID"   # interact without mouse/keyboard
-agent-sim screenshot fitness-streaks          # PNG at /tmp/agent-fitness-streaks.png
-agent-sim shutdown fitness-streaks            # free resources when done
-```
-
-## TestFlight on every update
-
-After finishing a change and pushing to git, ALWAYS upload a new TestFlight build by
-running `./scripts/testflight.sh` — do this unprompted on every push that changes app
-code. Jack tests every update on his device and shouldn't have to ask.
+---
+Shared iOS conventions (build, simulator, release/TestFlight, ASC key, signing, HealthKit/widget gotchas):
+always-loaded global CLAUDE.md + the `ios-dev` skill.
