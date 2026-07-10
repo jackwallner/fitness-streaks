@@ -343,18 +343,24 @@ private struct RootView: View {
                 showTrialPaywall = true
             }
         }) {
+            // Resolve from the non-nil computed source, not the `@State` alone: on the
+            // post-onboarding fallback path the sheet can render a tick before
+            // `trialOfferPackage` is assigned (set-state-then-present race), which made
+            // `directPurchase` false and downgraded the one-tap "START FREE TRIAL" CTA
+            // to "SEE PLANS". `directTrialPackage` always reflects the loaded products,
+            // mirroring OnboardingView's `hasDirectTrialPackage`.
             TrialOfferSheet(
-                offerLabel: trialOfferPackage?.streaksIntroOfferLabel
+                offerLabel: (trialOfferPackage ?? directTrialPackage)?.streaksIntroOfferLabel
                     ?? storeKit.products.compactMap(\.streaksIntroOfferLabel).first,
-                priceLabel: trialOfferPackage?.streaksRecurringPriceLabel,
-                directPurchase: trialOfferPackage != nil,
+                priceLabel: (trialOfferPackage ?? directTrialPackage)?.streaksRecurringPriceLabel,
+                directPurchase: (trialOfferPackage ?? directTrialPackage) != nil,
                 isPurchasing: trialPurchaseInFlight,
                 errorMessage: trialPurchaseError,
                 pickedCount: settings.lastOnboardingPickedCount,
                 freeCap: Self.freeTrackedLimit,
                 longestStreak: longestStreakInfo(),
                 onStartTrial: {
-                    if trialOfferPackage != nil {
+                    if (trialOfferPackage ?? directTrialPackage) != nil {
                         startDirectTrialPurchase()
                     } else {
                         pendingPaywallAfterTrialDismiss = true
