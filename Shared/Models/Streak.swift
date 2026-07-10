@@ -1,6 +1,6 @@
 import Foundation
 
-/// A single-hour slice of the day (e.g. 17 → "5–6pm").
+/// A single-hour slice of the day (e.g. 17 → "5-6pm").
 /// When present on a Streak, we're tracking activity WITHIN that hour every day,
 /// not the whole-day total. This is how Streaks surfaces hidden rhythms.
 struct HourWindow: Hashable, Sendable, Codable {
@@ -9,7 +9,7 @@ struct HourWindow: Hashable, Sendable, Codable {
     var label: String {
         let s = Self.format(hour: startHour)
         let e = Self.format(hour: (startHour + 1) % 24)
-        return "\(s)–\(e)"
+        return "\(s)-\(e)"
     }
 
     static func format(hour: Int) -> String {

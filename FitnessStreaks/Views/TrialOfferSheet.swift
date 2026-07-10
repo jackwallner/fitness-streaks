@@ -82,7 +82,9 @@ struct TrialOfferSheet: View {
 
     private var subheadline: String {
         if let subheadlineOverride { return subheadlineOverride }
-        let trialClause = offerLabel.map { ", free for your \($0.replacingOccurrences(of: " free trial", with: ""))" } ?? ""
+        // "7-day free trial" -> ", free for your 7-day trial" (keeping "trial" so the
+        // sentence doesn't dangle as "...earned, free for your 7-day.").
+        let trialClause = offerLabel.map { ", free for your \($0.replacingOccurrences(of: " free trial", with: " trial"))" } ?? ""
         if hasMeaningfulStreak {
             return "One missed \(longestStreak?.cadenceLabel ?? "day") zeroes it out. Streaks+ auto-saves the run and tracks every streak you've earned\(trialClause)."
         }
@@ -214,12 +216,18 @@ struct TrialOfferSheet: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
-                .background(Theme.retroLime, in: RoundedRectangle(cornerRadius: 4, style: .continuous))
+                // Hard retro shadow lives on the background shape only. Applying
+                // .shadow to the whole composite double-prints the label text as a
+                // dark offset ghost on the lime fill.
+                .background(
+                    RoundedRectangle(cornerRadius: 4, style: .continuous)
+                        .fill(Theme.retroLime)
+                        .shadow(color: Theme.retroInk, radius: 0, x: 3, y: 3)
+                )
                 .overlay(
                     RoundedRectangle(cornerRadius: 4, style: .continuous)
                         .stroke(Theme.retroInk, lineWidth: 2)
                 )
-                .shadow(color: Theme.retroInk, radius: 0, x: 3, y: 3)
             }
             .buttonStyle(.plain)
             .disabled(isPurchasing)
