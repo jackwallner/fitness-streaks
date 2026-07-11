@@ -1,1 +1,1 @@
-Bug fixes and performance improvements across the app, widgets, and Apple Watch.
+修复应用、小组件和 Apple Watch 中的错误并提升性能。

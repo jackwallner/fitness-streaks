@@ -1,1 +1,1 @@
-Bug fixes and performance improvements across the app, widgets, and Apple Watch.
+ਐਪ, ਵਿਜੇਟ ਅਤੇ Apple Watch ਵਿੱਚ ਬੱਗ ਠੀਕ ਅਤੇ ਪ੍ਰਦਰਸ਼ਨ ਸੁਧਾਰ।
