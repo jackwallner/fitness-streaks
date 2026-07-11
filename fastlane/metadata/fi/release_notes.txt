@@ -1,1 +1,1 @@
-Bug fixes and performance improvements across the app, widgets, and Apple Watch.
+Bugikorjauksia ja suorituskyvyn parannuksia sovelluksessa, widgeteissä ja Apple Watchissa.
