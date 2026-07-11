@@ -13,6 +13,7 @@ struct OnboardingView: View {
         case loading     // running discovery
         case selecting   // pick which discovered streaks to track
         case empty       // no streaks discovered
+        case trial       // full-screen onboarding trial page (Continue-slot CTA)
     }
 
     @State private var phase: Phase = .intro
@@ -23,16 +24,12 @@ struct OnboardingView: View {
     @State private var flameVisible = true
     @State private var selection: Set<String> = []
     @State private var authProgress: Double = 0
-    /// Full "see all plans" paywall — reached from the trial offer or as a fallback.
+    /// Full "see all plans" paywall — reached only as an emergency fallback when
+    /// trial products failed to load. The onboarding trial page itself never
+    /// offers "see all plans" (Continue-slot bar: one offer, one tap).
     @State private var showingPaywall = false
-    /// Personalized loss-aversion trial pitch shown at Start for over-cap free users.
-    @State private var showingTrialOffer = false
     @State private var trialPurchaseInFlight = false
     @State private var trialPurchaseError: String? = nil
-    /// Set when the user opts into the full paywall from inside the trial sheet so
-    /// the full paywall is presented *after* the trial sheet finishes dismissing —
-    /// presenting both in the same tick is racy in SwiftUI.
-    @State private var pendingPaywallAfterTrialDismiss = false
 
     private static let tips: [String] = [
         "Streaks update automatically from Apple Health. No manual logging.",
@@ -43,10 +40,11 @@ struct OnboardingView: View {
         "Per-workout-type streaks let you track yoga, runs, and lifts separately."
     ]
     private static let privacyPolicyURL = URL(string: "https://jackwallner.github.io/fitness-streaks/privacy-policy.html")!
+    private static let termsURL = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
 
     /// Free accounts track at most this many discovered streaks. Onboarding
     /// pre-selects *more* than this (all core metrics) and lets the user keep
-    /// them all through the selection step. The paywall at Start is the gate:
+    /// them all through the selection step. The trial page at Start is the gate:
     /// pay to keep everything, or dismiss and we trim down to the top N.
     static let freeTrackedLimit = 3
 
@@ -61,52 +59,22 @@ struct OnboardingView: View {
             Theme.retroBg.ignoresSafeArea()
 
             switch phase {
-            case .intro:     introScreen
-            case .intensity: intensityScreen
+            case .intro:     introContent
+            case .intensity: intensityContent
             case .loading:   loadingScreen
-            case .selecting: selectingScreen
-            case .empty:     emptyScreen
+            case .selecting: selectingContent
+            case .empty:     emptyContent
+            case .trial:     trialContent
             }
         }
-        .sheet(isPresented: $showingTrialOffer, onDismiss: {
-            trialPurchaseInFlight = false
-            trialPurchaseError = nil
-            // If a purchase succeeded inside the trial sheet, the entitlement
-            // (or pending grant) makes any further paywall pointless. Skip the
-            // hand-off and finish onboarding directly.
-            if storeKit.grantsUnlimitedTrackedStreaks {
-                pendingPaywallAfterTrialDismiss = false
-                settings.hasSeenTrialOffer = true
-                finishOnboardingAfterPaywallDismiss()
-            } else if pendingPaywallAfterTrialDismiss {
-                // They chose "see all plans" — hand off to the full paywall, which
-                // owns the trim-and-complete on its own dismiss.
-                pendingPaywallAfterTrialDismiss = false
-                showingPaywall = true
-            } else {
-                settings.hasSeenTrialOffer = true
-                finishOnboardingAfterPaywallDismiss()
-            }
-        }) {
-            TrialOfferSheet(
-                offerLabel: trialOfferLabel,
-                priceLabel: trialPriceLabel,
-                directPurchase: hasDirectTrialPackage,
-                isPurchasing: trialPurchaseInFlight,
-                errorMessage: trialPurchaseError,
-                pickedCount: selection.count,
-                freeCap: Self.freeTrackedLimit,
-                longestStreak: longestSelectedStreak(),
-                onStartTrial: startTrialPurchase,
-                onSeeAllPlans: {
-                    pendingPaywallAfterTrialDismiss = true
-                    showingTrialOffer = false
-                },
-                onDismiss: { showingTrialOffer = false }
-            )
-            .presentationDetents([.large])
-            .presentationDragIndicator(.visible)
-            .interactiveDismissDisabled(trialPurchaseInFlight)
+        // Shared bottom CTA bar. Rendering the primary lime button here (rather than
+        // inside each phase's content) is what guarantees the zero-shift requirement:
+        // the button's frame is fixed by the reserved footer slot + bottom padding
+        // BELOW it, so it lands in the exact same (x, y, w, h) on every phase,
+        // including the trial page. Anything ABOVE the button (soft exit, price
+        // disclosure) grows the bar upward and never moves the button.
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            bottomBar
         }
         .sheet(isPresented: $showingPaywall, onDismiss: {
             // Soft paywall: swipe-to-dismiss is intentionally allowed so a failed
@@ -120,10 +88,9 @@ struct OnboardingView: View {
             // Entitlement (or pending entitlement) landed — kill any pitch surface
             // so the user never sees a second paywall after paying.
             guard granted else { return }
-            pendingPaywallAfterTrialDismiss = false
-            showingTrialOffer = false
             showingPaywall = false
             settings.hasSeenTrialOffer = true
+            if phase == .trial { finishFromTrial() }
         }
         .onAppear {
             // Start timers on appear
@@ -149,9 +116,137 @@ struct OnboardingView: View {
         }
     }
 
+    // MARK: - Shared bottom CTA bar (zero-shift)
+
+    /// The one lime primary button used on every phase. Identical construction
+    /// everywhere so its rendered frame (height from the fixed vertical padding +
+    /// mono(13) line, width from the fixed horizontal padding) is byte-for-byte
+    /// the same on GET STARTED / FIND MY STREAKS / START · N / CONTINUE / the
+    /// trial CTA. `minimumScaleFactor` keeps long labels on one line without
+    /// changing the frame.
+    private func primaryButton(_ title: String, enabled: Bool = true, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(RetroFont.mono(13, weight: .bold))
+                .foregroundStyle(Theme.retroBg)
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(enabled ? Theme.retroLime : Theme.retroInkFaint)
+        }
+        .buttonStyle(.plain)
+        .disabled(!enabled)
+        .padding(.horizontal, 20)
+    }
+
+    /// Fixed-height legal-footer slot reserved BELOW the primary button on every
+    /// phase (Rev A #2). Empty (but space-reserving) on non-trial phases; holds
+    /// Terms · Privacy · Restore on the trial page. Its constant height is what
+    /// pins the primary button to the same y across phases.
+    private func footerSlot<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
+        // Color.clear (not EmptyView) keeps the slot occupying its 30pt even when
+        // there's no footer content — EmptyView ignores frame modifiers, which
+        // would collapse the slot and shift the primary button between phases.
+        ZStack {
+            Color.clear
+            content()
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 30)
+    }
+
+    @ViewBuilder
+    private var bottomBar: some View {
+        switch phase {
+        case .loading:
+            EmptyView()
+        case .intro:
+            standardCTA("▶ GET STARTED") { withAnimation { phase = .intensity } }
+        case .intensity:
+            standardCTA(requesting ? "CONNECTING..." : "▶ FIND MY STREAKS", enabled: !requesting) {
+                Task { await beginDiscoveryWithAuth() }
+            }
+        case .selecting:
+            standardCTA(startButtonLabel, enabled: !selection.isEmpty) { finishWithSelection() }
+        case .empty:
+            standardCTA("▶ CONTINUE") { finishWithoutTracking() }
+        case .trial:
+            trialCTA
+        }
+    }
+
+    /// Non-trial CTA: primary button + empty reserved footer slot + bottom padding.
+    private func standardCTA(_ title: String, enabled: Bool = true, action: @escaping () -> Void) -> some View {
+        VStack(spacing: 10) {
+            primaryButton(title, enabled: enabled, action: action)
+            footerSlot { EmptyView() }
+        }
+        .padding(.bottom, 24)
+        .background(Theme.retroBg)
+    }
+
+    /// Trial-page CTA stack: soft "Get Started" exit + price disclosure ABOVE the
+    /// primary (neither moves the button), the same lime primary button in the
+    /// Continue slot, then Terms · Privacy · Restore in the reserved footer.
+    private var trialCTA: some View {
+        VStack(spacing: 10) {
+            Button(action: finishFromTrial) {
+                Text("GET STARTED")
+                    .font(RetroFont.mono(12, weight: .bold))
+                    .tracking(1)
+                    .foregroundStyle(Theme.retroInkDim)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .overlay(Rectangle().stroke(Theme.retroInkFaint, lineWidth: 2))
+            }
+            .buttonStyle(.plain)
+            .disabled(trialPurchaseInFlight)
+            .padding(.horizontal, 20)
+
+            if let disclosure = trialDisclosureText {
+                Text(disclosure)
+                    .font(RetroFont.mono(9))
+                    .foregroundStyle(Theme.retroInkDim)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, 18)
+            }
+
+            if let trialPurchaseError {
+                Text(trialPurchaseError)
+                    .font(RetroFont.mono(10, weight: .bold))
+                    .foregroundStyle(Theme.retroRed)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 18)
+            }
+
+            primaryButton(trialPrimaryLabel, enabled: !trialPurchaseInFlight) {
+                startOnboardingTrialPurchase()
+            }
+
+            footerSlot { trialFooter }
+        }
+        .padding(.bottom, 24)
+        .background(Theme.retroBg)
+    }
+
+    private var trialFooter: some View {
+        HStack(spacing: 8) {
+            Link("TERMS", destination: Self.termsURL)
+            Text("·").foregroundStyle(Theme.retroInkFaint)
+            Link("PRIVACY", destination: Self.privacyPolicyURL)
+            Text("·").foregroundStyle(Theme.retroInkFaint)
+            Button("RESTORE") { Task { await storeKit.restore() } }
+        }
+        .font(RetroFont.mono(9, weight: .bold))
+        .tracking(1)
+        .foregroundStyle(Theme.retroCyan)
+    }
+
     // MARK: - Intro
 
-    private var introScreen: some View {
+    private var introContent: some View {
         VStack(spacing: 24) {
             VStack(spacing: 18) {
                 Image(systemName: "flame.fill")
@@ -190,11 +285,8 @@ struct OnboardingView: View {
 
             Spacer(minLength: 8)
 
-            VStack(spacing: 8) {
-                connectButton
-                compactPrivacyNotice
-            }
-            .padding(.horizontal, 20)
+            compactPrivacyNotice
+                .padding(.horizontal, 20)
         }
     }
 
@@ -253,20 +345,6 @@ struct OnboardingView: View {
         .padding(.bottom, 6)
     }
 
-    private var connectButton: some View {
-        Button {
-            withAnimation { phase = .intensity }
-        } label: {
-            Text("▶ GET STARTED")
-                .font(RetroFont.mono(13, weight: .bold))
-                .foregroundStyle(Theme.retroBg)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-                .background(Theme.retroLime)
-        }
-        .buttonStyle(.plain)
-    }
-
     private func errorBlock(_ err: String) -> some View {
         VStack(spacing: 8) {
             Text(err)
@@ -305,7 +383,7 @@ struct OnboardingView: View {
 
     // MARK: - Intensity
 
-    private var intensityScreen: some View {
+    private var intensityContent: some View {
         VStack(spacing: 20) {
             VStack(spacing: 8) {
                 Text("PICK YOUR INTENSITY")
@@ -333,21 +411,6 @@ struct OnboardingView: View {
                 errorBlock(err)
                     .padding(.bottom, 12)
             }
-
-            Button {
-                Task { await beginDiscoveryWithAuth() }
-            } label: {
-                Text(requesting ? "CONNECTING..." : "▶ FIND MY STREAKS")
-                    .font(RetroFont.mono(13, weight: .bold))
-                    .foregroundStyle(Theme.retroBg)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(requesting ? Theme.retroInkFaint : Theme.retroLime)
-            }
-            .buttonStyle(.plain)
-            .disabled(requesting)
-            .padding(.horizontal, 20)
-            .padding(.bottom, 24)
         }
     }
 
@@ -483,7 +546,7 @@ struct OnboardingView: View {
 
     // MARK: - Selecting
 
-    private var selectingScreen: some View {
+    private var selectingContent: some View {
         VStack(spacing: 0) {
             VStack(spacing: 6) {
                 Text("YOUR STREAKS")
@@ -534,27 +597,12 @@ struct OnboardingView: View {
                     .padding(.horizontal, 20)
                     .padding(.bottom, 8)
             }
-
-            Button {
-                finishWithSelection()
-            } label: {
-                Text(startButtonLabel)
-                    .font(RetroFont.mono(13, weight: .bold))
-                    .foregroundStyle(Theme.retroBg)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(selection.isEmpty ? Theme.retroInkFaint : Theme.retroLime)
-            }
-            .buttonStyle(.plain)
-            .disabled(selection.isEmpty)
-            .padding(.horizontal, 20)
-            .padding(.bottom, 24)
         }
     }
 
     // MARK: - Empty
 
-    private var emptyScreen: some View {
+    private var emptyContent: some View {
         VStack(spacing: 20) {
             Spacer(minLength: 0)
 
@@ -576,21 +624,108 @@ struct OnboardingView: View {
             }
 
             Spacer(minLength: 0)
-
-            Button {
-                finishWithoutTracking()
-            } label: {
-                Text("▶ CONTINUE")
-                    .font(RetroFont.mono(13, weight: .bold))
-                    .foregroundStyle(Theme.retroBg)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(Theme.retroLime)
-            }
-            .buttonStyle(.plain)
-            .padding(.horizontal, 20)
-            .padding(.bottom, 24)
         }
+    }
+
+    // MARK: - Trial page
+
+    private var trialContent: some View {
+        // Scrolls (instead of compressing) when the CTA bar grows — e.g. when a
+        // purchase error line appears — so the headline never truncates.
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 20) {
+                VStack(spacing: 16) {
+                    trialHero
+                        .padding(.top, 28)
+
+                    VStack(spacing: 10) {
+                        Text("UNLOCK EVERY\nSTREAK")
+                            .font(RetroFont.mono(26, weight: .bold))
+                            .tracking(2)
+                            .foregroundStyle(Theme.retroMagenta)
+                            .multilineTextAlignment(.center)
+                            .lineSpacing(4)
+                            .retroGlow(Theme.retroMagenta)
+                            .minimumScaleFactor(0.7)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        Text(trialSubtitle)
+                            .font(RetroFont.mono(12))
+                            .foregroundStyle(Theme.retroInkDim)
+                            .multilineTextAlignment(.center)
+                            .lineSpacing(3)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.horizontal, 16)
+                    }
+                }
+
+                VStack(spacing: 10) {
+                    trialBenefit("infinity", Theme.retroCyan,
+                                 "Track every streak",
+                                 "Free tracks \(Self.freeTrackedLimit). Streaks+ keeps every metric you've earned.")
+                    trialBenefit("flame.fill", Theme.retroMagenta,
+                                 "Auto-save misses",
+                                 "Miss a day? Streaks+ revives the run instead of zeroing it.")
+                    trialBenefit("wand.and.stars", Theme.retroLime,
+                                 "Custom streaks",
+                                 "Your own thresholds, cadences, and hour windows.")
+                }
+                .padding(.horizontal, 20)
+            }
+            .padding(.bottom, 12)
+        }
+    }
+
+    private var trialHero: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .fill(Theme.retroBgRaised)
+                .frame(width: 84, height: 84)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .stroke(Theme.retroMagenta, lineWidth: 2)
+                )
+                .shadow(color: Theme.retroMagenta.opacity(0.6), radius: 0, x: 4, y: 4)
+            Image(systemName: "flame.fill")
+                .font(.system(size: 38, weight: .heavy))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [Theme.retroAmber, Theme.retroMagenta],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+        }
+    }
+
+    private func trialBenefit(_ icon: String, _ tint: Color, _ title: String, _ detail: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 20, weight: .bold))
+                .foregroundStyle(tint)
+                .frame(width: 28)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title.uppercased())
+                    .font(RetroFont.mono(12, weight: .bold))
+                    .tracking(1)
+                    .foregroundStyle(Theme.retroInk)
+                Text(detail)
+                    .font(RetroFont.mono(10))
+                    .foregroundStyle(Theme.retroInkDim)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .pixelPanel(color: tint, fill: Theme.retroBgRaised)
+    }
+
+    private var trialSubtitle: String {
+        if let offer = trialOfferLabel {
+            return "Start your \(offer.lowercased()) and keep every streak you just earned."
+        }
+        return "Start a free trial and keep every streak you just earned."
     }
 
     // MARK: - Flow
@@ -624,7 +759,7 @@ struct OnboardingView: View {
         // Pre-select Apple's Activity-ring core metrics for a familiar onboarding
         // experience. Both free and Pro users start with all available core
         // metrics selected. Free users land over the cap on purpose — the Start
-        // button routes them through the paywall (pay to keep all, or we trim to
+        // button routes them through the trial page (pay to keep all, or we trim to
         // `freeTrackedLimit` on dismiss). This is the self-force funnel.
         let coreMetrics: [StreakMetric] = [.steps, .exerciseMinutes, .standHours, .activeEnergy, .workouts]
         let core = store.allCandidates
@@ -654,12 +789,12 @@ struct OnboardingView: View {
         settings.manualStreakOrder = order
         settings.lastOnboardingTrackedKeys = order
         store.refilter()
-        advanceFromSelection()
+        routeToTrialOrFinish()
     }
 
-    /// After any onboarding paywall/trial sheet closes, enforce the free cap only
-    /// when the user did not purchase. Restores the full onboarding pick list when
-    /// they did (including pending entitlement activation).
+    /// After any onboarding paywall closes, enforce the free cap only when the
+    /// user did not purchase. Restores the full onboarding pick list when they did
+    /// (including pending entitlement activation).
     private func finishOnboardingAfterPaywallDismiss() {
         Task {
             await storeKit.refreshEntitlement()
@@ -673,7 +808,7 @@ struct OnboardingView: View {
         }
     }
 
-    /// Free user dismissed the paywall without upgrading. Trim their over-cap
+    /// Free user left the trial page without upgrading. Trim their over-cap
     /// selection down to `freeTrackedLimit`, keeping the highest-ranked picks in
     /// the order already recorded in `manualStreakOrder`.
     private func trimSelectionToFreeCap() {
@@ -689,25 +824,35 @@ struct OnboardingView: View {
     private func finishWithoutTracking() {
         settings.trackedStreaks = nil
         store.refilter()
-        advanceFromSelection(showPaywall: false)
+        routeToTrialOrFinish()
     }
 
-    /// After the user picks (or skips) streaks, route non-Pro users through
-    /// the paywall directly as the natural next step. Pro users skip through.
-    private func advanceFromSelection(showPaywall: Bool = true) {
-        // Only gate on the paywall when there's actually an offering to show. If
-        // RevenueCat hasn't loaded (offline / slow / misconfigured), proceed into
-        // the app rather than presenting an empty, non-actionable paywall.
-        if storeKit.grantsUnlimitedTrackedStreaks || !showPaywall || storeKit.offerings?.current == nil {
-            if storeKit.grantsUnlimitedTrackedStreaks {
-                settings.restoreOnboardingTrackedStreaksIfNeeded()
-                store.refilter()
-            } else {
-                trimSelectionToFreeCap()
-            }
+    /// Route both onboarding exit paths (Start with a selection, and the empty
+    /// discovery CONTINUE) into the full-screen trial page before completing
+    /// setup. Pro users skip straight through. Falls back to the full paywall
+    /// only when a trial product couldn't be resolved.
+    private func routeToTrialOrFinish() {
+        if storeKit.grantsUnlimitedTrackedStreaks {
+            settings.restoreOnboardingTrackedStreaksIfNeeded()
+            store.refilter()
             completeSetup()
+            return
+        }
+        if hasDirectTrialPackage {
+            // Setting this now prevents the passive ~4s TrialOfferSheet from
+            // double-firing once the dashboard appears.
+            settings.hasSeenTrialOffer = true
+            trialPurchaseError = nil
+            withAnimation { phase = .trial }
+            return
+        }
+        // No trial-bearing product resolved. If offerings loaded, fall back to the
+        // full paywall; if nothing loaded at all, don't brick first launch.
+        if storeKit.offerings?.current != nil {
+            showingPaywall = true
         } else {
-            showingTrialOffer = true
+            trimSelectionToFreeCap()
+            completeSetup()
         }
     }
 
@@ -720,29 +865,25 @@ struct OnboardingView: View {
         withAnimation { settings.hasCompletedSetup = true }
     }
 
-    // MARK: - Trial Offer
+    // MARK: - Trial page purchase
 
-    /// Strongest streak the *free cap would drop* from the user's selection.
-    /// The loss-aversion pitch must reference a streak Streaks+ would save —
-    /// not one the user keeps under the free tier anyway. Returns nil when the
-    /// selection fits inside the free cap (nothing would be lost).
-    private func longestSelectedStreak() -> TrialOfferSheet.LongestStreakInfo? {
-        guard selection.count > Self.freeTrackedLimit else { return nil }
-        // Determine which of the user's picks would survive the free-tier trim,
-        // mirroring `trimSelectionToFreeCap`. Anything outside `kept` is at risk.
-        let orderedKeys = settings.manualStreakOrder.filter { selection.contains($0) }
-        let pickOrder = orderedKeys.isEmpty ? Array(selection) : orderedKeys
-        let kept = Set(pickOrder.prefix(Self.freeTrackedLimit))
-        let atRisk = store.allCandidates.filter {
-            selection.contains($0.trackingKey) && !kept.contains($0.trackingKey)
+    /// Finish onboarding from the trial page (soft "Get Started" exit or a
+    /// completed purchase). Mirrors the paywall-dismiss completion: restore full
+    /// picks if paid, else trim to the free cap, then complete setup.
+    private func finishFromTrial() {
+        Task {
+            await storeKit.refreshEntitlement()
+            if storeKit.grantsUnlimitedTrackedStreaks {
+                settings.restoreOnboardingTrackedStreaksIfNeeded()
+                store.refilter()
+            } else {
+                trimSelectionToFreeCap()
+            }
+            completeSetup()
         }
-        guard let top = atRisk.max(by: { $0.current < $1.current }), top.current > 0 else {
-            return nil
-        }
-        return .init(displayName: top.displayName, current: top.current, cadenceLabel: top.cadence.label)
     }
 
-    /// True when a trial-bearing package loaded, so the trial sheet can buy it
+    /// True when a trial-bearing package loaded, so the trial page can buy it
     /// directly rather than punting to the full paywall.
     private var hasDirectTrialPackage: Bool {
         storeKit.products.contains { $0.streaksIntroOfferLabel != nil }
@@ -760,14 +901,26 @@ struct OnboardingView: View {
         return best?.streaksRecurringPriceLabel
     }
 
+    /// Live 3.1.2 billing disclosure shown just above the primary trial CTA.
+    private var trialDisclosureText: String? {
+        guard let offer = trialOfferLabel, let price = trialPriceLabel else { return nil }
+        return "\(offer.capitalized), then \(price). Auto-renews unless canceled at least 24 hours before the trial ends."
+    }
+
+    private var trialPrimaryLabel: String {
+        if let offer = trialOfferLabel {
+            return "▶ START \(offer.uppercased())"
+        }
+        return "▶ START FREE TRIAL"
+    }
+
     /// Buy the trial-bearing package directly. Yearly is preferred (longer
-    /// commitment, better trial value). Falls through to the full paywall when no
-    /// trial product is available.
-    private func startTrialPurchase() {
+    /// commitment, better trial value). Falls back to the full paywall only when
+    /// no trial product is available.
+    private func startOnboardingTrialPurchase() {
         let trials = storeKit.products.filter { $0.streaksIntroOfferLabel != nil }
         guard let package = trials.first(where: { $0.packageType == .annual }) ?? trials.first else {
-            pendingPaywallAfterTrialDismiss = true
-            showingTrialOffer = false
+            showingPaywall = true
             return
         }
         trialPurchaseError = nil
@@ -777,9 +930,9 @@ struct OnboardingView: View {
             switch await storeKit.purchase(package: package) {
             case .purchased, .pending:
                 settings.hasSeenTrialOffer = true
-                showingTrialOffer = false
+                finishFromTrial()
             case .cancelled:
-                trialPurchaseError = "Trial wasn't started. Tap again, or pick a different plan."
+                trialPurchaseError = "Trial wasn't started. Tap again to begin your free trial."
             case .failed:
                 trialPurchaseError = storeKit.lastError ?? "Couldn't start your trial. Please try again."
             }
