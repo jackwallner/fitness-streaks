@@ -1,6 +1,6 @@
 # Astro ASO setup — Streak Finder (US)
 
-> Process: [`astro-setup-process.md`](astro-setup-process.md) · Playbook: [`astro-global-aso-go-2026.md`](astro-global-aso-go-2026.md) · Phase B: [`astro-phase-b-report.md`](astro-phase-b-report.md) · Last pass: **2026-05-25**
+> Process: [Astro setup process](~/ios/aso/astro-setup-process.md) · Playbook: [global ASO rollout archive](~/ios/archive/aso/2026-05/astro-global-aso-go-2026.md) · Phase B: [Phase B report](archive/aso/2026-05/astro-phase-b-report.md) · Last pass: **2026-05-25**
 
 ## App
 
