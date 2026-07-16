@@ -1,6 +1,6 @@
 # Localization ASO — Streak Finder
 
-**Playbook:** [`astro-global-aso-go-2026.md`](astro-global-aso-go-2026.md) — say **go** = optimize all locales · 91 Astro stores · **upload ASC draft**.
+**Playbook:** [global ASO rollout archive](~/ios/archive/aso/2026-05/astro-global-aso-go-2026.md) — say **go** = optimize all locales · 91 Astro stores · **upload ASC draft**.
 
 ## Status (2026-05-25)
 
