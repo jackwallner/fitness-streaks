@@ -8,25 +8,75 @@
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta property="og:image" content="https://jackwallner.github.io/fitness-streaks/screenshot-1.png">
-<title>Streak Counter: Steps & Rings for iPhone & Apple Watch</title>
-<meta name="description" content="Free fitness streak tracker for iPhone & Apple Watch. Automatically discover your activity streaks from Apple Health. No manual logging. No ads, no subscriptions, 100% private.">
+<title>Streak Counter: Steps & Rings - Fitness Streak Tracker for iPhone & Apple Watch</title>
+<meta name="description" content="Free fitness streak tracker for iPhone & Apple Watch. Automatically discover your activity streaks from Apple Health &mdash; steps, exercise, sleep, and more. Optional Streaks+ adds Grace Days and auto-save. 100% private, no account required.">
 <link rel="canonical" href="https://jackwallner.github.io/fitness-streaks/">
-<meta property="og:title" content="Streak Counter: Steps & Rings for iPhone & Apple Watch">
-<meta property="og:description" content="Automatically discover your fitness streaks from Apple Health. Private, free, no ads or subscriptions.">
+<meta name="apple-itunes-app" content="app-id=6762699692">
+<meta name="keywords" content="streak tracker, fitness streak, step counter, Apple Health, habit tracker, activity streak, Apple Watch, widgets, free, private, no account">
+<meta property="og:title" content="Streak Counter: Steps & Rings - Automatic Fitness Streak Tracker">
+<meta property="og:description" content="Automatically discover the fitness streaks you've already built from Apple Health. Steps, exercise, sleep, and more. Free, private, no account required.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://jackwallner.github.io/fitness-streaks/">
-<meta property="og:site_name" content="Streak Counter">
+<meta property="og:image" content="https://jackwallner.github.io/fitness-streaks/screenshot-1.png">
+<meta property="og:site_name" content="Streak Counter: Steps & Rings">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Streak Counter: Steps & Rings">
-<meta name="twitter:description" content="Discover your fitness streaks automatically from Apple Health. Free, private, no account required.">
+<meta name="twitter:description" content="Discover your fitness streaks automatically from Apple Health. Free to start, with optional Streaks+ upgrade.">
 <meta name="twitter:image" content="https://jackwallner.github.io/fitness-streaks/screenshot-1.png">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Streak Counter: Steps & Rings","operatingSystem":"iOS","applicationCategory":"HealthApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"description":"Automatically discover your fitness streaks from Apple Health. Private, free, powered by HealthKit.","url":"https://apps.apple.com/us/app/streak-counter-steps-rings/id6762699692","author":{"@type":"Person","name":"Jack Wallner"}}</script>
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Streak Counter: Steps & Rings",
+    "operatingSystem": "iOS",
+    "applicationCategory": "HealthApplication",
+    "offers": [
+        {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "description": "Free tier with automatic streak discovery across 12 Apple Health metrics, hero streak & badges, calendar heatmaps, widgets, and Apple Watch app"
+        },
+        {
+            "@type": "Offer",
+            "price": "1.99",
+            "priceCurrency": "USD",
+            "description": "Streaks+ Monthly &mdash; Grace Day auto-save, at-risk alerts, broken-streak revive"
+        },
+        {
+            "@type": "Offer",
+            "price": "14.99",
+            "priceCurrency": "USD",
+            "description": "Streaks+ Yearly &mdash; same features, billed annually"
+        },
+        {
+            "@type": "Offer",
+            "price": "29.99",
+            "priceCurrency": "USD",
+            "description": "Streaks+ Lifetime &mdash; one-time purchase, no subscription"
+        }
+    ],
+    "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5",
+        "ratingCount": "1"
+    },
+    "description": "Automatically discover the fitness streaks you've already built from Apple Health &mdash; steps, exercise, sleep, and more. Private, simple, powered by HealthKit. Free with optional Streaks+ upgrade for iPhone and Apple Watch.",
+    "url": "https://jackwallner.github.io/fitness-streaks/",
+    "downloadUrl": "https://apps.apple.com/us/app/streak-counter-steps-rings/id6762699692",
+    "screenshot": "https://jackwallner.github.io/fitness-streaks/screenshot-1.png",
+    "softwareVersion": "1.2.7",
+    "author": {
+        "@type": "Person",
+        "name": "Jack Wallner"
+    }
+}
+</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",sans-serif;color:#1d1d1f;background:#fafafa;-webkit-font-smoothing:antialiased}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",sans-serif;color:#1d1d1f;background:#fafafa;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 .container{max-width:980px;margin:0 auto;padding:0 24px}
-nav{padding:16px 0;border-bottom:1px solid rgba(0,0,0,0.06);background:rgba(250,250,250,0.85);backdrop-filter:blur(12px);position:sticky;top:0;z-index:10}
+nav{padding:16px 0;border-bottom:1px solid rgba(0,0,0,0.06);background:rgba(250,250,250,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);position:sticky;top:0;z-index:10}
 nav .container{display:flex;align-items:center;justify-content:space-between}
 .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#1d1d1f}
 .nav-brand img{width:32px;height:32px;border-radius:7px}
@@ -35,50 +85,56 @@ nav .container{display:flex;align-items:center;justify-content:space-between}
 .nav-link:hover{opacity:.85}
 .hero{text-align:center;padding:100px 24px 64px}
 .hero h1{font-size:52px;font-weight:700;letter-spacing:-1.5px;line-height:1.08;margin-bottom:16px}
-.hero .tagline{font-size:21px;color:#1d1d1f;line-height:1.4;max-width:480px;margin:0 auto 12px}
-.hero .platforms{font-size:15px;color:#86868b;margin-bottom:36px}
-.download-btn{display:inline-block;background:#1d1d1f;color:#fff;font-size:17px;font-weight:500;padding:16px 40px;border-radius:980px;text-decoration:none;transition:opacity .15s}
+.hero h1 span{background:linear-gradient(135deg,#ff2d95,#ffb020);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero .tagline{font-size:19px;color:#6e6e73;line-height:1.5;max-width:460px;margin:0 auto 12px}
+.hero .platforms{font-size:13px;color:#86868b;letter-spacing:.3px;margin-bottom:36px}
+.download-btn{display:inline-block;background:#1d1d1f;color:#fff;font-size:15px;font-weight:500;padding:14px 36px;border-radius:980px;text-decoration:none;transition:opacity .15s}
 .download-btn:hover{opacity:.85}
-.showcase{padding:0 24px 80px;display:flex;justify-content:center;gap:24px;flex-wrap:wrap}
-.phone-frame{flex-shrink:0}
-.phone-frame img{height:500px;border-radius:32px;border:1px solid rgba(0,0,0,0.08);box-shadow:0 2px 8px rgba(0,0,0,0.04),0 12px 40px rgba(0,0,0,0.06)}
+.showcase{padding:0 0 80px}
+.showcase-scroll{display:flex;gap:24px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:0 24px;max-width:1200px;margin:0 auto;scrollbar-width:none}
+.showcase-scroll::-webkit-scrollbar{display:none}
+.showcase-card{flex-shrink:0;scroll-snap-align:center;border-radius:18px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06),0 16px 48px rgba(0,0,0,0.08)}
+.showcase-card img{height:540px;display:block}
 .features{padding:80px 0;background:#fff;border-top:1px solid rgba(0,0,0,0.06);border-bottom:1px solid rgba(0,0,0,0.06)}
 .features-header{text-align:center;margin-bottom:56px}
-.features-header h2{font-size:32px;font-weight:700;letter-spacing:-.5px;margin-bottom:8px}
+.features-header h2{font-size:36px;font-weight:700;letter-spacing:-.5px;margin-bottom:8px}
 .features-header p{font-size:17px;color:#6e6e73}
 .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(0,0,0,0.06);border-top:1px solid rgba(0,0,0,0.06);border-bottom:1px solid rgba(0,0,0,0.06)}
 .feature-card{background:#fff;padding:36px 32px}
-.feature-card h3{font-size:18px;font-weight:600;margin-bottom:6px}
-.feature-card p{font-size:15px;color:#6e6e73;line-height:1.5}
+.feature-card .label{display:inline-block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#86868b;margin-bottom:10px}
+.feature-card .label.streaks-plus{color:#ff2d95}
+.feature-card h3{font-size:20px;font-weight:600;letter-spacing:-.2px;margin-bottom:8px}
+.feature-card p{font-size:14px;color:#6e6e73;line-height:1.55}
 .privacy{padding:80px 0}
 .privacy .container{max-width:640px;text-align:center}
 .privacy .lockup{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:12px;background:#f5f5f7;margin-bottom:20px}
 .privacy .lockup svg{width:22px;height:22px;fill:none;stroke:#1d1d1f;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.privacy h2{font-size:28px;font-weight:700;letter-spacing:-.3px;margin-bottom:12px}
+.privacy h2{font-size:32px;font-weight:700;letter-spacing:-.5px;margin-bottom:12px}
 .privacy p{font-size:17px;color:#6e6e73;line-height:1.6;margin-bottom:20px}
 .privacy a{font-size:15px;color:#0066cc;text-decoration:none;font-weight:500}
 .privacy a:hover{text-decoration:underline}
-.cta{text-align:center;padding:64px 24px 80px;background:#fff;border-top:1px solid rgba(0,0,0,0.06)}
-.cta h2{font-size:28px;font-weight:700;letter-spacing:-.3px;margin-bottom:6px}
-.cta p{font-size:15px;color:#86868b;margin-bottom:28px}
-footer{text-align:center;padding:32px 24px;font-size:12px;color:#86868b;border-top:1px solid rgba(0,0,0,0.06)}
-footer a{color:#86868b;text-decoration:none;margin:0 10px}
-footer a:hover{color:#1d1d1f}
-@media(max-width:768px){.hero{padding:72px 20px 48px}.hero h1{font-size:36px;letter-spacing:-1px}.hero .tagline{font-size:19px}.phone-frame img{height:400px;border-radius:24px}.features-grid{grid-template-columns:1fr}.features-header h2{font-size:26px}.privacy h2,.cta h2{font-size:24px}}
-@media(max-width:480px){.phone-frame:not(:first-child){display:none}.phone-frame img{height:440px}}
 .more-info{padding:64px 24px;background:#fff;border-top:1px solid rgba(0,0,0,0.06)}
 .more-info-header{text-align:center;margin-bottom:48px}
-.more-info-header h2{font-size:32px;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px}
+.more-info-header h2{font-size:32px;font-weight:700;letter-spacing:-.5px;margin-bottom:8px}
 .more-info-header p{font-size:17px;color:#6e6e73}
 .more-info-content{max-width:720px;margin:0 auto}
 .more-info-section{margin-bottom:40px}
-.more-info-section h3{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:#86868b;margin-bottom:12px}
+.more-info-section h3{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#86868b;margin-bottom:12px}
 .more-info-section p{font-size:15px;line-height:1.6;color:#1d1d1f;margin-bottom:12px}
 .more-info-section p:last-child{margin-bottom:0}
 .more-info-section strong{font-weight:600}
 .specs-table{width:100%;font-size:14px;border-collapse:collapse;margin-top:16px}
 .specs-table td{padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.06)}
-.specs-table td:first-child{color:#86868b;width:140px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px}
+.specs-table td:first-child{color:#86868b;width:140px;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+.cta{text-align:center;padding:64px 24px 80px;background:#fff;border-top:1px solid rgba(0,0,0,0.06)}
+.cta h2{font-size:32px;font-weight:700;letter-spacing:-.5px;margin-bottom:6px}
+.cta p{font-size:15px;color:#86868b;margin-bottom:28px}
+footer{text-align:center;padding:20px 24px;font-size:12px;color:#86868b}
+footer a{color:#86868b;text-decoration:none;margin:0 10px}
+footer a:hover{color:#1d1d1f}
+footer .divider{margin:4px 0}
+@media(max-width:768px){.hero{padding:72px 20px 48px}.hero h1{font-size:36px;letter-spacing:-1px}.hero .tagline{font-size:17px}.showcase-card img{height:400px}.features-grid{grid-template-columns:1fr}.features-header h2{font-size:28px}.privacy h2,.cta h2{font-size:26px}}
+@media(max-width:480px){.showcase-card img{height:360px}}
 </style>
 </head>
 <body>
@@ -89,32 +145,34 @@ footer a:hover{color:#1d1d1f}
 <img src="icon_256.png" alt="Streak Counter">
 <span>Streak Counter</span>
 </a>
-<a class="nav-link" href="https://github.com/jackwallner/fitness-streaks">View Source</a>
+<a class="nav-link" href="https://apps.apple.com/us/app/streak-counter-steps-rings/id6762699692">Download</a>
 </div>
 </nav>
 
 <section class="hero">
-<h1>Your fitness streaks, found.</h1>
-<p class="tagline">Automatically discover how many days in a row you've hit your goals. No setup, no manual logging.</p>
+<h1>Your <span>fitness streaks</span>, found.</h1>
+<p class="tagline">Automatically discover how many days in a row you've hit your goals &mdash; all from Apple Health, all on your device. Free to start, with optional Streaks+.</p>
 <p class="platforms">iPhone &middot; Apple Watch &middot; Widgets</p>
-<a class="download-btn" href="https://apps.apple.com/us/app/streak-counter-steps-rings/id6762699692">Get it Free</a>
+<a class="download-btn" href="https://apps.apple.com/us/app/streak-counter-steps-rings/id6762699692">Download for free</a>
 </section>
 
 <section class="showcase">
-<div class="phone-frame">
-<img src="screenshot-1.png" alt="Streak Counter home screen with hero streak and daily steps">
+<div class="showcase-scroll">
+<div class="showcase-card">
+<img src="screenshot-1.png" alt="Your streaks, found. &mdash; hero streak and daily steps on the home screen">
 </div>
-<div class="phone-frame">
-<img src="screenshot-2.png" alt="Streak Counter streak detail with calendar heatmap">
+<div class="showcase-card">
+<img src="screenshot-2.png" alt="See every day. &mdash; calendar heatmap of hits and misses for a streak">
 </div>
-<div class="phone-frame">
-<img src="screenshot-3.png" alt="Streak Counter home screen in dark mode">
+<div class="showcase-card">
+<img src="screenshot-3.png" alt="Dark mode. &mdash; the home screen at night">
 </div>
-<div class="phone-frame">
-<img src="screenshot-4.png" alt="Streak Counter settings to adjust streak thresholds">
+<div class="showcase-card">
+<img src="screenshot-4.png" alt="Tune your thresholds. &mdash; settings to adjust streak difficulty">
 </div>
-<div class="phone-frame">
-<img src="screenshot-5.png" alt="Streak Counter reminders and metric configuration">
+<div class="showcase-card">
+<img src="screenshot-5.png" alt="Reminders, your way. &mdash; 7pm at-risk nudge and metric configuration">
+</div>
 </div>
 </section>
 
@@ -122,45 +180,54 @@ footer a:hover{color:#1d1d1f}
 <div class="container">
 <div class="features-header">
 <h2>Works with your Health data</h2>
-<p>Everything you already track, now with streaks.</p>
+<p>Everything you already track, now with streaks. Free to start &mdash; upgrade to save the ones you almost lost.</p>
 </div>
 </div>
 <div class="features-grid">
 <div class="feature-card">
-<h3>Automatic Discovery</h3>
-<p>Connects to Apple Health and instantly finds your existing streaks.</p>
+<span class="label">Discovery</span>
+<h3>Automatic streak detection</h3>
+<p>Connects to Apple Health and instantly finds the streaks you've already built &mdash; no manual logging.</p>
 </div>
 <div class="feature-card">
-<h3>Steps, Exercise, Sleep & More</h3>
-<p>Supports 12 metrics including workouts, stand hours, and mindful minutes.</p>
+<span class="label">Metrics</span>
+<h3>12 Health metrics, daily & weekly</h3>
+<p>Steps, exercise, stand hours, active energy, workouts, mindfulness, sleep, distance, flights climbed, and more.</p>
 </div>
 <div class="feature-card">
-<h3>Your Best Streak</h3>
-<p>Your longest current streak is always front and center.</p>
+<span class="label">Dashboard</span>
+<h3>Hero streak & badges</h3>
+<p>Your single best current run is always front and center, with the rest as tappable badges.</p>
 </div>
 <div class="feature-card">
-<h3>Smart Reminders</h3>
-<p>Get notified when you're about to break a streak, not randomly.</p>
+<span class="label">History</span>
+<h3>Calendar heatmaps</h3>
+<p>Every streak gets a year-view heatmap of hits and misses, so you can see your patterns at a glance.</p>
 </div>
 <div class="feature-card">
-<h3>Home Screen Widgets</h3>
-<p>See your streaks at a glance without opening the app.</p>
+<span class="label streaks-plus">Grace Days · Streaks+</span>
+<h3>Auto-save a missed day</h3>
+<p>Miss a day and Streaks+ automatically saves your streak with a planned freeze &mdash; no scramble required.</p>
 </div>
 <div class="feature-card">
-<h3>Watch Complications</h3>
-<p>Your streaks on your watch face, all day.</p>
+<span class="label streaks-plus">Alerts · Streaks+</span>
+<h3>At-risk notifications</h3>
+<p>A heads-up before a streak slips, on top of the free 7pm nudge for your hero streak.</p>
 </div>
 <div class="feature-card">
-<h3>Private by Design</h3>
-<p>Your data never leaves your device. No account needed.</p>
+<span class="label">Widgets</span>
+<h3>Home & lock screen</h3>
+<p>See your streaks at a glance without opening the app, on iPhone and StandBy.</p>
 </div>
 <div class="feature-card">
-<h3>Free. No Ads.</h3>
-<p>No subscriptions, no tracking, no nonsense.</p>
+<span class="label">Apple Watch</span>
+<h3>Full watch app & complications</h3>
+<p>Your streaks on your watch face all day &mdash; circular, rectangular, corner, and inline styles.</p>
 </div>
 <div class="feature-card">
-<h3>Retro Pixel Style</h3>
-<p>Clean 8-bit aesthetic that stands out from other fitness apps.</p>
+<span class="label">Privacy</span>
+<h3>Private by design</h3>
+<p>Read-only Apple Health access, on-device processing, no account, no ads, no analytics.</p>
 </div>
 </div>
 </section>
@@ -168,11 +235,11 @@ footer a:hover{color:#1d1d1f}
 <section class="privacy">
 <div class="container">
 <div class="lockup">
-<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
 </div>
 <h2>Your data stays yours</h2>
-<p>Streak Counter reads from Apple Health and stores everything locally on your device. No servers, no analytics, no third parties.</p>
-<a href="privacy-policy.html">Read our Privacy Policy</a>
+<p>Streak Counter reads from Apple Health in read-only mode and stores everything locally on your device. No accounts, no analytics, no ads, no third-party SDKs, no network requests.</p>
+<a href="privacy-policy.html">Privacy Policy &rarr;</a>
 </div>
 </section>
 
@@ -185,32 +252,36 @@ footer a:hover{color:#1d1d1f}
 <div class="more-info-content">
 <div class="more-info-section">
 <h3>The Pitch</h3>
-<p>You already have streaks — you just don't know it. That 47-day walk streak, the 12-week sleep average above 7 hours, the 3-month daily stand goal. They're buried in HealthKit, invisible.</p>
-<p>Streak Counter surfaces them automatically, ranks them by how impressive they actually are, and warns you before you break the good ones.</p>
+<p>You already have streaks &mdash; you just don't know it. That 47-day walk streak, the 12-week sleep average above 7 hours, the 3-month daily stand goal. They're buried in HealthKit, invisible.</p>
+<p>Streak Counter surfaces them automatically, ranks them by how impressive they actually are, and warns you before you break the good ones. No manual logging, no signup, no starting from day one.</p>
+</div>
+
+<div class="more-info-section">
+<h3>Streaks+</h3>
+<p>An optional upgrade for people who don't want a single missed day to end a real streak. $1.99/month or $14.99/year, both with a 7-day free trial, or $29.99 once for lifetime access.</p>
+<p><strong>Grace Day auto-save.</strong> Miss a day and Streaks+ automatically covers it with a planned freeze, so the streak keeps going instead of resetting to zero.</p>
+<p><strong>At-risk alerts.</strong> A heads-up before a streak slips, layered on top of the free 7pm hero-streak nudge.</p>
+<p><strong>Broken-streak revive.</strong> Just missed one? Starting a Streaks+ trial can revive a recently broken streak instead of losing the progress for good.</p>
 </div>
 
 <div class="more-info-section">
 <h3>Specs</h3>
 <table class="specs-table">
 <tr><td>Platform</td><td>iOS 17+, watchOS 10+</td></tr>
-<tr><td>Size</td><td>9.4 MB</td></tr>
-<tr><td>Category</td><td>Health & Fitness</td></tr>
-<tr><td>Language</td><td>English</td></tr>
-<tr><td>Age Rating</td><td>9+</td></tr>
-<tr><td>Data</td><td>SwiftData cache, App Group shared with widgets</td></tr>
-<tr><td>Metrics</td><td>Steps, exercise, stand, energy, distance, flights, workouts, sleep, mindfulness</td></tr>
-<tr><td>Analysis</td><td>400 days of history, daily + weekly cadences, threshold tiers</td></tr>
-<tr><td>Notifications</td><td>7 PM at-risk nudge for hero streak</td></tr>
+<tr><td>Language</td><td>Swift 6 with strict concurrency</td></tr>
+<tr><td>Framework</td><td>SwiftUI · HealthKit · WidgetKit</td></tr>
+<tr><td>Data</td><td>Read-only HealthKit access, local only</td></tr>
+<tr><td>Storage</td><td>SwiftData cache shared via App Group</td></tr>
+<tr><td>Widgets</td><td>Home Screen, Lock Screen, StandBy, watchOS complications</td></tr>
 </table>
 </div>
 
 <div class="more-info-section">
 <h3>What Mattered</h3>
-<p><strong>The discovery engine.</strong> Every metric has 6 threshold tiers. The engine evaluates every (metric, cadence, threshold) combo across 400 days, finds contiguous streaks, and filters for minimum viability. Then it ranks by a weighted score: streak length × threshold difficulty.</p>
-<p><strong>Hero streak + badges.</strong> One streak gets featured — your best current run. Everything else appears as tappable badges. The hero rotates automatically as streaks break and new ones form. No manual curation, no decision fatigue.</p>
-<p><strong>Calendar heatmaps.</strong> Each streak has a year-view heatmap showing every hit and miss. Green intensity maps to how far above threshold. It's visceral — you can see your life patterns.</p>
-<p><strong>The 7 PM nudge.</strong> If your hero streak isn't "locked in" for the day, you get a gentle notification at 7 PM. Not nagging — context. You decide if you care enough to save it.</p>
-<p><strong>Widget reliability.</strong> All widgets read from a snapshot JSON in App Group UserDefaults — never HealthKit directly. The main app refreshes this on every foreground and background task. Widgets are instant, not laggy.</p>
+<p><strong>The discovery engine.</strong> Every metric has multiple threshold tiers. The engine evaluates every (metric, cadence, threshold) combination across 400 days of history, finds contiguous streaks, and ranks by a weighted score of length and difficulty.</p>
+<p><strong>Hero streak, not a dashboard of numbers.</strong> One streak gets featured &mdash; your best current run. Everything else appears as tappable badges. The hero rotates automatically as streaks break and new ones form. No manual curation.</p>
+<p><strong>Calendar heatmaps.</strong> Each streak has a year-view heatmap showing every hit and miss, with intensity mapped to how far above threshold you landed that day. It's visceral &mdash; you can see your patterns.</p>
+<p><strong>Widget reliability.</strong> Widgets never query HealthKit directly. They read a snapshot the main app writes to App Group storage on every refresh, so they stay instant instead of laggy.</p>
 </div>
 </div>
 </div>
@@ -218,14 +289,16 @@ footer a:hover{color:#1d1d1f}
 
 <section class="cta">
 <h2>Ready to find your streaks?</h2>
-<p>Download free on the App Store</p>
-<a class="download-btn" href="https://apps.apple.com/us/app/streak-counter-steps-rings/id6762699692">Download</a>
+<p>Free on the App Store. No account required. Upgrade to Streaks+ anytime.</p>
+<a class="download-btn" href="https://apps.apple.com/us/app/streak-counter-steps-rings/id6762699692">Download for free</a>
 </section>
 
 <footer>
-<a href="./">App</a>
+<div class="divider">&copy; 2026 Jack Wallner</div>
+<div>
 <a href="support.html">Support</a>
 <a href="privacy-policy.html">Privacy</a>
+</div>
 </footer>
 
 </body>
