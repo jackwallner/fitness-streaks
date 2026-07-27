@@ -1,1 +1,1 @@
-Bug fixes and performance improvements across the app, widgets, and Apple Watch.
+New first-run trial flow makes it clearer which discovered streaks stay free and which Streaks+ protects. Updated App Store icon and conversion-focused onboarding.

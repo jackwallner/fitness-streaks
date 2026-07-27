@@ -99,16 +99,21 @@ final class StoreKitService: NSObject, ObservableObject {
 
     private override init() {
         super.init()
+        self.isPro = defaults.bool(forKey: Self.entitlementKey)
+        #if targetEnvironment(simulator)
+        // Agent and simulator runs must never create customers in the production
+        // RevenueCat project. StoreKit Testing supplies products separately.
+        return
+        #else
         guard let apiKey = Self.loadAPIKey(), !apiKey.isEmpty, apiKey != "REVENUECAT_API_KEY" else {
-            self.isPro = defaults.bool(forKey: Self.entitlementKey)
             return
         }
-        self.isPro = defaults.bool(forKey: Self.entitlementKey)
         Purchases.logLevel = .error
         Purchases.configure(with: .init(withAPIKey: apiKey)
             .with(usesStoreKit2IfAvailable: true))
         Purchases.shared.delegate = self
         Task { await refreshState() }
+        #endif
     }
 
     /// Pro entitlement, or a purchase just completed (entitlement may still be pending).
@@ -119,6 +124,10 @@ final class StoreKitService: NSObject, ObservableObject {
     // MARK: - Public API
 
     func loadProducts() async {
+        #if targetEnvironment(simulator)
+        lastError = "Plans are available on device and TestFlight."
+        return
+        #else
         isLoadingProducts = true
         defer { isLoadingProducts = false }
         do {
@@ -128,6 +137,7 @@ final class StoreKitService: NSObject, ObservableObject {
         } catch {
             self.lastError = "Couldn't load products: \(error.localizedDescription)"
         }
+        #endif
     }
 
     func isEligibleForIntroOffer(_ package: Package) -> Bool {
@@ -137,6 +147,9 @@ final class StoreKitService: NSObject, ObservableObject {
 
     /// Custom paywall impressions for RevenueCat analytics (hosted UI did this automatically).
     func trackPaywallImpression(id: String, oncePerSession: Bool = false) {
+        #if targetEnvironment(simulator)
+        return
+        #else
         #if DEBUG
         if CommandLine.arguments.contains("-UITestSetPro") { return }
         #endif
@@ -147,6 +160,7 @@ final class StoreKitService: NSObject, ObservableObject {
         Purchases.shared.trackCustomPaywallImpression(
             CustomPaywallImpressionParams(paywallId: id)
         )
+        #endif
     }
 
     private func refreshIntroEligibility() async {
@@ -165,6 +179,10 @@ final class StoreKitService: NSObject, ObservableObject {
 
     @discardableResult
     func purchase(package: Package) async -> PurchaseOutcome {
+        #if targetEnvironment(simulator)
+        lastError = "Purchases are available on device and TestFlight."
+        return .failed
+        #else
         guard !purchaseInProgress else { return .cancelled }
         purchaseInProgress = true
         defer { purchaseInProgress = false }
@@ -183,15 +201,20 @@ final class StoreKitService: NSObject, ObservableObject {
             lastError = error.localizedDescription
             return .failed
         }
+        #endif
     }
 
     func restore() async {
+        #if targetEnvironment(simulator)
+        lastError = "Restore is available on device and TestFlight."
+        #else
         do {
             let customerInfo = try await Purchases.shared.restorePurchases()
             updateProStatus(from: customerInfo)
         } catch {
             lastError = error.localizedDescription
         }
+        #endif
     }
 
     func refreshState() async {
@@ -200,12 +223,16 @@ final class StoreKitService: NSObject, ObservableObject {
     }
 
     func refreshEntitlement() async {
+        #if targetEnvironment(simulator)
+        return
+        #else
         do {
             let customerInfo = try await Purchases.shared.customerInfo()
             updateProStatus(from: customerInfo)
         } catch {
             lastError = error.localizedDescription
         }
+        #endif
     }
 
     enum PurchaseOutcome { case purchased, cancelled, pending, failed }
