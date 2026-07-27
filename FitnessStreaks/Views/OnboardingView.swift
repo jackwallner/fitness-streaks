@@ -186,24 +186,11 @@ struct OnboardingView: View {
         .background(Theme.retroBg)
     }
 
-    /// Trial-page CTA stack: soft "Get Started" exit + price disclosure ABOVE the
-    /// primary (neither moves the button), the same lime primary button in the
-    /// Continue slot, then Terms · Privacy · Restore in the reserved footer.
+    /// Trial-page CTA stack: price disclosure above the primary trial action, then
+    /// the soft free-mode exit and legal links below. The paid action stays visually
+    /// dominant and occupies the same primary slot used throughout onboarding.
     private var trialCTA: some View {
         VStack(spacing: 10) {
-            Button(action: finishFromTrial) {
-                Text("GET STARTED")
-                    .font(RetroFont.mono(12, weight: .bold))
-                    .tracking(1)
-                    .foregroundStyle(Theme.retroInkDim)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
-                    .overlay(Rectangle().stroke(Theme.retroInkFaint, lineWidth: 2))
-            }
-            .buttonStyle(.plain)
-            .disabled(trialPurchaseInFlight)
-            .padding(.horizontal, 20)
-
             if let disclosure = trialDisclosureText {
                 Text(disclosure)
                     .font(RetroFont.mono(9))
@@ -224,6 +211,18 @@ struct OnboardingView: View {
             primaryButton(trialPrimaryLabel, enabled: !trialPurchaseInFlight) {
                 startOnboardingTrialPurchase()
             }
+
+            Button(action: finishFromTrial) {
+                Text("CONTINUE WITH 3 FREE STREAKS")
+                    .font(RetroFont.mono(10, weight: .bold))
+                    .tracking(0.8)
+                    .foregroundStyle(Theme.retroInkDim)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+            }
+            .buttonStyle(.plain)
+            .disabled(trialPurchaseInFlight)
+            .padding(.horizontal, 20)
 
             footerSlot { trialFooter }
         }
@@ -639,7 +638,7 @@ struct OnboardingView: View {
                         .padding(.top, 28)
 
                     VStack(spacing: 10) {
-                        Text("UNLOCK EVERY\nSTREAK")
+                        Text(trialHeadline)
                             .font(RetroFont.mono(26, weight: .bold))
                             .tracking(2)
                             .foregroundStyle(Theme.retroMagenta)
@@ -721,11 +720,25 @@ struct OnboardingView: View {
         .pixelPanel(color: tint, fill: Theme.retroBgRaised)
     }
 
+    private var trialHeadline: String {
+        let count = settings.lastOnboardingPickedCount
+        guard count > Self.freeTrackedLimit else { return "PROTECT YOUR\nSTREAKS" }
+        return "KEEP ALL \(count)\nSTREAKS"
+    }
+
     private var trialSubtitle: String {
-        if let offer = trialOfferLabel {
-            return "Start your \(offer.lowercased()) and keep every streak you just earned."
+        let count = settings.lastOnboardingPickedCount
+        if count > Self.freeTrackedLimit {
+            let locked = count - Self.freeTrackedLimit
+            if let offer = trialOfferLabel {
+                return "Free keeps \(Self.freeTrackedLimit). Start your \(offer.lowercased()) to keep the other \(locked) and protect every run."
+            }
+            return "Free keeps \(Self.freeTrackedLimit). Start a free trial to keep the other \(locked) and protect every run."
         }
-        return "Start a free trial and keep every streak you just earned."
+        if let offer = trialOfferLabel {
+            return "Start your \(offer.lowercased()) to auto-save misses and protect every streak you just found."
+        }
+        return "Start a free trial to auto-save misses and protect every streak you just found."
     }
 
     // MARK: - Flow
@@ -838,6 +851,13 @@ struct OnboardingView: View {
             completeSetup()
             return
         }
+        if storeKit.offerings == nil {
+            Task { @MainActor in
+                await storeKit.loadProducts()
+                routeToTrialOrFinish()
+            }
+            return
+        }
         if hasDirectTrialPackage {
             // Setting this now prevents the passive ~4s TrialOfferSheet from
             // double-firing once the dashboard appears.
@@ -846,8 +866,8 @@ struct OnboardingView: View {
             withAnimation { phase = .trial }
             return
         }
-        // No trial-bearing product resolved. If offerings loaded, fall back to the
-        // full paywall; if nothing loaded at all, don't brick first launch.
+        // No trial-bearing product resolved. If non-trial products loaded, fall
+        // back to the full paywall. A failed catalog load never bricks first launch.
         if storeKit.offerings?.current != nil {
             showingPaywall = true
         } else {
@@ -909,9 +929,9 @@ struct OnboardingView: View {
 
     private var trialPrimaryLabel: String {
         if let offer = trialOfferLabel {
-            return "▶ START \(offer.uppercased())"
+            return "▶ KEEP ALL · START \(offer.uppercased())"
         }
-        return "▶ START FREE TRIAL"
+        return "▶ KEEP ALL · START FREE TRIAL"
     }
 
     /// Buy the trial-bearing package directly. Yearly is preferred (longer
