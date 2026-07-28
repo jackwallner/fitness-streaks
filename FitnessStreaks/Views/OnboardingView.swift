@@ -854,6 +854,11 @@ struct OnboardingView: View {
         if storeKit.offerings == nil {
             Task { @MainActor in
                 await storeKit.loadProducts()
+                guard storeKit.offerings != nil else {
+                    trimSelectionToFreeCap()
+                    completeSetup()
+                    return
+                }
                 routeToTrialOrFinish()
             }
             return
@@ -906,17 +911,17 @@ struct OnboardingView: View {
     /// True when a trial-bearing package loaded, so the trial page can buy it
     /// directly rather than punting to the full paywall.
     private var hasDirectTrialPackage: Bool {
-        storeKit.products.contains { $0.streaksIntroOfferLabel != nil }
+        storeKit.products.contains { storeKit.isEligibleForIntroOffer($0) }
     }
 
     private var trialOfferLabel: String? {
-        let trials = storeKit.products.filter { $0.streaksIntroOfferLabel != nil }
+        let trials = storeKit.products.filter { storeKit.isEligibleForIntroOffer($0) }
         let best = trials.first(where: { $0.packageType == .annual }) ?? trials.first
-        return best?.streaksIntroOfferLabel ?? storeKit.products.compactMap(\.streaksIntroOfferLabel).first
+        return best?.streaksIntroOfferLabel
     }
 
     private var trialPriceLabel: String? {
-        let trials = storeKit.products.filter { $0.streaksIntroOfferLabel != nil }
+        let trials = storeKit.products.filter { storeKit.isEligibleForIntroOffer($0) }
         let best = trials.first(where: { $0.packageType == .annual }) ?? trials.first
         return best?.streaksRecurringPriceLabel
     }
@@ -938,7 +943,7 @@ struct OnboardingView: View {
     /// commitment, better trial value). Falls back to the full paywall only when
     /// no trial product is available.
     private func startOnboardingTrialPurchase() {
-        let trials = storeKit.products.filter { $0.streaksIntroOfferLabel != nil }
+        let trials = storeKit.products.filter { storeKit.isEligibleForIntroOffer($0) }
         guard let package = trials.first(where: { $0.packageType == .annual }) ?? trials.first else {
             showingPaywall = true
             return
