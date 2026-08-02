@@ -2,7 +2,7 @@
 
 iPhone + Apple Watch app that mines Apple Health history for active streaks and encourages the user to keep them alive.
 
-XcodeGen project/scheme: `FitnessStreaks`, simulator device `agent-fitness-streaks`.
+XcodeGen project/scheme: `FitnessStreaks`, sim lease owner `fitness-streaks`.
 
 ## Tech Stack
 
