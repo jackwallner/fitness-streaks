@@ -854,3 +854,43 @@ It should scaffold email or other notification delivery but keep delivery disabl
 - No claim is made that RevenueCat purchase processing contradicts the local HealthKit privacy story; that comparison was intentionally excluded from findings per request.
 - No treatment, diagnosis, prevention, or cure claim is recommended anywhere in the implementation backlog.
 
+## Activity and success context, 2026-08-23
+
+Classification: **growing acquisition, monetizing, conversion softening**. Confidence: **medium**. Trend: **acquisition growing, conversion softening**.
+
+ASC release state: `iOS 1.2.8 Ready for Distribution`. ASC evidence: [Analytics Overview](https://appstoreconnect.apple.com/apps/6762699692/analytics/overview?dateSpec=d90), selected range `dateSpec=d90`.
+RevenueCat evidence: [Project Overview](https://app.revenuecat.com/projects/a635c59c/overview), production mode, selected range `Last 28 days, 2026-07-27 through 2026-08-23`.
+
+### Observed activity
+
+| Source | Metric | Value | Window or comparison |
+| --- | --- | ---: | --- |
+| ASC | First-time downloads | 29 | 90-day Analytics Overview |
+| ASC | Redownloads | 4 | 90-day Analytics Overview |
+| ASC | Conversion rate | 0.7% | comparison -66.8% |
+| ASC | Proceeds | $13 | 90-day Analytics Overview |
+| ASC | In-app purchases | 3 | 90-day Analytics Overview |
+| RevenueCat | New customers | 15 | last 28 days |
+| RevenueCat | Active customers | 23 | last 28 days |
+| RevenueCat | Active trials | 0 | current total |
+| RevenueCat | Active subscriptions | 1 | current total |
+| RevenueCat | MRR | $1 | current total |
+| RevenueCat | Revenue | $15 | last 28 days |
+
+A missing value above means the source did not expose that metric in this read-only snapshot. It is not a zero.
+
+### Interpretation and implementation focus
+
+Streak has a clear mixed signal. ASC first-time downloads are up 480% to 29, but ASC conversion is down 66.8% to 0.7%. RevenueCat shows 15 new customers, 1 active subscription, and $15 of revenue. This is the highest-priority conversion diagnosis among the small apps: identify the acquisition source, compare the current paywall and first-value sequence with the prior release, and measure trial starts before adding more traffic.
+
+The deterministic classifier recommends: Prioritize first-value and trial-start instrumentation, then test the paywall or native purchase surface with mature conversion cohorts.
+
+- Join ASC first-time download, first launch, first value, paywall shown, offer loaded, trial started, trial canceled, trial converted, entitlement active, restore, and purchase failure events with the app version and build.
+- Keep ASC's 90-day acquisition and proceeds window separate from RevenueCat's 28-day customer and revenue window. Do not calculate a conversion rate by dividing values from different windows.
+- Use a mature trial cohort and a minimum sample before choosing a native paywall or onboarding A/B winner. Record the offering identifier, package, placement, experiment variant, and build.
+- Put the app's classification and the next baseline date in the release handoff so Cursor, Claude, and Codex do not optimize from an old qualitative audit.
+
+### Boundary on success or death
+
+This snapshot supports the label **growing acquisition, monetizing, conversion softening**, not a lifetime verdict. Acquisition or paid conversion is rising, while ASC conversion rate is moving down. A later decision should include a clean 28-day RevenueCat trend, ASC acquisition and conversion trend, ratings and review count, crash and hang evidence, and a release-specific cohort.
+This dated section supersedes earlier statements in this file that per-app ASC or RevenueCat activity was unavailable as of 2026-08-23. Earlier statements remain historical evidence boundaries for their original audit pass.
