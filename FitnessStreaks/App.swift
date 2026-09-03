@@ -131,6 +131,14 @@ struct FitnessStreaksApp: App {
 
     init() {
         ReviewPromptTracker.recordAppLaunch()
+        ConversionDiagnostics.recordAppOpen()
+        #if DEBUG
+        if RevenueCatProbe.isEnabled {
+            // Same entry point the real paywall screens call, so what this
+            // proves is the actual path and not a parallel one.
+            StoreKitService.shared.trackPaywallImpression(id: RevenueCatProbe.impressionID)
+        }
+        #endif
         BGTaskScheduler.shared.register(forTaskWithIdentifier: refreshTaskID, using: DispatchQueue.main) { task in
             guard let task = task as? BGAppRefreshTask else { return }
             Self.handleAppRefresh(task)
