@@ -137,6 +137,18 @@ struct FitnessStreaksApp: App {
             // Same entry point the real paywall screens call, so what this
             // proves is the actual path and not a parallel one.
             StoreKitService.shared.trackPaywallImpression(id: RevenueCatProbe.impressionID)
+            if RevenueCatProbe.wantsPurchase {
+                Task {
+                    await StoreKitService.shared.loadProducts()
+                    // Logged rather than asserted: when the Test Store sheet
+                    // never appears, this separates "nothing came back" from
+                    // "purchase returned .failed".
+                    NSLog("RCPROBE packages=%d", StoreKitService.shared.products.count)
+                    guard let package = StoreKitService.shared.products.first else { return }
+                    let outcome = await StoreKitService.shared.purchase(package: package)
+                    NSLog("RCPROBE purchase outcome=%@", String(describing: outcome))
+                }
+            }
         }
         #endif
         BGTaskScheduler.shared.register(forTaskWithIdentifier: refreshTaskID, using: DispatchQueue.main) { task in

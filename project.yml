@@ -17,11 +17,23 @@ settings:
     SWIFT_VERSION: "6.0"
     DEVELOPMENT_TEAM: YXG4MP6W39
     CODE_SIGN_STYLE: Automatic
-    MARKETING_VERSION: "1.2.8"
-    CURRENT_PROJECT_VERSION: 147
+    MARKETING_VERSION: "1.2.9"
+    CURRENT_PROJECT_VERSION: 149
     GENERATE_INFOPLIST_FILE: NO
 
 schemes:
+  FitnessStreaksUITests:
+    build:
+      targets:
+        FitnessStreaks: all
+        FitnessStreaksUITests: [test]
+    test:
+      config: Debug
+      targets:
+        - FitnessStreaksUITests
+    run:
+      config: Debug
+
   FitnessStreaks:
     build:
       targets:
@@ -135,3 +147,20 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.jackwallner.streaks.tests
         GENERATE_INFOPLIST_FILE: YES
+
+  # The paywall purchase probe. Its own target and scheme: the app's own test
+  # action activates StoreKit Testing, and this has to reach RevenueCat's Test
+  # Store instead.
+  FitnessStreaksUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: FitnessStreaksUITests
+    dependencies:
+      - target: FitnessStreaks
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.jackwallner.streaks.uitests
+        TEST_TARGET_NAME: FitnessStreaks
+

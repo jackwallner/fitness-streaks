@@ -149,10 +149,20 @@ final class StoreKitService: NSObject, ObservableObject {
     // MARK: - Public API
 
     func loadProducts() async {
-        #if targetEnvironment(simulator)
-        lastError = "Plans are available on device and TestFlight."
-        return
+        // The probe is the one simulator run that configures RevenueCat, and
+        // against the project's Test Store rather than production. Without this
+        // it returns here and the purchase it drives has nothing to buy.
+        #if DEBUG
+        let probing = RevenueCatProbe.isEnabled
         #else
+        let probing = false
+        #endif
+        #if targetEnvironment(simulator)
+        if !probing {
+            lastError = "Plans are available on device and TestFlight."
+            return
+        }
+        #endif
         isLoadingProducts = true
         defer { isLoadingProducts = false }
         do {
@@ -162,7 +172,6 @@ final class StoreKitService: NSObject, ObservableObject {
         } catch {
             self.lastError = "Couldn't load products: \(error.localizedDescription)"
         }
-        #endif
     }
 
     func isEligibleForIntroOffer(_ package: Package) -> Bool {
@@ -230,10 +239,17 @@ final class StoreKitService: NSObject, ObservableObject {
 
     @discardableResult
     func purchase(package: Package) async -> PurchaseOutcome {
-        #if targetEnvironment(simulator)
-        lastError = "Purchases are available on device and TestFlight."
-        return .failed
+        #if DEBUG
+        let probing = RevenueCatProbe.isEnabled
         #else
+        let probing = false
+        #endif
+        #if targetEnvironment(simulator)
+        if !probing {
+            lastError = "Purchases are available on device and TestFlight."
+            return .failed
+        }
+        #endif
         guard !purchaseInProgress else { return .cancelled }
         purchaseInProgress = true
         defer { purchaseInProgress = false }
@@ -260,7 +276,6 @@ final class StoreKitService: NSObject, ObservableObject {
             lastError = error.localizedDescription
             return .failed
         }
-        #endif
     }
 
     func restore() async {
@@ -472,6 +487,12 @@ enum RevenueCatProbe {
 
     static var impressionID: String {
         ProcessInfo.processInfo.environment["RC_PROBE_SURFACE"] ?? "streaks_dashboard_sheet"
+    }
+
+    /// Drives a Test Store purchase after the impression, so the `converted_*`
+    /// half of the funnel record is exercised and not just the impression half.
+    static var wantsPurchase: Bool {
+        ProcessInfo.processInfo.arguments.contains("-rcfunnelprobepurchase")
     }
 }
 #endif
