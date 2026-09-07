@@ -1,1 +1,1 @@
-activity,rings,walking,sleep,exercise,stand,calories,watch,widget,goals,calendar,consistency,mindful
+steps,workout,activity,rings,walking,sleep,exercise,stand,calorie,watch,widget,goals,calendar,streak

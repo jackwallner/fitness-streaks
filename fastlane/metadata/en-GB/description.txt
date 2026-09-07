@@ -1,8 +1,15 @@
-Discover fitness streaks already in your Apple Health history. Track steps, workouts and sleep without logging each day by hand.
+A habit tracker should not become another habit to maintain. Turn the activity already recorded in Apple Health into visible proof that you're showing up.
 
-Keep up to three streaks free. Streaks Pro unlocks unlimited tracked streaks. See your progress in calendar heatmaps, widgets and Apple Watch complications.
+CONNECT HEALTH. SEE YOUR CONSISTENCY.
+With your permission, the app reads your existing Health history and finds streaks across nine supported metrics, including steps, workouts, exercise, sleep and mindful minutes. No daily check-off or duplicate activity entry is needed. What appears depends on your available history and read permissions.
 
-Explore nine Apple Health metrics, including steps, exercise, stand hours, energy, workouts, mindfulness, sleep, distance and flights climbed. Streaks depend on the history and permissions you provide. Calculations run on your device with read-only Health access. This is a fitness habit tool, not medical advice.
+START WITH THREE
+Track three streaks free. Choose the health habits that matter to you and see how consistent you've been, instead of starting every habit counter at zero.
+
+MAKE ROOM FOR MORE
+The paid upgrade unlocks unlimited tracking and more ways to follow your progress. Calendar views, widgets and the Apple Watch companion help keep your habits visible.
+
+Your Health records are read-only and calculations run on your device. The app does not write activity into Apple Health or guarantee a streak length. It is a fitness awareness tool, not medical advice.
 
 Monthly plan: US$6.99. Yearly plan: US$29.99. Both subscriptions renew automatically, and each offers a 7-day free trial when eligible. Apple charges your Apple Account when you confirm the purchase or after an eligible trial. If you are not eligible, Apple charges at confirmation. The renewal charge is made within 24 hours before the current period ends. Manage or cancel in Settings › Apple Account › Subscriptions at least 24 hours before the period ends. Prices vary by region and are shown before purchase.
 A one-time lifetime unlock is also available. (US$69.99)
