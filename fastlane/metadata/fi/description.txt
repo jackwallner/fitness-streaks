@@ -1,8 +1,15 @@
-Löydä Apple Terveys -historiaasi jo kertyneet putket. Seuraa askeleita, treenejä ja unta ilman päivittäistä käsin kirjaamista.
+Tapaseurannan ei pitäisi muuttua itse ylimääräiseksi tavaksi. Muuta Terveys-sovellukseen jo tallentunut aktiivisuus näkyväksi todisteeksi siitä, että pysyt mukana.
 
-Seuraa maksutta enintään kolmea putkea. Streaks Pro avaa rajattoman seurannan. Näe edistymisesi värikalentereissa, widgeteissä ja Apple Watchin komplikaatioissa.
+YHDISTÄ TERVEYS. NÄE SÄÄNNÖLLISYYTESI.
+Luvallasi sovellus lukee olemassa olevan Terveys-historiasi ja löytää putkia yhdeksästä tuetusta mittarista, muun muassa askeleista, treeneistä, liikunnasta, unesta ja mindfulness-minuuteista. Päivittäistä merkintää tai päällekkäistä kirjausta ei tarvita. Näkyvä sisältö riippuu käytettävissä olevasta historiastasi ja myönnetyistä lukuoikeuksista.
 
-Yhdeksän Terveys-mittaria: askeleet, liikunta, seisomistunnit, energia, treenit, tietoisuustaidot, uni, matka ja kerrokset. Putket riippuvat historiasta ja käyttöluvista. Laskenta tapahtuu laitteellasi, ja Terveys-tietoja vain luetaan. Liikuntatottumusten työkalu, ei lääketieteellinen neuvo.
+ALOITA KOLMELLA
+Seuraa kolmea putkea ilmaiseksi. Valitse itsellesi tärkeät terveystavat ja näe, kuinka säännöllinen olet ollut, sen sijaan että aloittaisit jokaisen laskurin nollasta.
+
+TEE TILAA LISÄÄ
+Maksullinen päivitys avaa rajattoman seurannan ja useampia tapoja seurata edistymistäsi. Kalenterinäkymät, widgetit ja Apple Watch -kumppanisovellus pitävät tapasi näkyvillä.
+
+Terveystietosi ovat vain luettavissa, ja laskenta tapahtuu laitteellasi. Sovellus ei kirjoita aktiivisuutta Terveyteen eikä takaa minkään putken pituutta. Se on kuntotietoisuuden työkalu, ei lääketieteellinen neuvo.
 
 Kuukausitilaus maksaa US$6.99 ja vuositilaus US$29.99. Molemmat uusiutuvat automaattisesti, ja kumpaankin kuuluu 7 päivän ilmainen kokeilu, jos olet siihen oikeutettu. Apple veloittaa Apple-tiliäsi oston vahvistamisen yhteydessä tai oikeutetun kokeilun jälkeen. Jos et ole oikeutettu, veloitus tehdään vahvistettaessa. Uusimisveloitus tehdään 24 tunnin kuluessa ennen nykyisen kauden päättymistä. Hallitse tai peruuta vähintään 24 tuntia ennen kauden päättymistä kohdassa Asetukset › Apple-tili › Tilaukset. Hinnat vaihtelevat alueittain ja näkyvät ennen ostoa.
 Saatavilla on myös kertamaksullinen elinikäinen avaus. (US$69.99)

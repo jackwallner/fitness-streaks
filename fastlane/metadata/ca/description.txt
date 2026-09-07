@@ -1,8 +1,15 @@
-Descobreix ratxes ja presents al teu historial de Salut d'Apple. Segueix passos, entrenaments i son sense registrar cada dia a mà.
+Un rastrejador d'hàbits no hauria de convertir-se en un altre hàbit a mantenir. Converteix l'activitat que ja consta a Apple Health en una prova visible que estàs complint.
 
-Segueix fins a tres ratxes gratis. Streaks Pro desbloqueja el seguiment il·limitat. Consulta el progrés en calendaris de colors, ginys i complicacions de l'Apple Watch.
+CONNECTA SALUT. VEU LA TEVA CONSTÀNCIA.
+Amb el teu permís, l'app llegeix l'historial de Salut que ja tens i hi troba ratxes en nou mètriques compatibles, com passos, entrenaments, exercici, son i minuts d'atenció plena. No cal marcar res cada dia ni duplicar cap registre d'activitat. El que veus depèn del teu historial disponible i dels permisos de lectura.
 
-Nou mètriques de Salut: passos, exercici, hores dempeus, energia, entrenaments, atenció plena, son, distància i pisos pujats. Les ratxes depenen de l'historial i els permisos. Els càlculs es fan al dispositiu amb accés de només lectura a Salut. Una eina d'hàbits esportius, no consell mèdic.
+COMENÇA AMB TRES
+Fes seguiment de tres ratxes gratis. Tria els hàbits de salut que t'importen i veu la teva constància, en lloc de començar cada comptador de zero.
+
+FES LLOC PER A MÉS
+L'actualització de pagament desbloqueja seguiment il·limitat i més maneres de veure el teu progrés. Les vistes de calendari, els ginys i el complement per a l'Apple Watch mantenen els teus hàbits visibles.
+
+Els teus registres de Salut són només de lectura i els càlculs es fan al teu dispositiu. L'app no escriu activitat a Apple Health ni garanteix la durada de cap ratxa. És una eina de consciència física, no un consell mèdic.
 
 El pla mensual costa US$6.99 i l'anual US$29.99. Tots dos es renoven automàticament i inclouen una prova gratuïta de 7 dies si compleixes els requisits. Apple cobra al teu Compte d'Apple quan confirmes la compra o després d'una prova elegible. Si no hi tens dret, cobra en confirmar. El càrrec de renovació es fa durant les 24 hores anteriors al final del període. Gestiona o cancel·la a Configuració › Compte d'Apple › Subscripcions, almenys 24 hores abans del final. Els preus varien segons la regió i es mostren abans de comprar.
 També hi ha un desbloqueig de per vida amb un únic pagament. (US$69.99)

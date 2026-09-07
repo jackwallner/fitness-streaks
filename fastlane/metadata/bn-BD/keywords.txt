@@ -1,1 +1,1 @@
-motivate,habit,rings,widget,move,steps,workout,mindful,sleep,stand,fitness,reminder,wellness
+পদক্ষেপ,ওয়ার্কআউট,কার্যকলাপ,রিং,হাঁটা,ঘুম,ব্যায়াম,ক্যালোরি,ওয়াচ,উইজেট,ক্যালেন্ডার,স্ট্রিক

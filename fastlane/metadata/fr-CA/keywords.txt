@@ -1,1 +1,1 @@
-motiver,habitude,anneaux,widget,montre,mouvement,entraînement,méditation,sommeil,debout,podomètre
+pas,entraînement,activité,anneaux,marche,sommeil,exercice,calories,montre,widget,objectifs,série

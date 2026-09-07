@@ -1,8 +1,15 @@
-Découvrez les séries déjà présentes dans votre historique Apple Santé. Suivez pas, entraînements et sommeil sans saisie manuelle chaque jour.
+Un suivi d'habitudes ne devrait pas devenir une habitude de plus à entretenir. Transformez l'activité déjà enregistrée dans Santé en preuve visible de votre régularité.
 
-Suivez jusqu'à trois séries gratuitement. Streaks Pro débloque le suivi illimité. Consultez vos progrès dans le calendrier coloré, les widgets et les complications Apple Watch.
+CONNECTEZ SANTÉ. VOYEZ VOTRE RÉGULARITÉ.
+Avec votre autorisation, l'app lit votre historique Santé existant et repère des séries sur neuf métriques prises en charge, dont les pas, les entraînements, l'exercice, le sommeil et les minutes de pleine conscience. Aucun pointage quotidien ni saisie d'activité en double n'est nécessaire. Ce qui s'affiche dépend de votre historique disponible et des autorisations de lecture accordées.
 
-Neuf mesures Apple Santé : pas, exercice, heures debout, énergie, entraînements, pleine conscience, sommeil, distance et étages. Les séries dépendent de votre historique et des autorisations. Les calculs restent sur votre appareil, avec accès Santé en lecture seule. Un outil d'habitudes sportives, pas un avis médical.
+COMMENCEZ AVEC TROIS
+Suivez trois séries gratuitement. Choisissez les habitudes de santé qui comptent pour vous et voyez votre régularité, plutôt que de repartir de zéro sur chaque compteur.
+
+FAITES DE LA PLACE POUR PLUS
+La mise à niveau payante débloque un suivi illimité et davantage de façons de suivre votre progression. Les vues calendrier, les widgets et l'app compagnon Apple Watch aident à garder vos habitudes bien en vue.
+
+Vos données Santé sont en lecture seule et les calculs s'exécutent sur votre appareil. L'app n'écrit aucune activité dans Santé et ne garantit la durée d'aucune série. C'est un outil de conscience physique, pas un avis médical.
 
 Le forfait mensuel coûte US$6.99 et l’annuel US$29.99. Tous deux se renouvellent automatiquement et proposent un essai gratuit de 7 jours si vous êtes éligible. Apple facture votre compte Apple lors de la confirmation de l’achat ou après un essai éligible. Si vous n’êtes pas éligible, le débit est effectué à la confirmation. Le renouvellement est facturé dans les 24 heures précédant la fin de la période en cours. Gérez ou annulez dans Réglages › Compte Apple › Abonnements, au moins 24 heures avant la fin. Les prix varient selon la région et sont affichés avant l’achat.
 Un déverrouillage à vie en un seul paiement est également disponible. (US$69.99)
