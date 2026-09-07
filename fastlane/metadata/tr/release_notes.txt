@@ -1,1 +1,1 @@
-Uygulama, widget’lar ve Apple Watch genelinde hata düzeltmeleri ve performans iyileştirmeleri.
+App Store bilgileri ve abonelik tanılamaları güncellendi.

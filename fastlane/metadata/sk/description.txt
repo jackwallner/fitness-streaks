@@ -1,33 +1,10 @@
-Iné aplikácie na série vás nútia začínať znova od prvého dňa. Fitness Streak Tracker číta vašu históriu Apple Health a odhaľuje série, ktoré už BUDUJETE — 40, 120, dokonca 300 dní dlhé, práve dnes.
+Objavte série, ktoré už máte v histórii Apple Zdravie. Sledujte kroky, tréningy a spánok bez každodenného ručného zapisovania.
 
-Nie je nič motivujúcejšie ako zistenie, že už ste vo víťaznej sérii. Namiesto ručného zaznamenávania návykov aplikácia automaticky odhalí tempo skryté vo vašich dátach — takže prvý deň je už stým dňom.
+Sledujte až tri série zadarmo. Streaks Pro odomkne neobmedzené sledovanie. Pozrite si pokrok vo farebnom kalendári, widgetoch a komplikáciách Apple Watch.
 
-AUTOMATICKY OBJAVTE SVOJE SÉRIE
-Nájdite aktívne série naprieč 9 metrikami Apple Health bez akéhokoľvek zaznamenávania: Kroky, Minúty cvičenia, Hodiny státia, Aktívna energia, Tréningy, Všímavosť, Spánok, Vzdialenosť a Vyšliapané poschodia. Odhaľte skryté série, ktoré vás nikdy nenapadlo sledovať.
+Deväť metrík Zdravia: kroky, cvičenie, hodiny státia, energia, tréningy, všímavosť, spánok, vzdialenosť a poschodia. Série závisia od histórie a oprávnení. Výpočty bežia v zariadení s prístupom k Zdraviu len na čítanie. Nástroj na pohybové návyky, nie lekárska rada.
 
-NIKDY NEPRERUŠTE REŤAZ
-Dajte svoj najdôležitejší cieľ do popredia pomocou Hero Streak, sledujte rast svojej série na kalendárovej heatmape a zbierajte odznaky, ako vaša konzistencia rastie. O 19:00 dostanete jemné pošťuchnutie, ak je dnešná séria v ohrození — povieme vám to skôr, než séria zanikne.
-
-KAMKOĽVEK SA POZRIETE
-• Widgety pre Domovskú obrazovku, Uzamknutú obrazovku a StandBy
-• Natívna aplikácia pre Apple Watch s bohatými komplikáciami
-• Počet vašich sérií vždy na jediný pohľad
-
-NIE ĎALŠÍ SLEDOVAČ NÁVYKOV
-Žiadne zaškrtávacie políčka. Žiadne ručné zaznamenávanie. Žiadne skóre regenerácie. Len série, ktoré si vaše skoršie ja už zaslúžilo — odhalené, oslávené a chránené.
-
-NEKOMPROMISNE SÚKROMNÉ (Z PRINCÍPU)
-Vaše zdravotné dáta patria vám:
-• Prístup k Apple Health iba na čítanie
-• 100% spracovanie v zariadení
-• Žiadne účty ani registrácie
-• Žiadne sieťové požiadavky, žiadne sledovanie
-Vaša zdravotná história nikdy neopustí váš telefón.
-
-Neprerušte reťaz. Stiahnite si Fitness Streak Tracker a udržte si svoje tempo!
-
-Podrobnosti predplatného
-Streaks Pro je k dispozícii ako automaticky obnovované predplatné (mesačne $1.99 / ročne $14.99 so 7-dňovou bezplatnou skúšobnou dobou) alebo ako jednorazový doživotný nákup ($29.99). Platba bude naúčtovaná na vaše Apple ID po potvrdení. Predplatné sa automaticky obnovuje, pokiaľ ho nezrušíte aspoň 24 hodín pred koncom obdobia. Spravovať alebo zrušiť ho môžete kedykoľvek v Nastavenia → Apple ID → Predplatné.
-
-Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
-Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Mesačný plán stojí US$6.99 a ročný US$29.99. Obe predplatné sa automaticky obnovujú a pri nároku ponúkajú 7-dňovú bezplatnú skúšku. Apple zaúčtuje platbu na tvoj účet Apple pri potvrdení nákupu alebo po oprávnenej skúške. Ak nárok nemáš, platba sa zaúčtuje pri potvrdení. Poplatok za obnovenie sa účtuje do 24 hodín pred koncom aktuálneho obdobia. Spravuj alebo zruš v Nastavenia › Účet Apple › Predplatné aspoň 24 hodín pred koncom. Ceny sa líšia podľa regiónu a zobrazia sa pred nákupom.
+K dispozícii je aj jednorazové doživotné odomknutie. (US$69.99)
+Zásady ochrany súkromia: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
+Podmienky používania (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

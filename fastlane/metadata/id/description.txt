@@ -1,33 +1,10 @@
-Aplikasi streak lain memaksa Anda mulai lagi dari hari pertama. Fitness Streak Tracker membaca riwayat Apple Health Anda dan mengungkap streak yang SUDAH Anda bangun selama ini — 40, 120, bahkan 300 hari, hari ini juga.
+Temukan streak yang sudah ada dalam riwayat Apple Kesehatan. Pantau langkah, latihan dan tidur tanpa mencatat setiap hari secara manual.
 
-Tidak ada yang lebih memotivasi daripada menyadari bahwa Anda sudah berada dalam streak kemenangan. Alih-alih mencatat kebiasaan secara manual, Streaks otomatis mengungkap momentum yang tersembunyi di data Anda — sehingga hari pertama sebenarnya sudah hari ke-100.
+Pantau hingga tiga streak gratis. Streaks Pro membuka pelacakan tanpa batas. Lihat progres di kalender berwarna, widget dan komplikasi Apple Watch.
 
-TEMUKAN STREAK ANDA OTOMATIS
-Temukan streak aktif di 9 metrik Apple Health tanpa pencatatan: Steps, Exercise Minutes, Stand Hours, Active Energy, Workouts, Mindfulness, Sleep, Distance, dan Flights Climbed. Ungkap streak tersembunyi yang tak pernah terpikir untuk Anda lacak.
+Sembilan metrik Kesehatan: langkah, olahraga, jam berdiri, energi, latihan, mindfulness, tidur, jarak dan lantai dinaiki. Streak bergantung pada riwayat dan izin. Perhitungan berjalan di perangkat dengan akses Kesehatan hanya baca. Alat kebiasaan kebugaran, bukan nasihat medis.
 
-JANGAN PUTUSKAN RANTAINYA
-Letakkan tujuan terpenting Anda di posisi utama dengan Hero Streak, saksikan rangkaian Anda tumbuh di heatmap kalender, dan kumpulkan lencana seiring konsistensi Anda menguat. Dapatkan dorongan lembut pukul 19.00 jika streak hari ini berisiko putus — kami memberi tahu sebelum sebuah streak mati.
-
-DI MANA PUN ANDA MELIHAT
-• Widget Home Screen, Lock Screen & StandBy
-• Aplikasi Apple Watch native dengan komplikasi yang kaya
-• Jumlah streak Anda, selalu dalam satu pandangan
-
-BUKAN SEKADAR PELACAK KEBIASAAN
-Tanpa kotak centang. Tanpa pencatatan manual. Tanpa skor pemulihan. Hanya streak yang sudah diraih oleh diri Anda di masa lalu — diungkap, dirayakan, dan dilindungi.
-
-SANGAT PRIBADI (SESUAI DESAIN)
-Data kesehatan Anda adalah milik Anda:
-• Akses Apple Health hanya-baca
-• 100% pemrosesan di perangkat
-• Tanpa akun atau pendaftaran
-• Tanpa panggilan jaringan, tanpa pelacakan
-Riwayat kesehatan Anda tidak pernah meninggalkan ponsel Anda.
-
-Jangan putuskan rantainya. Unduh Fitness Streak Tracker dan jaga momentum Anda!
-
-Detail Langganan
-Streaks Pro tersedia sebagai langganan perpanjangan otomatis (Bulanan $1.99 / Tahunan $14.99 dengan uji coba gratis 7 hari) atau pembelian Lifetime satu kali ($29.99). Pembayaran akan dibebankan ke Apple ID Anda saat konfirmasi. Langganan akan diperpanjang otomatis kecuali dibatalkan minimal 24 jam sebelum periode berakhir. Kelola atau batalkan kapan saja di Pengaturan → Apple ID → Subscriptions.
-
-Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
-Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Paket bulanan seharga US$6.99 dan paket tahunan seharga US$29.99. Keduanya diperpanjang otomatis dan masing-masing menawarkan uji coba gratis 7 hari jika memenuhi syarat. Apple menagih Akun Apple Anda saat mengonfirmasi pembelian atau setelah uji coba yang memenuhi syarat. Jika tidak memenuhi syarat, penagihan dilakukan saat konfirmasi. Biaya perpanjangan ditagihkan dalam 24 jam sebelum periode berjalan berakhir. Kelola atau batalkan di Pengaturan › Akun Apple › Langganan setidaknya 24 jam sebelum periode berakhir. Harga berbeda menurut wilayah dan ditampilkan sebelum pembelian.
+Tersedia juga akses seumur hidup dengan satu kali pembayaran. (US$69.99)
+Kebijakan Privasi: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
+Ketentuan Penggunaan (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

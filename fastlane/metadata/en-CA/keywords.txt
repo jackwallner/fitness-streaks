@@ -1,1 +1,1 @@
-stand,ring,step,sleep,move,healthkit,hidden,uncover,nudge,logging,momentum,chain,mindful,heatmap
+activity,rings,walking,sleep,exercise,stand,calories,watch,widget,goals,calendar,consistency,mindful

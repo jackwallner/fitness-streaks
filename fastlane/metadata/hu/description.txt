@@ -1,33 +1,10 @@
-Más sorozatkövető alkalmazások az első naptól kezdetik újra veled. A Fitness Streak Tracker beolvassa az Apple Health előzményeidet, és felfedi azokat a sorozatokat, amelyeket MÁR most is építesz – akár 40, 120 vagy épp 300 napos sorozatokat, már ma.
+Fedezd fel az Apple Egészség előzményeiben már meglévő sorozataidat. Kövesd a lépéseket, edzést és alvást napi kézi naplózás nélkül.
 
-Semmi sem motiválóbb annál, mint rájönni, hogy már nyerő szériában vagy. Ahelyett, hogy kézzel naplóznád a szokásaidat, a Fitness Streak Tracker automatikusan felszínre hozza az adataidban rejlő lendületet – így az első nap valójában már a századik.
+Kövess legfeljebb három sorozatot ingyen. A Streaks Pro korlátlan követést ad. Nézd a fejlődést színes naptárban, widgeteken és Apple Watch-komplikációkon.
 
-FEDEZD FEL AUTOMATIKUSAN A SOROZATAIDAT
-Találd meg az aktív sorozatokat 9 Apple Health-mutatóban, mindenféle naplózás nélkül: lépések, edzéspercek, állóórák, aktív energia, edzések, tudatosság, alvás, távolság és megtett emeletek. Hozd felszínre azokat a rejtett sorozatokat, amelyeket eszedbe sem jutott követni.
+Kilenc Egészség-mutató: lépések, mozgás, állóórák, energia, edzések, tudatos jelenlét, alvás, táv és emeletek. A sorozatok az előzményektől és engedélyektől függnek. A számítás a készüléken történik, csak olvasási Egészség-hozzáféréssel. Edzési szokásokat segítő eszköz, nem orvosi tanács.
 
-NE SZAKÍTSD MEG A LÁNCOT
-Tedd a legfontosabb célodat a középpontba a kiemelt sorozattal, nézd, ahogy a sorozatod nő a naptáras hőtérképen, és gyűjts jelvényeket, ahogy erősödik a következetességed. Finom emlékeztetőt kapsz este 7-kor, ha aznap veszélyben van a sorozatod – még azelőtt szólunk, hogy egy sorozat megszakadna.
-
-BÁRHOVÁ IS NÉZEL
-• Főképernyő-, Zárolt képernyő- és StandBy-widgetek
-• Natív Apple Watch alkalmazás gazdag komplikációkkal
-• A sorozatszámod mindig egyetlen pillantásnyira
-
-NEM EGY ÚJABB SZOKÁSKÖVETŐ
-Nincsenek jelölőnégyzetek. Nincs kézi naplózás. Nincs regenerációs pontszám. Csak azok a sorozatok, amelyeket a múltbeli éned már kiérdemelt – felszínre hozva, megünnepelve és megvédve.
-
-MAKACSUL ADATVÉDŐ (KIALAKÍTÁSÁBÓL ADÓDÓAN)
-Az egészségügyi adataid hozzád tartoznak:
-• Csak olvasási jogosultság az Apple Health-hez
-• 100% készüléken történő feldolgozás
-• Nincs fiók vagy regisztráció
-• Nulla hálózati hívás, nulla követés
-Az egészségügyi előzményeid soha nem hagyják el a telefonodat.
-
-Ne szakítsd meg a láncot. Töltsd le a Fitness Streak Trackert, és tartsd fenn a lendületedet!
-
-Előfizetési részletek
-A Streaks Pro automatikusan megújuló előfizetésként érhető el (havi $1.99 / éves $14.99 7 napos ingyenes próbaidővel), vagy egyszeri Lifetime vásárlásként ($29.99). A díjat megerősítéskor terheljük az Apple ID-fiókodra. Az előfizetés automatikusan megújul, hacsak nem mondod le legalább 24 órával az időszak vége előtt. Kezelheted vagy lemondhatod bármikor: Beállítások → Apple ID → Előfizetések.
-
-Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
-Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+A havi csomag ára US$6.99, az évesé US$29.99. Mindkettő automatikusan megújul, és jogosultság esetén 7 napos ingyenes próba jár hozzá. Az Apple a vásárlás megerősítésekor vagy jogosult próba után terheli meg az Apple-fiókodat. Jogosultság nélkül a terhelés megerősítéskor történik. A megújítási díjat az időszak vége előtti 24 órán belül számítjuk fel. Kezeld vagy mondd le a Beállítások › Apple-fiók › Előfizetések menüben, legalább 24 órával a vége előtt. Az árak régiónként eltérnek, és vásárlás előtt láthatók.
+Egyszeri, élethosszig tartó feloldás is elérhető. (US$69.99)
+Adatvédelmi szabályzat: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
+Felhasználási feltételek (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
