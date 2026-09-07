@@ -1,33 +1,10 @@
-Druge aplikacije za nize te prisilijo, da začneš znova pri prvem dnevu. Fitness Streak Tracker prebere tvojo zgodovino v aplikaciji Apple Health in razkrije nize, ki si jih ŽE gradil — danes dolge 40, 120, celo 300 dni.
+Odkrijte nize, ki že obstajajo v zgodovini Apple Zdravja. Sledite korakom, vadbam in spanju brez vsakodnevnega ročnega vnašanja.
 
-Nič ni bolj motivacijskega kot spoznanje, da si že sredi zmagovitega niza. Namesto ročnega beleženja navad Streaks samodejno razkrije zagon, skrit v tvojih podatkih — tako je prvi dan že stoti dan.
+Brezplačno sledite do trem nizom. Streaks Pro odklene neomejeno sledenje. Oglejte si napredek v barvnih koledarjih, gradnikih in zapletih Apple Watch.
 
-SAMODEJNO ODKRIJ SVOJE NIZE
-Najdi aktivne nize med 9 meritvami v aplikaciji Apple Health brez vsakršnega beleženja: koraki, minute vadbe, ure stoje, aktivna energija, treningi, čuječnost, spanje, razdalja in prehojena nadstropja. Razkrij skrite nize, ki ti jih ni nikoli prišlo na misel spremljati.
+Devet meritev Zdravja: koraki, gibanje, ure stanja, energija, vadbe, čuječnost, spanje, razdalja in nadstropja. Nizi so odvisni od zgodovine in dovoljenj. Izračuni potekajo v napravi z dostopom do Zdravja samo za branje. Orodje za gibalne navade, ne zdravstveni nasvet.
 
-NIKOLI NE PREKINI VERIGE
-Postavi svoj najpomembnejši cilj v ospredje z nizom Hero Streak, opazuj svojo serijo, kako raste na koledarski toplotni karti, in si prisluži značke, ko se tvoja doslednost gradi. Ob 19. uri prejmeš nežen opomnik, če je današnji niz ogrožen — povemo ti, preden niz ugasne.
-
-KAMOR KOLI POGLEDAŠ
-• Pripomočki za začetni zaslon, zaklenjeni zaslon in StandBy
-• Domorodna aplikacija za Apple Watch z bogatimi zapleti
-• Tvoje število nizov, vedno na dosegu enega pogleda
-
-NE ŠE EN SLEDILNIK NAVAD
-Brez potrditvenih polj. Brez ročnega beleženja. Brez ocene okrevanja. Le nizi, ki si jih je tvoj nekdanji jaz že prislužil — razkriti, proslavljeni in zaščiteni.
-
-ODLOČNO ZASEBNO (PO ZASNOVI)
-Tvoji zdravstveni podatki pripadajo tebi:
-• Dostop do aplikacije Apple Health samo za branje
-• 100-odstotna obdelava na napravi
-• Brez računov ali registracij
-• Nič omrežnih klicev, nič sledenja
-Tvoja zdravstvena zgodovina nikoli ne zapusti tvojega telefona.
-
-Ne prekini verige. Prenesi Fitness Streak Tracker in ohrani svoj zagon!
-
-Podrobnosti o naročnini
-Streaks Pro je na voljo kot samodejno obnavljajoča se naročnina (mesečno $1.99 / letno $14.99 s 7-dnevnim brezplačnim preizkusom) ali kot enkraten doživljenjski (Lifetime) nakup ($29.99). Plačilo se ob potrditvi zaračuna tvojemu Apple ID. Naročnine se samodejno obnavljajo, razen če jih prekličeš vsaj 24 ur pred koncem obdobja. Naročnine lahko kadar koli upravljaš ali prekličeš v Nastavitve → Apple ID → Naročnine.
-
-Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
-Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Mesečni paket stane US$6.99, letni pa US$29.99. Oba se samodejno podaljšujeta in ob upravičenosti vključujeta 7-dnevni brezplačni preizkus. Apple ob potrditvi nakupa ali po upravičenem preizkusu bremeni tvoj račun Apple. Če nisi upravičen, se bremenitev izvede ob potrditvi. Strošek podaljšanja se zaračuna v 24 urah pred koncem trenutnega obdobja. Upravljaj ali prekliči v Nastavitve › Račun Apple › Naročnine vsaj 24 ur pred koncem. Cene se razlikujejo glede na regijo in so prikazane pred nakupom.
+Na voljo je tudi enkratno doživljenjsko odklepanje. (US$69.99)
+Pravilnik o zasebnosti: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
+Pogoji uporabe (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

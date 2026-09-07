@@ -1,33 +1,10 @@
-Andra streak-appar tvingar dig att börja om från dag ett. Fitness Streak Tracker läser din historik i Apple Health och avslöjar de streaks du REDAN har byggt upp — 40, 120, till och med 300 dagar långa, redan idag.
+Hitta sviter som redan finns i din Apple Hälsa-historik. Följ steg, träning och sömn utan att logga varje dag för hand.
 
-Det finns inget mer motiverande än att inse att du redan är mitt i en vinnande svit. I stället för att logga vanor för hand lyfter Streaks automatiskt fram den fart som döljer sig i dina data — så att dag ett redan är dag 100.
+Följ upp till tre sviter gratis. Streaks Pro låser upp obegränsad spårning. Se framsteg i färgkalendrar, widgetar och Apple Watch-komplikationer.
 
-UPPTÄCK DINA STREAKS AUTOMATISKT
-Hitta aktiva streaks i 9 mätvärden från Apple Health utan att logga något: Steg, Träningsminuter, Stå-timmar, Aktiv energi, Träningspass, Mindfulness, Sömn, Distans och Trappor uppför. Lyft fram dolda streaks du aldrig tänkt på att följa.
+Nio Hälsa-mått: steg, motion, ståtid, energi, träningspass, mindfulness, sömn, distans och trappor. Sviter beror på historik och behörigheter. Beräkningar sker på enheten med skrivskyddad åtkomst till Hälsa. Ett verktyg för träningsvanor, inte medicinska råd.
 
-BRYT ALDRIG KEDJAN
-Sätt ditt viktigaste mål i centrum med Hero Streak, se din svit växa på en kalenderbaserad värmekarta och tjäna utmärkelser i takt med att din uthållighet byggs upp. Få en vänlig knuff kl. 19 om dagens streak är i fara — vi säger till innan en streak dör.
-
-VAR DU ÄN TITTAR
-• Widgetar för hemskärm, låsskärm och StandBy
-• En inbyggd Apple Watch-app med rika komplikationer
-• Ditt streak-antal, alltid en blick bort
-
-INTE ÄNNU EN VANEAPP
-Inga kryssrutor. Ingen manuell loggning. Ingen återhämtningspoäng. Bara de streaks som ditt forna jag redan har förtjänat — framlyfta, firade och skyddade.
-
-KOMPROMISSLÖST PRIVAT (FRÅN GRUNDEN)
-Dina hälsodata tillhör dig:
-• Skrivskyddad åtkomst till Apple Health
-• 100 % bearbetning på enheten
-• Inga konton eller registreringar
-• Noll nätverksanrop, noll spårning
-Din hälsohistorik lämnar aldrig din telefon.
-
-Bryt inte kedjan. Ladda ner Fitness Streak Tracker och håll din fart vid liv!
-
-Prenumerationsinformation
-Streaks Pro finns som en automatiskt förnyad prenumeration (Månadsvis $1.99 / Årsvis $14.99 med 7 dagars gratis provperiod) eller som ett engångsköp av Lifetime ($29.99). Betalningen dras från ditt Apple ID vid bekräftelsen. Prenumerationer förnyas automatiskt om de inte sägs upp minst 24 timmar före periodens slut. Hantera eller säg upp när som helst i Inställningar → Apple ID → Prenumerationer.
-
-Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
-Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Månadsplanen kostar US$6.99 och årsplanen US$29.99. Båda förnyas automatiskt och erbjuder 7 dagars kostnadsfri provperiod om du är berättigad. Apple debiterar ditt Apple-konto när du bekräftar köpet eller efter en berättigad provperiod. Om du inte är berättigad debiteras du vid bekräftelsen. Förnyelseavgiften debiteras inom 24 timmar före den aktuella periodens slut. Hantera eller avsluta i Inställningar › Apple-konto › Abonnemang minst 24 timmar före periodens slut. Priserna varierar beroende på region och visas före köp.
+En livstidsupplåsning mot en engångsbetalning finns också. (US$69.99)
+Integritetspolicy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
+Användarvillkor (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

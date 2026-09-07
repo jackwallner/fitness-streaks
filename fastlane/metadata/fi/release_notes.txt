@@ -1,1 +1,1 @@
-Bugikorjauksia ja suorituskyvyn parannuksia sovelluksessa, widgeteissä ja Apple Watchissa.
+App Storen tiedot ja tilausten diagnostiikka päivitetty.

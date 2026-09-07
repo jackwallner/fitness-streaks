@@ -1,33 +1,10 @@
-Other streak apps make you start over at day one. Streak Finder reads your Apple Health history and reveals the streaks you've ALREADY been building, 40, 120, even 300 days long, today.
+Discover fitness streaks already in your Apple Health history. Track steps, workouts and sleep without logging each day by hand.
 
-There's nothing more motivating than realizing you're already on a winning streak. Instead of logging habits by hand, Streak Finder surfaces the momentum hidden in your data, so day one is already day 100.
+Keep up to three streaks free. Streaks Pro unlocks unlimited tracked streaks. See your progress in calendar heatmaps, widgets and Apple Watch complications.
 
-AUTO-DISCOVER YOUR STREAKS
-Find active streaks across 9 Apple Health metrics with zero logging: Steps, Exercise Minutes, Stand Hours, Active Energy, Workouts, Mindfulness, Sleep, Distance, and Flights Climbed. Surface hidden streaks you never thought to track.
+Explore nine Apple Health metrics, including steps, exercise, stand hours, energy, workouts, mindfulness, sleep, distance and flights climbed. Streaks depend on the history and permissions you provide. Calculations run on your device with read-only Health access. This is a fitness habit tool, not medical advice.
 
-NEVER BREAK THE CHAIN
-Put your most important goal front and center with the Hero Streak, watch your run grow on a calendar heatmap, and earn badges as your consistency builds. Get a gentle nudge before a streak is about to break, so you can save it in time.
-
-EVERYWHERE YOU LOOK
-• Home Screen, Lock Screen & StandBy widgets
-• A native Apple Watch app with rich complications
-• Your streak count, always one glance away
-
-NOT ANOTHER HABIT TRACKER
-No check-boxes. No manual logging. No recovery score. Just the streaks your past self already earned, surfaced, celebrated, and protected.
-
-FIERCELY PRIVATE (BY DESIGN)
-Your health data belongs to you:
-• Read-only Apple Health access
-• 100% on-device processing
-• No accounts or sign-ups
-• Zero network calls, zero tracking
-Your health history never leaves your phone.
-
-Don't break the chain. Download Streak Finder and keep your momentum going!
-
-Subscription Details
-Streaks Pro is available as an auto-renewing subscription (Monthly $1.99 / Yearly $14.99, both with a 7-day free trial) or a one-time Lifetime purchase ($29.99). Payment is charged to your Apple ID at confirmation. Subscriptions auto-renew unless canceled at least 24 hours before the end of the period. Manage or cancel anytime in Settings.
-
+Monthly plan: US$6.99. Yearly plan: US$29.99. Both subscriptions renew automatically, and each offers a 7-day free trial when eligible. Apple charges your Apple Account when you confirm the purchase or after an eligible trial. If you are not eligible, Apple charges at confirmation. The renewal charge is made within 24 hours before the current period ends. Manage or cancel in Settings › Apple Account › Subscriptions at least 24 hours before the period ends. Prices vary by region and are shown before purchase.
+A one-time lifetime unlock is also available. (US$69.99)
 Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
 Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

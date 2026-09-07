@@ -46,8 +46,9 @@ if [[ -n "${ASC_APP_VERSION:-}" ]]; then
   DELIVER_EXTRA+=(--app_version "$ASC_APP_VERSION")
 fi
 
-if command -v fastlane >/dev/null; then
-  exec fastlane deliver download_metadata \
+FL="$(dirname "$0")/fastlane-bin.sh"
+if [[ -x "$FL" ]]; then
+  exec "$FL" deliver download_metadata \
     --api_key_path "$TMPKEY" \
     --metadata_path ./fastlane/metadata \
     --force true \

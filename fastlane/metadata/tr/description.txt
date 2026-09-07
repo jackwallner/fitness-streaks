@@ -1,33 +1,10 @@
-Diğer seri uygulamaları sizi sıfırdan başlatır. Fitness Seri Takibi, Apple Health geçmişinizi okur ve ZATEN oluşturmuş olduğunuz serileri ortaya çıkarır — bugün itibarıyla 40, 120, hatta 300 gün uzunluğunda.
+Apple Sağlık geçmişinde zaten oluşmuş serilerini keşfet. Adımları, antrenmanları ve uykuyu her gün elle kaydetmeden takip et.
 
-Hâlihazırda kazanan bir seride olduğunuzu fark etmekten daha motive edici bir şey yoktur. Alışkanlıkları elle kaydetmek yerine Fitness Seri Takibi, verilerinizde gizlenen ivmeyi otomatik olarak gün yüzüne çıkarır — böylece birinci gün, çoktan yüzüncü gün olur.
+Üç seriye kadar ücretsiz takip et. Streaks Pro sınırsız takibi açar. İlerlemeyi renkli takvimlerde, araç takımlarında ve Apple Watch komplikasyonlarında gör.
 
-SERİLERİNİZİ OTOMATİK KEŞFEDİN
-9 Apple Health metriğindeki aktif serilerinizi hiç kayıt tutmadan bulun: Adımlar, Egzersiz Dakikaları, Ayakta Durma Saatleri, Aktif Enerji, Antrenmanlar, Farkındalık, Uyku, Mesafe ve Çıkılan Kat. Takip etmeyi hiç düşünmediğiniz gizli serileri keşfedin.
+Dokuz Sağlık ölçümü: adım, egzersiz, ayakta durma, enerji, antrenman, farkındalık, uyku, mesafe ve çıkılan kat. Seriler geçmişe ve izinlere bağlıdır. Hesaplamalar cihazında, Sağlık'a salt okunur erişimle yapılır. Egzersiz alışkanlıkları için bir araçtır, tıbbi tavsiye değildir.
 
-ZİNCİRİ HİÇ KIRMAYIN
-Hero Streak ile en önemli hedefinizi en öne taşıyın, serinizin bir takvim ısı haritasında büyüyüşünü izleyin ve istikrarınız arttıkça rozetler kazanın. Bugünkü seriniz risk altındaysa akşam 19.00'da nazik bir hatırlatma alın — bir seri sönmeden önce sizi uyarırız.
-
-BAKTIĞINIZ HER YERDE
-• Ana Ekran, Kilit Ekranı ve StandBy widget'ları
-• Zengin komplikasyonlara sahip yerel bir Apple Watch uygulaması
-• Seri sayınız, her zaman bir bakış uzağınızda
-
-SIRADAN BİR ALIŞKANLIK TAKİPÇİSİ DEĞİL
-Onay kutusu yok. Elle kayıt yok. İyileşme puanı yok. Yalnızca geçmişteki halinizin çoktan hak ettiği seriler — gün yüzüne çıkarılmış, kutlanmış ve korunmuş.
-
-TAMAMEN GİZLİ (TASARIM GEREĞİ)
-Sağlık verileriniz size aittir:
-• Yalnızca okuma izinli Apple Health erişimi
-• %100 cihaz üzerinde işleme
-• Hesap veya kayıt yok
-• Sıfır ağ çağrısı, sıfır takip
-Sağlık geçmişiniz telefonunuzdan asla çıkmaz.
-
-Zinciri kırmayın. Fitness Seri Takibi'ni indirin ve ivmenizi sürdürün!
-
-Abonelik Ayrıntıları
-Streaks Pro, otomatik yenilenen bir abonelik (Aylık $1.99 / Yıllık $14.99, 7 günlük ücretsiz deneme ile) veya tek seferlik Lifetime satın alımı ($29.99) olarak sunulur. Ödeme, onay sırasında Apple ID'nizden tahsil edilir. Abonelikler, dönem bitiminden en az 24 saat önce iptal edilmediği sürece otomatik olarak yenilenir. Ayarlar → Apple ID → Abonelikler bölümünden istediğiniz zaman yönetebilir veya iptal edebilirsiniz.
-
-Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
-Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Aylık plan US$6.99, yıllık plan US$29.99 tutarındadır. İkisi de otomatik yenilenir ve uygunsanız 7 günlük ücretsiz deneme sunar. Apple, satın almayı onayladığınızda veya uygun bir denemeden sonra Apple Hesabınızdan ücret alır. Uygun değilseniz ücret onay sırasında alınır. Yenileme ücreti mevcut dönemin bitiminden önceki 24 saat içinde alınır. Dönem bitmeden en az 24 saat önce Ayarlar › Apple Hesabı › Abonelikler bölümünden yönetin veya iptal edin. Fiyatlar bölgeye göre değişir ve satın almadan önce gösterilir.
+Tek seferlik ödemeyle ömür boyu kilit açma da kullanılabilir. (US$69.99)
+Gizlilik Politikası: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
+Kullanım Koşulları (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

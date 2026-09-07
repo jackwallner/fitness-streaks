@@ -1,1 +1,1 @@
-修正 App、小組件與 Apple Watch 的錯誤並提升效能。
+更新了App Store資訊與訂閱診斷功能。

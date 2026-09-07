@@ -1,33 +1,10 @@
-Các ứng dụng theo dõi chuỗi khác bắt bạn phải bắt đầu lại từ ngày một. Fitness Streak Tracker đọc lịch sử Apple Health của bạn và tiết lộ những chuỗi mà bạn ĐÃ gây dựng từ trước — dài 40, 120, thậm chí 300 ngày, ngay hôm nay.
+Khám phá chuỗi đã có trong lịch sử Apple Sức khỏe. Theo dõi bước chân, tập luyện và giấc ngủ mà không phải ghi thủ công mỗi ngày.
 
-Không gì tạo động lực mạnh hơn việc nhận ra bạn đang nắm giữ một chuỗi thắng. Thay vì ghi lại thói quen bằng tay, Streaks tự động làm hiện rõ đà tiến ẩn giấu trong dữ liệu của bạn — để ngày một đã là ngày thứ 100.
+Theo dõi miễn phí tối đa ba chuỗi. Streaks Pro mở theo dõi không giới hạn. Xem tiến bộ qua lịch màu, tiện ích và tổ hợp Apple Watch.
 
-TỰ ĐỘNG KHÁM PHÁ CHUỖI CỦA BẠN
-Tìm các chuỗi đang hoạt động trên 9 chỉ số Apple Health mà không cần ghi chép gì: Số bước, Phút Tập luyện, Giờ Đứng, Năng lượng Hoạt động, Bài tập, Chánh niệm, Giấc ngủ, Quãng đường và Số tầng đã leo. Phát hiện những chuỗi ẩn mà bạn chưa từng nghĩ đến việc theo dõi.
+Chín chỉ số Sức khỏe: bước chân, vận động, giờ đứng, năng lượng, bài tập, chánh niệm, giấc ngủ, quãng đường và tầng leo. Chuỗi phụ thuộc lịch sử và quyền truy cập. Tính toán trên thiết bị với quyền chỉ đọc Sức khỏe. Công cụ thói quen vận động, không phải tư vấn y tế.
 
-ĐỪNG BAO GIỜ ĐỨT CHUỖI
-Đặt mục tiêu quan trọng nhất của bạn lên hàng đầu với Hero Streak, theo dõi chuỗi của bạn lớn dần trên bản đồ nhiệt dạng lịch, và nhận huy hiệu khi sự kiên định của bạn được vun đắp. Nhận một lời nhắc nhẹ nhàng lúc 7 giờ tối nếu chuỗi hôm nay đang gặp nguy cơ — chúng tôi báo cho bạn trước khi một chuỗi chấm dứt.
-
-Ở MỌI NƠI BẠN NHÌN
-• Widget Màn hình chính, Màn hình khóa và StandBy
-• Một ứng dụng Apple Watch gốc với các tính năng phức tạp phong phú
-• Số đếm chuỗi của bạn, luôn trong tầm mắt
-
-KHÔNG PHẢI MỘT ỨNG DỤNG THEO DÕI THÓI QUEN KHÁC
-Không ô đánh dấu. Không ghi chép thủ công. Không điểm hồi phục. Chỉ có những chuỗi mà chính con người bạn trong quá khứ đã giành được — được làm hiện rõ, được tôn vinh và được bảo vệ.
-
-RIÊNG TƯ TUYỆT ĐỐI (NGAY TỪ THIẾT KẾ)
-Dữ liệu sức khỏe của bạn thuộc về bạn:
-• Quyền truy cập Apple Health chỉ đọc
-• Xử lý 100% trên thiết bị
-• Không tài khoản hay đăng ký
-• Không có lệnh gọi mạng, không theo dõi
-Lịch sử sức khỏe của bạn không bao giờ rời khỏi điện thoại.
-
-Đừng làm đứt chuỗi. Hãy tải Fitness Streak Tracker và giữ cho đà tiến của bạn tiếp tục!
-
-Chi tiết Đăng ký
-Streaks Pro được cung cấp dưới dạng gói đăng ký tự động gia hạn (Hàng tháng $1.99 / Hàng năm $14.99 kèm dùng thử miễn phí 7 ngày) hoặc một lần mua Lifetime trọn đời ($29.99). Khoản thanh toán sẽ được tính vào Apple ID của bạn khi xác nhận. Gói đăng ký sẽ tự động gia hạn trừ khi bị hủy ít nhất 24 giờ trước khi kết thúc kỳ hạn. Quản lý hoặc hủy bất cứ lúc nào trong Cài đặt → Apple ID → Đăng ký.
-
-Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
-Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Gói tháng có giá US$6.99 và gói năm có giá US$29.99. Cả hai đều tự động gia hạn và có 7 ngày dùng thử miễn phí nếu đủ điều kiện. Apple tính phí vào Tài khoản Apple của bạn khi xác nhận mua hoặc sau khi kết thúc đợt dùng thử đủ điều kiện. Nếu không đủ điều kiện, phí được tính ngay khi xác nhận. Phí gia hạn được tính trong vòng 24 giờ trước khi kỳ hiện tại kết thúc. Quản lý hoặc hủy trong Cài đặt › Tài khoản Apple › Gói đăng ký ít nhất 24 giờ trước khi kỳ kết thúc. Giá thay đổi theo khu vực và được hiển thị trước khi mua.
+Bạn cũng có thể mở khóa trọn đời với một lần thanh toán. (US$69.99)
+Chính sách quyền riêng tư: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
+Điều khoản sử dụng (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

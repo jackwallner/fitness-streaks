@@ -1,1 +1,1 @@
-Fejlrettelser og ydeevneforbedringer i appen, widgets og Apple Watch.
+Opdateret App Store-information og diagnosticering af abonnementer.
