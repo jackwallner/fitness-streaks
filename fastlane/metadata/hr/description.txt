@@ -1,8 +1,15 @@
-Otkrijte nizove koji već postoje u povijesti Apple Zdravlja. Pratite korake, treninge i san bez svakodnevnog ručnog unosa.
+Praćenje navika ne bi smjelo postati još jedna navika koju treba održavati. Pretvori aktivnost koja je već zabilježena u Zdravlju u vidljiv dokaz da si dosljedan.
 
-Pratite do tri niza besplatno. Streaks Pro otključava neograničeno praćenje. Pogledajte napredak u kalendarima u boji, widgetima i komplikacijama Apple Watcha.
+POVEŽI ZDRAVLJE. VIDI SVOJU DOSLJEDNOST.
+Uz tvoju dozvolu, aplikacija čita tvoju postojeću povijest Zdravlja i pronalazi nizove u devet podržanih mjerenja, uključujući korake, treninge, vježbanje, san i minute svjesnosti. Nije potrebno svakodnevno ručno označavanje ni dupli unos aktivnosti. Ono što se prikazuje ovisi o tvojoj dostupnoj povijesti i dodijeljenim dozvolama čitanja.
 
-Devet mjera Zdravlja: koraci, vježbanje, sati stajanja, energija, treninzi, svjesnost, san, udaljenost i katovi. Nizovi ovise o povijesti i dopuštenjima. Izračuni se izvode na uređaju uz pristup Zdravlju samo za čitanje. Alat za navike kretanja, a ne medicinski savjet.
+ZAPOČNI S TRI
+Prati tri niza besplatno. Odaberi zdravstvene navike koje su ti važne i vidi koliko si dosljedan, umjesto da svaki brojač kreneš od nule.
+
+NAPRAVI MJESTA ZA VIŠE
+Plaćena nadogradnja otključava neograničeno praćenje i više načina za pratiti napredak. Prikazi kalendara, widgeti i prateća aplikacija za Apple Watch pomažu da ti navike ostanu na vidiku.
+
+Tvoji zapisi Zdravlja služe samo za čitanje, a izračuni se odvijaju na tvom uređaju. Aplikacija ne upisuje aktivnost u Apple Health i ne jamči duljinu nijednog niza. To je alat za svijest o fitnessu, ne medicinski savjet.
 
 Mjesečni plan iznosi US$6.99, a godišnji US$29.99. Oba se automatski obnavljaju i uključuju 7-dnevnu besplatnu probu ako ispunjavaš uvjete. Apple tereti tvoj Apple račun pri potvrdi kupnje ili nakon prihvatljive probe. Ako nemaš pravo, naplata se vrši pri potvrdi. Naknada za obnovu naplaćuje se unutar 24 sata prije završetka razdoblja. Upravljaj pretplatom ili je otkaži u Postavke › Apple račun › Pretplate najmanje 24 sata prije završetka. Cijene ovise o regiji i prikazuju se prije kupnje.
 Dostupno je i jednokratno doživotno otključavanje. (US$69.99)

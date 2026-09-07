@@ -1,1 +1,1 @@
-motiváció,szokás,gyűrűk,widget,óra,mozgás,lépések,edzés,mindfulness,alvás,állás,badge,lépésszámláló
+lépés,edzés,aktivitás,gyűrűk,séta,alvás,mozgás,állás,kalória,óra,widget,célok,naptár,sorozat

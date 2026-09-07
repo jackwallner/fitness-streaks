@@ -1,8 +1,15 @@
-Entdecke Fitness-Serien in deinem bisherigen Apple-Health-Verlauf. Verfolge Schritte, Training und Schlaf ohne tägliches manuelles Eintragen.
+Ein Habit Tracker sollte nicht selbst zur zusätzlichen Gewohnheit werden. Verwandle die Aktivität, die bereits in Apple Health steht, in einen sichtbaren Beweis, dass du dranbleibst.
 
-Verfolge bis zu drei Serien kostenlos. Streaks Pro schaltet unbegrenzt viele frei. Sieh deinen Fortschritt in Kalender-Heatmaps, Widgets und Apple-Watch-Komplikationen.
+HEALTH VERBINDEN. SERIE SEHEN.
+Mit deiner Erlaubnis liest die App deinen vorhandenen Health-Verlauf und findet Serien über neun unterstützte Messwerte, darunter Schritte, Training, Übungen, Schlaf und Achtsamkeitsminuten. Kein tägliches Abhaken, keine doppelte Eingabe von Aktivität nötig. Was angezeigt wird, hängt von deinem verfügbaren Verlauf und den erteilten Leserechten ab.
 
-Neun Apple-Health-Messwerte: Schritte, Training, Stehstunden, Energie, Workouts, Achtsamkeit, Schlaf, Strecke und Stockwerke. Serien hängen von deinem Verlauf und den Freigaben ab. Berechnungen laufen auf deinem Gerät, mit rein lesendem Health-Zugriff. Ein Werkzeug für Fitnessgewohnheiten, keine medizinische Beratung.
+MIT DREI STARTEN
+Verfolge drei Serien kostenlos. Wähle die Gesundheitsgewohnheiten, die dir wichtig sind, und sieh, wie konsequent du warst, statt jeden Zähler bei null zu starten.
+
+PLATZ FÜR MEHR SCHAFFEN
+Das kostenpflichtige Upgrade schaltet unbegrenztes Tracking frei und mehr Wege, deinen Fortschritt zu verfolgen. Kalenderansichten, Widgets und die Apple Watch App halten deine Gewohnheiten im Blick.
+
+Deine Health-Daten werden nur gelesen, und alle Berechnungen laufen auf deinem Gerät. Die App schreibt keine Aktivität in Apple Health und garantiert keine Serienlänge. Sie ist ein Werkzeug für Fitnessbewusstsein, keine medizinische Beratung.
 
 Das Monatsabo kostet US$6.99, das Jahresabo US$29.99. Beide verlängern sich automatisch und enthalten bei Berechtigung eine 7-tägige kostenlose Probe. Apple belastet deinen Apple Account bei Bestätigung des Kaufs oder nach einer berechtigten Probe. Ohne Berechtigung erfolgt die Belastung bei Bestätigung. Die Verlängerung wird innerhalb der letzten 24 Stunden vor Periodenende berechnet. Verwalte oder kündige mindestens 24 Stunden vor Periodenende unter Einstellungen › Apple Account › Abonnements. Preise variieren je nach Region und werden vor dem Kauf angezeigt.
 Ein einmaliger lebenslanger Zugriff ist ebenfalls verfügbar. (US$69.99)

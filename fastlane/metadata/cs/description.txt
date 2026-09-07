@@ -1,8 +1,15 @@
-Objevte série, které už máte v historii Apple Zdraví. Sledujte kroky, tréninky a spánek bez každodenního ručního zapisování.
+Sledovač návyků by se neměl stát dalším návykem, který musíš udržovat. Změň aktivitu, kterou už máš zaznamenanou v Apple Zdraví, na viditelný důkaz, že to zvládáš.
 
-Sledujte až tři série zdarma. Streaks Pro odemkne neomezené sledování. Prohlížejte pokrok v barevném kalendáři, widgetech a komplikacích Apple Watch.
+PŘIPOJ ZDRAVÍ. SLEDUJ SVOU PRAVIDELNOST.
+Se svolením aplikace čte tvou existující historii Zdraví a hledá série napříč devíti podporovanými metrikami, včetně kroků, tréninků, cvičení, spánku a minut všímavosti. Není potřeba žádné denní odškrtávání ani duplicitní zápis aktivity. To, co se zobrazí, závisí na dostupné historii a udělených oprávněních ke čtení.
 
-Devět metrik Zdraví: kroky, cvičení, hodiny stání, energie, tréninky, všímavost, spánek, vzdálenost a patra. Série závisí na historii a oprávněních. Výpočty běží v zařízení s přístupem ke Zdraví jen pro čtení. Nástroj pro pohybové návyky, nikoli lékařská rada.
+ZAČNI SE TŘEMI
+Sleduj tři série zdarma. Vyber si zdravotní návyky, na kterých ti záleží, a sleduj svou pravidelnost, místo abys každé počítadlo začínal od nuly.
+
+UDĚLEJ MÍSTO PRO VÍC
+Placené rozšíření odemyká neomezené sledování a další způsoby, jak sledovat svůj pokrok. Zobrazení kalendáře, widgety a doprovodná aplikace pro Apple Watch pomáhají mít návyky stále na očích.
+
+Tvé záznamy ve Zdraví jsou pouze pro čtení a výpočty probíhají přímo na tvém zařízení. Aplikace nezapisuje aktivitu do Apple Zdraví ani negarantuje délku žádné série. Jde o nástroj pro povědomí o fitness, ne o lékařskou radu.
 
 Měsíční plán stojí US$6.99 a roční US$29.99. Oba se automaticky obnovují a při nároku zahrnují 7denní zkušební verzi. Apple strhne platbu z účtu Apple při potvrzení nákupu nebo po oprávněné zkoušce. Bez nároku strhne platbu při potvrzení. Poplatek za obnovení se účtuje během 24 hodin před koncem období. Spravuj nebo zruš v Nastavení › Účet Apple › Předplatná, nejméně 24 hodin před koncem. Ceny se liší podle regionu a zobrazí se před nákupem.
 K dispozici je také jednorázové doživotní odemčení. (US$69.99)
