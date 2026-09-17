@@ -212,6 +212,9 @@ struct FitnessStreaksApp: App {
                         }
                     }
                     await store.load(allowCachedSnapshot: true)
+                    #if DEBUG
+                    store.seedScreenshotDataIfRequested()
+                    #endif
                 }
                 .onChange(of: scenePhase) { _, phase in
                     guard phase == .active else { return }
