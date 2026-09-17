@@ -347,6 +347,97 @@ final class StreakStore: ObservableObject {
         #endif
     }
 
+    #if DEBUG
+    /// Supplies deterministic local activity for screenshot review. This keeps
+    /// simulator captures meaningful without pretending HealthKit contains data.
+    func seedScreenshotDataIfRequested() {
+        guard CommandLine.arguments.contains("-UITestSeedStreaks") else { return }
+
+        let today = DateHelpers.startOfDay()
+        history = (0..<30).map { offset in
+            let variation = Double((offset * 137) % 900)
+            return ActivityDay(
+                date: DateHelpers.addDays(-offset, to: today),
+                steps: 8_400 + variation,
+                exerciseMinutes: 24 + Double(offset % 12),
+                standHours: 9 + Double(offset % 3),
+                activeEnergy: 410 + Double((offset * 17) % 90),
+                workoutCount: offset % 4 == 0 ? 1 : 0,
+                sleepHours: 7.2 + Double(offset % 5) * 0.1,
+                distanceMiles: 3.8 + Double(offset % 4) * 0.2,
+                flightsClimbed: 8 + Double(offset % 5),
+                heartRateMinutes: 18 + Double(offset % 8)
+            )
+        }
+
+        let seeded: [Streak] = [
+            Streak(
+                metric: .steps,
+                cadence: .daily,
+                threshold: 8_000,
+                current: 12,
+                best: 23,
+                startDate: DateHelpers.addDays(-11, to: today),
+                lastHitDate: DateHelpers.addDays(-1, to: today),
+                currentUnitCompleted: true,
+                currentUnitProgress: 1.12,
+                currentUnitValue: 8_960,
+                completionRate: 0.87,
+                lookbackDays: 30
+            ),
+            Streak(
+                metric: .exerciseMinutes,
+                cadence: .daily,
+                threshold: 20,
+                current: 9,
+                best: 17,
+                startDate: DateHelpers.addDays(-8, to: today),
+                lastHitDate: DateHelpers.addDays(-1, to: today),
+                currentUnitCompleted: true,
+                currentUnitProgress: 1.35,
+                currentUnitValue: 27,
+                completionRate: 0.80,
+                lookbackDays: 30
+            ),
+            Streak(
+                metric: .standHours,
+                cadence: .daily,
+                threshold: 8,
+                current: 7,
+                best: 14,
+                startDate: DateHelpers.addDays(-6, to: today),
+                lastHitDate: DateHelpers.addDays(-1, to: today),
+                currentUnitCompleted: true,
+                currentUnitProgress: 1.25,
+                currentUnitValue: 10,
+                completionRate: 0.77,
+                lookbackDays: 30
+            ),
+            Streak(
+                metric: .sleepHours,
+                cadence: .daily,
+                threshold: 7,
+                current: 6,
+                best: 12,
+                startDate: DateHelpers.addDays(-5, to: today),
+                lastHitDate: DateHelpers.addDays(-1, to: today),
+                currentUnitCompleted: true,
+                currentUnitProgress: 1.04,
+                currentUnitValue: 7.3,
+                completionRate: 0.73,
+                lookbackDays: 30
+            )
+        ]
+
+        StreakSettings.shared.trackedStreaks = nil
+        StreakSettings.shared.manualStreakOrder = []
+        allCandidates = seeded
+        streaks = seeded
+        lastUpdated = .now
+        persistCurrentSnapshot()
+    }
+    #endif
+
     private func restore(_ snapshot: StreakSnapshot) {
         let restored = ([snapshot.hero].compactMap { $0 } + snapshot.badges).compactMap { item -> Streak? in
             guard let metric = item.streakMetric else { return nil }
