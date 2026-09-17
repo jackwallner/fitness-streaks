@@ -31,7 +31,9 @@ struct SettingsView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    proSection
+                    if !FitnessBrand.isScreenshotMode {
+                        proSection
+                    }
                     appearanceSection
                     intensitySection
                     notificationsSection

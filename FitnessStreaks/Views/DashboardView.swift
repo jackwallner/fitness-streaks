@@ -287,7 +287,7 @@ struct DashboardView: View {
     private var topBar: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("▶ STREAK FINDER")
+                Text("▶ \(FitnessBrand.name.uppercased())")
                     .font(RetroFont.mono(11, weight: .bold))
                     .tracking(1)
                     .foregroundStyle(Theme.retroMagenta)

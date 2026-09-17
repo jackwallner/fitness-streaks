@@ -11,6 +11,18 @@ import RevenueCat
 @preconcurrency import WatchConnectivity
 #endif
 
+enum FitnessBrand {
+    #if DEBUG
+    static let isScreenshotMode = ProcessInfo.processInfo.arguments.contains("-FitnessScreenshotBrand")
+    #else
+    static let isScreenshotMode = false
+    #endif
+
+    static var name: String {
+        isScreenshotMode ? "Fitness Habit Tracker" : "Streak Finder"
+    }
+}
+
 private let log = Logger(subsystem: "com.jackwallner.streaks", category: "App")
 private let refreshTaskID = "com.jackwallner.streaks.refresh"
 
