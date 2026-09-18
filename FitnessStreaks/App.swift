@@ -216,6 +216,7 @@ struct FitnessStreaksApp: App {
                     // authorizationStatus(for:) always returns .notDetermined for read-only
                     // types, making status-based checks unreliable on cold launch.
                     if settings.hasCompletedSetup,
+                       !FitnessBrand.isScreenshotMode,
                        !CommandLine.arguments.contains("-UITestSkipHealthKit") {
                         let cached = HealthKitService.shared.cachedHistory(days: 30)
                         if cached.isEmpty {
@@ -312,7 +313,7 @@ private struct RootView: View {
 
     var body: some View {
         Group {
-            if settings.hasCompletedSetup {
+            if settings.hasCompletedSetup || FitnessBrand.isScreenshotMode {
                 RootTabView()
             } else {
                 OnboardingView()
