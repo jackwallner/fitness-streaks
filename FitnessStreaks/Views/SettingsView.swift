@@ -36,7 +36,9 @@ struct SettingsView: View {
                     }
                     appearanceSection
                     intensitySection
-                    notificationsSection
+                    if !FitnessBrand.isScreenshotMode {
+                        notificationsSection
+                    }
                     metricsSection
                     dataSection
                     plannedFreezesSection
