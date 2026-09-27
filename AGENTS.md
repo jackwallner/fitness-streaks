@@ -1,4 +1,4 @@
-# Streak Finder — Project Guide
+# Streak Finder Project Guide
 
 iPhone + Apple Watch app that mines Apple Health history for active streaks and encourages the user to keep them alive.
 
@@ -54,4 +54,4 @@ Weekly totals: summed per ISO week starting Monday (see `DateHelpers.startOfWeek
 
 ---
 Shared iOS conventions (build, simulator, release/TestFlight, ASC key, signing, HealthKit/widget gotchas):
-always-loaded global CLAUDE.md + the `ios-dev` skill.
+the global agent rules + the `ios-dev` skill.
