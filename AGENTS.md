@@ -44,7 +44,7 @@ Widgets never query HealthKit. They render from the `StreakSnapshot` that the ma
 - Picks the highest threshold where `current ≥ minLength` (3 days / 2 weeks).
 - Falls back to the lowest threshold with `current ≥ 2` if nothing higher qualifies.
 
-Today / this-week is treated as "live" — doesn't break the streak until the unit actually ends.
+Today / this-week is treated as "live". It doesn't break the streak until the unit actually ends.
 Sleep attribution: an asleep sample is credited to the day it *ended*.
 Weekly totals: summed per ISO week starting Monday (see `DateHelpers.startOfWeek`).
 
