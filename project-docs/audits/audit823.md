@@ -86,7 +86,7 @@ Evidence: `FitnessStreaks/FitnessStreaks.storekit:4-84`.
 
 This file is a development StoreKit configuration, not proof of live ASC or RevenueCat pricing. It is still the source used for local testing, so it must not contradict the code or test assumptions.
 
-The local test configuration says both monthly and yearly have a 7-day free trial (`FitnessStreaks/FitnessStreaks.storekit:34-70`). The current paywall spec says `Yearly only - 7 days` (`my-current-paywall-spec.md:198-206`). The current App Store description says both monthly and yearly have a 7-day free trial (`fastlane/metadata/en-US/description.txt:29-30`). This is a P1 offer-definition conflict. Confirm whether monthly trials are intentionally live, then update the spec and tests.
+The local test configuration says both monthly and yearly have a 7-day free trial (`FitnessStreaks/FitnessStreaks.storekit:34-70`). The current paywall spec says `Yearly only - 7 days` (`../specs/my-current-paywall-spec.md:198-206`). The current App Store description says both monthly and yearly have a 7-day free trial (`fastlane/metadata/en-US/description.txt:29-30`). This is a P1 offer-definition conflict. Confirm whether monthly trials are intentionally live, then update the spec and tests.
 
 ### 1.3 Metadata completeness and limits
 
@@ -487,7 +487,7 @@ Other vocabulary drift:
 
 - Current `PaywallView` uses auto-save, freeze days, and at-risk alerts (`FitnessStreaks/Views/PaywallView.swift:126-239`).
 - Current Settings contains planned freeze controls (`FitnessStreaks/Views/SettingsView.swift:690-752`).
-- The old paywall spec and local StoreKit descriptions use Grace Days (`my-current-paywall-spec.md:48-107`, `FitnessStreaks/FitnessStreaks.storekit:11,74`).
+- The old paywall spec and local StoreKit descriptions use Grace Days (`../specs/my-current-paywall-spec.md:48-107`, `FitnessStreaks/FitnessStreaks.storekit:11,74`).
 - `StreakSettings` retains legacy `earnedGraceDays` and `graceAwardTier` keys. This may be intentional migration compatibility, but it should not be presented as current product behavior.
 
 Use a glossary with explicit status: current, compatibility-only, experiment, or archived.
@@ -656,7 +656,7 @@ The daily reminder is replaced by a stable identifier, but broken streak notices
 
 | File or folder | Stale or conflicting content | Action for a later cleanup pass |
 |---|---|---|
-| `my-current-paywall-spec.md` | Large historical Grace Days design, yearly-only trial, dimensions that no longer match current code | Rename or move to archive and add a current pointer |
+| `../specs/my-current-paywall-spec.md` | Large historical Grace Days design, yearly-only trial, dimensions that no longer match current code | Rename or move to archive and add a current pointer |
 | `docs/astro-aso-setup.md` | Last pass 2026-05-25, old app name and old keyword plan | Mark historical or regenerate from current ASC data |
 | `scripts/apply-streak-tracker-name.py` | Hardcoded `Streak Tracker: Fitness Habits` rename | Make it an explicit experiment tool with dry-run and current name input |
 | `scripts/aso-fitness-locale-readout.py` and JSON | Old `Streak Tracker` or `Fitness Habits` name assumptions | Remove as source of truth or update after canonical-name decision |
@@ -758,7 +758,7 @@ It should scaffold email or other notification delivery but keep delivery disabl
 1. Pull production ASC and RevenueCat product IDs, prices, subscription group, entitlement identifier, trial eligibility, and storefront behavior.
 2. Resolve the exact ASC review issues link.
 3. Decide the canonical app name, supported-metric count, free tracked cap, custom-streak cap, and premium vocabulary.
-4. Mark `my-current-paywall-spec.md`, `docs/astro-aso-setup.md`, old ASO scripts, and historical audits as current, experiment, or archive.
+4. Mark `../specs/my-current-paywall-spec.md`, `docs/astro-aso-setup.md`, old ASO scripts, and historical audits as current, experiment, or archive.
 
 ### Phase 1, fix high-confidence commercial consistency
 
