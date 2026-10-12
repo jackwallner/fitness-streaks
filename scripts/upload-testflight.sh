@@ -1,38 +1,6 @@
 #!/usr/bin/env bash
-# Upload to TestFlight via xcodebuild -exportArchive with AppStoreUploadOptions.plist
-# (destination=upload, method=app-store-connect) and -allowProvisioningUpdates,
-# so Xcode uses your local App Store Connect / Apple ID session (no JWT in repo).
-#
-# Prerequisites: Xcode signed in (Xcode → Settings → Accounts) with team YXG4MP6W39.
-#
-# Usage (from fitness-streaks/):
-#   ./scripts/upload-testflight.sh [path/to/FitnessStreaks.xcarchive]
-
-set -euo pipefail
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-ARCHIVE="${1:-$ROOT/build/FitnessStreaks.xcarchive}"
-STAGING="$ROOT/build/upload-staging"
-PLIST="$ROOT/AppStoreUploadOptions.plist"
-
-if [[ ! -d "$ARCHIVE" ]]; then
-  echo "error: archive not found: $ARCHIVE" >&2
-  exit 1
-fi
-
-if [[ ! -f "$PLIST" ]]; then
-  echo "error: missing $PLIST" >&2
-  exit 1
-fi
-
-mkdir -p "$STAGING"
-echo "Uploading archive via App Store Connect (local Xcode session)..."
-echo "  archive: $ARCHIVE"
-echo "  plist:   $PLIST"
-
-xcodebuild -exportArchive \
-  -archivePath "$ARCHIVE" \
-  -exportPath "$STAGING" \
-  -exportOptionsPlist "$PLIST" \
-  -allowProvisioningUpdates
-
-echo "If upload succeeded, check App Store Connect → TestFlight for \"Processing\"."
+# Upload an existing archive of FitnessStreaks to TestFlight (default build/FitnessStreaks.xcarchive)
+# with the App Store Connect API key. The shared fleet script does the work; see
+# ~/ios/release/testflight.sh for flags and credentials.
+cd "$(dirname "$0")/.." || exit 1
+exec "$HOME/ios/release/testflight.sh" --project FitnessStreaks.xcodeproj --scheme FitnessStreaks --upload-only "$@"
