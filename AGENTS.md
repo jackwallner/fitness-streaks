@@ -50,7 +50,7 @@ Weekly totals: summed per ISO week starting Monday (see `DateHelpers.startOfWeek
 
 ## App-specific notes
 
-- Review funnel: positive moments on hero-streak growth / today's goal met (`ReviewPromptTracker`, `ReviewPromptSheet`). App Store ID `6762699692`. (Shared funnel mechanics + playbook in the `ios-dev` skill.)
+- Ratings: no in-app rating question (App Review 5.6.1). When the hero streak grows or today's goal is newly met (`StreakStore`), `DashboardView` calls the system `requestReview()` about 3.5s later if no sheet, alert, tutorial or trial pitch is up (from the 2nd launch, 30-day cooldown; `ReviewPromptTracker`). A blocked ask stays pending for the next moment. Settings has separate "RATE STREAKS" and "SEND FEEDBACK" rows. App Store ID `6762699692`. (Shared rules in the `ios-dev` skill.)
 
 ---
 Shared iOS conventions (build, simulator, release/TestFlight, ASC key, signing, HealthKit/widget gotchas):

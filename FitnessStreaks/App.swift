@@ -289,10 +289,6 @@ private struct RootView: View {
     @EnvironmentObject var settings: StreakSettings
     @EnvironmentObject var storeKit: StoreKitService
     @EnvironmentObject var store: StreakStore
-    @Environment(\.requestReview) private var requestReview
-
-    @ObservedObject private var reviewCoordinator = ReviewPromptCoordinator.shared
-
     @State private var showTrialOffer = false
     @State private var showTrialPaywall = false
     @State private var trialPurchaseInFlight = false
@@ -318,14 +314,6 @@ private struct RootView: View {
             } else {
                 OnboardingView()
             }
-        }
-        .sheet(item: $reviewCoordinator.activePresentation, onDismiss: {
-            if ReviewPromptTracker.pendingNativeReviewRequested() {
-                ReviewPromptTracker.setPendingNativeReview(false)
-                requestReview()
-            }
-        }) { presentation in
-            ReviewPromptSheet(initialPresentation: presentation)
         }
         #if REVENUECAT
         .task {

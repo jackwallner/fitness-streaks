@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct SettingsView: View {
     @EnvironmentObject var settings: StreakSettings
@@ -25,6 +26,16 @@ struct SettingsView: View {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
         return formatter
+    }()
+
+    private static let feedbackMailURL: URL? = {
+        var components = URLComponents()
+        components.scheme = "mailto"
+        components.path = AppStoreReviewLinks.feedbackEmail
+        components.queryItems = [
+            URLQueryItem(name: "subject", value: "\(AppStoreReviewLinks.displayName) feedback"),
+        ]
+        return components.url
     }()
 
     var body: some View {
@@ -967,12 +978,14 @@ struct SettingsView: View {
                     }
                 }
                 dashedLine
+                // Separate review and feedback rows, with no question in front
+                // of either (App Review 5.6.1).
                 Button {
-                    ReviewPromptCoordinator.shared.requestEnjoymentPrompt(bypassPassiveGates: true)
-                    dismiss()
+                    ReviewPromptTracker.markOpenedWriteReview()
+                    UIApplication.shared.open(AppStoreReviewLinks.writeReviewURL)
                 } label: {
                     HStack {
-                        Text("RATE OR SEND FEEDBACK")
+                        Text("RATE \(AppStoreReviewLinks.displayName.uppercased())")
                             .font(RetroFont.pixel(10))
                             .foregroundStyle(Theme.retroInk)
                         Spacer()
@@ -984,12 +997,12 @@ struct SettingsView: View {
                     .padding(.horizontal, 14)
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("Rate on the App Store or send feedback")
+                .accessibilityLabel("Rate \(AppStoreReviewLinks.displayName) on the App Store")
                 dashedLine
-                if let url = URL(string: "mailto:jackwallner+fs@gmail.com") {
+                if let url = Self.feedbackMailURL {
                     Link(destination: url) {
                         HStack {
-                            Text("SUPPORT")
+                            Text("SEND FEEDBACK")
                                 .font(RetroFont.pixel(10))
                                 .foregroundStyle(Theme.retroInk)
                             Spacer()

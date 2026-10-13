@@ -1,4 +1,6 @@
+import StoreKit
 import SwiftUI
+import UIKit
 import os
 
 private let log = Logger(subsystem: "com.jackwallner.streaks", category: "Dashboard")
@@ -19,6 +21,8 @@ struct DashboardView: View {
     @State private var tutorialIndex = 0
     @State private var tutorialActive = false
     @State private var passiveReviewTask: Task<Void, Never>?
+    @State private var reviewRequestedThisSession = false
+    @Environment(\.requestReview) private var requestReview
 
     private let grid = [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)]
     private static let relativeFormatter: RelativeDateTimeFormatter = {
@@ -203,18 +207,35 @@ struct DashboardView: View {
         withAnimation(.easeInOut(duration: 0.2)) { tutorialActive = false }
     }
 
+    /// The rating ask after a positive moment: Apple's own prompt, no question
+    /// in front of it. Waits for the streak update to settle, then asks only if
+    /// the dashboard is still clear. A blocked ask keeps the moment pending in
+    /// the tracker and the next moment asks.
     private func schedulePassiveReviewPrompt() {
         passiveReviewTask?.cancel()
         passiveReviewTask = Task { @MainActor in
             try? await Task.sleep(nanoseconds: 3_500_000_000)
-            guard !Task.isCancelled else { return }
-            guard settings.hasCompletedSetup else { return }
-            guard !showSettings, !showingPaywall, !showPicker, selectedBroken == nil, !tutorialActive else { return }
-            guard !trialOfferMayAppear else { return }
-            guard ReviewPromptCoordinator.shared.activePresentation == nil else { return }
-            guard ReviewPromptTracker.canPresentEnjoymentPrompt(hasCompletedSetup: true) else { return }
-            ReviewPromptCoordinator.shared.requestEnjoymentPrompt()
+            guard !Task.isCancelled,
+                  !reviewRequestedThisSession,
+                  isDashboardClear,
+                  ReviewPromptTracker.shouldRequestAfterPositiveMoment(hasCompletedSetup: settings.hasCompletedSetup)
+            else { return }
+            reviewRequestedThisSession = true
+            ReviewPromptTracker.markShown()
+            requestReview()
         }
+    }
+
+    /// No sheet, alert, tutorial or trial pitch of ours is up, and nothing else
+    /// is presented over the window (the root trial sheets included).
+    private var isDashboardClear: Bool {
+        guard !showSettings, !showingPaywall, !showPicker, selectedBroken == nil,
+              healthAccessErrorText == nil, !tutorialActive, !trialOfferMayAppear
+        else { return false }
+        return !UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap(\.windows)
+            .contains { $0.isKeyWindow && $0.rootViewController?.presentedViewController != nil }
     }
 
     private func scrollTutorialAnchor(into scrollProxy: ScrollViewProxy, index: Int) {
@@ -235,7 +256,7 @@ struct DashboardView: View {
         }
     }
 
-    /// Mirrors RootView trial-offer gates so the review sheet does not stack on the trial pitch.
+    /// Mirrors RootView trial-offer gates so the rating ask never stacks on the trial pitch.
     private var trialOfferMayAppear: Bool {
         #if REVENUECAT
         !storeKit.isPro
