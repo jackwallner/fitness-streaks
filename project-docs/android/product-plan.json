@@ -1,0 +1,13 @@
+{
+  "package": "com.jackwallner.streaks",
+  "revenuecatProject": "a635c59c",
+  "revenuecatPlayApp": "appb51d6aa64c",
+  "offering": "default",
+  "state": "Play script prepared; package creation blocks Play product activation",
+  "products": [
+    {"id": "com.jackwallner.streaks.monthly", "type": "subscription", "basePlan": "monthly", "period": "P1M", "trial": "P1W", "usd": "1.59", "package": "$rc_monthly"},
+    {"id": "com.jackwallner.streaks.yearly", "type": "subscription", "basePlan": "yearly", "period": "P1Y", "trial": "P1W", "usd": "11.99", "package": "$rc_annual"},
+    {"id": "com.jackwallner.streaks.lifetime", "type": "one-time", "usd": "23.99", "package": "$rc_lifetime"}
+  ],
+  "notes": "USD ladder about 20 percent below checked-in iOS StoreKit prices. Verify current iOS pricing, regional PPP, new-customer trial eligibility and Play availability before activation. RevenueCat Play credentials saved. Play product activation and licensed Play billing tests require package registration."
+}

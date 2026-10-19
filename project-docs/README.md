@@ -18,3 +18,7 @@ Developer notes and historical audits for this repository. The published site re
 ## Specs
 
 - [my-current-paywall-spec.md](specs/my-current-paywall-spec.md): FitnessStreaks Pro: Paywall Design Spec
+
+## Android
+
+- [Android release preparation](android/README.md): products, Play preparation and port acceptance evidence.
