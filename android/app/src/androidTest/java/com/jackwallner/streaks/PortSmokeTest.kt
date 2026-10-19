@@ -47,6 +47,22 @@ class PortSmokeTest {
     @Test fun customTimedGoalCanBeCreated(){launch(pro=true,route="custom");click("TIME WINDOW OFF");click(hourLabel(10));click(hourLabel(17));click("CREATE STREAK");assertEquals(17,app.graph.settings.custom.single().hour)}
     @Test fun settingsHasSeparateFeedbackAndReview(){launch(route="settings");compose.onNodeWithText("RATE STREAKS").performScrollTo().assertIsDisplayed();compose.onNodeWithText("SEND FEEDBACK").performScrollTo().assertIsDisplayed();compose.onNodeWithText("READ-ONLY · HEALTH DATA LOCAL-ONLY",substring=true).performScrollTo().assertIsDisplayed()}
     @Test fun settingsAppearancePersists(){launch(route="settings");click("DARK");assertEquals(1,app.graph.settings.appearance);assertEquals(1,Settings(app.graph.values).appearance);screenshot("06-settings-dark")}
+    @Test fun reviewerAccessRejectsWrongCodeAndPersistsValidGrant()=runBlocking {
+        val code=checkNotNull(InstrumentationRegistry.getArguments().getString("reviewCode")){"Supply the private reviewer code through the local test harness."}
+        launch(route="settings")
+        compose.onNodeWithText("STREAK FINDER 1.3.1",substring=true).performScrollTo().performTouchInput{longClick()}
+        compose.onNodeWithText("Reviewer code").performTextInput("wrong")
+        click("UNLOCK")
+        compose.onNodeWithText("That code isn't valid.").assertIsDisplayed()
+        assertFalse(app.graph.store.current.isPro)
+        compose.onNodeWithText("Reviewer code").performTextClearance()
+        compose.onNodeWithText("Reviewer code").performTextInput(code)
+        click("UNLOCK")
+        assertTrue(app.graph.store.current.isPro)
+        app.graph.store.start()
+        assertTrue(app.graph.store.current.isPro)
+        assertTrue(StoreService(app,app.graph.diagnostics).current.isPro)
+    }
     @Test fun permissionsAndLocalDeletionClearHealthHistory(){launch(route="settings");click("DISCONNECT & DELETE LOCAL HEALTH DATA");click("CONFIRM");compose.waitUntil(15000){app.graph.health.history.isEmpty()};assertTrue(app.graph.streaks.isEmpty());assertTrue(Codec.days(app.graph.values.string("healthCache")?:"[]").isEmpty())}
     @Test fun backgroundAndProGatesNeverGrantFreezesForFree(){launch();assertFalse(app.graph.settings.freeze(LocalDate.now(),false));assertEquals(3,app.graph.streaks.size);assertFalse(app.graph.store.current.isPro)}
     @Test fun perTabBackStacksStayIndependent(){launch(route="detail:steps-daily");click("STATS");compose.onNodeWithText("3 ACTIVE STREAKS").assertIsDisplayed();click("STREAKS");compose.onNodeWithText("UNTRACK STREAK").performScrollTo().assertIsDisplayed()}

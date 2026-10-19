@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.update
 
 import com.jackwallner.streaks.BuildConfig
 import com.jackwallner.streaks.model.ConversionDiagnostics
+import com.jackwallner.streaks.model.ReviewAccess
 
 object Legal {
     const val TERMS_URL = "https://jackwallner.github.io/fitness-streaks/android/terms.html"
@@ -57,13 +58,20 @@ data class StoreState(
  */
 class StoreService(private val context: Context, private val diagnostics: ConversionDiagnostics) {
     private val preferences=context.getSharedPreferences("streaks-billing",Context.MODE_PRIVATE)
-    private val _state = MutableStateFlow(StoreState(isPro=preferences.getBoolean("streaksProCached",false)))
+    private val reviewAccess=ReviewAccess(Preferences(context),BuildConfig.PLAY_REVIEW_CODE_SHA256)
+    private val _state = MutableStateFlow(StoreState(isPro=reviewAccess.isGranted||preferences.getBoolean("streaksProCached",false)))
     val state: StateFlow<StoreState> = _state.asStateFlow()
     private var isConfigured = false
     private var forcePro = false
     private var paywallImpressionsThisSession = mutableSetOf<String>()
 
     val current: StoreState get() = _state.value
+
+    fun activateReviewAccess(code: String): Boolean {
+        if (!reviewAccess.activate(code)) return false
+        _state.update { it.copy(isPro=true,isResolved=true) }
+        return true
+    }
 
     /** Debug-only hook: open the paid boundary for local screenshots and tests. */
     fun forceProForDebug() {
@@ -188,7 +196,7 @@ class StoreService(private val context: Context, private val diagnostics: Conver
     private fun apply(info: CustomerInfo) {
         if (forcePro) return
         preferences.edit().putBoolean("streaksProCached",info.hasProEntitlement).apply()
-        _state.update { it.copy(isPro = info.hasProEntitlement, isResolved = true) }
+        _state.update { it.copy(isPro = reviewAccess.isGranted || info.hasProEntitlement, isResolved = true) }
     }
 
     private fun configureIfNeeded(): Boolean {

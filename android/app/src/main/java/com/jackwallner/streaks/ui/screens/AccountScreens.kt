@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -62,9 +63,20 @@ fun findActivity(context: Context): Activity? {var c=context;while(c is android.
         PixelButton("SEND FEEDBACK"){g.review.feedback();openUrl(g.context,"mailto:${Legal.FEEDBACK_EMAIL}?subject=Streak%20Finder%20Android%20feedback")}
         PixelButton("REPLAY TUTORIAL"){push("tutorial")}
         PixelButton("RESTORE PURCHASES"){scope.launch{g.store.restorePurchases()}};store.restoreError?.let{Label(it,color=p.amber)}
-        Label("STREAK FINDER 1.3.1\nREAD-ONLY · HEALTH DATA LOCAL-ONLY\nChanges save automatically.",size=11,color=p.dim)
+        Label("STREAK FINDER 1.3.1\nREAD-ONLY · HEALTH DATA LOCAL-ONLY\nChanges save automatically.",size=11,color=p.dim,modifier=Modifier.combinedClickable(onClick={},onLongClick={confirm="review"}))
     }
-    confirm?.let{action->AlertDialog(onDismissRequest={confirm=null},title={Label(if(action=="disconnect")"DELETE LOCAL HEALTH DATA?"else"RECALIBRATE ALL GOALS?",bold=true)},text={Label(if(action=="disconnect")"Health Connect records stay in Health Connect. Local health history and saved run data will be cleared."else"New goals may be higher. Your active streak lengths may change.")},confirmButton={TextButton(onClick={if(action=="disconnect")scope.launch{g.health.disconnect()}else{g.settings.committed.keys.toList().forEach(g.settings::recalibrate);g.recompute()};confirm=null}){Label("CONFIRM",color=p.red)}},dismissButton={TextButton(onClick={confirm=null}){Label("CANCEL")}})}
+    if(confirm=="review")ReviewerCodeDialog(g){confirm=null}
+    confirm?.takeUnless{it=="review"}?.let{action->AlertDialog(onDismissRequest={confirm=null},title={Label(if(action=="disconnect")"DELETE LOCAL HEALTH DATA?"else"RECALIBRATE ALL GOALS?",bold=true)},text={Label(if(action=="disconnect")"Health Connect records stay in Health Connect. Local health history and saved run data will be cleared."else"New goals may be higher. Your active streak lengths may change.")},confirmButton={TextButton(onClick={if(action=="disconnect")scope.launch{g.health.disconnect()}else{g.settings.committed.keys.toList().forEach(g.settings::recalibrate);g.recompute()};confirm=null}){Label("CONFIRM",color=p.red)}},dismissButton={TextButton(onClick={confirm=null}){Label("CANCEL")}})}
+}
+
+@Composable private fun ReviewerCodeDialog(g: AppGraph,close: ()->Unit) {
+    var code by remember{mutableStateOf("")}
+    var failed by remember{mutableStateOf(false)}
+    AlertDialog(onDismissRequest=close,title={Label("REVIEWER ACCESS",bold=true)},text={Column {
+        Label("Enter the code provided in the Play review instructions.")
+        OutlinedTextField(code,{code=it;failed=false},label={Text("Reviewer code")},singleLine=true,keyboardOptions=androidx.compose.foundation.text.KeyboardOptions(keyboardType=androidx.compose.ui.text.input.KeyboardType.Password,autoCorrectEnabled=false),visualTransformation=androidx.compose.ui.text.input.PasswordVisualTransformation())
+        if(failed)Label("That code isn't valid.",color=LocalPalette.current.red)
+    }},confirmButton={TextButton(onClick={if(g.store.activateReviewAccess(code))close()else failed=true}){Label("UNLOCK")}},dismissButton={TextButton(onClick=close){Label("CANCEL")}})
 }
 @Composable fun Picker(g: AppGraph,custom: ()->Unit,upgrade: ()->Unit,back: ()->Unit){val store by g.store.state.collectAsState();var selection by remember(g.settings.tracked){mutableStateOf(g.settings.tracked)}
     ScrollPage {Label("TRACKED STREAKS",size=25,bold=true);Label("${selection.size} SELECTED · ${if(store.isPro)"UNLIMITED"else"FREE TRACKS 3"}",color=LocalPalette.current.lime)

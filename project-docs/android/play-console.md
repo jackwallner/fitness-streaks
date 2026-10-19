@@ -2,15 +2,21 @@
 
 Package: `com.jackwallner.streaks`. Listing: Streak Finder. Developer: E3 Apps, account `8314164911785412040`.
 
-## Console steps remaining
+## Current state
 
-Created in E3 Apps on 2026-10-18, Play app ID `4972839548045906217`. The package is registered and available through the Publisher API. Use the dedicated Play Chrome task tab. The account is signed in; standard new-tab attachment is timing out, while MCP DOM access through the task window works.
-1. App created as Streak Finder, English (United States), App, Free. Confirm E3 Apps and the developer ID above before each Console step. Stop for any new legal agreement or authentication challenge.
-2. Upload `android/app/build/outputs/bundle/release/app-release.aab` through the Publisher API, then create internal and production draft releases. Use Google Play App Signing with the existing upload certificate. Do not replace the upload key.
-3. Run `scripts/play-products.py` with the existing service-account file in `PLAY_SERVICE_ACCOUNT_JSON`. It creates the iOS-matching monthly, yearly and lifetime IDs, regional PPP pricing and eligible one-week trials. Inspect prices and product state.
-4. Stage `play-assets/` using `play_stage.py listing`, contact `jackwallner@gmail.com`, website `https://jackwallner.github.io/fitness-streaks/`. Stage internal and production draft releases with `play_stage.py release com.jackwallner.streaks 1 internal production`.
-5. Finish App content and store settings below. Complete and roll out internal testing, copy its actual tester opt-in link, and verify licensed no-charge Play purchase and restore plus the pre-launch report.
-6. Check Publishing overview and the fleet tracker. Quit Zyn was confirmed in review in Console on 2026-10-18. Keep managed publishing off. Leave production as a draft, "Ready: send in its pacing slot", until the preceding review clears and the weekly pacing permits this app. Then send its changes for review and verify status.
+Created in E3 Apps on 2026-10-18, Play app ID `4972839548045906217`. The package is registered. Version code 2 is uploaded. Internal testing is active and available to testers, not reviewed. Production remains a vc2 draft. All three iOS-matching products, monthly/yearly base plans, eligible seven-day trials and regional pricing are active. Listing, icon, feature graphic, four real free-screen captures and contact details are uploaded. Category is Health & Fitness. Production availability covers 178 countries/regions. The existing internal tester email list is selected. The actual Console opt-in link is https://play.google.com/apps/internaltest/4701382895236577639. Managed publishing is off.
+
+Privacy, reviewer access, ads, health, adult target audience, advertising ID, government, financial features and Data safety declarations are saved. Reviewers can continue without Health Connect, then long-press the Settings version label and enter the code saved in the private Play app access form. The current code is in the local credentials file, never in this repository.
+
+## Remaining release work
+
+1. Reviewer-access vc3 passes 1,213 JVM cases, the actual-dialog reviewer device case, signed artifact checks and optimized QA debug-hook isolation. The full build and release lint pass. Upload vc3, publish it to internal testing and replace the production draft. The current Play reviewer code matches vc3; internal vc2 contains the previous digest.
+2. Content rating is pending Jack's approval to accept IARC's Terms of Use. The questionnaire explicitly requires a new legal agreement, so leave it unchecked until approved.
+3. Internal release validation and rollout are complete. Verify licensed no-charge Play purchase and restore, and inspect the pre-launch report. A Google Play tester must already be signed in; never enter a password or OTP.
+4. The full three-step Health Connect declaration is saved, including all ten read/history/background permission explanations. Production preview now reports no errors and only the missing native debug symbols warning. Countries/regions are already selected.
+5. Recheck Publishing overview and the fleet tracker before production review. Quit Zyn was in review at the earlier 2026-10-18 check. Keep managed publishing off and leave this production release as a draft until the preceding review clears and pacing permits it. Do not claim ready while content rating or other required checks remain.
+
+Use the dedicated Play Chrome task tab. Standard new-tab attachment can time out, while MCP DOM access through the separate same-origin task window works. Confirm E3 Apps and developer ID before each mutation.
 
 ## App content answers from this build
 

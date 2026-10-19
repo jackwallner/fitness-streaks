@@ -13,6 +13,7 @@ val localProperties = Properties().apply {
 val playKey = System.getenv("REVENUECAT_PLAY_KEY") ?: localProperties.getProperty("REVENUECAT_PLAY_KEY", "")
 val externalSigning = providers.gradleProperty("externalSigning").orNull == "true"
 val testKey = localProperties.getProperty("REVENUECAT_TEST_KEY", "")
+val reviewCodeDigest = localProperties.getProperty("PLAY_REVIEW_CODE_SHA256", "")
 val uploadKeyStore = localProperties.getProperty("PLAY_UPLOAD_KEYSTORE", "")
 val uploadKeyAlias = localProperties.getProperty("PLAY_UPLOAD_KEY_ALIAS", "")
 val uploadStorePassword = localProperties.getProperty("PLAY_UPLOAD_STORE_PASSWORD", "")
@@ -21,6 +22,7 @@ val uploadKeyPassword = localProperties.getProperty("PLAY_UPLOAD_KEY_PASSWORD", 
 val validateReleaseConfiguration = tasks.register("validateReleaseConfiguration") {
     doLast {
         check(playKey.startsWith("goog_")) { "Set REVENUECAT_PLAY_KEY in android/local.properties before a release build." }
+        check(reviewCodeDigest.matches(Regex("[a-f0-9]{64}"))) { "Set PLAY_REVIEW_CODE_SHA256 before a release build." }
         if (externalSigning) return@doLast
         check(uploadKeyStore.isNotBlank() && rootProject.file(uploadKeyStore).isFile) {
             "Set PLAY_UPLOAD_KEYSTORE to the external upload keystore before a release build."
@@ -39,12 +41,13 @@ android {
         applicationId = "com.jackwallner.streaks"
         minSdk = 28
         targetSdk = 36
-        versionCode = 1
+        versionCode = 3
         versionName = "1.3.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // Every connected test starts from a clean install: no saved data, no purchase.
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
         buildConfigField("String", "REVENUECAT_API_KEY", "\"$testKey\"")
+        buildConfigField("String", "PLAY_REVIEW_CODE_SHA256", "\"$reviewCodeDigest\"")
     }
 
     buildFeatures {
