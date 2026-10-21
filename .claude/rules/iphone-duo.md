@@ -19,6 +19,16 @@ paths: ["FitnessStreaks/Views/RootTabView.swift", "Shared/Utilities/UnfoldedSpli
 - One view tree: folding only changes frames. The pane gets
   `horizontalSizeClass = .compact`. Never swap the tab content between
   containers with an `if`.
+- Open issue: on the gh-sim iPhone Duo (iOS 27.1, root 867 pt with an 84 pt
+  vertical bar on the trailing edge, fold 455.5...495.5) the leading pane's
+  NavigationStacks (Dashboard, Saves, Stats) lay out at 455.7 pt, then settle
+  at 371.7 pt, 84 pt short of the fold (`DUOGEOM dashboard width` in app.log).
+  The tab bar and the trailing pane are correct. A full-width leading-aligned
+  wrapper frame did not help. Next to try: measure with a DEBUG log whether
+  the pane gets an 84 pt trailing safe-area inset, and if so
+  `.ignoresSafeArea(.container, edges: split == nil ? [] : .trailing)` on the
+  leading content; else host the three tabs in one NavigationStack at the
+  `RootTabView` level, as VO2 Max does.
 - Still across the fold: onboarding and the paywall, picker, broken-streak and
   freeze sheets (centred form sheets). None are in the store set.
 - Unattended captures: `-FitnessScreenshotBrand -UITestSeedStreaks
