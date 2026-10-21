@@ -1,0 +1,19 @@
+Streak Finder lukee Health Connectin kautta jakamasi aktiivisuuden ja löytää tavat, joita olet jo rakentamassa. Näe pääputkesi, seuraa päivän edistymistä ja valitse itsellesi tärkeät päivätavoitteet.
+
+LÖYDÄ NYKYISET PUTKESI
+Löydä kaavoja askelista, treeniminuuteista, unesta, matkasta ja muusta tuetusta aktiivisuudesta. Valitse rutiiniisi sopiva intensiteetti. Tavoitteet pysyvät samoina, kunnes päätät säätää niitä.
+
+RAKENNA OMA KETJUSI
+Luo oma päivätavoite tuetulle treenityypille tai askeltavoite tunnille. Ilmaisversioon kuuluu kolme seurattua putkea ja kolme omaa tavoitetta.
+
+SEURAA EDISTYMISTÄSI
+Katso käynnissä olevat putket, ennätykset ja onnistumisprosentit. Streaks+ lisää rajattoman seurannan, koko historian, automaattiset pelastukset, suunnitellut taukopäivät ja valinnaiset muistutukset, kun putki on vaarassa.
+
+TERVEYTESI, LAITTEESI
+Health Connect -pääsy on vain luku -tilassa. Aktiivisuusarvot ja lasketut putket pysyvät laitteellasi, eikä niitä koskaan lähetetä meille tai mainospalveluille. Voit muuttaa käyttöoikeuksia milloin tahansa tai katkaista yhteyden ja poistaa paikalliset terveystiedot Asetuksista. Alkuperäiset Health Connect -tietosi säilyvät koskemattomina.
+
+Android käyttää Health Connectissa saatavilla olevia tietoja. Seisomistunnit eivät ole saatavilla, ja jotkin mittarit, pidempi historia ja taustakäyttö riippuvat laitteestasi ja käyttöoikeuksistasi. Puhelinsovelluksessa ei ole kello- tai aloitusnäytön widgetejä.
+
+Streak Finder on henkilökohtainen tapojen seuranta, eikä se anna lääketieteellistä neuvontaa. Valinnaiset Streaks+-tilaukset uusiutuvat automaattisesti, kunnes peruutat ne Google Playssa. Myös kertamaksullinen elinikäinen vaihtoehto on tarjolla. Hinnat ja mahdollinen kokeilu näytetään sovelluksessa ennen ostoa.
+
+Itse sovellus on englanniksi.

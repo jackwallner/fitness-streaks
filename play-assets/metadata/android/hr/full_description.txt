@@ -1,0 +1,19 @@
+Streak Finder čita aktivnost koju dijelite putem Health Connecta i pronalazi navike koje već gradite. Pogledajte glavni niz, pratite današnji napredak i odaberite dnevne ciljeve koji su vam važni.
+
+PRONAĐITE POSTOJEĆE NIZOVE
+Otkrijte obrasce u koracima, minutama treninga, snu, udaljenosti i drugim podržanim aktivnostima. Odaberite intenzitet koji odgovara vašoj rutini. Ciljevi ostaju nepromijenjeni dok ih sami ne odlučite prilagoditi.
+
+IZGRADITE VLASTITI LANAC
+Postavite vlastiti dnevni cilj za podržanu vrstu treninga ili cilj koraka po satu. Besplatna verzija uključuje tri praćena niza i tri vlastita cilja.
+
+PRATITE NAPREDAK
+Provjerite trenutačne nizove, osobne rekorde i postotak ispunjenih dana. Streaks+ dodaje neograničeno praćenje, cijelu povijest, automatska spašavanja, planirane dane odmora i neobavezne podsjetnike kad je niz u opasnosti.
+
+VAŠE ZDRAVLJE, VAŠ UREĐAJ
+Pristup Health Connectu samo je za čitanje. Vrijednosti aktivnosti i izračunani nizovi ostaju na vašem uređaju i nikad se ne šalju nama ni reklamnim uslugama. Dopuštenja možete promijeniti bilo kada ili u Postavkama prekinuti vezu i izbrisati lokalne zdravstvene podatke. Vaši izvorni zapisi u Health Connectu ostaju netaknuti.
+
+Android koristi podatke dostupne u Health Connectu. Sati stajanja nisu dostupni, a neke metrike, dulja povijest i pristup u pozadini ovise o vašem uređaju i dopuštenjima. Aplikacija za telefon nema widgete za sat ni početni zaslon.
+
+Streak Finder osobni je alat za praćenje navika i ne daje medicinske savjete. Neobvezne pretplate na Streaks+ obnavljaju se automatski dok ih ne otkažete u Google Playu. Dostupna je i doživotna opcija. Cijene i eventualno probno razdoblje prikazuju se u aplikaciji prije kupnje.
+
+Sama aplikacija je na engleskom.

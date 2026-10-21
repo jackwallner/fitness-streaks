@@ -1,0 +1,19 @@
+Streak Finder lit l'activité que vous choisissez de partager via Health Connect et repère les habitudes que vous construisez déjà. Découvrez votre série principale, suivez les progrès du jour et choisissez les objectifs quotidiens qui comptent pour vous.
+
+TROUVEZ VOS SÉRIES EXISTANTES
+Repérez des tendances dans vos pas, minutes d'entraînement, sommeil, distance et autres activités prises en charge. Choisissez une intensité adaptée à votre routine. Les objectifs restent fixes jusqu'à ce que vous décidiez de les recalibrer.
+
+CRÉEZ VOTRE PROPRE CHAÎNE
+Définissez un objectif quotidien personnalisé pour un type d'entraînement pris en charge, ou un objectif de pas par heure. La version gratuite inclut trois séries suivies et trois objectifs personnalisés.
+
+SUIVEZ VOS PROGRÈS
+Consultez vos séries en cours, vos records personnels et vos taux de réussite. Streaks+ ajoute le suivi illimité, tout l'historique, les sauvegardes automatiques, des jours de pause planifiés et des rappels optionnels quand une série est en danger.
+
+VOTRE SANTÉ, VOTRE APPAREIL
+L'accès à Health Connect est en lecture seule. Les valeurs d'activité et les séries calculées restent sur votre appareil et ne sont jamais envoyées à nos serveurs ni à des services publicitaires. Vous pouvez modifier les autorisations à tout moment, ou vous déconnecter et supprimer les données de santé locales dans les Réglages. Vos données d'origine dans Health Connect ne sont pas modifiées.
+
+Android utilise les données disponibles dans Health Connect. Les heures debout ne sont pas disponibles, et certaines mesures, un historique plus long et l'accès en arrière-plan dépendent de votre appareil et de vos autorisations. L'application mobile n'a pas de widgets pour montre ou écran d'accueil.
+
+Streak Finder est un outil personnel de suivi d'habitudes et ne donne aucun avis médical. Les abonnements Streaks+ optionnels se renouvellent automatiquement tant que vous ne les annulez pas dans Google Play. Une option à vie existe aussi. Les prix et l'éventuel essai sont affichés dans l'application avant l'achat.
+
+L'application elle-même est en anglais.

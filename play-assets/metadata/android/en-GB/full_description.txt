@@ -1,0 +1,19 @@
+Your next streak may have already started.
+
+Streak Finder reads the activity you choose to share through Health Connect and finds the habits you are already building. See your hero streak, follow today's progress and choose the daily goals that matter to you.
+
+FIND YOUR EXISTING STREAKS
+Discover patterns in steps, workout minutes, sleep, distance and other supported activity types. Choose an intensity that fits your routine. Goals stay committed until you choose to recalibrate them.
+
+BUILD YOUR OWN CHAIN
+Create a custom daily target, choose a supported workout type or set a one-hour step goal. Free includes three tracked streaks and three custom goals.
+
+SEE YOUR PROGRESS
+Check current runs, personal bests and completion rates. Streaks+ adds unlimited tracking, full history, auto-saves, planned freeze days and optional at-risk reminders.
+
+YOUR HEALTH, YOUR DEVICE
+Health Connect access is read-only. Activity values and calculated streaks stay on your device and are never sent to us, RevenueCat or advertising services. Change permissions at any time, or disconnect and delete local health data from Settings. Your original Health Connect records stay untouched.
+
+Android uses the data available in Health Connect. Stand hours are unavailable. Some metrics, longer history and background access depend on your device and permissions. The phone app does not include watch or home-screen widgets.
+
+Streak Finder is a personal habit tracker and does not provide medical advice. Optional Streaks+ subscriptions renew automatically unless cancelled in Google Play. A lifetime option is also available. Prices and any eligible trial are shown in the app before purchase.

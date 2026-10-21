@@ -1,0 +1,19 @@
+Streak Finder liest die Aktivitätsdaten, die du über Health Connect teilst, und findet die Gewohnheiten, die du schon aufbaust. Sieh deine Hauptserie, verfolge den heutigen Fortschritt und wähle die Tagesziele, die dir wichtig sind.
+
+BESTEHENDE SERIEN FINDEN
+Entdecke Muster bei Schritten, Trainingsminuten, Schlaf, Strecke und weiteren unterstützten Aktivitäten. Wähle eine Intensität, die zu deinem Alltag passt. Ziele bleiben fest, bis du sie selbst neu einstellst.
+
+EIGENE KETTE AUFBAUEN
+Lege ein eigenes Tagesziel für eine unterstützte Trainingsart fest oder setze ein Schrittziel pro Stunde. Die kostenlose Version enthält drei verfolgte Serien und drei eigene Ziele.
+
+FORTSCHRITT SEHEN
+Prüfe aktuelle Serien, persönliche Bestleistungen und Abschlussquoten. Streaks+ bietet unbegrenztes Tracking, den vollständigen Verlauf, automatische Rettung, geplante Freeze-Tage und optionale Erinnerungen bei gefährdeten Serien.
+
+DEINE GESUNDHEIT, DEIN GERÄT
+Der Zugriff auf Health Connect ist schreibgeschützt. Aktivitätswerte und berechnete Serien bleiben auf deinem Gerät und werden weder an uns noch an Werbedienste gesendet. Berechtigungen kannst du jederzeit ändern oder die Verbindung trennen und lokale Gesundheitsdaten in den Einstellungen löschen. Deine ursprünglichen Health-Connect-Daten bleiben unberührt.
+
+Android nutzt die Daten, die in Health Connect verfügbar sind. Stehstunden sind nicht verfügbar, und manche Messwerte, längerer Verlauf und Hintergrundzugriff hängen von deinem Gerät und deinen Berechtigungen ab. Die Handy-App hat keine Uhr- oder Startbildschirm-Widgets.
+
+Streak Finder ist ein persönlicher Gewohnheits-Tracker und bietet keine medizinische Beratung. Optionale Streaks+-Abos verlängern sich automatisch, bis du sie in Google Play kündigst. Es gibt auch eine Lifetime-Option. Preise und eine mögliche Testphase siehst du vor dem Kauf in der App.
+
+Die App selbst ist auf Englisch.

@@ -1,0 +1,19 @@
+Streak Finder läser den aktivitet du väljer att dela via Health Connect och hittar de vanor du redan bygger upp. Se din huvudsvit, följ dagens framsteg och välj de dagliga mål som betyder något för dig.
+
+HITTA DINA BEFINTLIGA SVITER
+Upptäck mönster i steg, träningsminuter, sömn, distans och annan aktivitet som stöds. Välj en intensitet som passar din rutin. Mål ligger fast tills du själv väljer att justera dem.
+
+BYGG DIN EGEN KEDJA
+Skapa ett eget dagsmål för en träningstyp som stöds, eller ett stegmål per timme. Den kostnadsfria versionen ger tre följda sviter och tre egna mål.
+
+SE DINA FRAMSTEG
+Kolla pågående sviter, personliga rekord och andel avklarade dagar. Streaks+ lägger till obegränsad uppföljning, full historik, automatiska räddningar, planerade vilodagar och valfria påminnelser när en svit är i fara.
+
+DIN HÄLSA, DIN ENHET
+Åtkomsten till Health Connect är skrivskyddad. Aktivitetsvärden och beräknade sviter stannar på din enhet och skickas aldrig till oss eller till reklamtjänster. Du kan ändra behörigheter när som helst, eller koppla från och radera lokal hälsodata under Inställningar. Dina ursprungliga poster i Health Connect rörs inte.
+
+Android använder de data som finns i Health Connect. Stående timmar saknas, och vissa mått, längre historik och bakgrundsåtkomst beror på din enhet och dina behörigheter. Mobilappen har inga klock- eller startskärmswidgetar.
+
+Streak Finder är en personlig vanespårare och ger inga medicinska råd. Valfria Streaks+-prenumerationer förnyas automatiskt tills du avslutar dem i Google Play. Ett engångsköp för livstid finns också. Priser och eventuell provperiod visas i appen före köp.
+
+Själva appen är på engelska.
