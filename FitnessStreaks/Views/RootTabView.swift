@@ -4,17 +4,92 @@ enum RootTab: Hashable {
     case streaks, saves, stats
 }
 
+/// The trailing pane of the unfolded iPhone Duo. Rows that would push a streak
+/// (or the gear that would present Settings) open it here instead. `nil` in
+/// the environment means there is no pane: push and present as on a phone.
+struct StreakDetailPane {
+    /// The streak on show, `nil` when there is none.
+    var selectedKey: String?
+    var showsSettings: Bool
+    var open: @MainActor (Streak) -> Void
+    var openSettings: @MainActor () -> Void
+}
+
+private struct StreakDetailPaneKey: EnvironmentKey {
+    static var defaultValue: StreakDetailPane? { nil }
+}
+
+extension EnvironmentValues {
+    var streakDetailPane: StreakDetailPane? {
+        get { self[StreakDetailPaneKey.self] }
+        set { self[StreakDetailPaneKey.self] = newValue }
+    }
+}
+
 struct RootTabView: View {
+    @EnvironmentObject var store: StreakStore
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
     @State private var selection: RootTab = .streaks
+    /// Measured so the unfolded iPhone Duo can put the tabs and the streak
+    /// they open on opposite sides of the fold.
+    @State private var paneGeometry = PaneGeometry(width: 0, fold: nil)
+    @State private var paneStreakKey: String?
+    @State private var paneShowsSettings = false
+
+    private var split: UnfoldedSplit? {
+        UnfoldedSplit.make(
+            width: paneGeometry.width,
+            isRegularWidth: horizontalSizeClass == .regular,
+            fold: paneGeometry.fold
+        )
+    }
+
+    /// The pane's streak, falling back to the hero when it is untracked.
+    private var paneStreak: Streak? {
+        store.streaks.first { $0.trackingKey == paneStreakKey } ?? store.hero
+    }
 
     var body: some View {
-        ZStack(alignment: .bottom) {
+        // One view tree in every pose: opening or closing the Duo only moves
+        // these frames, so the open tab keeps its scroll position.
+        ZStack(alignment: .bottomLeading) {
             content
                 .padding(.bottom, 64)  // leave room for the pixel tab bar
+                .frame(maxWidth: split?.primaryWidth ?? .infinity, maxHeight: .infinity)
 
             PixelTabBar(selection: $selection)
+                // Within the leading pane while split, never across the fold.
+                .frame(maxWidth: split?.primaryWidth ?? .infinity)
+
+            if let split {
+                detailPane
+                    .frame(maxWidth: split.secondaryWidth, maxHeight: .infinity)
+                    .padding(.leading, split.secondaryX)
+            }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+        .environment(\.horizontalSizeClass, split == nil ? horizontalSizeClass : .compact)
+        .environment(\.streakDetailPane, split == nil ? nil : StreakDetailPane(
+            selectedKey: paneStreak?.trackingKey,
+            showsSettings: paneShowsSettings,
+            open: { streak in
+                paneShowsSettings = false
+                paneStreakKey = streak.trackingKey
+            },
+            openSettings: { paneShowsSettings = true }
+        ))
         .background(Theme.retroBg.ignoresSafeArea())
+        .onGeometryChange(for: PaneGeometry.self) { proxy in
+            PaneGeometry(width: proxy.size.width, fold: proxy.verticalFold())
+        } action: { paneGeometry = $0 }
+        .onChange(of: split != nil) { _, isSplit in
+            // Folding hands Settings back to the Dashboard's sheet.
+            if !isSplit { paneShowsSettings = false }
+        }
+        #if DEBUG
+        .task(id: split != nil) { await runDuoTour(split: split != nil) }
+        #endif
     }
 
     @ViewBuilder
@@ -24,6 +99,110 @@ struct RootTabView: View {
         case .saves:   SavesView()
         case .stats:   StatsView()
         }
+    }
+
+    @ViewBuilder
+    private var detailPane: some View {
+        if paneShowsSettings {
+            SettingsView(onClose: { paneShowsSettings = false })
+        } else if let streak = paneStreak {
+            NavigationStack {
+                StreakDetailView(streak: streak, isPane: true)
+            }
+            .id(streak.trackingKey)
+        } else {
+            VStack(spacing: 14) {
+                PixelFlame(size: 56, intensity: 0.5, tint: Theme.retroInkDim)
+                Text("PICK A STREAK")
+                    .font(RetroFont.mono(11, weight: .bold))
+                    .tracking(2)
+                    .foregroundStyle(Theme.retroInkDim)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+
+    #if DEBUG
+    /// See `DuoScreenshotTour`. Each route starts with Settings closed.
+    private func runDuoTour(split isSplit: Bool) async {
+        guard DuoScreenshotTour.isEnabled else { return }
+        try? await Task.sleep(for: .seconds(DuoScreenshotTour.firstDelay))
+        while !Task.isCancelled {
+            for route in DuoScreenshotTour.routes(split: isSplit) {
+                guard !Task.isCancelled else { return }
+                NSLog("DUOTOUR %@ route=%@", isSplit ? "inner" : "outer", route)
+                openDuoRoute(route)
+                try? await Task.sleep(for: .seconds(DuoScreenshotTour.step))
+            }
+        }
+    }
+
+    private func openDuoRoute(_ route: String) {
+        let parts = route.split(separator: "/").map(String.init)
+        switch parts.first ?? "" {
+        case "saves": selection = .saves
+        case "stats": selection = .stats
+        default: selection = .streaks
+        }
+        paneShowsSettings = parts.last == "settings"
+        if parts.count > 1, let metric = StreakMetric(rawValue: parts[1]) {
+            paneStreakKey = store.streaks.first { $0.metric == metric }?.trackingKey
+        } else {
+            paneStreakKey = nil
+        }
+    }
+    #endif
+}
+
+#if DEBUG
+/// Unattended iPhone Duo capture (`gh-sim launch --device 'iPhone Duo'`).
+///
+/// `-DuoTour` walks the tabs on a timer, because `simctl openurl` raises a
+/// confirmation alert the capture job cannot tap. A route is a tab
+/// (`streaks`, `stats`, `saves`), optionally followed by the metric the
+/// trailing pane shows (`stats/standHours`) or `settings`. `-DuoRoutes` is the
+/// walk while folded and `-DuoRoutesRegular` while split. `-DuoTourFirst <s>`
+/// is the delay before the first route and `-DuoTourStep <s>` the dwell on
+/// each. The walk loops and restarts when the panes split or join. Every step
+/// logs a `DUOTOUR` line, which maps the captures to routes.
+enum DuoScreenshotTour {
+    private static let arguments = ProcessInfo.processInfo.arguments
+
+    static var isEnabled: Bool { arguments.contains("-DuoTour") }
+
+    static func routes(split: Bool) -> [String] {
+        let list = value(split ? "-DuoRoutesRegular" : "-DuoRoutes")
+            ?? (split
+                ? "streaks,streaks/exerciseMinutes,stats/standHours,saves/sleepHours,streaks/settings"
+                : "streaks,stats,saves")
+        return list.split(separator: ",").map(String.init)
+    }
+
+    static var firstDelay: Double { value("-DuoTourFirst").flatMap(Double.init) ?? 2 }
+    static var step: Double { value("-DuoTourStep").flatMap(Double.init) ?? 10 }
+
+    private static func value(_ key: String) -> String? {
+        guard let i = arguments.firstIndex(of: key), i + 1 < arguments.count else { return nil }
+        return arguments[i + 1]
+    }
+}
+#endif
+
+private struct PaneGeometry: Equatable, Sendable {
+    var width: CGFloat
+    var fold: ClosedRange<CGFloat>?
+}
+
+private extension GeometryProxy {
+    /// The vertical fold's horizontal extent in this proxy's space. Inactive
+    /// folds count too, so the panes don't jump while the device opens.
+    func verticalFold() -> ClosedRange<CGFloat>? {
+        guard #available(iOS 27.1, *) else { return nil }
+        let fold = reservedRegions(kind: .division, options: .includeInactive)
+            .map(\.frame)
+            .first { $0.height > $0.width && $0.minX > 0 && $0.maxX < size.width }
+        guard let fold else { return nil }
+        return fold.minX...fold.maxX
     }
 }
 

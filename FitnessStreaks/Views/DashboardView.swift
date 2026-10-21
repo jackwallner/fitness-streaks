@@ -23,6 +23,7 @@ struct DashboardView: View {
     @State private var passiveReviewTask: Task<Void, Never>?
     @State private var reviewRequestedThisSession = false
     @Environment(\.requestReview) private var requestReview
+    @Environment(\.streakDetailPane) private var detailPane
 
     private let grid = [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)]
     private static let relativeFormatter: RelativeDateTimeFormatter = {
@@ -57,8 +58,9 @@ struct DashboardView: View {
                     }
 
                     if let hero = store.hero {
-                        Button { selectedStreak = hero } label: {
+                        Button { open(hero) } label: {
                             StreakHero(streak: hero)
+                                .paneSelection(isShown(hero), accent: hero.metric.accent)
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel("\(hero.metric.displayName) streak: \(hero.current) \(hero.cadence.pluralLabel), threshold \(Int(hero.threshold)) \(hero.metric.unitLabel)")
@@ -144,6 +146,22 @@ struct DashboardView: View {
             .onChange(of: settings.hasSeenTutorial) { _, seen in
                 if !seen { maybeStartTutorial() }
             }
+            // Unfolding moves an open streak or Settings into the pane beside
+            // the list; folding moves Settings back into a sheet.
+            .onChange(of: detailPane != nil) { _, isSplit in
+                guard isSplit, let detailPane else { return }
+                if let streak = selectedStreak {
+                    selectedStreak = nil
+                    detailPane.open(streak)
+                }
+                if showSettings {
+                    showSettings = false
+                    detailPane.openSettings()
+                }
+            }
+            .onChange(of: detailPane?.showsSettings) { wasShown, isShown in
+                if wasShown == true, isShown == nil { showSettings = true }
+            }
             .onReceive(NotificationCenter.default.publisher(for: .reviewPromptPositiveMoment)) { _ in
                 schedulePassiveReviewPrompt()
             }
@@ -191,6 +209,7 @@ struct DashboardView: View {
 
     private func maybeStartTutorial() {
         guard !settings.hasSeenTutorial,
+              !FitnessBrand.isScreenshotMode,
               !tutorialActive,
               store.hero != nil else { return }
         // Defer one tick so anchor preferences settle before the overlay reads them.
@@ -229,7 +248,7 @@ struct DashboardView: View {
     /// No sheet, alert, tutorial or trial pitch of ours is up, and nothing else
     /// is presented over the window (the root trial sheets included).
     private var isDashboardClear: Bool {
-        guard !showSettings, !showingPaywall, !showPicker, selectedBroken == nil,
+        guard !showSettings, detailPane?.showsSettings != true, !showingPaywall, !showPicker, selectedBroken == nil,
               healthAccessErrorText == nil, !tutorialActive, !trialOfferMayAppear
         else { return false }
         return !UIApplication.shared.connectedScenes
@@ -265,6 +284,21 @@ struct DashboardView: View {
         #else
         false
         #endif
+    }
+
+    /// Pushes the streak, or shows it in the pane beside the list.
+    private func open(_ streak: Streak) {
+        if let detailPane { detailPane.open(streak) } else { selectedStreak = streak }
+    }
+
+    private func openSettings() {
+        if let detailPane { detailPane.openSettings() } else { showSettings = true }
+    }
+
+    /// Whether the pane beside the list is showing this streak.
+    private func isShown(_ streak: Streak) -> Bool {
+        guard let detailPane, !detailPane.showsSettings else { return false }
+        return streak.trackingKey == detailPane.selectedKey
     }
 
     private var visibleBadges: [Streak] {
@@ -341,7 +375,7 @@ struct DashboardView: View {
             .buttonStyle(.plain)
             .disabled(refreshing)
             .accessibilityLabel("Refresh streaks from Apple Health")
-            Button { showSettings = true } label: {
+            Button { openSettings() } label: {
                 Image(systemName: "gearshape.fill")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Theme.retroInkDim)
@@ -448,7 +482,7 @@ struct DashboardView: View {
     private func graceStatusBanner(for hero: Streak) -> some View {
         Button {
             if streaksPlusActive {
-                showSettings = true
+                openSettings()
             } else if !streaksPlusActivating {
                 showingPaywall = true
             }
@@ -549,8 +583,9 @@ struct DashboardView: View {
         LazyVGrid(columns: grid, spacing: 8) {
             ForEach(visibleBadges) { streak in
                 VStack(spacing: 6) {
-                    Button { selectedStreak = streak } label: {
+                    Button { open(streak) } label: {
                         StreakBadgeCard(streak: streak)
+                            .paneSelection(isShown(streak), accent: streak.metric.accent)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("\(streak.metric.displayName) streak: \(streak.current) \(streak.cadence.pluralLabel)")
@@ -671,5 +706,20 @@ struct DashboardView: View {
             log.error("Manual health access request failed: \(String(describing: error))")
             healthAccessErrorText = "Could not request Health access from iOS. Open Settings and enable Health access for Streaks."
         }
+    }
+}
+
+private extension View {
+    /// Rings the card whose streak fills the pane beside the list.
+    func paneSelection(_ isSelected: Bool, accent: Color) -> some View {
+        overlay {
+            if isSelected {
+                Rectangle()
+                    .stroke(accent, lineWidth: 2)
+                    .padding(-4)
+                    .accessibilityHidden(true)
+            }
+        }
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }

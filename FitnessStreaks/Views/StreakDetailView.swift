@@ -2,6 +2,9 @@ import SwiftUI
 
 struct StreakDetailView: View {
     let initialStreak: Streak
+    /// The root of the unfolded iPhone Duo's trailing pane, beside the list
+    /// it came from, so there is nothing to go back to.
+    let isPane: Bool
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var store: StreakStore
     @EnvironmentObject var settings: StreakSettings
@@ -15,8 +18,9 @@ struct StreakDetailView: View {
     @State private var showingPaywall = false
     @State private var selectedHeatmapRange: HeatmapDateRange
 
-    init(streak: Streak) {
+    init(streak: Streak, isPane: Bool = false) {
         self.initialStreak = streak
+        self.isPane = isPane
         // Pick a heatmap range that comfortably covers the user's recent history.
         // We can't read settings here, so default to 90d — refined onAppear.
         _selectedHeatmapRange = State(initialValue: .last90Days)
@@ -80,11 +84,13 @@ struct StreakDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button { dismiss() } label: {
-                    Label("Back", systemImage: "chevron.left")
-                        .font(RetroFont.mono(10, weight: .bold))
-                        .foregroundStyle(Theme.retroMagenta)
+            if !isPane {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button { dismiss() } label: {
+                        Label("Back", systemImage: "chevron.left")
+                            .font(RetroFont.mono(10, weight: .bold))
+                            .foregroundStyle(Theme.retroMagenta)
+                    }
                 }
             }
             ToolbarItem(placement: .principal) {

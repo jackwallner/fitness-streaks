@@ -7,6 +7,7 @@ struct StatsView: View {
     @EnvironmentObject var settings: StreakSettings
 
     @State private var selectedStreak: Streak? = nil
+    @Environment(\.streakDetailPane) private var detailPane
 
     var body: some View {
         NavigationStack {
@@ -38,6 +39,12 @@ struct StatsView: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .navigationDestination(item: $selectedStreak) { streak in
                 StreakDetailView(streak: streak)
+            }
+            // Unfolding moves an open streak into the pane beside the list.
+            .onChange(of: detailPane != nil) { _, isSplit in
+                guard isSplit, let detailPane, let streak = selectedStreak else { return }
+                selectedStreak = nil
+                detailPane.open(streak)
             }
         }
     }
@@ -144,7 +151,7 @@ struct StatsView: View {
             VStack(spacing: 0) {
                 ForEach(Array(store.streaks.enumerated()), id: \.element.id) { idx, streak in
                     Button {
-                        selectedStreak = streak
+                        if let detailPane { detailPane.open(streak) } else { selectedStreak = streak }
                     } label: {
                         streakRow(streak)
                     }
