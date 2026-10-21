@@ -96,6 +96,11 @@ struct DashboardView: View {
                 }
                 .padding(.bottom, 16)
                 .frame(maxWidth: .infinity, alignment: .top)
+                #if DEBUG
+                .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
+                    if DuoScreenshotTour.isEnabled { NSLog("DUOGEOM dashboard width=%.1f", width) }
+                }
+                #endif
             }
             .background(Theme.retroBg.ignoresSafeArea())
             .navigationDestination(item: $selectedStreak) { streak in
