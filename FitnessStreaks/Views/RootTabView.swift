@@ -54,13 +54,18 @@ struct RootTabView: View {
         // One view tree in every pose: opening or closing the Duo only moves
         // these frames, so the open tab keeps its scroll position.
         ZStack(alignment: .bottomLeading) {
+            // Every pane sits in a full-width frame: framed at its own width
+            // alone, the leading pane's NavigationStack laid out 84 pt narrow
+            // (the trailing pane's width) on the iPhone Duo.
             content
                 .padding(.bottom, 64)  // leave room for the pixel tab bar
                 .frame(maxWidth: split?.primaryWidth ?? .infinity, maxHeight: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
 
             PixelTabBar(selection: $selection)
                 // Within the leading pane while split, never across the fold.
                 .frame(maxWidth: split?.primaryWidth ?? .infinity)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             if let split {
                 detailPane
@@ -131,6 +136,8 @@ struct RootTabView: View {
             for route in DuoScreenshotTour.routes(split: isSplit) {
                 guard !Task.isCancelled else { return }
                 NSLog("DUOTOUR %@ route=%@", isSplit ? "inner" : "outer", route)
+                NSLog("DUOGEOM root=%.1f fold=%@ split=%@", paneGeometry.width,
+                      String(describing: paneGeometry.fold), String(describing: split))
                 openDuoRoute(route)
                 try? await Task.sleep(for: .seconds(DuoScreenshotTour.step))
             }

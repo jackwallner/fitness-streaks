@@ -355,19 +355,21 @@ final class StreakStore: ObservableObject {
 
         let today = DateHelpers.startOfDay()
         // Each seeded streak's days agree with its card: the current run up to
-        // today, the miss before it, its record run before that, then a mostly
-        // consistent history with an occasional miss.
-        func level(current: Int, best: Int, seed: Int, offset: Int) -> Double {
+        // today (through any day Streaks+ saved), the miss before it, its
+        // record run before that, then a mostly consistent history with an
+        // occasional miss.
+        func level(current: Int, best: Int, seed: Int, offset: Int, saved: Int? = nil) -> Double {
             let gapAfterRecord = current + best + 1
             let occasionalMiss = offset > gapAfterRecord && (offset * 31 + seed) % 7 == 0
-            let missed = offset == current || offset == gapAfterRecord || occasionalMiss
+            let isSavedDay = saved == offset
+            let missed = offset == current || isSavedDay || offset == gapAfterRecord || occasionalMiss
             let jitter = Double((offset * 37 + seed * 11) % 100) / 100
             return missed ? 0.6 + jitter * 0.3 : 1.05 + jitter * 0.35
         }
         history = (0..<90).map { (offset: Int) -> ActivityDay in
             let isToday = offset == 0
-            let steps: Double = isToday ? 8_960 : 8_000 * level(current: 12, best: 23, seed: 1, offset: offset)
-            let exercise: Double = isToday ? 27 : 20 * level(current: 9, best: 17, seed: 2, offset: offset)
+            let steps: Double = isToday ? 8_960 : 8_000 * level(current: 12, best: 23, seed: 1, offset: offset, saved: 5)
+            let exercise: Double = isToday ? 27 : 20 * level(current: 9, best: 17, seed: 2, offset: offset, saved: 4)
             let stand: Double = isToday ? 10 : (8 * level(current: 7, best: 14, seed: 3, offset: offset)).rounded()
             let sleep: Double = isToday ? 7.3 : 7 * level(current: 6, best: 12, seed: 4, offset: offset)
             let distance: Double = isToday ? 3.4 : 3 * level(current: 5, best: 11, seed: 5, offset: offset)
@@ -401,7 +403,7 @@ final class StreakStore: ObservableObject {
                 currentUnitCompleted: true,
                 currentUnitProgress: 1.12,
                 currentUnitValue: 8_960,
-                completionRate: 0.97,
+                completionRate: 0.93,
                 lookbackDays: 30
             ),
             Streak(
@@ -415,7 +417,7 @@ final class StreakStore: ObservableObject {
                 currentUnitCompleted: true,
                 currentUnitProgress: 1.35,
                 currentUnitValue: 27,
-                completionRate: 0.93,
+                completionRate: 0.90,
                 lookbackDays: 30
             ),
             Streak(
@@ -461,6 +463,24 @@ final class StreakStore: ObservableObject {
                 lookbackDays: 30
             )
         ]
+
+        // The two days Streaks+ saved above, and a trip coming up.
+        let savedDays: [(Streak, Int, Int)] = [(seeded[0], 5, 6), (seeded[1], 4, 4)]
+        let saves = savedDays.map { (entry: (Streak, Int, Int)) -> GracePreservation in
+            let (streak, missedOffset, runLength) = entry
+            return GracePreservation(
+                key: streak.trackingKey,
+                missedDate: DateHelpers.addDays(-missedOffset, to: today),
+                preservedLength: runLength,
+                threshold: streak.threshold,
+                metric: streak.metric,
+                cadence: streak.cadence,
+                hourWindow: nil,
+                grantedAt: DateHelpers.addDays(-missedOffset + 1, to: today)
+            )
+        }
+        StreakSettings.shared.gracePreservations = Dictionary(uniqueKeysWithValues: saves.map { ($0.key, $0) })
+        StreakSettings.shared.plannedFreezes = [DateHelpers.addDays(9, to: today)]
 
         StreakSettings.shared.trackedStreaks = nil
         StreakSettings.shared.manualStreakOrder = []
