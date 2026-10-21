@@ -354,19 +354,38 @@ final class StreakStore: ObservableObject {
         guard CommandLine.arguments.contains("-UITestSeedStreaks") else { return }
 
         let today = DateHelpers.startOfDay()
-        history = (0..<30).map { offset in
-            let variation = Double((offset * 137) % 900)
+        // Each seeded streak's days agree with its card: the current run up to
+        // today, the miss before it, its record run before that, then a mostly
+        // consistent history with an occasional miss.
+        func level(current: Int, best: Int, seed: Int, offset: Int) -> Double {
+            let gapAfterRecord = current + best + 1
+            let occasionalMiss = offset > gapAfterRecord && (offset * 31 + seed) % 7 == 0
+            let missed = offset == current || offset == gapAfterRecord || occasionalMiss
+            let jitter = Double((offset * 37 + seed * 11) % 100) / 100
+            return missed ? 0.6 + jitter * 0.3 : 1.05 + jitter * 0.35
+        }
+        history = (0..<90).map { (offset: Int) -> ActivityDay in
+            let isToday = offset == 0
+            let steps: Double = isToday ? 8_960 : 8_000 * level(current: 12, best: 23, seed: 1, offset: offset)
+            let exercise: Double = isToday ? 27 : 20 * level(current: 9, best: 17, seed: 2, offset: offset)
+            let stand: Double = isToday ? 10 : (8 * level(current: 7, best: 14, seed: 3, offset: offset)).rounded()
+            let sleep: Double = isToday ? 7.3 : 7 * level(current: 6, best: 12, seed: 4, offset: offset)
+            let distance: Double = isToday ? 3.4 : 3 * level(current: 5, best: 11, seed: 5, offset: offset)
+            let energy: Double = 410 + Double((offset * 17) % 90)
+            let workouts: Double = offset % 4 == 0 ? 1 : 0
+            let flights: Double = 8 + Double(offset % 5)
+            let heartMinutes: Double = 18 + Double(offset % 8)
             return ActivityDay(
                 date: DateHelpers.addDays(-offset, to: today),
-                steps: 8_400 + variation,
-                exerciseMinutes: 24 + Double(offset % 12),
-                standHours: 9 + Double(offset % 3),
-                activeEnergy: 410 + Double((offset * 17) % 90),
-                workoutCount: offset % 4 == 0 ? 1 : 0,
-                sleepHours: 7.2 + Double(offset % 5) * 0.1,
-                distanceMiles: 3.8 + Double(offset % 4) * 0.2,
-                flightsClimbed: 8 + Double(offset % 5),
-                heartRateMinutes: 18 + Double(offset % 8)
+                steps: steps,
+                exerciseMinutes: exercise,
+                standHours: stand,
+                activeEnergy: energy,
+                workoutCount: workouts,
+                sleepHours: sleep,
+                distanceMiles: distance,
+                flightsClimbed: flights,
+                heartRateMinutes: heartMinutes
             )
         }
 
@@ -382,7 +401,7 @@ final class StreakStore: ObservableObject {
                 currentUnitCompleted: true,
                 currentUnitProgress: 1.12,
                 currentUnitValue: 8_960,
-                completionRate: 0.87,
+                completionRate: 0.97,
                 lookbackDays: 30
             ),
             Streak(
@@ -396,7 +415,7 @@ final class StreakStore: ObservableObject {
                 currentUnitCompleted: true,
                 currentUnitProgress: 1.35,
                 currentUnitValue: 27,
-                completionRate: 0.80,
+                completionRate: 0.93,
                 lookbackDays: 30
             ),
             Streak(
@@ -410,7 +429,7 @@ final class StreakStore: ObservableObject {
                 currentUnitCompleted: true,
                 currentUnitProgress: 1.25,
                 currentUnitValue: 10,
-                completionRate: 0.77,
+                completionRate: 0.90,
                 lookbackDays: 30
             ),
             Streak(
@@ -424,7 +443,21 @@ final class StreakStore: ObservableObject {
                 currentUnitCompleted: true,
                 currentUnitProgress: 1.04,
                 currentUnitValue: 7.3,
-                completionRate: 0.73,
+                completionRate: 0.87,
+                lookbackDays: 30
+            ),
+            Streak(
+                metric: .distanceMiles,
+                cadence: .daily,
+                threshold: 3,
+                current: 5,
+                best: 11,
+                startDate: DateHelpers.addDays(-4, to: today),
+                lastHitDate: DateHelpers.addDays(-1, to: today),
+                currentUnitCompleted: true,
+                currentUnitProgress: 1.13,
+                currentUnitValue: 3.4,
+                completionRate: 0.90,
                 lookbackDays: 30
             )
         ]

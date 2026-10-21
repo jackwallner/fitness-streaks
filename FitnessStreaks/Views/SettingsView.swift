@@ -7,6 +7,10 @@ struct SettingsView: View {
     @EnvironmentObject var store: StreakStore
     @EnvironmentObject var storeKit: StoreKitService
 
+    /// Closes Settings when it is the unfolded iPhone Duo's trailing pane
+    /// rather than a sheet.
+    var onClose: (() -> Void)? = nil
+
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     @State private var showingPicker = false
@@ -37,6 +41,10 @@ struct SettingsView: View {
         ]
         return components.url
     }()
+
+    private func close() {
+        if let onClose { onClose() } else { dismiss() }
+    }
 
     var body: some View {
         NavigationStack {
@@ -83,7 +91,7 @@ struct SettingsView: View {
                         .foregroundStyle(Theme.retroMagenta)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button { dismiss() } label: {
+                    Button { close() } label: {
                         Text("CLOSE")
                             .font(RetroFont.pixel(10))
                             .foregroundStyle(Theme.retroCyan)
@@ -1019,7 +1027,7 @@ struct SettingsView: View {
                 dashedLine
                 Button {
                     settings.hasSeenTutorial = false
-                    dismiss()
+                    close()
                 } label: {
                     HStack {
                         Text("REPLAY TUTORIAL")

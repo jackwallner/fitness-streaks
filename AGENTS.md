@@ -59,3 +59,4 @@ the global agent rules + the `ios-dev` skill.
 ## Path-scoped rules
 
 - [Android](.claude/rules/android.md): native phone port, local Pro verification, Health Connect differences and billing.
+- [iPhone Duo](.claude/rules/iphone-duo.md): unfolded two-pane layout (tabs beside the streak detail), split math and capture tour.
