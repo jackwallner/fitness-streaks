@@ -19,16 +19,15 @@ paths: ["FitnessStreaks/Views/RootTabView.swift", "Shared/Utilities/UnfoldedSpli
 - One view tree: folding only changes frames. The pane gets
   `horizontalSizeClass = .compact`. Never swap the tab content between
   containers with an `if`.
-- Open issue: on the gh-sim iPhone Duo (iOS 27.1, root 867 pt with an 84 pt
-  vertical bar on the trailing edge, fold 455.5...495.5) the leading pane's
-  NavigationStacks (Dashboard, Saves, Stats) lay out at 455.7 pt, then settle
-  at 371.7 pt, 84 pt short of the fold (`DUOGEOM dashboard width` in app.log).
-  The tab bar and the trailing pane are correct. A full-width leading-aligned
-  wrapper frame did not help. Next to try: measure with a DEBUG log whether
-  the pane gets an 84 pt trailing safe-area inset, and if so
-  `.ignoresSafeArea(.container, edges: split == nil ? [] : .trailing)` on the
-  leading content; else host the three tabs in one NavigationStack at the
-  `RootTabView` level, as VO2 Max does.
+- iOS 27.1 moves a `NavigationStack`'s toolbar into a vertical bar on its
+  trailing edge. In the leading pane that bar sat against the fold and
+  narrowed Streaks, Saves and Stats by 84 pt (455.5 pt pane, 371.7 pt
+  content). While split, `RootTabView` sets `toolbarVerticalBehavior(.disabled)`
+  (`horizontalToolbarsInPanes`); folded keeps `.automatic`. The system then
+  drops its own vertical bar: root 951 pt, panes 0-455.5 and 495.5-951, the
+  status bar across the top of the trailing pane.
+- Split, the Dashboard hides its empty nav bar and ignores the top safe area,
+  its top bar padded 30 pt so it sits level with the detail's title.
 - Still across the fold: onboarding and the paywall, picker, broken-streak and
   freeze sheets (centred form sheets). None are in the store set.
 - Unattended captures: `-FitnessScreenshotBrand -UITestSeedStreaks
