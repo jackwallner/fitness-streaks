@@ -33,6 +33,15 @@ final class UnfoldedSplitTests: XCTestCase {
         XCTAssertEqual(split.secondaryWidth, 371.5)
     }
 
+    func testMeasuredSimulatorFoldWithHorizontalPaneToolbars() throws {
+        // With horizontal pane toolbars the system drops its vertical bar: the
+        // root is the full 951 pt and the panes mirror each other.
+        let split = try XCTUnwrap(UnfoldedSplit.make(width: innerWidth, isRegularWidth: true, fold: 455.5...495.5))
+        XCTAssertEqual(split.primaryWidth, 455.5)
+        XCTAssertEqual(split.secondaryX, 495.5)
+        XCTAssertEqual(split.secondaryWidth, split.primaryWidth)
+    }
+
     func testZeroWidthFoldStillMeetsIt() throws {
         let split = try XCTUnwrap(UnfoldedSplit.make(width: innerWidth, isRegularWidth: true, fold: 475...475))
         XCTAssertEqual(split.primaryWidth, 475)

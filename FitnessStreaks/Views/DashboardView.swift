@@ -38,7 +38,7 @@ struct DashboardView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 10) {
                     topBar
-                        .padding(.top, 4)
+                        .padding(.top, detailPane == nil ? 4 : 30)
 
                     if store.dataMaybeRevoked {
                         revokedBanner
@@ -102,6 +102,11 @@ struct DashboardView: View {
                 }
                 #endif
             }
+            // Split, the status bar sits over the detail pane, so the band
+            // above the list would be empty. The top bar rises into it, level
+            // with the detail's title.
+            .ignoresSafeArea(.container, edges: detailPane == nil ? [] : .top)
+            .toolbar(detailPane == nil ? .automatic : .hidden, for: .navigationBar)
             .background(Theme.retroBg.ignoresSafeArea())
             .navigationDestination(item: $selectedStreak) { streak in
                 StreakDetailView(streak: streak)

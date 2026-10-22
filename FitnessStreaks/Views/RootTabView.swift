@@ -54,18 +54,13 @@ struct RootTabView: View {
         // One view tree in every pose: opening or closing the Duo only moves
         // these frames, so the open tab keeps its scroll position.
         ZStack(alignment: .bottomLeading) {
-            // Every pane sits in a full-width frame: framed at its own width
-            // alone, the leading pane's NavigationStack laid out 84 pt narrow
-            // (the trailing pane's width) on the iPhone Duo.
             content
                 .padding(.bottom, 64)  // leave room for the pixel tab bar
                 .frame(maxWidth: split?.primaryWidth ?? .infinity, maxHeight: .infinity)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
 
             PixelTabBar(selection: $selection)
                 // Within the leading pane while split, never across the fold.
                 .frame(maxWidth: split?.primaryWidth ?? .infinity)
-                .frame(maxWidth: .infinity, alignment: .leading)
 
             if let split {
                 detailPane
@@ -74,6 +69,7 @@ struct RootTabView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+        .horizontalToolbarsInPanes(split != nil)
         .environment(\.horizontalSizeClass, split == nil ? horizontalSizeClass : .compact)
         .environment(\.streakDetailPane, split == nil ? nil : StreakDetailPane(
             selectedKey: paneStreak?.trackingKey,
@@ -138,7 +134,7 @@ struct RootTabView: View {
                 NSLog("DUOTOUR %@ route=%@", isSplit ? "inner" : "outer", route)
                 NSLog("DUOGEOM root=%.1f fold=%@ split=%@", paneGeometry.width,
                       String(describing: paneGeometry.fold), String(describing: split))
-                openDuoRoute(route)
+                withAnimation(.easeInOut(duration: 0.3)) { openDuoRoute(route) }
                 try? await Task.sleep(for: .seconds(DuoScreenshotTour.step))
             }
         }
@@ -198,6 +194,22 @@ enum DuoScreenshotTour {
 private struct PaneGeometry: Equatable, Sendable {
     var width: CGFloat
     var fold: ClosedRange<CGFloat>?
+}
+
+private extension View {
+    /// iOS 27.1 moves a stack's toolbar into a vertical bar on its trailing
+    /// edge, which in the leading pane sits against the fold and narrowed the
+    /// tabs by 84 pt. While split each pane keeps the phone's horizontal bar
+    /// and the status bar runs across the top of the trailing pane. Folded,
+    /// the system default is unchanged.
+    @ViewBuilder
+    func horizontalToolbarsInPanes(_ isSplit: Bool) -> some View {
+        if #available(iOS 27.1, *) {
+            toolbarVerticalBehavior(isSplit ? .disabled : .automatic)
+        } else {
+            self
+        }
+    }
 }
 
 private extension GeometryProxy {
