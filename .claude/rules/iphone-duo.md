@@ -8,7 +8,9 @@ paths: ["FitnessStreaks/Views/RootTabView.swift", "Shared/Utilities/UnfoldedSpli
   puts the open tab (Streaks, Saves or Stats) and the pixel tab bar on the
   leading side of the fold and the streak detail on the trailing side. The
   pane shows the tapped streak, else the hero; the card on show gets a ring in
-  its metric colour. Settings (the gear, the auto-save banner) opens in the
+  its metric colour. The ring sits inside the card's border
+  (`PaneSelectionRing`, tested): drawn outside, it overran the pane margin and
+  halved the grid gutter (rejected 2026-10-23). Settings (the gear, the auto-save banner) opens in the
   trailing pane, `SettingsView(onClose:)`.
 - Fold edges come from `GeometryProxy.verticalFold()` (iOS 27.1
   `reservedRegions(.division)`), else an even split; the math is
