@@ -174,6 +174,12 @@ final class StreakStore: ObservableObject {
     /// On watchOS, skips HealthKit and reads only from the snapshot written by the iPhone app.
     func load(allowCachedSnapshot: Bool = false) async {
         if isLoading { return }
+        #if DEBUG
+        // Seeded screenshot data stands in for Apple Health. A load started on
+        // launch (the task or the scene going active) would restore the widget
+        // snapshot over it, so captures showed an empty or partial state.
+        if Self.isSeedingScreenshots { return }
+        #endif
 
         #if os(watchOS)
         // Watch app: no HealthKit access needed; just display data synced from iPhone
@@ -350,8 +356,10 @@ final class StreakStore: ObservableObject {
     #if DEBUG
     /// Supplies deterministic local activity for screenshot review. This keeps
     /// simulator captures meaningful without pretending HealthKit contains data.
+    static let isSeedingScreenshots = CommandLine.arguments.contains("-UITestSeedStreaks")
+
     func seedScreenshotDataIfRequested() {
-        guard CommandLine.arguments.contains("-UITestSeedStreaks") else { return }
+        guard Self.isSeedingScreenshots else { return }
 
         let today = DateHelpers.startOfDay()
         // Each seeded streak's days agree with its card: the current run up to

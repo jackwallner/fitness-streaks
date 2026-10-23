@@ -199,6 +199,10 @@ struct FitnessStreaksApp: App {
                 .environmentObject(store)
                 .environmentObject(storeKit)
                 .task {
+                    #if DEBUG
+                    // Seed before the first await so no capture shows the cache.
+                    store.seedScreenshotDataIfRequested()
+                    #endif
                     await healthKit.synchronizeAuthorization()
                     #if DEBUG
                     if CommandLine.arguments.contains("-UITestSetPro") {
@@ -225,9 +229,6 @@ struct FitnessStreaksApp: App {
                         }
                     }
                     await store.load(allowCachedSnapshot: true)
-                    #if DEBUG
-                    store.seedScreenshotDataIfRequested()
-                    #endif
                 }
                 .onChange(of: scenePhase) { _, phase in
                     guard phase == .active else { return }
