@@ -41,5 +41,8 @@ paths: ["FitnessStreaks/Views/RootTabView.swift", "Shared/Utilities/UnfoldedSpli
   (iOS 27.1 alerts over every openurl). `-DuoTour` (`-DuoTourFirst`,
   `-DuoTourStep`, `-DuoRoutes`, `-DuoRoutesRegular`) walks the routes on a
   timer for recordings. `DUOSCREEN`/`DUOTOUR` lines in app.log map shots to
-  routes (`DuoScreenshotTour` in `RootTabView.swift`).
+  routes (`DuoScreenshotTour` in `RootTabView.swift`). `-UITestSeedStreaks`
+  seeds before the launch task's first await and turns `StreakStore.load()`
+  into a no-op; otherwise a launch load restored the widget snapshot over the
+  seed (folded empty state, 0% completion, the routed streak missing).
   Screenshot mode skips the coachmark tutorial.
