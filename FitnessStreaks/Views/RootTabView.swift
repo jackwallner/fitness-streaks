@@ -127,12 +127,24 @@ struct RootTabView: View {
     /// See `DuoScreenshotTour`. Each route starts with Settings closed.
     private func runDuoTour(split isSplit: Bool) async {
         if let route = DuoScreenshotTour.screen {
+            // The widget snapshot restores a few streaks before the seed lands,
+            // so wait for the one the route names.
+            let metric = route.split(separator: "/").dropFirst().first
+                .flatMap { StreakMetric(rawValue: String($0)) }
+            func isReady() -> Bool {
+                guard let metric else { return !store.streaks.isEmpty }
+                return store.streaks.contains { $0.metric == metric }
+            }
             var waited = 0
-            while store.streaks.isEmpty, waited < 100, !Task.isCancelled {
+            while !isReady(), waited < 100, !Task.isCancelled {
                 try? await Task.sleep(for: .milliseconds(100))
                 waited += 1
             }
-            NSLog("DUOSCREEN %@ route=%@", isSplit ? "inner" : "outer", route)
+            NSLog("DUOSCREEN %@ route=%@ waited=%d", isSplit ? "inner" : "outer", route, waited)
+            openDuoRoute(route)
+            // Open it again once any later reload settles.
+            try? await Task.sleep(for: .seconds(2))
+            guard !Task.isCancelled else { return }
             openDuoRoute(route)
             return
         }
