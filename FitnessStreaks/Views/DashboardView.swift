@@ -785,8 +785,8 @@ private struct HeroCoachmark: ViewModifier {
     }
 }
 
-private extension View {
-    /// Rings the card whose streak fills the pane beside the list, inside its
+extension View {
+    /// Rings the card or row whose streak fills the pane beside the list, inside its
     /// border so the card's frame never grows past the pane margin or gutter.
     func paneSelection(_ isSelected: Bool, accent: Color) -> some View {
         overlay {

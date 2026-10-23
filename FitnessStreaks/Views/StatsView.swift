@@ -9,10 +9,15 @@ struct StatsView: View {
     @State private var selectedStreak: Streak? = nil
     @Environment(\.streakDetailPane) private var detailPane
 
+    /// Beside the fold the pane is a landscape half with about 575 pt above the
+    /// tab bar, so Stats tightens: saves become a fourth tile and each streak
+    /// takes one line, and the whole list ends above the bar.
+    private var isSplit: Bool { detailPane != nil }
+
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: isSplit ? 14 : 20) {
                     if store.streaks.isEmpty {
                         emptyState
                     } else {
@@ -56,6 +61,9 @@ struct StatsView: View {
             cell(title: "ACTIVE", value: "\(activeCount)", unit: "STREAKS", color: Theme.retroLime)
             cell(title: "TOTAL", value: "\(totalCurrentDays)", unit: "DAYS COMBINED", color: Theme.retroMagenta)
             cell(title: "BEST", value: "\(longestEver)", unit: longestEverLabel, color: Theme.retroAmber)
+            if isSplit {
+                cell(title: "SAVES", value: "\(totalSaves)", unit: "STREAKS+", color: Theme.retroLime)
+            }
         }
     }
 
@@ -109,7 +117,9 @@ struct StatsView: View {
 
     private var completionRateCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Across all streaks")
+            if !isSplit {
+                PixelSectionHeader(title: "Across all streaks")
+            }
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     Text("AVG COMPLETION")
@@ -123,19 +133,21 @@ struct StatsView: View {
                 }
                 PixelProgressBar(progress: avgCompletionRate, accent: Theme.retroMagenta, segments: 24, height: 14)
 
-                Rectangle()
-                    .fill(Theme.retroInkFaint.opacity(0.6))
-                    .frame(height: 1)
+                if !isSplit {
+                    Rectangle()
+                        .fill(Theme.retroInkFaint.opacity(0.6))
+                        .frame(height: 1)
 
-                HStack {
-                    Text("STREAKS+ SAVES TO DATE")
-                        .font(RetroFont.pixel(10))
-                        .tracking(1)
-                        .foregroundStyle(Theme.retroInkDim)
-                    Spacer()
-                    Text("\(totalSaves)")
-                        .font(RetroFont.pixel(14))
-                        .foregroundStyle(Theme.retroLime)
+                    HStack {
+                        Text("STREAKS+ SAVES TO DATE")
+                            .font(RetroFont.pixel(10))
+                            .tracking(1)
+                            .foregroundStyle(Theme.retroInkDim)
+                        Spacer()
+                        Text("\(totalSaves)")
+                            .font(RetroFont.pixel(14))
+                            .foregroundStyle(Theme.retroLime)
+                    }
                 }
             }
             .padding(14)
@@ -154,6 +166,7 @@ struct StatsView: View {
                         if let detailPane { detailPane.open(streak) } else { selectedStreak = streak }
                     } label: {
                         streakRow(streak)
+                            .paneSelection(isShown(streak), accent: streak.metric.accent)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("\(streak.metric.displayName), \(streak.current) \(streak.cadence.pluralLabel), \(Int(streak.completionRate * 100)) percent completion")
@@ -169,26 +182,40 @@ struct StatsView: View {
         }
     }
 
+    /// Whether the pane beside the list is showing this streak.
+    private func isShown(_ streak: Streak) -> Bool {
+        guard let detailPane, !detailPane.showsSettings else { return false }
+        return streak.trackingKey == detailPane.selectedKey
+    }
+
     private func streakRow(_ streak: Streak) -> some View {
-        HStack(spacing: 12) {
+        // Split, the name and its numbers share one line.
+        let text = isSplit
+            ? AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: 12))
+            : AnyLayout(VStackLayout(alignment: .leading, spacing: 2))
+        return HStack(spacing: 12) {
             Image(systemName: streak.displaySymbol)
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(streak.metric.accent)
                 .frame(width: 28)
-            VStack(alignment: .leading, spacing: 2) {
+            text {
                 Text(streak.displayName.uppercased())
                     .font(RetroFont.pixel(11))
                     .foregroundStyle(Theme.retroInk)
+                    .lineLimit(isSplit ? 1 : nil)
+                if isSplit { Spacer(minLength: 0) }
                 Text("\(streak.current) \(streak.cadence.pluralLabel) · best \(streak.best) · \(Int(streak.completionRate * 100))%")
                     .font(RetroFont.mono(10))
                     .foregroundStyle(Theme.retroInkDim)
+                    .lineLimit(isSplit ? 1 : nil)
             }
+            .frame(maxWidth: isSplit ? .infinity : nil, alignment: .leading)
             Spacer()
             Text("›")
                 .font(RetroFont.mono(14, weight: .bold))
                 .foregroundStyle(Theme.retroInkDim)
         }
-        .padding(.vertical, 12)
+        .padding(.vertical, isSplit ? 10 : 12)
         .padding(.horizontal, 14)
         .contentShape(Rectangle())
     }

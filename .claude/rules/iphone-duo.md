@@ -30,7 +30,15 @@ paths: ["FitnessStreaks/Views/RootTabView.swift", "Shared/Utilities/UnfoldedSpli
   status bar across the top of the trailing pane.
 - Split, the Dashboard hides its empty nav bar and ignores the top safe area,
   its top bar padded 30 pt so it sits level with the detail's title.
-- The pane is only 669 pt tall. Split, the Saves hero puts its sprite beside
+- The pane is only 669 pt tall (about 575 pt of scroll above the tab bar).
+  Split, the Dashboard drops its big hero card: the hero leads the streak grid
+  as a card and Find More fills the last cell (`DashboardGridCell`, tested),
+  since the detail pane already shows the hero in full. With the big card the
+  Sleep and Distance row was sliced by the tab bar (rejected 2026-10-23).
+  Split, Stats moves saves into a fourth tile, drops the "Across all streaks"
+  header and puts each breakdown row on one line, ringing the open streak's
+  row, so the fifth row ends above the bar too.
+  Split, the Saves hero puts its sprite beside
   the caption (a row, not a column), so the Planned Freezes card ends above
   the tab bar instead of being sliced by it (rejected 2026-10-23). Check every
   leading-pane tab for text cut at the bar after a layout change.
