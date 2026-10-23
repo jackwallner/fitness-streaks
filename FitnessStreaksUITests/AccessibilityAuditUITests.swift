@@ -77,10 +77,10 @@ final class AccessibilityAuditUITests: XCTestCase {
     private func audit(_ screen: String) {
         do {
             var count = 0
-            try app.performAccessibilityAudit(for: .all) { issue in
+            try app.performAccessibilityAudit(for: .all) { [self] issue in
                 count += 1
                 let el = issue.element
-                note("AUDIT@\(screen): type=\(issue.auditType.rawValue) \(issue.compactDescription) :: \(issue.detailedDescription) :: element=\(el.map { clean($0.label) } ?? "?") [\(el.map { String(format: "%.0fx%.0f", $0.frame.width, $0.frame.height) } ?? "?")]")
+                self.note("AUDIT@\(screen): type=\(issue.auditType.rawValue) \(issue.compactDescription) :: \(issue.detailedDescription) :: element=\(el.map { self.clean($0.label) } ?? "?") [\(el.map { String(format: "%.0fx%.0f", $0.frame.width, $0.frame.height) } ?? "?")]")
                 return true
             }
             note("AUDIT@\(screen): \(count) issue(s)")
