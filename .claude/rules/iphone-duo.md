@@ -1,5 +1,5 @@
 ---
-paths: ["FitnessStreaks/Views/RootTabView.swift", "Shared/Utilities/UnfoldedSplit.swift", "FitnessStreaks/Views/DashboardView.swift", "FitnessStreaks/Views/StatsView.swift", "FitnessStreaks/Views/StreakDetailView.swift", "FitnessStreaks/Views/SettingsView.swift"]
+paths: ["FitnessStreaks/Views/RootTabView.swift", "Shared/Utilities/UnfoldedSplit.swift", "FitnessStreaks/Views/DashboardView.swift", "FitnessStreaks/Views/StatsView.swift", "FitnessStreaks/Views/SavesView.swift", "FitnessStreaks/Views/StreakDetailView.swift", "FitnessStreaks/Views/SettingsView.swift"]
 ---
 
 # Streak Finder: iPhone Duo (2026-10-21)
@@ -28,10 +28,18 @@ paths: ["FitnessStreaks/Views/RootTabView.swift", "Shared/Utilities/UnfoldedSpli
   status bar across the top of the trailing pane.
 - Split, the Dashboard hides its empty nav bar and ignores the top safe area,
   its top bar padded 30 pt so it sits level with the detail's title.
+- The pane is only 669 pt tall. Split, the Saves hero puts its sprite beside
+  the caption (a row, not a column), so the Planned Freezes card ends above
+  the tab bar instead of being sliced by it (rejected 2026-10-23). Check every
+  leading-pane tab for text cut at the bar after a layout change.
 - Still across the fold: onboarding and the paywall, picker, broken-streak and
   freeze sheets (centred form sheets). None are in the store set.
 - Unattended captures: `-FitnessScreenshotBrand -UITestSeedStreaks
-  -UITestSetPro -UITestSkipHealthKit -DuoTour` plus `-DuoTourFirst`,
-  `-DuoTourStep`, `-DuoRoutes`, `-DuoRoutesRegular` (`DuoScreenshotTour` in
-  `RootTabView.swift`). `DUOTOUR` lines in app.log map shots to routes.
+  -UITestSetPro -UITestSkipHealthKit`, then one `gh-sim --screen
+  "-DuoScreen <route>"` per surface (`streaks`, `streaks/exerciseMinutes`,
+  `stats/standHours`, `saves/sleepHours`, `streaks/settings`). Never `--url`
+  (iOS 27.1 alerts over every openurl). `-DuoTour` (`-DuoTourFirst`,
+  `-DuoTourStep`, `-DuoRoutes`, `-DuoRoutesRegular`) walks the routes on a
+  timer for recordings. `DUOSCREEN`/`DUOTOUR` lines in app.log map shots to
+  routes (`DuoScreenshotTour` in `RootTabView.swift`).
   Screenshot mode skips the coachmark tutorial.
