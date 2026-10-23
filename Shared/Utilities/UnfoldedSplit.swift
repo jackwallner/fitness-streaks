@@ -32,3 +32,17 @@ struct UnfoldedSplit: Equatable, Sendable {
         return UnfoldedSplit(primaryWidth: half, secondaryX: half, secondaryWidth: width - half)
     }
 }
+
+/// The ring on the card whose streak fills the pane beside the list. It sits
+/// inside the card, a gap in from the card's own border, so the selected card
+/// keeps the same outline, margins and grid gutter as its neighbours.
+enum PaneSelectionRing {
+    static let lineWidth: CGFloat = 2
+    /// Distance from the card's edge to the centre of the ring's stroke.
+    static let inset: CGFloat = 4
+
+    /// The area the stroke covers, for a card of the given bounds.
+    static func strokeBounds(in card: CGRect) -> CGRect {
+        card.insetBy(dx: inset - lineWidth / 2, dy: inset - lineWidth / 2)
+    }
+}

@@ -75,3 +75,29 @@ final class UnfoldedSplitTests: XCTestCase {
         }
     }
 }
+
+/// The selected card's ring stays inside the card (rejected 2026-10-23: drawn
+/// 4 pt outside, it overran the pane margin and halved the grid gutter).
+final class PaneSelectionRingTests: XCTestCase {
+    /// A badge card in the leading pane's two-column grid.
+    private let card = CGRect(x: 6, y: 0, width: 220, height: 120)
+    private let cardBorderWidth: CGFloat = 2
+    private let badgeContentPadding: CGFloat = 10
+
+    func testRingStaysInsideTheCard() {
+        XCTAssertTrue(card.contains(PaneSelectionRing.strokeBounds(in: card)))
+    }
+
+    func testRingClearsTheCardBorder() {
+        // The card's border stroke reaches half its width inside the edge.
+        let borderInner = card.insetBy(dx: cardBorderWidth / 2, dy: cardBorderWidth / 2)
+        let ring = PaneSelectionRing.strokeBounds(in: card)
+        XCTAssertGreaterThan(ring.minX, borderInner.minX)
+        XCTAssertLessThan(ring.maxX, borderInner.maxX)
+    }
+
+    func testRingClearsTheCardContent() {
+        let ringInnerEdge = PaneSelectionRing.inset + PaneSelectionRing.lineWidth / 2
+        XCTAssertLessThan(ringInnerEdge, badgeContentPadding)
+    }
+}
