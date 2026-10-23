@@ -58,24 +58,29 @@ struct DashboardView: View {
                     }
 
                     if let hero = store.hero {
-                        Button { open(hero) } label: {
-                            StreakHero(streak: hero)
-                                .paneSelection(isShown(hero), accent: hero.metric.accent)
+                        // Beside the fold the hero leads the grid instead
+                        // (`DashboardGridCell`), so the list fits above the tab bar.
+                        if detailPane == nil {
+                            Button { open(hero) } label: {
+                                StreakHero(streak: hero)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("\(hero.metric.displayName) streak: \(hero.current) \(hero.cadence.pluralLabel), threshold \(Int(hero.threshold)) \(hero.metric.unitLabel)")
+                            .accessibilityHint("View streak details")
+                            .padding(.horizontal, 6)
+                            .coachmarkAnchor("hero")
+                            .id("coach-hero")
                         }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel("\(hero.metric.displayName) streak: \(hero.current) \(hero.cadence.pluralLabel), threshold \(Int(hero.threshold)) \(hero.metric.unitLabel)")
-                        .accessibilityHint("View streak details")
-                        .padding(.horizontal, 6)
-                        .coachmarkAnchor("hero")
-                        .id("coach-hero")
 
                         if shouldShowAtRisk(for: hero) {
                             atRiskBanner(for: hero)
                                 .padding(.horizontal, 6)
                         }
 
-                        if !visibleBadges.isEmpty {
-                            PixelSectionHeader(title: "Other Streaks · \(store.badges.count) Active")
+                        if !gridCells.isEmpty {
+                            PixelSectionHeader(title: detailPane == nil
+                                ? "Other Streaks · \(store.badges.count) Active"
+                                : "Your Streaks · \(store.badges.count + 1) Active")
                                 .padding(.top, 2)
 
                             badgeGrid
@@ -84,10 +89,12 @@ struct DashboardView: View {
                                 .id("coach-badges")
                         }
 
-                        findMoreButton
-                            .padding(.horizontal, 6)
-                            .coachmarkAnchor("findMore")
-                            .id("coach-findMore")
+                        if detailPane == nil {
+                            findMoreButton
+                                .padding(.horizontal, 6)
+                                .coachmarkAnchor("findMore")
+                                .id("coach-findMore")
+                        }
                     } else if store.isLoading {
                         loadingState
                     } else {
@@ -97,8 +104,10 @@ struct DashboardView: View {
                 .padding(.bottom, 16)
                 .frame(maxWidth: .infinity, alignment: .top)
                 #if DEBUG
-                .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
-                    if DuoScreenshotTour.isEnabled { NSLog("DUOGEOM dashboard width=%.1f", width) }
+                .onGeometryChange(for: CGSize.self) { $0.size } action: { size in
+                    if DuoScreenshotTour.isEnabled {
+                        NSLog("DUOGEOM dashboard width=%.1f height=%.1f", size.width, size.height)
+                    }
                 }
                 #endif
             }
@@ -591,19 +600,59 @@ struct DashboardView: View {
         .accessibilityLabel("Find more streaks")
     }
 
+    private var gridCells: [DashboardGridCell] {
+        DashboardGridCell.cells(hero: store.hero, badges: visibleBadges, isSplit: detailPane != nil)
+    }
+
     private var badgeGrid: some View {
         LazyVGrid(columns: grid, spacing: 8) {
-            ForEach(visibleBadges) { streak in
-                VStack(spacing: 6) {
+            ForEach(gridCells) { cell in
+                switch cell {
+                case .streak(let streak):
                     Button { open(streak) } label: {
                         StreakBadgeCard(streak: streak)
                             .paneSelection(isShown(streak), accent: streak.metric.accent)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("\(streak.metric.displayName) streak: \(streak.current) \(streak.cadence.pluralLabel)")
+                    .modifier(HeroCoachmark(isHero: streak.id == store.hero?.id))
+                case .findMore:
+                    if let hero = store.hero {
+                        findMoreCard(sizedLike: hero)
+                            .coachmarkAnchor("findMore")
+                            .id("coach-findMore")
+                    }
                 }
             }
         }
+    }
+
+    /// Find More as the grid's last cell beside the fold, sized like the
+    /// streak cards: a hidden card sets the height, so the row stays even.
+    private func findMoreCard(sizedLike streak: Streak) -> some View {
+        Button {
+            showPicker = true
+        } label: {
+            StreakBadgeCard(streak: streak)
+                .hidden()
+                .overlay {
+                    VStack(spacing: 6) {
+                        Text("+")
+                            .font(RetroFont.mono(22, weight: .bold))
+                            .foregroundStyle(Theme.retroLime)
+                        Text("FIND MORE STREAKS")
+                            .font(RetroFont.mono(9, weight: .bold))
+                            .tracking(1)
+                            .foregroundStyle(Theme.retroInkDim)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                    }
+                    .padding(.horizontal, 10)
+                }
+                .pixelPanel(color: Theme.retroInkFaint, fill: Theme.retroBgRaised)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Find more streaks")
     }
 
     private var loadingState: some View {
@@ -717,6 +766,21 @@ struct DashboardView: View {
         } catch {
             log.error("Manual health access request failed: \(String(describing: error))")
             healthAccessErrorText = "Could not request Health access from iOS. Open Settings and enable Health access for Streaks."
+        }
+    }
+}
+
+/// Beside the fold the hero is a grid card, and the tutorial's first step
+/// points at it there.
+private struct HeroCoachmark: ViewModifier {
+    let isHero: Bool
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if isHero {
+            content.coachmarkAnchor("hero").id("coach-hero")
+        } else {
+            content
         }
     }
 }

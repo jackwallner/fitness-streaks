@@ -101,3 +101,45 @@ final class PaneSelectionRingTests: XCTestCase {
         XCTAssertLessThan(ringInnerEdge, badgeContentPadding)
     }
 }
+
+/// The Dashboard grid beside the fold (rejected 2026-10-23: with the big hero
+/// card above it, the last row of streak cards was sliced by the tab bar).
+final class DashboardGridCellTests: XCTestCase {
+    private func streak(_ metric: StreakMetric, current: Int) -> Streak {
+        Streak(
+            metric: metric,
+            cadence: .daily,
+            threshold: 10,
+            current: current,
+            best: current,
+            startDate: nil,
+            lastHitDate: nil,
+            currentUnitCompleted: true,
+            currentUnitProgress: 1,
+            currentUnitValue: 10,
+            completionRate: 0.9,
+            lookbackDays: 30
+        )
+    }
+
+    private var hero: Streak { streak(.steps, current: 12) }
+    private var badges: [Streak] { [streak(.exerciseMinutes, current: 9), streak(.standHours, current: 7)] }
+
+    func testFoldedGridHoldsOnlyTheOtherStreaks() {
+        let cells = DashboardGridCell.cells(hero: hero, badges: badges, isSplit: false)
+        XCTAssertEqual(cells, badges.map(DashboardGridCell.streak))
+    }
+
+    func testSplitGridLeadsWithTheHeroAndEndsWithFindMore() {
+        let cells = DashboardGridCell.cells(hero: hero, badges: badges, isSplit: true)
+        XCTAssertEqual(cells, [.streak(hero)] + badges.map(DashboardGridCell.streak) + [.findMore])
+    }
+
+    func testSplitGridFillsEveryRowForFourOtherStreaks() {
+        // The seeded store set: a hero and four others make three full rows of two.
+        let four = badges + [streak(.sleepHours, current: 6), streak(.distanceMiles, current: 5)]
+        let cells = DashboardGridCell.cells(hero: hero, badges: four, isSplit: true)
+        XCTAssertEqual(cells.count, 6)
+        XCTAssertEqual(Set(cells.map(\.id)).count, cells.count)
+    }
+}

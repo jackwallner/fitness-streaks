@@ -46,3 +46,26 @@ enum PaneSelectionRing {
         card.insetBy(dx: inset - lineWidth / 2, dy: inset - lineWidth / 2)
     }
 }
+
+/// A cell of the Dashboard's streak grid.
+enum DashboardGridCell: Hashable, Identifiable {
+    case streak(Streak)
+    case findMore
+
+    var id: String {
+        switch self {
+        case .streak(let streak): return streak.id
+        case .findMore: return "findMore"
+        }
+    }
+
+    /// Folded, the hero keeps its big card above the grid and Find More sits
+    /// below it. Beside the fold the pane is only 669 pt tall and the detail
+    /// pane already shows the hero in full, so the hero leads the grid as a
+    /// card and Find More fills the last cell: every card ends above the tab bar.
+    static func cells(hero: Streak?, badges: [Streak], isSplit: Bool) -> [DashboardGridCell] {
+        guard isSplit else { return badges.map(DashboardGridCell.streak) }
+        let streaks = ([hero].compactMap { $0 } + badges).map(DashboardGridCell.streak)
+        return streaks + [.findMore]
+    }
+}
