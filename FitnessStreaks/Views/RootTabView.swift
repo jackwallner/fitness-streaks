@@ -126,6 +126,16 @@ struct RootTabView: View {
     #if DEBUG
     /// See `DuoScreenshotTour`. Each route starts with Settings closed.
     private func runDuoTour(split isSplit: Bool) async {
+        if let route = DuoScreenshotTour.screen {
+            var waited = 0
+            while store.streaks.isEmpty, waited < 100, !Task.isCancelled {
+                try? await Task.sleep(for: .milliseconds(100))
+                waited += 1
+            }
+            NSLog("DUOSCREEN %@ route=%@", isSplit ? "inner" : "outer", route)
+            openDuoRoute(route)
+            return
+        }
         guard DuoScreenshotTour.isEnabled else { return }
         try? await Task.sleep(for: .seconds(DuoScreenshotTour.firstDelay))
         while !Task.isCancelled {
@@ -168,10 +178,15 @@ struct RootTabView: View {
 /// is the delay before the first route and `-DuoTourStep <s>` the dwell on
 /// each. The walk loops and restarts when the panes split or join. Every step
 /// logs a `DUOTOUR` line, which maps the captures to routes.
+///
+/// `-DuoScreen <route>` opens that one route once the streaks load and stays
+/// there, in either pose, and wins over `-DuoTour`. `gh-sim --screen` relaunches
+/// with one per store surface.
 enum DuoScreenshotTour {
     private static let arguments = ProcessInfo.processInfo.arguments
 
     static var isEnabled: Bool { arguments.contains("-DuoTour") }
+    static var screen: String? { value("-DuoScreen") }
 
     static func routes(split: Bool) -> [String] {
         let list = value(split ? "-DuoRoutesRegular" : "-DuoRoutes")

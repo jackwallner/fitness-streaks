@@ -7,6 +7,7 @@ struct SavesView: View {
     @EnvironmentObject var settings: StreakSettings
     @EnvironmentObject var store: StreakStore
     @EnvironmentObject var storeKit: StoreKitService
+    @Environment(\.streakDetailPane) private var detailPane
 
     @State private var showingPaywall = false
     @State private var showingFreezeDatePicker = false
@@ -65,21 +66,28 @@ struct SavesView: View {
 
     private var accent: Color { storeKit.isPro ? Theme.retroLime : Theme.retroMagenta }
 
+    /// Beside the fold the pane is a landscape half only 669 pt tall, so the
+    /// sprite sits beside its caption and the freezes card clears the tab bar.
     private var statusHero: some View {
-        VStack(spacing: 16) {
-            AutoSavePulse(tint: accent, lit: storeKit.isPro)
+        let layout = detailPane == nil
+            ? AnyLayout(VStackLayout(spacing: 16))
+            : AnyLayout(HStackLayout(spacing: 16))
+        return VStack(spacing: 16) {
+            layout {
+                AutoSavePulse(tint: accent, lit: storeKit.isPro)
 
-            VStack(spacing: 6) {
-                Text(storeKit.isPro ? "AUTO-SAVE ON" : "AUTO-SAVE LOCKED")
-                    .font(RetroFont.pixel(14))
-                    .tracking(2)
-                    .foregroundStyle(accent)
-                Text(storeKit.isPro
-                     ? "Miss a day, keep your streak."
-                     : "One miss ends a streak. Streaks+ saves it.")
-                    .font(RetroFont.mono(11, weight: .bold))
-                    .foregroundStyle(Theme.retroInk)
-                    .multilineTextAlignment(.center)
+                VStack(alignment: detailPane == nil ? .center : .leading, spacing: 6) {
+                    Text(storeKit.isPro ? "AUTO-SAVE ON" : "AUTO-SAVE LOCKED")
+                        .font(RetroFont.pixel(14))
+                        .tracking(2)
+                        .foregroundStyle(accent)
+                    Text(storeKit.isPro
+                         ? "Miss a day, keep your streak."
+                         : "One miss ends a streak. Streaks+ saves it.")
+                        .font(RetroFont.mono(11, weight: .bold))
+                        .foregroundStyle(Theme.retroInk)
+                        .multilineTextAlignment(detailPane == nil ? .center : .leading)
+                }
             }
 
             if !storeKit.isPro {
@@ -98,7 +106,7 @@ struct SavesView: View {
                 .accessibilityLabel(storeKit.hasEligibleTrial ? "Start Streaks+ trial" : "Unlock Streaks+")
             }
         }
-        .padding(.vertical, 20)
+        .padding(.vertical, detailPane == nil ? 20 : 12)
         .padding(.horizontal, 16)
         .frame(maxWidth: .infinity)
         .pixelPanel(color: accent, fill: Theme.retroBgRaised)

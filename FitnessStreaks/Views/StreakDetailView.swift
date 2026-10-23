@@ -438,9 +438,10 @@ struct StreakDetailView: View {
             ViewThatFits(in: .horizontal) {
                 HStack(spacing: 8) {
                     if !isHero {
-                        compactActionButton(title: "PRIMARY", color: Theme.retroMagenta) {
+                        compactActionButton(title: "PIN TO TOP", color: Theme.retroInk) {
                             makePrimary()
                         }
+                        .accessibilityLabel("Make this the primary streak on the dashboard")
                     }
                     if canRecalibrate {
                         compactActionButton(title: "RECALIBRATE", color: Theme.retroCyan) {
@@ -454,9 +455,10 @@ struct StreakDetailView: View {
 
                 VStack(spacing: 8) {
                     if !isHero {
-                        compactActionButton(title: "MAKE PRIMARY", color: Theme.retroMagenta) {
+                        compactActionButton(title: "PIN TO TOP", color: Theme.retroInk) {
                             makePrimary()
                         }
+                        .accessibilityLabel("Make this the primary streak on the dashboard")
                     }
                     if canRecalibrate {
                         compactActionButton(title: "RECALIBRATE", color: Theme.retroCyan) {
