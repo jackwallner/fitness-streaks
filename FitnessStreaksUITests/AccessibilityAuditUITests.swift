@@ -76,14 +76,20 @@ final class AccessibilityAuditUITests: XCTestCase {
     /// Runs Apple's accessibility audit and records every issue instead of failing.
     private func audit(_ screen: String) {
         do {
-            var count = 0
-            try app.performAccessibilityAudit(for: .all) { [self] issue in
-                count += 1
-                let el = issue.element
-                self.note("AUDIT@\(screen): type=\(issue.auditType.rawValue) \(issue.compactDescription) :: \(issue.detailedDescription) :: element=\(el.map { self.clean($0.label) } ?? "?") [\(el.map { String(format: "%.0fx%.0f", $0.frame.width, $0.frame.height) } ?? "?")]")
-                return true
+            // XCTest runs UI tests on the main thread; assumeIsolated lets the
+            // audit's issue handler stay on the main actor under Swift 6 checking.
+            try MainActor.assumeIsolated {
+                var count = 0
+                try app.performAccessibilityAudit(for: .all) { issue in
+                    count += 1
+                    let el = issue.element
+                    let label = el.map { self.clean($0.label) } ?? "?"
+                    let size = el.map { String(format: "%.0fx%.0f", $0.frame.width, $0.frame.height) } ?? "?"
+                    self.note("AUDIT@\(screen): type=\(issue.auditType.rawValue) \(issue.compactDescription) :: \(issue.detailedDescription) :: element=\(label) [\(size)]")
+                    return true
+                }
+                self.note("AUDIT@\(screen): \(count) issue(s)")
             }
-            note("AUDIT@\(screen): \(count) issue(s)")
         } catch {
             note("AUDIT@\(screen) failed: \(error)")
         }
