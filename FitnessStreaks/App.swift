@@ -298,10 +298,6 @@ private struct RootView: View {
     /// trial sheet finishes dismissing — presenting both bindings in the same tick
     /// is racy in SwiftUI and frequently drops the second sheet.
     @State private var pendingPaywallAfterTrialDismiss = false
-    #if REVENUECAT
-    @State private var trialOfferPackage: Package?
-    #endif
-
     /// Free-tier cap used for the "Keep all N streaks" pitch. Mirrors
     /// `OnboardingView.freeTrackedLimit` — kept in sync manually since that
     /// constant is fileprivate to OnboardingView.
@@ -357,7 +353,6 @@ private struct RootView: View {
             settings.hasSeenTrialOffer = true
             trialPurchaseInFlight = false
             trialPurchaseError = nil
-            trialOfferPackage = nil
             // If the user paid inside the trial sheet, skip the hand-off to the
             // full paywall — one payment unlocks everything.
             if storeKit.grantsUnlimitedTrackedStreaks {
@@ -367,24 +362,14 @@ private struct RootView: View {
                 showTrialPaywall = true
             }
         }) {
-            // Resolve from the non-nil computed source, not the `@State` alone: on the
-            // post-onboarding fallback path the sheet can render a tick before
-            // `trialOfferPackage` is assigned (set-state-then-present race), which made
-            // `directPurchase` false and downgraded the one-tap "START FREE TRIAL" CTA
-            // to "SEE PLANS". `directTrialPackage` always reflects the loaded products,
-            // mirroring OnboardingView's `hasDirectTrialPackage`.
             TrialOfferSheet(
-                offerLabel: (trialOfferPackage ?? directTrialPackage)?.streaksIntroOfferLabel
-                    ?? storeKit.products.compactMap(\.streaksIntroOfferLabel).first,
-                priceLabel: (trialOfferPackage ?? directTrialPackage)?.streaksRecurringPriceLabel,
-                directPurchase: (trialOfferPackage ?? directTrialPackage) != nil,
                 isPurchasing: trialPurchaseInFlight,
                 errorMessage: trialPurchaseError,
                 pickedCount: settings.lastOnboardingPickedCount,
                 freeCap: Self.freeTrackedLimit,
                 longestStreak: longestStreakInfo(),
                 onStartTrial: {
-                    if (trialOfferPackage ?? directTrialPackage) != nil {
+                    if storeKit.preferredOfferPackage != nil {
                         startDirectTrialPurchase()
                     } else {
                         pendingPaywallAfterTrialDismiss = true
@@ -422,23 +407,16 @@ private struct RootView: View {
     }
 
     #if REVENUECAT
-    /// Yearly trial-bearing package, else any trial-bearing package. Yearly is
-    /// preferred because the longer commitment maximizes trial conversion value.
-    private var directTrialPackage: Package? {
-        let trialPackages = storeKit.products.filter { $0.streaksIntroOfferLabel != nil }
-        return trialPackages.first(where: { $0.packageType == .annual }) ?? trialPackages.first
-    }
-
-    /// One-time post-onboarding free-trial nudge. Gates:
+    /// One-time post-onboarding offer. Gates:
     /// - onboarding done (so we don't double-prompt on the onboarding paywall)
     /// - not already Pro
     /// - haven't seen the trial offer before
-    /// - at least one trial-bearing product loaded
+    /// - at least one subscription product loaded
     private func evaluateTrialOffer() {
         guard settings.hasCompletedSetup,
               !storeKit.grantsUnlimitedTrackedStreaks,
               !settings.hasSeenTrialOffer,
-              storeKit.products.contains(where: { $0.streaksIntroOfferLabel != nil })
+              storeKit.preferredOfferPackage != nil
         else { return }
         Task { @MainActor in
             // Defer ~4s so the user sees their dashboard hydrate (rings, hero
@@ -448,9 +426,8 @@ private struct RootView: View {
             guard !showTrialOffer, !showTrialPaywall,
                   !settings.hasSeenTrialOffer,
                   !storeKit.grantsUnlimitedTrackedStreaks,
-                  storeKit.products.contains(where: { $0.streaksIntroOfferLabel != nil })
+                  storeKit.preferredOfferPackage != nil
             else { return }
-            trialOfferPackage = directTrialPackage
             showTrialOffer = true
         }
     }
@@ -465,7 +442,7 @@ private struct RootView: View {
               !storeKit.grantsUnlimitedTrackedStreaks,
               let firstShown = settings.firstTrialOfferShownAt,
               Date.now.timeIntervalSince(firstShown) >= 7 * 24 * 60 * 60,
-              storeKit.products.contains(where: { $0.streaksIntroOfferLabel != nil }),
+              storeKit.preferredOfferPackage != nil,
               let longest = longestStreakInfo(), longest.current >= 3
         else { return }
         Task { @MainActor in
@@ -475,17 +452,17 @@ private struct RootView: View {
                   !storeKit.grantsUnlimitedTrackedStreaks
             else { return }
             settings.hasReofferedTrial = true
-            trialOfferPackage = directTrialPackage
             showTrialOffer = true
         }
     }
 
     private func startDirectTrialPurchase() {
-        guard let package = trialOfferPackage ?? directTrialPackage else {
+        guard let package = storeKit.preferredOfferPackage else {
             pendingPaywallAfterTrialDismiss = true
             showTrialOffer = false
             return
         }
+        let startsTrial = storeKit.isEligibleForIntroOffer(package)
         trialPurchaseError = nil
         trialPurchaseInFlight = true
         Task { @MainActor in
@@ -495,9 +472,13 @@ private struct RootView: View {
                 settings.hasSeenTrialOffer = true
                 showTrialOffer = false
             case .cancelled:
-                trialPurchaseError = "Trial wasn't started. Tap again, or pick a different plan."
+                trialPurchaseError = startsTrial
+                    ? "Trial wasn't started. Tap again, or pick a different plan."
+                    : "Purchase wasn't completed. Tap again, or pick a different plan."
             case .failed:
-                trialPurchaseError = storeKit.lastError ?? "Couldn't start your trial. Please try again."
+                trialPurchaseError = storeKit.lastError ?? (startsTrial
+                    ? "Couldn't start your trial. Please try again."
+                    : "Couldn't complete the purchase. Please try again.")
             }
         }
     }

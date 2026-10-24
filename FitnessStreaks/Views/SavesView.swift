@@ -86,7 +86,7 @@ struct SavesView: View {
                 Button {
                     showingPaywall = true
                 } label: {
-                    Text("START STREAKS+ TRIAL")
+                    Text(storeKit.hasEligibleTrial ? "START STREAKS+ TRIAL" : "UNLOCK STREAKS+")
                         .font(RetroFont.mono(11, weight: .bold))
                         .tracking(2)
                         .foregroundStyle(Theme.retroBg)
@@ -95,7 +95,7 @@ struct SavesView: View {
                         .background(Theme.retroMagenta)
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("Start Streaks+ trial")
+                .accessibilityLabel(storeKit.hasEligibleTrial ? "Start Streaks+ trial" : "Unlock Streaks+")
             }
         }
         .padding(.vertical, 20)

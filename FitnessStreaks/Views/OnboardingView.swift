@@ -733,12 +733,12 @@ struct OnboardingView: View {
             if let offer = trialOfferLabel {
                 return "Free keeps \(Self.freeTrackedLimit). Start your \(offer.lowercased()) to keep the other \(locked) and protect every run."
             }
-            return "Free keeps \(Self.freeTrackedLimit). Start a free trial to keep the other \(locked) and protect every run."
+            return "Free keeps \(Self.freeTrackedLimit). Subscribe to Streaks+ to keep the other \(locked) and protect every run."
         }
         if let offer = trialOfferLabel {
             return "Start your \(offer.lowercased()) to auto-save misses and protect every streak you just found."
         }
-        return "Start a free trial to auto-save misses and protect every streak you just found."
+        return "Subscribe to Streaks+ to auto-save misses and protect every streak you just found."
     }
 
     // MARK: - Flow
@@ -911,19 +911,15 @@ struct OnboardingView: View {
     /// True when a trial-bearing package loaded, so the trial page can buy it
     /// directly rather than punting to the full paywall.
     private var hasDirectTrialPackage: Bool {
-        storeKit.products.contains { storeKit.isEligibleForIntroOffer($0) }
+        storeKit.eligibleTrialPackage != nil
     }
 
     private var trialOfferLabel: String? {
-        let trials = storeKit.products.filter { storeKit.isEligibleForIntroOffer($0) }
-        let best = trials.first(where: { $0.packageType == .annual }) ?? trials.first
-        return best?.streaksIntroOfferLabel
+        storeKit.eligibleTrialPackage?.streaksIntroOfferLabel
     }
 
     private var trialPriceLabel: String? {
-        let trials = storeKit.products.filter { storeKit.isEligibleForIntroOffer($0) }
-        let best = trials.first(where: { $0.packageType == .annual }) ?? trials.first
-        return best?.streaksRecurringPriceLabel
+        storeKit.eligibleTrialPackage?.streaksRecurringPriceLabel
     }
 
     /// Live 3.1.2 billing disclosure shown just above the primary trial CTA.
@@ -936,15 +932,14 @@ struct OnboardingView: View {
         if let offer = trialOfferLabel {
             return "▶ KEEP ALL · START \(offer.uppercased())"
         }
-        return "▶ KEEP ALL · START FREE TRIAL"
+        return "▶ KEEP ALL · SEE PLANS"
     }
 
     /// Buy the trial-bearing package directly. Yearly is preferred (longer
     /// commitment, better trial value). Falls back to the full paywall only when
     /// no trial product is available.
     private func startOnboardingTrialPurchase() {
-        let trials = storeKit.products.filter { storeKit.isEligibleForIntroOffer($0) }
-        guard let package = trials.first(where: { $0.packageType == .annual }) ?? trials.first else {
+        guard let package = storeKit.eligibleTrialPackage else {
             showingPaywall = true
             return
         }
@@ -982,7 +977,9 @@ struct OnboardingView: View {
                     .tracking(1)
                     .foregroundStyle(Theme.retroMagenta)
                 Text(lockedCount > 0
-                     ? "Tap any locked streak to start a free trial and add it."
+                     ? (hasDirectTrialPackage
+                        ? "Tap any locked streak to start a free trial and add it."
+                        : "Tap any locked streak to see Streaks+ plans and add it.")
                      : "Streaks+ unlocks custom streaks, auto-save, and travel freezes.")
                     .font(RetroFont.mono(9))
                     .foregroundStyle(Theme.retroInkDim)

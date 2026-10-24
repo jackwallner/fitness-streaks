@@ -261,7 +261,7 @@ struct DashboardView: View {
         #if REVENUECAT
         !storeKit.isPro
             && !settings.hasSeenTrialOffer
-            && storeKit.products.contains(where: { $0.streaksIntroOfferLabel != nil })
+            && storeKit.preferredOfferPackage != nil
         #else
         false
         #endif
@@ -487,7 +487,7 @@ struct DashboardView: View {
     private func graceStatusTitle(for hero: Streak) -> String {
         if streaksPlusActive { return "AUTO-SAVE ON" }
         if streaksPlusActivating { return "ACTIVATING STREAKS+" }
-        return "TRY STREAKS+ FREE"
+        return storeKit.hasEligibleTrial ? "TRY STREAKS+ FREE" : "UNLOCK STREAKS+"
     }
 
     private func graceStatusDetail(for hero: Streak) -> String {
@@ -497,7 +497,9 @@ struct DashboardView: View {
         if streaksPlusActivating {
             return "Your purchase is syncing. Streak picks restore in a moment."
         }
-        return "Start a trial. Streaks+ auto-saves every missed day."
+        return storeKit.hasEligibleTrial
+            ? "Start a trial. Streaks+ auto-saves every missed day."
+            : "Streaks+ auto-saves every missed day."
     }
 
     private func brokenBanner(_ broken: BrokenStreak) -> some View {

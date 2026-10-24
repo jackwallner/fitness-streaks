@@ -218,7 +218,9 @@ struct StreakPickerSheet: View {
                                     .font(RetroFont.mono(10, weight: .bold))
                                     .tracking(1)
                                     .foregroundStyle(Theme.retroAmber)
-                                Text("Deselect \(selection.count - Self.freeTrackedLimit) to save, or start a free trial to keep them all.")
+                                Text(storeKit.hasEligibleTrial
+                                    ? "Deselect \(selection.count - Self.freeTrackedLimit) to save, or start a free trial to keep them all."
+                                    : "Deselect \(selection.count - Self.freeTrackedLimit) to save, or unlock Streaks+ to keep them all.")
                                     .font(RetroFont.mono(10))
                                     .foregroundStyle(Theme.retroInkDim)
                             }

@@ -121,3 +121,68 @@ final class PaywallFunnelTests: XCTestCase {
         }
     }
 }
+
+final class TrialOfferEligibilityTests: XCTestCase {
+    private struct Offer: Equatable {
+        let id: String
+        var hasFreeTrial = true
+        var isAnnual = false
+        var isSubscription = true
+    }
+
+    private let yearly = Offer(id: "yearly", isAnnual: true)
+    private let monthly = Offer(id: "monthly")
+    private let lifetime = Offer(id: "lifetime", hasFreeTrial: false, isSubscription: false)
+
+    private func resolve(_ offers: [Offer], eligibility: [String: Bool]) -> Offer? {
+        TrialOfferResolver.preferredPackage(
+            in: offers,
+            introEligibility: eligibility,
+            productID: { $0.id },
+            hasFreeTrial: { $0.hasFreeTrial },
+            isAnnual: { $0.isAnnual },
+            isSubscription: { $0.isSubscription }
+        )
+    }
+
+    func testTrialRequiresConfirmedEligibility() {
+        XCTAssertFalse(TrialOfferResolver.isEligible(productID: "yearly", hasFreeTrial: true, introEligibility: [:]))
+        XCTAssertFalse(TrialOfferResolver.isEligible(productID: "yearly", hasFreeTrial: true, introEligibility: ["yearly": false]))
+        XCTAssertTrue(TrialOfferResolver.isEligible(productID: "yearly", hasFreeTrial: true, introEligibility: ["yearly": true]))
+        XCTAssertFalse(TrialOfferResolver.isEligible(productID: "yearly", hasFreeTrial: false, introEligibility: ["yearly": true]))
+    }
+
+    func testEligibleAnnualTrialRemainsPreferred() {
+        XCTAssertEqual(resolve([monthly, lifetime, yearly], eligibility: ["monthly": true, "yearly": true]), yearly)
+    }
+
+    func testEligibleMonthlyTrialWinsOverIneligibleAnnual() {
+        XCTAssertEqual(resolve([yearly, monthly], eligibility: ["yearly": false, "monthly": true]), monthly)
+    }
+
+    func testEligibleMonthlyTrialWinsOverUnknownAnnual() {
+        XCTAssertEqual(resolve([yearly, monthly], eligibility: ["monthly": true]), monthly)
+    }
+
+    func testExpiredSubscriberGetsOrdinaryAnnualOffer() {
+        XCTAssertEqual(resolve([lifetime, monthly, yearly], eligibility: ["monthly": false, "yearly": false]), yearly)
+    }
+
+    func testUnavailableAnnualTrialFallsBackToOrdinaryAnnualBeforeMonthly() {
+        let paidYearly = Offer(id: "yearly", hasFreeTrial: false, isAnnual: true)
+        XCTAssertEqual(resolve([monthly, paidYearly], eligibility: ["monthly": false]), paidYearly)
+    }
+
+    func testNoTrialMonthlyAndEmptyCatalogFallbacks() {
+        XCTAssertEqual(resolve([lifetime, monthly], eligibility: [:]), monthly)
+        XCTAssertNil(resolve([lifetime], eligibility: [:]))
+        XCTAssertNil(resolve([], eligibility: [:]))
+    }
+
+    func testEligibilityChangeReResolvesOffer() {
+        let offers = [yearly, monthly]
+        XCTAssertEqual(resolve(offers, eligibility: ["yearly": true, "monthly": true]), yearly)
+        XCTAssertEqual(resolve(offers, eligibility: ["yearly": false, "monthly": true]), monthly)
+        XCTAssertEqual(resolve(offers, eligibility: ["yearly": false, "monthly": false]), yearly)
+    }
+}
