@@ -1,5 +1,26 @@
 import Foundation
 
+enum TrialOfferResolver {
+    static func isEligible(productID: String, hasFreeTrial: Bool, introEligibility: [String: Bool]) -> Bool {
+        hasFreeTrial && introEligibility[productID] == true
+    }
+
+    static func preferredPackage<Offer>(
+        in packages: [Offer],
+        introEligibility: [String: Bool],
+        productID: (Offer) -> String,
+        hasFreeTrial: (Offer) -> Bool,
+        isAnnual: (Offer) -> Bool,
+        isSubscription: (Offer) -> Bool
+    ) -> Offer? {
+        let trials = packages.filter {
+            isEligible(productID: productID($0), hasFreeTrial: hasFreeTrial($0), introEligibility: introEligibility)
+        }
+        return trials.first(where: isAnnual) ?? trials.first
+            ?? packages.first(where: isAnnual) ?? packages.first(where: isSubscription)
+    }
+}
+
 #if REVENUECAT
 import RevenueCat
 
@@ -175,9 +196,31 @@ final class StoreKitService: NSObject, ObservableObject {
     }
 
     func isEligibleForIntroOffer(_ package: Package) -> Bool {
-        guard package.streaksIntroOfferLabel != nil else { return false }
-        return introEligibility[package.storeProduct.productIdentifier] ?? true
+        TrialOfferResolver.isEligible(
+            productID: package.storeProduct.productIdentifier,
+            hasFreeTrial: package.streaksIntroOfferLabel != nil,
+            introEligibility: introEligibility
+        )
     }
+
+    /// One live offer for the returning and revival sheets, including paid fallback.
+    var preferredOfferPackage: Package? {
+        TrialOfferResolver.preferredPackage(
+            in: products,
+            introEligibility: introEligibility,
+            productID: { $0.storeProduct.productIdentifier },
+            hasFreeTrial: { $0.streaksIntroOfferLabel != nil },
+            isAnnual: { $0.packageType == .annual },
+            isSubscription: { $0.storeProduct.subscriptionPeriod != nil }
+        )
+    }
+
+    var eligibleTrialPackage: Package? {
+        guard let package = preferredOfferPackage, isEligibleForIntroOffer(package) else { return nil }
+        return package
+    }
+
+    var hasEligibleTrial: Bool { eligibleTrialPackage != nil }
 
     /// Custom paywall impressions for RevenueCat analytics (hosted UI did this automatically).
     func trackPaywallImpression(id: String, oncePerSession: Bool = false) {
@@ -418,6 +461,8 @@ extension StoreKitService: PurchasesDelegate {
 @MainActor
 final class StoreKitService: ObservableObject {
     static let shared = StoreKitService()
+
+    var hasEligibleTrial: Bool { false }
 
     static let lifetimeID = "com.jackwallner.streaks.lifetime"
     static let yearlyID = "com.jackwallner.streaks.yearly"

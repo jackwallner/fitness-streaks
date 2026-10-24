@@ -13,9 +13,6 @@ struct PaywallScreenshotHarness: View {
             if mode == .trial {
                 trialBackdrop {
                     TrialOfferSheet(
-                        offerLabel: trialPackage?.streaksIntroOfferLabel ?? "7-day free trial",
-                        priceLabel: trialPackage?.streaksRecurringPriceLabel,
-                        directPurchase: true,
                         isPurchasing: false,
                         errorMessage: nil,
                         pickedCount: 4,
@@ -37,12 +34,6 @@ struct PaywallScreenshotHarness: View {
             if storeKit.products.isEmpty { await storeKit.loadProducts() }
         }
     }
-
-    #if REVENUECAT
-    private var trialPackage: Package? {
-        storeKit.yearly ?? storeKit.sortedPackages.first
-    }
-    #endif
 
     private func trialBackdrop<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         ZStack {

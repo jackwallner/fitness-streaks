@@ -3,20 +3,15 @@ import SwiftUI
 import RevenueCat
 #endif
 
-/// One-time free-trial offer presented shortly after a non-Pro user finishes
+/// One-time subscription offer presented shortly after a non-Pro user finishes
 /// onboarding. Hybrid behavior:
-/// - When a trial-bearing yearly package loaded, the primary CTA buys it directly
+/// - When a subscription package loaded, the primary CTA buys it directly
 ///   via StoreKit and the sheet shows the Apple 3.1.2-required price + auto-renew
 ///   disclosure plus a "See all plans" link to the full paywall.
-/// - When no trial product loaded yet, the primary CTA opens the full native paywall.
+/// - Trial claims require confirmed eligibility for the resolved package.
+/// - When no subscription loaded yet, the primary CTA opens the full native paywall.
 struct TrialOfferSheet: View {
     @EnvironmentObject private var storeKit: StoreKitService
-    /// Trial length copy, e.g. "7-day free trial". May be nil if products haven't loaded.
-    let offerLabel: String?
-    /// Recurring price after the trial. Required when `directPurchase` is true.
-    let priceLabel: String?
-    /// True when the primary button can buy the trial product directly via StoreKit.
-    let directPurchase: Bool
     let isPurchasing: Bool
     let errorMessage: String?
     /// How many streaks the user picked at the end of onboarding *before* the free
@@ -41,6 +36,26 @@ struct TrialOfferSheet: View {
     let onDismiss: () -> Void
 
     @State private var restoreStatus: String?
+
+    private var offerLabel: String? {
+        #if REVENUECAT
+        guard let package = storeKit.preferredOfferPackage,
+              storeKit.isEligibleForIntroOffer(package) else { return nil }
+        return package.streaksIntroOfferLabel
+        #else
+        return nil
+        #endif
+    }
+
+    private var priceLabel: String? {
+        #if REVENUECAT
+        return storeKit.preferredOfferPackage?.streaksRecurringPriceLabel
+        #else
+        return nil
+        #endif
+    }
+
+    private var directPurchase: Bool { priceLabel != nil }
 
     struct LongestStreakInfo {
         let displayName: String
@@ -77,7 +92,7 @@ struct TrialOfferSheet: View {
         if let offerLabel {
             return "\(offerLabel.uppercased()), ON US."
         }
-        return "TRY STREAKS+ FREE."
+        return "UNLOCK STREAKS+."
     }
 
     private var subheadline: String {
@@ -91,7 +106,7 @@ struct TrialOfferSheet: View {
         if offerLabel != nil {
             return "Unlock the full Streaks+ toolkit free. No charge until your trial ends."
         }
-        return "Unlock the full Streaks+ toolkit free for eligible new subscribers."
+        return "Unlock the full Streaks+ toolkit."
     }
 
     private var bullets: [TrialBullet] {
@@ -164,18 +179,18 @@ struct TrialOfferSheet: View {
     /// the user never has to scroll to find "Start my free trial".
     private var stickyActionBlock: some View {
         VStack(spacing: 8) {
-            if directPurchase, let priceLabel, let offerLabel {
+            if directPurchase, let priceLabel {
                 let footnote: String = {
                     #if REVENUECAT
-                    if let package = trialPackage {
+                    if let package = storeKit.preferredOfferPackage {
                         return PaywallDisclosure.subscriptionFootnote(
                             package: package,
                             displayPrice: priceLabel,
-                            isEligibleForIntro: true
+                            isEligibleForIntro: storeKit.isEligibleForIntroOffer(package)
                         )
                     }
                     #endif
-                    return "\(offerLabel.capitalized), then \(priceLabel). Renews automatically unless you cancel at least 24 hours before the trial ends."
+                    return "\(priceLabel). Renews automatically; cancel in Settings > Subscriptions."
                 }()
                 Text(footnote)
                     .font(.system(.caption2, design: .rounded))
@@ -289,13 +304,6 @@ struct TrialOfferSheet: View {
                 .ignoresSafeArea(edges: .bottom)
         )
     }
-
-    #if REVENUECAT
-    private var trialPackage: Package? {
-        let trials = storeKit.products.filter { $0.streaksIntroOfferLabel != nil }
-        return trials.first(where: { $0.packageType == .annual }) ?? trials.first
-    }
-    #endif
 
     /// CTA names the plan + recurring price (Apple 3.1.2). "Start my free trial"
     /// alone has been rejected for not disclosing the subscription term.

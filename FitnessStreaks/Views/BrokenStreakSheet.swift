@@ -113,9 +113,6 @@ struct BrokenStreakSheet: View {
                 }
             }) {
                 TrialOfferSheet(
-                    offerLabel: trialOfferLabel,
-                    priceLabel: trialOfferPriceLabel,
-                    directPurchase: hasDirectTrial,
                     isPurchasing: trialInFlight,
                     errorMessage: trialError,
                     pickedCount: 0,
@@ -126,7 +123,9 @@ struct BrokenStreakSheet: View {
                         cadenceLabel: broken.cadence.label
                     ),
                     headlineOverride: "REVIVE YOUR \(broken.brokenLength)-\(broken.cadence.label.uppercased()) \(broken.metric.displayName.uppercased()) STREAK.",
-                    subheadlineOverride: "Your run just ended. Start a Streaks+ trial and we'll restore it on the spot. Then auto-save every future miss so it can't happen again.",
+                    subheadlineOverride: trialOfferLabel != nil
+                        ? "Your run just ended. Start a Streaks+ trial and we'll restore it on the spot. Then auto-save every future miss so it can't happen again."
+                        : "Your run just ended. Subscribe to Streaks+ and we'll restore it on the spot. Then auto-save every future miss so it can't happen again.",
                     onStartTrial: { startReviveTrialPurchase() },
                     onSeeAllPlans: {
                         pendingPaywallAfterTrial = true
@@ -143,49 +142,24 @@ struct BrokenStreakSheet: View {
 
     // MARK: - Direct trial purchase (revive context)
 
-    private var hasDirectTrial: Bool {
-        #if REVENUECAT
-        return directTrialPackage != nil
-        #else
-        return false
-        #endif
-    }
-
     private var trialOfferLabel: String? {
         #if REVENUECAT
-        return directTrialPackage?.streaksIntroOfferLabel
-            ?? storeKit.products.compactMap(\.streaksIntroOfferLabel).first
+        return storeKit.eligibleTrialPackage?.streaksIntroOfferLabel
         #else
         return nil
         #endif
     }
 
-    private var trialOfferPriceLabel: String? {
-        #if REVENUECAT
-        return directTrialPackage?.streaksRecurringPriceLabel
-        #else
-        return nil
-        #endif
-    }
-
-    #if REVENUECAT
-    /// Yearly trial-bearing package, else any trial-bearing package — mirrors the
-    /// app-level post-onboarding offer so both surfaces buy the same product.
-    private var directTrialPackage: Package? {
-        let trials = storeKit.products.filter { $0.streaksIntroOfferLabel != nil }
-        return trials.first(where: { $0.packageType == .annual }) ?? trials.first
-    }
-    #endif
-
-    /// Buy the trial in-context and revive the broken run on success. Falls back to
-    /// the full paywall when no trial product is available.
+    /// Buy the resolved offer in-context and revive the broken run on success.
+    /// Falls back to the full paywall when no subscription product is available.
     private func startReviveTrialPurchase() {
         #if REVENUECAT
-        guard let package = directTrialPackage else {
+        guard let package = storeKit.preferredOfferPackage else {
             pendingPaywallAfterTrial = true
             showingTrialOffer = false
             return
         }
+        let startsTrial = storeKit.isEligibleForIntroOffer(package)
         trialError = nil
         trialInFlight = true
         Task { @MainActor in
@@ -196,9 +170,13 @@ struct BrokenStreakSheet: View {
                 showingTrialOffer = false
                 close()
             case .cancelled:
-                trialError = "Trial wasn't started. Tap again, or see all plans."
+                trialError = startsTrial
+                    ? "Trial wasn't started. Tap again, or see all plans."
+                    : "Purchase wasn't completed. Tap again, or see all plans."
             case .failed:
-                trialError = storeKit.lastError ?? "Couldn't start your trial. Please try again."
+                trialError = storeKit.lastError ?? (startsTrial
+                    ? "Couldn't start your trial. Please try again."
+                    : "Couldn't complete the purchase. Please try again.")
             }
         }
         #else
@@ -238,20 +216,22 @@ struct BrokenStreakSheet: View {
                     Image(systemName: "shield.lefthalf.filled")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(Theme.retroLime)
-                    Text("REVIVE WITH STREAKS+ TRIAL")
+                    Text(trialOfferLabel != nil ? "REVIVE WITH STREAKS+ TRIAL" : "REVIVE WITH STREAKS+")
                         .font(RetroFont.pixel(10))
                         .tracking(1)
                         .foregroundStyle(Theme.retroLime)
                     Spacer()
                     PixelChip(text: "STREAKS+", accent: Theme.retroMagenta)
                 }
-                Text("Start a Streaks+ trial and we'll restore your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) run on the spot. Streaks+ auto-saves every missed day so this doesn't happen again.")
+                Text(trialOfferLabel != nil
+                    ? "Start a Streaks+ trial and we'll restore your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) run on the spot. Streaks+ auto-saves every missed day so this doesn't happen again."
+                    : "Subscribe to Streaks+ and we'll restore your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) run on the spot. Streaks+ auto-saves every missed day so this doesn't happen again.")
                     .font(RetroFont.mono(11))
                     .foregroundStyle(Theme.retroInk)
                     .lineSpacing(3)
                     .multilineTextAlignment(.leading)
                 HStack {
-                    Text("START TRIAL · REVIVE STREAK")
+                    Text(trialOfferLabel != nil ? "START TRIAL · REVIVE STREAK" : "SUBSCRIBE · REVIVE STREAK")
                         .font(RetroFont.mono(10, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(Theme.retroMagenta)
@@ -267,6 +247,8 @@ struct BrokenStreakSheet: View {
             .pixelPanel(color: Theme.retroLime, fill: Theme.retroBgRaised)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Start a Streaks+ trial to revive your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) streak")
+        .accessibilityLabel(trialOfferLabel != nil
+            ? "Start a Streaks+ trial to revive your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) streak"
+            : "Subscribe to Streaks+ to revive your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) streak")
     }
 }

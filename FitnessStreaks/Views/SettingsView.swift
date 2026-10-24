@@ -220,7 +220,9 @@ struct SettingsView: View {
         if storeKit.isPro {
             return "Streaks+ auto-saves any day you miss. Your streak survives and the count keeps climbing tomorrow. Unlimited, automatic, no action needed."
         }
-        return "Free streaks end on the first missed day. Start a Streaks+ trial when it happens and we'll revive the run on the spot, then auto-save every miss after that."
+        return storeKit.hasEligibleTrial
+            ? "Free streaks end on the first missed day. Start a Streaks+ trial when it happens and we'll revive the run on the spot, then auto-save every miss after that."
+            : "Free streaks end on the first missed day. Subscribe to Streaks+ when it happens and we'll revive the run on the spot, then auto-save every miss after that."
     }
 
     private var recentPreservations: [GracePreservation] {

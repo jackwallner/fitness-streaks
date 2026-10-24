@@ -134,7 +134,9 @@ struct StreakDetailView: View {
                 .padding(.bottom, 8)
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("History. Unlock with Streaks+. Free trial available.")
+            .accessibilityLabel(storeKit.hasEligibleTrial
+                ? "History. Unlock with Streaks+. Free trial available."
+                : "History. Unlock with Streaks+.")
         }
     }
 
@@ -151,7 +153,9 @@ struct StreakDetailView: View {
                     .allowsHitTesting(false)
                     .overlay(heatmapLockOverlay)
                     .accessibilityElement(children: .ignore)
-                    .accessibilityLabel("History heatmap. Unlock with Streaks+. Free trial available.")
+                    .accessibilityLabel(storeKit.hasEligibleTrial
+                        ? "History heatmap. Unlock with Streaks+. Free trial available."
+                        : "History heatmap. Unlock with Streaks+.")
             }
             .buttonStyle(.plain)
         }
@@ -167,7 +171,7 @@ struct StreakDetailView: View {
                 .font(RetroFont.pixel(11))
                 .tracking(2)
                 .foregroundStyle(Theme.retroAmber)
-            Text("Free trial available")
+            Text(storeKit.hasEligibleTrial ? "Free trial available" : "See Streaks+ plans")
                 .font(RetroFont.mono(10, weight: .bold))
                 .foregroundStyle(Theme.retroInk)
         }
