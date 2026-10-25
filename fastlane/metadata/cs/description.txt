@@ -11,7 +11,7 @@ Placené rozšíření odemyká neomezené sledování a další způsoby, jak s
 
 Tvé záznamy ve Zdraví jsou pouze pro čtení a výpočty probíhají přímo na tvém zařízení. Aplikace nezapisuje aktivitu do Apple Zdraví ani negarantuje délku žádné série. Jde o nástroj pro povědomí o fitness, ne o lékařskou radu.
 
-Měsíční plán stojí US$6.99 a roční US$29.99. Oba se automaticky obnovují a při nároku zahrnují 7denní zkušební verzi. Apple strhne platbu z účtu Apple při potvrzení nákupu nebo po oprávněné zkoušce. Bez nároku strhne platbu při potvrzení. Poplatek za obnovení se účtuje během 24 hodin před koncem období. Spravuj nebo zruš v Nastavení › Účet Apple › Předplatná, nejméně 24 hodin před koncem. Ceny se liší podle regionu a zobrazí se před nákupem.
-K dispozici je také jednorázové doživotní odemčení. (US$69.99)
+Oba se automaticky obnovují a při nároku zahrnují 7denní zkušební verzi. Apple strhne platbu z účtu Apple při potvrzení nákupu nebo po oprávněné zkoušce. Bez nároku strhne platbu při potvrzení. Poplatek za obnovení se účtuje během 24 hodin před koncem období. Spravuj nebo zruš v Nastavení › Účet Apple › Předplatná, nejméně 24 hodin před koncem. Ceny se liší podle regionu a zobrazí se před nákupem.
+K dispozici je také jednorázové doživotní odemčení.
 Zásady ochrany soukromí: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
 Podmínky použití (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

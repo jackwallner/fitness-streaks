@@ -11,7 +11,7 @@ Maksullinen päivitys avaa rajattoman seurannan ja useampia tapoja seurata edist
 
 Terveystietosi ovat vain luettavissa, ja laskenta tapahtuu laitteellasi. Sovellus ei kirjoita aktiivisuutta Terveyteen eikä takaa minkään putken pituutta. Se on kuntotietoisuuden työkalu, ei lääketieteellinen neuvo.
 
-Kuukausitilaus maksaa US$6.99 ja vuositilaus US$29.99. Molemmat uusiutuvat automaattisesti, ja kumpaankin kuuluu 7 päivän ilmainen kokeilu, jos olet siihen oikeutettu. Apple veloittaa Apple-tiliäsi oston vahvistamisen yhteydessä tai oikeutetun kokeilun jälkeen. Jos et ole oikeutettu, veloitus tehdään vahvistettaessa. Uusimisveloitus tehdään 24 tunnin kuluessa ennen nykyisen kauden päättymistä. Hallitse tai peruuta vähintään 24 tuntia ennen kauden päättymistä kohdassa Asetukset › Apple-tili › Tilaukset. Hinnat vaihtelevat alueittain ja näkyvät ennen ostoa.
-Saatavilla on myös kertamaksullinen elinikäinen avaus. (US$69.99)
+Molemmat uusiutuvat automaattisesti, ja kumpaankin kuuluu 7 päivän ilmainen kokeilu, jos olet siihen oikeutettu. Apple veloittaa Apple-tiliäsi oston vahvistamisen yhteydessä tai oikeutetun kokeilun jälkeen. Jos et ole oikeutettu, veloitus tehdään vahvistettaessa. Uusimisveloitus tehdään 24 tunnin kuluessa ennen nykyisen kauden päättymistä. Hallitse tai peruuta vähintään 24 tuntia ennen kauden päättymistä kohdassa Asetukset › Apple-tili › Tilaukset. Hinnat vaihtelevat alueittain ja näkyvät ennen ostoa.
+Saatavilla on myös kertamaksullinen elinikäinen avaus.
 Tietosuojakäytäntö: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
 Käyttöehdot (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

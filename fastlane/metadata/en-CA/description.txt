@@ -11,7 +11,7 @@ The paid upgrade unlocks unlimited tracking and more ways to follow your progres
 
 Your Health records are read-only and calculations run on your device. The app does not write activity into Apple Health or guarantee a streak length. It is a fitness awareness tool, not medical advice.
 
-Monthly plan: US$6.99. Yearly plan: US$29.99. Both subscriptions renew automatically, and each offers a 7-day free trial when eligible. Apple charges your Apple Account when you confirm the purchase or after an eligible trial. If you are not eligible, Apple charges at confirmation. The renewal charge is made within 24 hours before the current period ends. Manage or cancel in Settings › Apple Account › Subscriptions at least 24 hours before the period ends. Prices vary by region and are shown before purchase.
-A one-time lifetime unlock is also available. (US$69.99)
+Both subscriptions renew automatically, and each offers a 7-day free trial when eligible. Apple charges your Apple Account when you confirm the purchase or after an eligible trial. If you are not eligible, Apple charges at confirmation. The renewal charge is made within 24 hours before the current period ends. Manage or cancel in Settings › Apple Account › Subscriptions at least 24 hours before the period ends. Prices vary by region and are shown before purchase.
+A one-time lifetime unlock is also available.
 Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
 Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

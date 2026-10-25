@@ -11,7 +11,7 @@ Den betalte oppgraderingen låser opp ubegrenset sporing og flere måter å føl
 
 Helsedataene dine er skrivebeskyttet, og beregningene skjer på enheten din. Appen skriver ikke aktivitet inn i Apple Helse og garanterer ikke lengden på noen rekke. Det er et verktøy for treningsbevissthet, ikke medisinske råd.
 
-Månedsplanen koster US$6.99, og årsplanen US$29.99. Begge fornyes automatisk og tilbyr 7 dagers gratis prøve hvis du kvalifiserer. Apple belaster Apple-kontoen din når du bekrefter kjøpet eller etter en kvalifisert prøveperiode. Hvis du ikke kvalifiserer, belastes du ved bekreftelse. Fornyelsesbeløpet belastes innen 24 timer før gjeldende periode utløper. Administrer eller si opp i Innstillinger › Apple-konto › Abonnementer minst 24 timer før perioden utløper. Prisene varierer etter region og vises før kjøp.
-En engangsopplåsing for hele livet er også tilgjengelig. (US$69.99)
+Begge fornyes automatisk og tilbyr 7 dagers gratis prøve hvis du kvalifiserer. Apple belaster Apple-kontoen din når du bekrefter kjøpet eller etter en kvalifisert prøveperiode. Hvis du ikke kvalifiserer, belastes du ved bekreftelse. Fornyelsesbeløpet belastes innen 24 timer før gjeldende periode utløper. Administrer eller si opp i Innstillinger › Apple-konto › Abonnementer minst 24 timer før perioden utløper. Prisene varierer etter region og vises før kjøp.
+En engangsopplåsing for hele livet er også tilgjengelig.
 Personvernerklæring: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
 Bruksvilkår (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

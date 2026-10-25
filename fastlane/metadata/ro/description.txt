@@ -11,7 +11,7 @@ Upgrade-ul plătit deblochează urmărire nelimitată și mai multe moduri de a-
 
 Înregistrările tale din Sănătate sunt doar pentru citire, iar calculele se fac pe dispozitivul tău. Aplicația nu scrie activitate în Sănătate și nu garantează durata vreunei serii. Este un instrument de conștientizare a formei fizice, nu un sfat medical.
 
-Planul lunar costă US$6.99, iar cel anual US$29.99. Ambele se reînnoiesc automat și oferă o perioadă de probă gratuită de 7 zile dacă ești eligibil. Apple îți debitează contul Apple la confirmarea achiziției sau după o perioadă de probă eligibilă. Dacă nu ești eligibil, debitarea are loc la confirmare. Taxa de reînnoire se percepe în cele 24 de ore dinaintea încheierii perioadei curente. Gestionează sau anulează în Configurări › Cont Apple › Abonamente cu cel puțin 24 de ore înainte de încheiere. Prețurile diferă în funcție de regiune și sunt afișate înainte de cumpărare.
-Este disponibilă și deblocarea pe viață printr-o singură plată. (US$69.99)
+Ambele se reînnoiesc automat și oferă o perioadă de probă gratuită de 7 zile dacă ești eligibil. Apple îți debitează contul Apple la confirmarea achiziției sau după o perioadă de probă eligibilă. Dacă nu ești eligibil, debitarea are loc la confirmare. Taxa de reînnoire se percepe în cele 24 de ore dinaintea încheierii perioadei curente. Gestionează sau anulează în Configurări › Cont Apple › Abonamente cu cel puțin 24 de ore înainte de încheiere. Prețurile diferă în funcție de regiune și sunt afișate înainte de cumpărare.
+Este disponibilă și deblocarea pe viață printr-o singură plată.
 Politica de confidențialitate: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
 Termeni de utilizare (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

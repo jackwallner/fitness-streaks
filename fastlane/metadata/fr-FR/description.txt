@@ -11,7 +11,7 @@ La mise à niveau payante débloque un suivi illimité et davantage de façons d
 
 Vos données Santé sont en lecture seule et les calculs s'exécutent sur votre appareil. L'app n'écrit aucune activité dans Santé et ne garantit la durée d'aucune série. C'est un outil de conscience physique, pas un avis médical.
 
-Le forfait mensuel coûte US$6.99 et l’annuel US$29.99. Tous deux se renouvellent automatiquement et proposent un essai gratuit de 7 jours si vous êtes éligible. Apple facture votre compte Apple lors de la confirmation de l’achat ou après un essai éligible. Si vous n’êtes pas éligible, le débit est effectué à la confirmation. Le renouvellement est facturé dans les 24 heures précédant la fin de la période en cours. Gérez ou annulez dans Réglages › Compte Apple › Abonnements, au moins 24 heures avant la fin. Les prix varient selon la région et sont affichés avant l’achat.
-Un déverrouillage à vie en un seul paiement est également disponible. (US$69.99)
+Tous deux se renouvellent automatiquement et proposent un essai gratuit de 7 jours si vous êtes éligible. Apple facture votre compte Apple lors de la confirmation de l’achat ou après un essai éligible. Si vous n’êtes pas éligible, le débit est effectué à la confirmation. Le renouvellement est facturé dans les 24 heures précédant la fin de la période en cours. Gérez ou annulez dans Réglages › Compte Apple › Abonnements, au moins 24 heures avant la fin. Les prix varient selon la région et sont affichés avant l’achat.
+Un déverrouillage à vie en un seul paiement est également disponible.
 Politique de confidentialité: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
 Conditions d’utilisation (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

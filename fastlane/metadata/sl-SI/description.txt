@@ -11,7 +11,7 @@ Plačana nadgradnja odklene neomejeno sledenje in več načinov za spremljanje n
 
 Tvoji podatki Zdravja so samo za branje, izračuni pa potekajo na tvoji napravi. Aplikacija ne zapisuje aktivnosti v Zdravje in ne zagotavlja dolžine nobenega niza. Je orodje za zavedanje o kondiciji, ne zdravniški nasvet.
 
-Mesečni paket stane US$6.99, letni pa US$29.99. Oba se samodejno podaljšujeta in ob upravičenosti vključujeta 7-dnevni brezplačni preizkus. Apple ob potrditvi nakupa ali po upravičenem preizkusu bremeni tvoj račun Apple. Če nisi upravičen, se bremenitev izvede ob potrditvi. Strošek podaljšanja se zaračuna v 24 urah pred koncem trenutnega obdobja. Upravljaj ali prekliči v Nastavitve › Račun Apple › Naročnine vsaj 24 ur pred koncem. Cene se razlikujejo glede na regijo in so prikazane pred nakupom.
-Na voljo je tudi enkratno doživljenjsko odklepanje. (US$69.99)
+Oba se samodejno podaljšujeta in ob upravičenosti vključujeta 7-dnevni brezplačni preizkus. Apple ob potrditvi nakupa ali po upravičenem preizkusu bremeni tvoj račun Apple. Če nisi upravičen, se bremenitev izvede ob potrditvi. Strošek podaljšanja se zaračuna v 24 urah pred koncem trenutnega obdobja. Upravljaj ali prekliči v Nastavitve › Račun Apple › Naročnine vsaj 24 ur pred koncem. Cene se razlikujejo glede na regijo in so prikazane pred nakupom.
+Na voljo je tudi enkratno doživljenjsko odklepanje.
 Pravilnik o zasebnosti: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
 Pogoji uporabe (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
