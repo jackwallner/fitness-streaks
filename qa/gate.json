@@ -1,0 +1,17 @@
+{
+  "project": "FitnessStreaks.xcodeproj",
+  "scheme": "FitnessStreaksUITests",
+  "uitests_dir": "FitnessStreaksUITests",
+  "journeys": [
+    "FitnessStreaksUITests/ReleaseJourneysUITests"
+  ],
+  "personas": [
+    "newcomer",
+    "accessibility",
+    "reduce-motion",
+    "german"
+  ],
+  "persona_overrides": {},
+  "slot": null,
+  "bundle_id": "com.jackwallner.streaks"
+}
