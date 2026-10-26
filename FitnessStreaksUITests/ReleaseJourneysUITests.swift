@@ -39,7 +39,10 @@ final class ReleaseJourneysUITests: XCTestCase {
 
     func test03StreaksPlusPaywallShownAndClosed() {
         continueAfterFailure = false
-        let app = launch(Self.seeded + ["-UITestSetFree"])
+        // The Test Store, a separate RevenueCat app, supplies the prices; the
+        // production key never runs on a simulator. Its customer never buys.
+        let app = launch(Self.seeded + ["-UITestSetFree", "-rcfunnelprobe"],
+                         environment: ["RC_PROBE_USER": "qa-streaks-journeys"])
         // The auto-save banner is the free user's way in; the screenshot brand
         // hides Settings' Streaks+ section.
         let unlock = app.buttons.matching(NSPredicate(
@@ -73,9 +76,9 @@ final class ReleaseJourneysUITests: XCTestCase {
         QA.checkpoint(app, "streaks-after-relaunch")
     }
 
-    private func launch(_ arguments: [String]) -> XCUIApplication {
+    private func launch(_ arguments: [String], environment: [String: String] = [:]) -> XCUIApplication {
         let app = XCUIApplication(bundleIdentifier: Self.bundle)
-        QA.launch(app, arguments: arguments)
+        QA.launch(app, environment: environment, arguments: arguments)
         XCTAssertTrue(app.buttons["Open settings"].waitForExistence(timeout: 25), "Streaks never rendered")
         return app
     }
