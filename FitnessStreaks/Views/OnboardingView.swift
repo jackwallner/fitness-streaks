@@ -253,12 +253,9 @@ struct OnboardingView: View {
                     .foregroundStyle(Theme.retroMagenta)
                     .retroGlow(Theme.retroMagenta)
                     .opacity(flameVisible ? 1 : 0.25)
+                    .animation(.linear(duration: 0.6).repeatForever(autoreverses: true), value: flameVisible)
                     .padding(.top, 30)
-                    .onAppear {
-                        withAnimation(.linear(duration: 0.6).repeatForever(autoreverses: true)) {
-                            flameVisible = false
-                        }
-                    }
+                    .onAppear { flameVisible = false }
 
                 VStack(spacing: 10) {
                     Text("STREAK\nFINDER")

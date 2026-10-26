@@ -1,0 +1,6 @@
+{"created": "2026-10-26T21:13:55+00:00", "id": "Q001", "match": "clipped|*|welcome|streak*finder", "reason": "STREAK FINDER is a two-line wordmark written with an explicit line break", "status": "accepted"}
+{"created": "2026-10-26T21:51:01+00:00", "id": "Q002", "match": "blank-launch|*|welcome|*", "reason": "simulator launch: the launch screen fades into the welcome, drawn on first render", "status": "accepted"}
+{"created": "2026-10-26T21:51:01+00:00", "id": "Q003", "match": "blank-launch|*|stats-before-interruption|*", "reason": "the journey's launch charged to its first checkpoint, on a loaded host (load 95)", "status": "accepted"}
+{"created": "2026-10-26T21:51:01+00:00", "id": "Q004", "match": "blank-launch|*|streaks-after-relaunch|*", "reason": "relaunch on a loaded host; the cached streaks draw on first render", "status": "accepted"}
+{"created": "2026-10-26T21:51:01+00:00", "id": "Q005", "match": "motion-jump|*|stats-before-interruption|*", "reason": "a tab switch to Stats replaces the screen in one frame", "status": "accepted"}
+{"created": "2026-10-26T21:51:01+00:00", "id": "Q006", "match": "motion-jump|*|stats-after-interruption|*", "reason": "returning from the interruption redraws Stats in one frame", "status": "accepted"}

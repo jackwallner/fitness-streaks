@@ -39,11 +39,13 @@ final class ReleaseJourneysUITests: XCTestCase {
 
     func test03StreaksPlusPaywallShownAndClosed() {
         continueAfterFailure = false
-        let app = launch(Self.seeded)
-        app.buttons["Open settings"].tap()
-        let unlock = app.buttons.containing(NSPredicate(format: "label CONTAINS[c] %@", "Unlock Streaks+")).firstMatch
-        XCTAssertTrue(unlock.waitForExistence(timeout: 15), "Streaks+ row missing for a free user")
-        QA.checkpoint(app, "settings")
+        let app = launch(Self.seeded + ["-UITestSetFree"])
+        // The auto-save banner is the free user's way in; the screenshot brand
+        // hides Settings' Streaks+ section.
+        let unlock = app.buttons.matching(NSPredicate(
+            format: "label BEGINSWITH[c] %@ OR label BEGINSWITH[c] %@", "UNLOCK STREAKS+", "TRY STREAKS+ FREE")).firstMatch
+        XCTAssertTrue(unlock.waitForExistence(timeout: 15), "Streaks+ banner missing for a free user")
+        QA.checkpoint(app, "streaks-free")
 
         for _ in 0..<4 where !unlock.isHittable { app.swipeUp() }
         unlock.tap()
@@ -54,7 +56,7 @@ final class ReleaseJourneysUITests: XCTestCase {
         XCTAssertTrue(close.waitForExistence(timeout: 10))
         close.tap()
         XCTAssertTrue(unlock.waitForExistence(timeout: 15), "paywall never closed")
-        QA.checkpoint(app, "settings-after-paywall", paywall: false)
+        QA.checkpoint(app, "streaks-after-paywall", paywall: false)
     }
 
     func test04ReturnVisitWithInterruption() {

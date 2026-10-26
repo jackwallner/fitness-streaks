@@ -207,6 +207,10 @@ struct FitnessStreaksApp: App {
                     #if DEBUG
                     if CommandLine.arguments.contains("-UITestSetPro") {
                         storeKit.debugSetPro(true)
+                    } else if CommandLine.arguments.contains("-UITestSetFree") {
+                        // The Pro flag lives in the App Group, which outlives
+                        // a reinstall on the simulator.
+                        storeKit.debugSetPro(false)
                     } else {
                         await storeKit.refreshState()
                     }

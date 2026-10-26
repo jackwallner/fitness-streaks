@@ -267,10 +267,7 @@ struct BlinkingText: View {
             .tracking(tracking)
             .foregroundStyle(color)
             .opacity(visible ? 1 : 0)
-            .onAppear {
-                withAnimation(.linear(duration: 0.6).repeatForever(autoreverses: true)) {
-                    visible = false
-                }
-            }
+            .animation(.linear(duration: 0.6).repeatForever(autoreverses: true), value: visible)
+            .onAppear { visible = false }
     }
 }
