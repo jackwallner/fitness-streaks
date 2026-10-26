@@ -18,7 +18,7 @@ final class ReleaseJourneysUITests: XCTestCase {
         continueAfterFailure = false
         let app = XCUIApplication(bundleIdentifier: Self.bundle)
         QA.launch(app)
-        XCTAssertTrue(app.buttons["DISCOVER YOUR STREAKS"].waitForExistence(timeout: 20), "welcome never rendered")
+        XCTAssertTrue(app.staticTexts["DISCOVER YOUR STREAKS"].waitForExistence(timeout: 20), "welcome never rendered")
         QA.checkpoint(app, "welcome")
     }
 
@@ -41,11 +41,11 @@ final class ReleaseJourneysUITests: XCTestCase {
         continueAfterFailure = false
         let app = launch(Self.seeded)
         app.buttons["Open settings"].tap()
-        let unlock = app.buttons.containing(NSPredicate(format: "label CONTAINS %@", "UNLOCK STREAKS+")).firstMatch
+        let unlock = app.buttons.containing(NSPredicate(format: "label CONTAINS[c] %@", "Unlock Streaks+")).firstMatch
         XCTAssertTrue(unlock.waitForExistence(timeout: 15), "Streaks+ row missing for a free user")
         QA.checkpoint(app, "settings")
 
-        if !unlock.isHittable { app.swipeUp() }
+        for _ in 0..<4 where !unlock.isHittable { app.swipeUp() }
         unlock.tap()
         XCTAssertTrue(app.staticTexts["DON'T BREAK THE STREAK."].waitForExistence(timeout: 20), "paywall never rendered")
         QA.checkpoint(app, "streaks-plus-paywall", paywall: true)

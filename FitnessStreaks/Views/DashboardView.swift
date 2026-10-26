@@ -518,8 +518,8 @@ struct DashboardView: View {
                     Text(graceStatusDetail(for: hero))
                         .font(RetroFont.mono(10))
                         .foregroundStyle(Theme.retroInkDim)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.75)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer()
                 if !streaksPlusActivating {
