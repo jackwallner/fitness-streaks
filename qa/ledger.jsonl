@@ -4,3 +4,4 @@
 {"created": "2026-10-26T21:51:01+00:00", "id": "Q004", "match": "blank-launch|*|streaks-after-relaunch|*", "reason": "relaunch on a loaded host; the cached streaks draw on first render", "status": "accepted"}
 {"created": "2026-10-26T21:51:01+00:00", "id": "Q005", "match": "motion-jump|*|stats-before-interruption|*", "reason": "a tab switch to Stats replaces the screen in one frame", "status": "accepted"}
 {"created": "2026-10-26T21:51:01+00:00", "id": "Q006", "match": "motion-jump|*|stats-after-interruption|*", "reason": "returning from the interruption redraws Stats in one frame", "status": "accepted"}
+{"created": "2026-10-26T22:28:09+00:00", "id": "Q007", "match": "blank-launch|*|streaks|*", "reason": "simulator launch: the launch screen fades into the cached streaks, drawn on first render", "status": "accepted"}
