@@ -223,9 +223,14 @@ struct FitnessStreaksApp: App {
                     // We check for actual data rather than authorization status because
                     // authorizationStatus(for:) always returns .notDetermined for read-only
                     // types, making status-based checks unreliable on cold launch.
+                    #if DEBUG
+                    let skipsHealthKitCheck = CommandLine.arguments.contains("-UITestSkipHealthKit")
+                    #else
+                    let skipsHealthKitCheck = false
+                    #endif
                     if settings.hasCompletedSetup,
                        !FitnessBrand.isScreenshotMode,
-                       !CommandLine.arguments.contains("-UITestSkipHealthKit") {
+                       !skipsHealthKitCheck {
                         let cached = HealthKitService.shared.cachedHistory(days: 30)
                         if cached.isEmpty {
                             log.warning("Resetting onboarding — hasCompletedSetup=true but HealthKit cache is empty (never authorized)")

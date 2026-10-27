@@ -36,9 +36,13 @@ enum ReviewPromptTracker {
     static let cooldownDays = 30
 
     static var skipsAutomation: Bool {
-        ProcessInfo.processInfo.arguments.contains(where: {
+        #if DEBUG
+        return ProcessInfo.processInfo.arguments.contains(where: {
             $0.hasPrefix("-UITest") || $0 == "-FASTLANE_SNAPSHOT"
         })
+        #else
+        return false
+        #endif
     }
 
     // MARK: - State
