@@ -55,3 +55,7 @@ Weekly totals: summed per ISO week starting Monday (see `DateHelpers.startOfWeek
 ---
 Shared iOS conventions (build, simulator, release/TestFlight, ASC key, signing, HealthKit/widget gotchas):
 the global agent rules + the `ios-dev` skill.
+
+## Rules index
+
+- [Android port](.claude/rules/android.md): build, Health Connect, billing, parity and Pro emulator workflow.

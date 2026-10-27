@@ -1,0 +1,324 @@
+{
+  "metrics" : [
+    {
+      "key" : "steps",
+      "name" : "Steps",
+      "thresholds" : [
+        3000,
+        5000,
+        7500,
+        10000,
+        12500,
+        15000
+      ],
+      "unit" : "steps",
+      "weight" : 1.2
+    },
+    {
+      "key" : "exerciseMinutes",
+      "name" : "Exercise",
+      "thresholds" : [
+        10,
+        20,
+        30,
+        45,
+        60
+      ],
+      "unit" : "min",
+      "weight" : 1.3
+    },
+    {
+      "key" : "standHours",
+      "name" : "Stand",
+      "thresholds" : [
+        6,
+        8,
+        10,
+        12
+      ],
+      "unit" : "hr",
+      "weight" : 0.90000000000000002
+    },
+    {
+      "key" : "activeEnergy",
+      "name" : "Active energy",
+      "thresholds" : [
+        200,
+        300,
+        400,
+        500,
+        700,
+        1000
+      ],
+      "unit" : "kcal",
+      "weight" : 1.1000000000000001
+    },
+    {
+      "key" : "workouts",
+      "name" : "Workouts",
+      "thresholds" : [
+        1
+      ],
+      "unit" : "workout",
+      "weight" : 1.25
+    },
+    {
+      "key" : "mindfulMinutes",
+      "name" : "Mindfulness",
+      "thresholds" : [
+        1,
+        5,
+        10
+      ],
+      "unit" : "min mindful",
+      "weight" : 0.84999999999999998
+    },
+    {
+      "key" : "sleepHours",
+      "name" : "Sleep",
+      "thresholds" : [
+        6,
+        7,
+        8
+      ],
+      "unit" : "hr sleep",
+      "weight" : 0.90000000000000002
+    },
+    {
+      "key" : "distanceMiles",
+      "name" : "Distance",
+      "thresholds" : [
+        1,
+        3,
+        5,
+        8
+      ],
+      "unit" : "mi",
+      "weight" : 1
+    },
+    {
+      "key" : "flightsClimbed",
+      "name" : "Flights climbed",
+      "thresholds" : [
+        5,
+        10,
+        20
+      ],
+      "unit" : "flights",
+      "weight" : 0.84999999999999998
+    },
+    {
+      "key" : "earlySteps",
+      "name" : "Early Steps",
+      "thresholds" : [
+        500,
+        1000,
+        2000,
+        3000,
+        5000
+      ],
+      "unit" : "early steps",
+      "weight" : 1
+    },
+    {
+      "key" : "intensityRatio",
+      "name" : "Intensity",
+      "thresholds" : [
+        5,
+        8,
+        10,
+        12,
+        15,
+        20
+      ],
+      "unit" : "kcal\/min",
+      "weight" : 1.1000000000000001
+    },
+    {
+      "key" : "heartRateMinutes",
+      "name" : "Cardio Minutes",
+      "thresholds" : [
+        3,
+        5,
+        10,
+        15,
+        20,
+        30
+      ],
+      "unit" : "min cardio",
+      "weight" : 1.1499999999999999
+    }
+  ],
+  "workouts" : [
+    {
+      "distance" : true,
+      "key" : "running",
+      "name" : "Running"
+    },
+    {
+      "distance" : true,
+      "key" : "walking",
+      "name" : "Walking"
+    },
+    {
+      "distance" : true,
+      "key" : "hiking",
+      "name" : "Hiking"
+    },
+    {
+      "distance" : true,
+      "key" : "cycling",
+      "name" : "Cycling"
+    },
+    {
+      "distance" : true,
+      "key" : "swimming",
+      "name" : "Swimming"
+    },
+    {
+      "distance" : true,
+      "key" : "rowing",
+      "name" : "Rowing"
+    },
+    {
+      "distance" : false,
+      "key" : "elliptical",
+      "name" : "Elliptical"
+    },
+    {
+      "distance" : false,
+      "key" : "stairClimbing",
+      "name" : "Stair Climbing"
+    },
+    {
+      "distance" : false,
+      "key" : "yoga",
+      "name" : "Yoga"
+    },
+    {
+      "distance" : false,
+      "key" : "pilates",
+      "name" : "Pilates"
+    },
+    {
+      "distance" : false,
+      "key" : "coreTraining",
+      "name" : "Core Training"
+    },
+    {
+      "distance" : false,
+      "key" : "functionalStrength",
+      "name" : "Functional Strength"
+    },
+    {
+      "distance" : false,
+      "key" : "traditionalStrength",
+      "name" : "Strength Training"
+    },
+    {
+      "distance" : false,
+      "key" : "hiit",
+      "name" : "HIIT"
+    },
+    {
+      "distance" : false,
+      "key" : "mixedCardio",
+      "name" : "Mixed Cardio"
+    },
+    {
+      "distance" : false,
+      "key" : "cardioDance",
+      "name" : "Dance"
+    },
+    {
+      "distance" : false,
+      "key" : "boxing",
+      "name" : "Boxing"
+    },
+    {
+      "distance" : false,
+      "key" : "kickboxing",
+      "name" : "Kickboxing"
+    },
+    {
+      "distance" : false,
+      "key" : "martialArts",
+      "name" : "Martial Arts"
+    },
+    {
+      "distance" : false,
+      "key" : "climbing",
+      "name" : "Climbing"
+    },
+    {
+      "distance" : false,
+      "key" : "tennis",
+      "name" : "Tennis"
+    },
+    {
+      "distance" : false,
+      "key" : "basketball",
+      "name" : "Basketball"
+    },
+    {
+      "distance" : false,
+      "key" : "soccer",
+      "name" : "Soccer"
+    },
+    {
+      "distance" : true,
+      "key" : "golf",
+      "name" : "Golf"
+    },
+    {
+      "distance" : true,
+      "key" : "skating",
+      "name" : "Skating"
+    },
+    {
+      "distance" : true,
+      "key" : "downhillSkiing",
+      "name" : "Skiing"
+    },
+    {
+      "distance" : true,
+      "key" : "snowboarding",
+      "name" : "Snowboarding"
+    },
+    {
+      "distance" : false,
+      "key" : "surfing",
+      "name" : "Surfing"
+    },
+    {
+      "distance" : true,
+      "key" : "paddleSports",
+      "name" : "Paddle Sports"
+    },
+    {
+      "distance" : false,
+      "key" : "jumpRope",
+      "name" : "Jump Rope"
+    },
+    {
+      "distance" : false,
+      "key" : "mindAndBody",
+      "name" : "Mind & Body"
+    },
+    {
+      "distance" : false,
+      "key" : "pickleball",
+      "name" : "Pickleball"
+    },
+    {
+      "distance" : false,
+      "key" : "barre",
+      "name" : "Barre"
+    },
+    {
+      "distance" : false,
+      "key" : "taiChi",
+      "name" : "Tai Chi"
+    }
+  ]
+}
