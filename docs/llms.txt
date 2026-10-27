@@ -1,0 +1,20 @@
+# Fitness Habit Tracker: Auto
+
+> Fitness Habit Tracker is a fitness streak app for iPhone and Apple Watch that finds your workout, step and sleep streaks in Apple Health automatically. Private.
+
+## App
+
+- [Fitness Streak App for iPhone | Fitness Habit Tracker: Auto](https://jackwallner.com/ios/fitness-streaks/index.html.md): Fitness Habit Tracker is a fitness streak app for iPhone and Apple Watch that finds your workout, step and sleep streaks in Apple Health automatically. Private.
+
+## Guides
+
+- [Apple Watch Streak Broken? How to Keep a Workout Streak](https://jackwallner.com/ios/fitness-streaks/apple-watch-streak-broken.html.md): What Apple documents about protecting an Apple Watch award streak (Pause Rings, up to 90 days), what a missed day really costs, and how to keep a streak.
+- [Streaks App Alternatives: 5 Habit Trackers Compared](https://jackwallner.com/ios/fitness-streaks/streaks-app-alternative.html.md): Looking for a Streaks app alternative? Five iPhone habit trackers compared: Streaks, HabitKit, Habitify, Gentler Streak and Fitness Habit Tracker: Auto.
+
+## Optional
+
+- [Streak Finder Android Privacy Policy](https://jackwallner.github.io/fitness-streaks/android/privacy-policy.html.md)
+- [Streak Finder Android Terms of Use](https://jackwallner.github.io/fitness-streaks/android/terms.html.md)
+- [Streak Finder Privacy Policy](https://jackwallner.com/ios/fitness-streaks/privacy-policy.html.md): Streak Finder reads Apple Health activity only after you grant permission. It does not require an account and does not send HealthKit data to a server.
+- [Streak Finder - Support](https://jackwallner.com/ios/fitness-streaks/support.html.md): Streak Finder app support - get help with your fitness streak tracker for iPhone and Apple Watch.
+- [Streak Finder Terms of Use](https://jackwallner.com/ios/fitness-streaks/terms.html.md): By using Streak Finder, you agree to these Terms of Use and Apple's Standard Licensed Application End User License Agreement.
