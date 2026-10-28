@@ -6,7 +6,7 @@ Web page: https://jackwallner.com/ios/fitness-streaks/apple-watch-streak-broken.
 
 ## Apple Watch Streak Broken? How to Keep a Workout Streak Going
 
-By Jack Wallner. Last updated October 25, 2026.
+By Jack Wallner. Last updated October 28, 2026.
 
 Apple documents one way to protect an Apple Watch award streak: Pause Rings, for a day up to 90 days, without breaking the streak. If a streak already broke, one miss does not undo the habit: habit research found that missing a single opportunity did not materially affect habit formation. To keep a workout streak, set a floor you can hit on your worst day, use weekly streaks if daily ones keep failing, and tie the activity to a fixed time and place.
 

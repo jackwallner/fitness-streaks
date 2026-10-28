@@ -36,7 +36,7 @@
     "@graph": [
         {
             "@type": "MobileApplication",
-            "dateModified": "2026-10-27",
+            "dateModified": "2026-10-28",
             "@id": "https://jackwallner.com/ios/fitness-streaks/#app",
             "name": "Fitness Habit Tracker: Auto",
             "alternateName": "Fitness Streaks",
@@ -219,7 +219,7 @@ nav .container{display:flex;align-items:center;justify-content:space-between}
 .cta h2{font-size:32px;font-weight:700;letter-spacing:-.5px;margin-bottom:6px}
 .cta p{font-size:15px;color:#6e6e73;margin-bottom:28px}
 footer{text-align:center;padding:20px 24px;font-size:12px;color:#6e6e73}
-footer a{color:#6e6e73;text-decoration:none;margin:0 10px}
+footer a{ display: inline-block; padding: 6px 0;color:#6e6e73;text-decoration:none;margin:0 10px}
 footer a:hover{color:#1d1d1f}
 footer .divider{margin:4px 0}
 @media(max-width:768px){.hero{padding:72px 20px 48px}.hero h1{font-size:36px;letter-spacing:-1px}.hero .tagline{font-size:17px}.showcase-card img{height:400px}.features-grid{grid-template-columns:1fr}.features-header h2{font-size:28px}.privacy h2,.cta h2{font-size:26px}}
@@ -238,8 +238,8 @@ footer .divider{margin:4px 0}
 
 <nav>
 <div class="container">
-<a class="nav-brand" href="./">
-<img src="icon_256.png" alt="Fitness Habit Tracker: Auto">
+<a class="nav-brand" href="./" aria-label="Fitness Habit Tracker: Auto">
+<img src="icon_64.webp" alt="" width="32" height="32">
 <span>Fitness Habit Tracker: Auto</span>
 </a>
 <a class="nav-link" href="https://apps.apple.com/us/app/fitness-habit-tracker-auto/id6762699692?pt=128748779&amp;ct=jw-fitness-streaks-home&amp;mt=8">Download</a>
@@ -256,19 +256,19 @@ footer .divider{margin:4px 0}
 <section class="showcase">
 <div class="showcase-scroll">
 <div class="showcase-card">
-<img src="screenshot-1.webp" alt="Your streaks, found. Hero streak and daily steps on the home screen" loading="lazy" decoding="async" width="720" height="1561">
+<img src="screenshot-1.webp" srcset="screenshot-1-360.webp 360w, screenshot-1-540.webp 540w, screenshot-1.webp 720w" sizes="(max-width: 480px) 166px, (max-width: 768px) 184px, 249px" alt="Your streaks, found. Hero streak and daily steps on the home screen" loading="lazy" decoding="async" width="720" height="1561">
 </div>
 <div class="showcase-card">
-<img src="screenshot-2.webp" alt="See every day. Calendar heatmap of hits and misses for a streak" loading="lazy" decoding="async" width="720" height="1561">
+<img src="screenshot-2.webp" srcset="screenshot-2-360.webp 360w, screenshot-2-540.webp 540w, screenshot-2.webp 720w" sizes="(max-width: 480px) 166px, (max-width: 768px) 184px, 249px" alt="See every day. Calendar heatmap of hits and misses for a streak" loading="lazy" decoding="async" width="720" height="1561">
 </div>
 <div class="showcase-card">
-<img src="screenshot-3.webp" alt="Dark mode. The home screen at night" loading="lazy" decoding="async" width="720" height="1561">
+<img src="screenshot-3.webp" srcset="screenshot-3-360.webp 360w, screenshot-3-540.webp 540w, screenshot-3.webp 720w" sizes="(max-width: 480px) 166px, (max-width: 768px) 184px, 249px" alt="Dark mode. The home screen at night" loading="lazy" decoding="async" width="720" height="1561">
 </div>
 <div class="showcase-card">
-<img src="screenshot-4.webp" alt="Tune your thresholds. Settings to adjust streak difficulty" loading="lazy" decoding="async" width="720" height="1561">
+<img src="screenshot-4.webp" srcset="screenshot-4-360.webp 360w, screenshot-4-540.webp 540w, screenshot-4.webp 720w" sizes="(max-width: 480px) 166px, (max-width: 768px) 184px, 249px" alt="Tune your thresholds. Settings to adjust streak difficulty" loading="lazy" decoding="async" width="720" height="1561">
 </div>
 <div class="showcase-card">
-<img src="screenshot-5.webp" alt="Reminders, your way. 7pm at-risk nudge and metric configuration" loading="lazy" decoding="async" width="720" height="1561">
+<img src="screenshot-5.webp" srcset="screenshot-5-360.webp 360w, screenshot-5-540.webp 540w, screenshot-5.webp 720w" sizes="(max-width: 480px) 166px, (max-width: 768px) 184px, 249px" alt="Reminders, your way. 7pm at-risk nudge and metric configuration" loading="lazy" decoding="async" width="720" height="1561">
 </div>
 </div>
 </section>
@@ -395,7 +395,7 @@ footer .divider{margin:4px 0}
 </section>
 
 <footer>
-<div class="divider">&copy; 2026 Jack Wallner · Last updated <time datetime="2026-10-27" data-updated>October 27, 2026</time></div>
+<div class="divider">&copy; 2026 Jack Wallner · Last updated <time datetime="2026-10-28" data-updated>October 28, 2026</time></div>
 <div>
 <a href="apple-watch-streak-broken.html">Apple Watch streak broken?</a>
 <a href="streaks-app-alternative.html">Streaks app alternatives</a>

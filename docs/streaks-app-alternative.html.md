@@ -6,7 +6,7 @@ Web page: https://jackwallner.com/ios/fitness-streaks/streaks-app-alternative.ht
 
 ## Streaks App Alternatives for iPhone and Apple Watch
 
-By Jack Wallner · Last updated October 25, 2026
+By Jack Wallner · Last updated October 28, 2026
 
 **Best if you like the to-do style of Streaks and want Health-linked tasks:** Streaks itself, a paid download with no subscription. **Best free option with a simple grid:** HabitKit. **Best for logging habits from Apple Health, Strava and Screen Time:** Habitify, with that integration in its Pro tier. **Best for a workout streak that allows rest days:** Gentler Streak. **Best for streaks found in your existing Health history with no check-ins:** Fitness Habit Tracker: Auto, the app I make.
 
