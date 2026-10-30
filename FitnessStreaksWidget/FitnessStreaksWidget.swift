@@ -116,7 +116,7 @@ struct StreakWidgetView: View {
                             Text(hero.compactCurrentUnitValueLabel)
                                 .font(.system(size: 18, weight: .bold, design: .rounded))
                                 .minimumScaleFactor(0.5)
-                            Text("/\(hero.compactGoalValueLabel)")
+                            Text(verbatim: "/\(hero.compactGoalValueLabel)")
                                 .font(.system(size: 8, weight: .bold, design: .rounded))
                                 .minimumScaleFactor(0.6)
                         }
@@ -148,7 +148,7 @@ struct StreakWidgetView: View {
                         .font(.system(size: 22, weight: .bold, design: .rounded))
                         .monospacedDigit()
                         .minimumScaleFactor(0.55)
-                    Text("/ \(hero.goalValueLabel) \(hero.unitLabel)")
+                    Text(verbatim: "/ \(hero.goalValueLabel) \(hero.unitLabel)")
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
@@ -342,7 +342,7 @@ struct StreakWidgetView: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
                 Spacer(minLength: 2)
-                Text("\(item.compactCurrentUnitValueLabel)/\(item.compactGoalValueLabel)")
+                Text(verbatim: "\(item.compactCurrentUnitValueLabel)/\(item.compactGoalValueLabel)")
                     .font(.system(size: 10, weight: .heavy, design: .rounded))
                     .foregroundStyle(valueColor)
                     .monospacedDigit()
@@ -391,10 +391,7 @@ struct StreakWidgetView: View {
     }
 
     private func streakLengthLabel(_ item: StreakSnapshot.Item) -> String {
-        if item.cadence == "daily" {
-            return item.current == 1 ? "1 day" : "\(item.current) days"
-        }
-        return item.current == 1 ? "1 week" : "\(item.current) weeks"
+        item.streakCadence.count(item.current)
     }
 }
 

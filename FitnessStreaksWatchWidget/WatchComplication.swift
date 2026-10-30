@@ -96,7 +96,7 @@ struct WatchComplicationView: View {
                         Text(hero.compactCurrentUnitValueLabel)
                             .font(.system(size: 18, weight: .bold, design: .rounded))
                             .minimumScaleFactor(0.5)
-                        Text("/\(hero.compactGoalValueLabel)")
+                        Text(verbatim: "/\(hero.compactGoalValueLabel)")
                             .font(.system(size: 8, weight: .bold, design: .rounded))
                             .minimumScaleFactor(0.6)
                     }
@@ -123,7 +123,7 @@ struct WatchComplicationView: View {
                         .font(.system(size: 22, weight: .bold, design: .rounded))
                         .monospacedDigit()
                         .minimumScaleFactor(0.55)
-                    Text("/ \(hero.goalValueLabel) \(hero.unitLabel)")
+                    Text(verbatim: "/ \(hero.goalValueLabel) \(hero.unitLabel)")
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
@@ -149,7 +149,7 @@ struct WatchComplicationView: View {
                     .minimumScaleFactor(0.45)
                     .widgetCurvesContent()
                     .widgetLabel {
-                        Label("\(hero.displayName) / \(hero.compactGoalValueLabel)", systemImage: hero.displaySymbol)
+                        Label { Text(verbatim: "\(hero.displayName) / \(hero.compactGoalValueLabel)") } icon: { Image(systemName: hero.displaySymbol) }
                     }
             } else {
                 Image(systemName: "flame").widgetLabel("Open app to sync")
@@ -168,7 +168,8 @@ struct WatchComplicationView: View {
 
     private func rectangularProgressLabel(_ item: StreakSnapshot.Item) -> String {
         if item.currentUnitCompleted {
-            return "\(item.progressValueLabel) done"
+            let progress = item.progressValueLabel
+            return String(localized: "\(progress) done")
         }
         return item.progressValueLabel
     }

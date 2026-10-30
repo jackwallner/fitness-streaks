@@ -77,7 +77,8 @@ struct StreakDetailView: View {
             if !isLoading, isRecalibrating {
                 isRecalibrating = false
                 let refreshed = store.streaks.first { $0.trackingKey == initialStreak.trackingKey } ?? initialStreak
-                actionMessage = "Recalibration complete. New goal: \(refreshed.thresholdLabel)."
+                let goal = refreshed.thresholdLabel
+                actionMessage = String(localized: "Recalibration complete. New goal: \(goal).")
             }
         }
         .background(Theme.retroBg.ignoresSafeArea())
@@ -115,7 +116,7 @@ struct StreakDetailView: View {
     @ViewBuilder
     private var historySectionHeader: some View {
         if storeKit.isPro {
-            PixelSectionHeader(title: "HISTORY")
+            PixelSectionHeader(title: String(localized: "HISTORY"))
         } else {
             Button {
                 showingPaywall = true
@@ -249,7 +250,7 @@ struct StreakDetailView: View {
                         .tracking(1)
                         .foregroundStyle(Theme.retroInkDim)
                     Spacer(minLength: 0)
-                    Text(streak.currentUnitCompleted ? "DONE" : "\(Int(min(1, streak.currentUnitProgress) * 100))%")
+                    Text(streak.currentUnitCompleted ? String(localized: "DONE") : min(1, streak.currentUnitProgress).formatted(.percent.precision(.fractionLength(0))))
                         .font(RetroFont.mono(10, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(streak.currentUnitCompleted ? Theme.retroLime : Theme.retroAmber)
@@ -259,8 +260,8 @@ struct StreakDetailView: View {
             }
 
             HStack(spacing: 8) {
-                statPill(value: "\(streak.current)", label: streak.current == 1 ? "\(streak.cadence.label) streak" : "\(streak.cadence.pluralLabel) streak", color: streak.metric.accent)
-                statPill(value: "\(streak.best)", label: streak.best == 1 ? "best \(streak.cadence.label)" : "best \(streak.cadence.pluralLabel)", color: Theme.retroAmber)
+                statPill(value: "\(streak.current)", label: streak.cadence.streakWord(streak.current), color: streak.metric.accent)
+                statPill(value: "\(streak.best)", label: streak.cadence.bestWord(streak.best), color: Theme.retroAmber)
             }
 
             if let lastMissed = streak.lastMissedDate {
@@ -281,7 +282,7 @@ struct StreakDetailView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .pixelPanel(color: streak.metric.accent)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(streak.metric.displayName) streak: \(streak.current) \(streak.cadence.pluralLabel) in a row, threshold \(Int(streak.threshold)) \(streak.metric.unitLabel)")
+        .accessibilityLabel("\(streak.displayName) streak: \(streak.cadence.count(streak.current)) in a row, threshold \(streak.thresholdLabel)")
     }
 
     private func statPill(value: String, label: String, color: Color) -> some View {
@@ -311,8 +312,9 @@ struct StreakDetailView: View {
 
     private var headerProse: String {
         if let w = streak.window {
-            let t = streak.metric.format(value: streak.threshold)
-            return "\(t)+ \(streak.metric.unitLabel) every day between \(w.label)"
+            let amount = StreakMetric.valueLabel(streak.metric, streak.metric.format(value: streak.threshold) + "+")
+            let hours = w.label
+            return String(localized: "\(amount) every day between \(hours)")
         }
         return streak.prose
     }
@@ -369,7 +371,9 @@ struct StreakDetailView: View {
         .padding(14)
         .pixelPanel(color: Theme.retroAmber)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Today's progress: \(Int(min(1, streak.currentUnitProgress) * 100)) percent. \(streak.currentUnitCompleted ? "Goal complete." : "Goal not yet complete.")")
+        .accessibilityLabel(streak.currentUnitCompleted
+            ? String(localized: "Today's progress: \(Int(min(1, streak.currentUnitProgress) * 100)) percent. Goal complete.")
+            : String(localized: "Today's progress: \(Int(min(1, streak.currentUnitProgress) * 100)) percent. Goal not yet complete."))
     }
 
     private func statusCard(_ text: String) -> some View {
@@ -401,7 +405,7 @@ struct StreakDetailView: View {
                 Button {
                     showingRecalibrateConfirm = true
                 } label: {
-                    Text("RECALIBRATE")
+                    Text(String(localized: "RECALIBRATE"))
                         .font(RetroFont.mono(10, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(Theme.retroCyan)
@@ -415,7 +419,7 @@ struct StreakDetailView: View {
                     Button("Recalibrate (Apple Health)", role: .destructive) {
                         settings.clearCommittedThreshold(for: streak.trackingKey)
                         isRecalibrating = true
-                        actionMessage = "Recalibrating from Apple Health..."
+                        actionMessage = String(localized: "Recalibrating from Apple Health...")
                         Task { await store.load() }
                     }
                     Button("Cancel", role: .cancel) {}
@@ -438,34 +442,34 @@ struct StreakDetailView: View {
             ViewThatFits(in: .horizontal) {
                 HStack(spacing: 8) {
                     if !isHero {
-                        compactActionButton(title: "PIN TO TOP", color: Theme.retroInk) {
+                        compactActionButton(title: String(localized: "PIN TO TOP"), color: Theme.retroInk) {
                             makePrimary()
                         }
                         .accessibilityLabel("Make this the primary streak on the dashboard")
                     }
                     if canRecalibrate {
-                        compactActionButton(title: "RECALIBRATE", color: Theme.retroCyan) {
+                        compactActionButton(title: String(localized: "RECALIBRATE"), color: Theme.retroCyan) {
                             showingRecalibrateConfirm = true
                         }
                     }
-                    compactActionButton(title: "UNTRACK", color: Theme.retroRed) {
+                    compactActionButton(title: String(localized: "UNTRACK"), color: Theme.retroRed) {
                         showingUntrackConfirm = true
                     }
                 }
 
                 VStack(spacing: 8) {
                     if !isHero {
-                        compactActionButton(title: "PIN TO TOP", color: Theme.retroInk) {
+                        compactActionButton(title: String(localized: "PIN TO TOP"), color: Theme.retroInk) {
                             makePrimary()
                         }
                         .accessibilityLabel("Make this the primary streak on the dashboard")
                     }
                     if canRecalibrate {
-                        compactActionButton(title: "RECALIBRATE", color: Theme.retroCyan) {
+                        compactActionButton(title: String(localized: "RECALIBRATE"), color: Theme.retroCyan) {
                             showingRecalibrateConfirm = true
                         }
                     }
-                    compactActionButton(title: "UNTRACK", color: Theme.retroRed) {
+                    compactActionButton(title: String(localized: "UNTRACK"), color: Theme.retroRed) {
                         showingUntrackConfirm = true
                     }
                 }
@@ -474,7 +478,7 @@ struct StreakDetailView: View {
                 Button("Recalibrate (Apple Health)", role: .destructive) {
                     settings.clearCommittedThreshold(for: streak.trackingKey)
                     isRecalibrating = true
-                    actionMessage = "Recalibrating from Apple Health..."
+                    actionMessage = String(localized: "Recalibrating from Apple Health...")
                     Task { await store.load() }
                 }
                 Button("Cancel", role: .cancel) {}
@@ -554,7 +558,7 @@ struct StreakDetailView: View {
                 Button {
                     showingUntrackConfirm = true
                 } label: {
-                    Text("UNTRACK")
+                    Text(String(localized: "UNTRACK"))
                         .font(RetroFont.mono(10, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(Theme.retroRed)
@@ -597,14 +601,17 @@ struct StreakDetailView: View {
             settings.trackedStreaks = tracked
         }
         store.refilter()
-        actionMessage = "Primary streak updated."
+        actionMessage = String(localized: "Primary streak updated.")
     }
 
     private var recalibrationPreview: String {
         guard let suggested = suggestedThreshold else {
-            return "Currently \(streak.thresholdLabel)"
+            let current = streak.thresholdLabel
+            return String(localized: "Currently \(current)")
         }
-        return "Currently \(streak.thresholdLabel) → suggests \(streak.metric.thresholdLabel(suggested, cadence: streak.cadence))"
+        let current = streak.thresholdLabel
+        let next = streak.metric.thresholdLabel(suggested, cadence: streak.cadence)
+        return String(localized: "Currently \(current) → suggests \(next)")
     }
 
     private var suggestedThreshold: Double? {
@@ -668,7 +675,7 @@ struct StreakDetailView: View {
 
                 Spacer()
 
-                Text("\(selectedHeatmapHits) HITS · \(String(format: "%.1f", avgHitsPerWeek)) / WK")
+                Text("\(selectedHeatmapHits) HITS · \(LocalizedNumber.fixed(avgHitsPerWeek, digits: 1)) / WK")
                     .font(RetroFont.pixel(8))
                     .foregroundStyle(Theme.retroInkDim)
             }
@@ -703,17 +710,17 @@ struct StreakDetailView: View {
 
     private var statsRow: some View {
         HStack(spacing: 8) {
-            statCell(title: "CURRENT",
+            statCell(title: String(localized: "CURRENT"),
                      value: "\(streak.current)",
-                     unit: "ACTIVE STREAK",
+                     unit: String(localized: "ACTIVE STREAK"),
                      color: streak.metric.accent)
-            statCell(title: "RECORD",
+            statCell(title: String(localized: "RECORD"),
                      value: "\(streak.best)",
-                     unit: "BEST STREAK",
+                     unit: String(localized: "BEST STREAK"),
                      color: Theme.retroAmber)
-            statCell(title: "RATE",
-                     value: "\(Int(streak.completionRate * 100))%",
-                     unit: "COMPLETION",
+            statCell(title: String(localized: "RATE"),
+                     value: streak.completionRate.formatted(.percent.precision(.fractionLength(0))),
+                     unit: String(localized: "COMPLETION"),
                      color: Theme.retroMagenta)
         }
     }
@@ -757,7 +764,7 @@ struct StreakDetailView: View {
                         Rectangle()
                             .fill(vals[i] > median ? streak.metric.accent : Theme.retroInkFaint)
                             .frame(height: max(4, CGFloat(vals[i] / maxVal) * 60))
-                        Text(["M","T","W","T","F","S","S"][i])
+                        Text(Self.mondayFirstWeekdayInitials[i])
                             .font(RetroFont.pixel(8))
                             .foregroundStyle(Theme.retroInkDim)
                     }
@@ -845,6 +852,12 @@ struct StreakDetailView: View {
         formatter.timeStyle = .none
         return formatter.string(from: date)
     }
+
+    /// "M T W T F S S" in the user's language, Monday first like the day-of-week stats.
+    private static let mondayFirstWeekdayInitials: [String] = {
+        let symbols = Calendar.current.veryShortStandaloneWeekdaySymbols
+        return Array(symbols[1...]) + [symbols[0]]
+    }()
 
     private func formatDayOfWeek(_ date: Date) -> String {
         let formatter = DateFormatter()

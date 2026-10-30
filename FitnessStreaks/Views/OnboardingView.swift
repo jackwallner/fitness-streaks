@@ -31,14 +31,14 @@ struct OnboardingView: View {
     @State private var trialPurchaseInFlight = false
     @State private var trialPurchaseError: String? = nil
 
-    private static let tips: [String] = [
-        "Streaks update automatically from Apple Health. No manual logging.",
-        "Sleep streaks are credited to the day a sleep sample ends.",
-        "Weekly streaks reset on Mondays, ISO-style.",
-        "Today doesn't break your streak until the day actually ends.",
-        "Add the widget for a glanceable streak count on your home screen.",
-        "Per-workout-type streaks let you track yoga, runs, and lifts separately."
-    ]
+    private static var tips: [String] { [
+        String(localized: "Streaks update automatically from Apple Health. No manual logging."),
+        String(localized: "Sleep streaks are credited to the day a sleep sample ends."),
+        String(localized: "Weekly streaks reset on Mondays, ISO-style."),
+        String(localized: "Today doesn't break your streak until the day actually ends."),
+        String(localized: "Add the widget for a glanceable streak count on your home screen."),
+        String(localized: "Per-workout-type streaks let you track yoga, runs, and lifts separately.")
+    ] }
     private static let privacyPolicyURL = URL(string: "https://jackwallner.github.io/fitness-streaks/privacy-policy.html")!
     private static let termsURL = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
 
@@ -162,15 +162,15 @@ struct OnboardingView: View {
         case .loading:
             EmptyView()
         case .intro:
-            standardCTA("▶ GET STARTED") { withAnimation { phase = .intensity } }
+            standardCTA(String(localized: "▶ GET STARTED")) { withAnimation { phase = .intensity } }
         case .intensity:
-            standardCTA(requesting ? "CONNECTING..." : "▶ FIND MY STREAKS", enabled: !requesting) {
+            standardCTA(requesting ? String(localized: "CONNECTING...") : String(localized: "▶ FIND MY STREAKS"), enabled: !requesting) {
                 Task { await beginDiscoveryWithAuth() }
             }
         case .selecting:
             standardCTA(startButtonLabel, enabled: !selection.isEmpty) { finishWithSelection() }
         case .empty:
-            standardCTA("▶ CONTINUE") { finishWithoutTracking() }
+            standardCTA(String(localized: "▶ CONTINUE")) { finishWithoutTracking() }
         case .trial:
             trialCTA
         }
@@ -294,10 +294,10 @@ struct OnboardingView: View {
                 .foregroundStyle(Theme.retroCyan)
 
             HStack(spacing: 14) {
-                streakPreviewItem(icon: "figure.walk", label: "STEPS")
-                streakPreviewItem(icon: "figure.run", label: "EXERCISE")
-                streakPreviewItem(icon: "figure.stand", label: "STAND")
-                streakPreviewItem(icon: "flame.fill", label: "WORKOUTS")
+                streakPreviewItem(icon: "figure.walk", label: String(localized: "STEPS"))
+                streakPreviewItem(icon: "figure.run", label: String(localized: "EXERCISE"))
+                streakPreviewItem(icon: "figure.stand", label: String(localized: "STAND"))
+                streakPreviewItem(icon: "flame.fill", label: String(localized: "WORKOUTS"))
             }
             .padding(.horizontal, 4)
         }
@@ -524,10 +524,10 @@ struct OnboardingView: View {
 
     private var currentStageLabel: String {
         if requesting {
-            return "CONNECTING TO APPLE HEALTH"
+            return String(localized: "CONNECTING TO APPLE HEALTH")
         }
         let label = store.loadStage.label
-        return label.isEmpty ? "CONNECTING…" : label
+        return label.isEmpty ? String(localized: "CONNECTING…") : label
     }
 
     private var displayedProgress: Double {
@@ -657,14 +657,14 @@ struct OnboardingView: View {
 
                 VStack(spacing: 10) {
                     trialBenefit("infinity", Theme.retroCyan,
-                                 "Track every streak",
-                                 "Free tracks \(Self.freeTrackedLimit). Streaks+ keeps every metric you've earned.")
+                                 String(localized: "Track every streak"),
+                                 String(localized: "Free tracks \(Self.freeTrackedLimit). Streaks+ keeps every metric you've earned."))
                     trialBenefit("flame.fill", Theme.retroMagenta,
-                                 "Auto-save misses",
-                                 "Miss a day? Streaks+ revives the run instead of zeroing it.")
+                                 String(localized: "Auto-save misses"),
+                                 String(localized: "Miss a day? Streaks+ revives the run instead of zeroing it."))
                     trialBenefit("wand.and.stars", Theme.retroLime,
-                                 "Custom streaks",
-                                 "Your own thresholds, cadences, and hour windows.")
+                                 String(localized: "Custom streaks"),
+                                 String(localized: "Your own thresholds, cadences, and hour windows."))
                 }
                 .padding(.horizontal, 20)
             }
@@ -719,23 +719,24 @@ struct OnboardingView: View {
 
     private var trialHeadline: String {
         let count = settings.lastOnboardingPickedCount
-        guard count > Self.freeTrackedLimit else { return "PROTECT YOUR\nSTREAKS" }
-        return "KEEP ALL \(count)\nSTREAKS"
+        guard count > Self.freeTrackedLimit else { return String(localized: "PROTECT YOUR\nSTREAKS") }
+        return String(localized: "KEEP ALL \(count)\nSTREAKS")
     }
 
     private var trialSubtitle: String {
         let count = settings.lastOnboardingPickedCount
         if count > Self.freeTrackedLimit {
             let locked = count - Self.freeTrackedLimit
-            if let offer = trialOfferLabel {
-                return "Free keeps \(Self.freeTrackedLimit). Start your \(offer.lowercased()) to keep the other \(locked) and protect every run."
+            let cap = Self.freeTrackedLimit
+            if let days = trialOfferDays {
+                return String(localized: "Free keeps \(cap). Start your \(days)-day free trial to keep the other \(locked) and protect every run.")
             }
-            return "Free keeps \(Self.freeTrackedLimit). Subscribe to Streaks+ to keep the other \(locked) and protect every run."
+            return String(localized: "Free keeps \(cap). Subscribe to Streaks+ to keep the other \(locked) and protect every run.")
         }
-        if let offer = trialOfferLabel {
-            return "Start your \(offer.lowercased()) to auto-save misses and protect every streak you just found."
+        if let days = trialOfferDays {
+            return String(localized: "Start your \(days)-day free trial to auto-save misses and protect every streak you just found.")
         }
-        return "Subscribe to Streaks+ to auto-save misses and protect every streak you just found."
+        return String(localized: "Subscribe to Streaks+ to auto-save misses and protect every streak you just found.")
     }
 
     // MARK: - Flow
@@ -879,8 +880,8 @@ struct OnboardingView: View {
     }
 
     private var startButtonLabel: String {
-        if selection.isEmpty { return "PICK AT LEAST ONE" }
-        return "▶ START · \(selection.count) STREAK\(selection.count == 1 ? "" : "S")"
+        if selection.isEmpty { return String(localized: "PICK AT LEAST ONE") }
+        return String(localized: "▶ START · \(selection.count) STREAKS")
     }
 
     private func completeSetup() {
@@ -911,8 +912,8 @@ struct OnboardingView: View {
         storeKit.eligibleTrialPackage != nil
     }
 
-    private var trialOfferLabel: String? {
-        storeKit.eligibleTrialPackage?.streaksIntroOfferLabel
+    private var trialOfferDays: Int? {
+        storeKit.eligibleTrialPackage?.streaksIntroOfferDays
     }
 
     private var trialPriceLabel: String? {
@@ -921,15 +922,15 @@ struct OnboardingView: View {
 
     /// Live 3.1.2 billing disclosure shown just above the primary trial CTA.
     private var trialDisclosureText: String? {
-        guard let offer = trialOfferLabel, let price = trialPriceLabel else { return nil }
-        return "\(offer.capitalized), then \(price). Auto-renews unless canceled at least 24 hours before the trial ends."
+        guard let days = trialOfferDays, let price = trialPriceLabel else { return nil }
+        return String(localized: "\(days)-Day Free Trial, then \(price). Auto-renews unless canceled at least 24 hours before the trial ends.")
     }
 
     private var trialPrimaryLabel: String {
-        if let offer = trialOfferLabel {
-            return "▶ KEEP ALL · START \(offer.uppercased())"
+        if let days = trialOfferDays {
+            return String(localized: "▶ KEEP ALL · START \(days)-DAY FREE TRIAL")
         }
-        return "▶ KEEP ALL · SEE PLANS"
+        return String(localized: "▶ KEEP ALL · SEE PLANS")
     }
 
     /// Buy the trial-bearing package directly. Yearly is preferred (longer
@@ -949,9 +950,9 @@ struct OnboardingView: View {
                 settings.hasSeenTrialOffer = true
                 finishFromTrial()
             case .cancelled:
-                trialPurchaseError = "Trial wasn't started. Tap again to begin your free trial."
+                trialPurchaseError = String(localized: "Trial wasn't started. Tap again to begin your free trial.")
             case .failed:
-                trialPurchaseError = storeKit.lastError ?? "Couldn't start your trial. Please try again."
+                trialPurchaseError = storeKit.lastError ?? String(localized: "Couldn't start your trial. Please try again.")
             }
         }
     }
@@ -975,9 +976,9 @@ struct OnboardingView: View {
                     .foregroundStyle(Theme.retroMagenta)
                 Text(lockedCount > 0
                      ? (hasDirectTrialPackage
-                        ? "Tap any locked streak to start a free trial and add it."
-                        : "Tap any locked streak to see Streaks+ plans and add it.")
-                     : "Streaks+ unlocks custom streaks, auto-save, and travel freezes.")
+                        ? String(localized: "Tap any locked streak to start a free trial and add it.")
+                        : String(localized: "Tap any locked streak to see Streaks+ plans and add it."))
+                     : String(localized: "Streaks+ unlocks custom streaks, auto-save, and travel freezes."))
                     .font(RetroFont.mono(9))
                     .foregroundStyle(Theme.retroInkDim)
             }
@@ -1001,10 +1002,10 @@ struct OnboardingView: View {
                 authProgress = max(authProgress, 0.45)
             }
         } catch is HealthKitError {
-            errorText = "Couldn't request Health access from iOS. Open the Health app or Settings and enable access for Streaks."
+            errorText = String(localized: "Couldn't request Health access from iOS. Open the Health app or Settings and enable access for Streaks.")
             return
         } catch {
-            errorText = "Couldn't connect to Apple Health. Open the Health app and enable access for Streaks."
+            errorText = String(localized: "Couldn't connect to Apple Health. Open the Health app and enable access for Streaks.")
             return
         }
 
@@ -1014,7 +1015,7 @@ struct OnboardingView: View {
         // them to Settings rather than parking on a data-less dashboard.
         let postStatus = await healthKit.authorizationRequestStatus()
         if postStatus == .shouldRequest {
-            errorText = "Health access needed. Open the Health app or Settings to enable Streaks's access to Apple Health."
+            errorText = String(localized: "Health access needed. Open the Health app or Settings to enable Streaks's access to Apple Health.")
         }
     }
 
@@ -1036,14 +1037,19 @@ struct CapPaywallSheet<Paywall: View>: View {
     @Environment(\.dismiss) private var dismiss
 
     private var streakName: String {
-        streak?.displayName.uppercased() ?? "THIS STREAK"
+        streak?.displayName.uppercased() ?? String(localized: "THIS STREAK")
     }
 
     private var headline: String {
+        let name = streakName
         if let streak, streak.current >= 3 {
-            return "KEEP YOUR \(streak.current)-\(streak.cadence.label.uppercased()) \(streakName) STREAK"
+            let n = streak.current
+            switch streak.cadence {
+            case .daily: return String(localized: "KEEP YOUR \(n)-DAY \(name) STREAK")
+            case .weekly: return String(localized: "KEEP YOUR \(n)-WEEK \(name) STREAK")
+            }
         }
-        return "ADD \(streakName) TO YOUR STREAKS+ LINEUP"
+        return String(localized: "ADD \(name) TO YOUR STREAKS+ LINEUP")
     }
 
     var body: some View {

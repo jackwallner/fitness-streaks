@@ -255,6 +255,34 @@ enum StreakCadence: String, Codable, Sendable, CaseIterable {
         case (.weekly, .other): String(localized: "weeks")
         }
     }
+
+    /// "DAY STREAK" / "DAYS STREAK" under a separately drawn count.
+    func streakWord(_ n: Int) -> String {
+        switch (self, PluralLabel.category(n)) {
+        case (.daily, .one): String(localized: "day streak")
+        case (.daily, .few): String(localized: "days streak (few)", defaultValue: "days streak")
+        case (.daily, .many): String(localized: "days streak (many)", defaultValue: "days streak")
+        case (.daily, .other): String(localized: "days streak")
+        case (.weekly, .one): String(localized: "week streak")
+        case (.weekly, .few): String(localized: "weeks streak (few)", defaultValue: "weeks streak")
+        case (.weekly, .many): String(localized: "weeks streak (many)", defaultValue: "weeks streak")
+        case (.weekly, .other): String(localized: "weeks streak")
+        }
+    }
+
+    /// "BEST DAYS" under a separately drawn record count.
+    func bestWord(_ n: Int) -> String {
+        switch (self, PluralLabel.category(n)) {
+        case (.daily, .one): String(localized: "best day")
+        case (.daily, .few): String(localized: "best days (few)", defaultValue: "best days")
+        case (.daily, .many): String(localized: "best days (many)", defaultValue: "best days")
+        case (.daily, .other): String(localized: "best days")
+        case (.weekly, .one): String(localized: "best week")
+        case (.weekly, .few): String(localized: "best weeks (few)", defaultValue: "best weeks")
+        case (.weekly, .many): String(localized: "best weeks (many)", defaultValue: "best weeks")
+        case (.weekly, .other): String(localized: "best weeks")
+        }
+    }
 }
 
 /// CLDR plural category of a count in the current language, read from the

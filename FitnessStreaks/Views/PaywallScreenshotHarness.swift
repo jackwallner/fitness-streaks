@@ -17,7 +17,7 @@ struct PaywallScreenshotHarness: View {
                         errorMessage: nil,
                         pickedCount: 4,
                         freeCap: 2,
-                        longestStreak: .init(displayName: "Morning run", current: 12, cadenceLabel: "day"),
+                        longestStreak: .init(displayName: StreakMetric.steps.displayName, inlineName: StreakMetric.steps.inlineName, current: 12, cadence: .daily),
                         onStartTrial: {},
                         onSeeAllPlans: {},
                         onDismiss: {}

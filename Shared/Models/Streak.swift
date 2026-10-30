@@ -9,7 +9,11 @@ struct HourWindow: Hashable, Sendable, Codable {
     var label: String {
         let end = (startHour + 1) % 24
         guard Bundle.main.preferredLocalizations.first == "en" else {
-            return String(localized: "\(startHour)-\(end) (24-hour window)")
+            // "17–18 Uhr", "17 h – 18 h", "17時～18時": the locale's own hour range.
+            let start = Calendar.current.date(bySettingHour: startHour, minute: 0, second: 0, of: Date()) ?? Date()
+            let formatter = DateIntervalFormatter()
+            formatter.dateTemplate = "H"
+            return formatter.string(from: start, to: start.addingTimeInterval(3_600))
         }
         return "\(Self.format(hour: startHour))-\(Self.format(hour: end))"
     }

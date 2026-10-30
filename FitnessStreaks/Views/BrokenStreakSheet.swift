@@ -33,7 +33,7 @@ struct BrokenStreakSheet: View {
                             .font(RetroFont.mono(12, weight: .bold))
                             .tracking(2)
                             .foregroundStyle(Theme.retroRed)
-                        Text("Your \(broken.metric.displayName.lowercased()) run ended at \(broken.brokenLength) \(broken.cadence.pluralLabel).")
+                        Text(endedSentence)
                             .font(RetroFont.mono(12))
                             .foregroundStyle(Theme.retroInk)
                             .lineSpacing(3)
@@ -119,13 +119,14 @@ struct BrokenStreakSheet: View {
                     freeCap: 3,
                     longestStreak: .init(
                         displayName: broken.metric.displayName,
+                        inlineName: broken.metric.inlineName,
                         current: broken.brokenLength,
-                        cadenceLabel: broken.cadence.label
+                        cadence: broken.cadence
                     ),
-                    headlineOverride: "REVIVE YOUR \(broken.brokenLength)-\(broken.cadence.label.uppercased()) \(broken.metric.displayName.uppercased()) STREAK.",
-                    subheadlineOverride: trialOfferLabel != nil
-                        ? "Your run just ended. Start a Streaks+ trial and we'll restore it on the spot. Then auto-save every future miss so it can't happen again."
-                        : "Your run just ended. Subscribe to Streaks+ and we'll restore it on the spot. Then auto-save every future miss so it can't happen again.",
+                    headlineOverride: reviveHeadline,
+                    subheadlineOverride: hasTrialOffer
+                        ? String(localized: "Your run just ended. Start a Streaks+ trial and we'll restore it on the spot. Then auto-save every future miss so it can't happen again.")
+                        : String(localized: "Your run just ended. Subscribe to Streaks+ and we'll restore it on the spot. Then auto-save every future miss so it can't happen again."),
                     onStartTrial: { startReviveTrialPurchase() },
                     onSeeAllPlans: {
                         pendingPaywallAfterTrial = true
@@ -142,12 +143,56 @@ struct BrokenStreakSheet: View {
 
     // MARK: - Direct trial purchase (revive context)
 
-    private var trialOfferLabel: String? {
+    private var hasTrialOffer: Bool {
         #if REVENUECAT
-        return storeKit.eligibleTrialPackage?.streaksIntroOfferLabel
+        return storeKit.eligibleTrialPackage?.streaksIntroOfferDays != nil
         #else
-        return nil
+        return false
         #endif
+    }
+
+    private var endedSentence: String {
+        let n = broken.brokenLength
+        let name = broken.metric.inlineName
+        switch broken.cadence {
+        case .daily: return String(localized: "Your \(name) run ended at \(n) days.")
+        case .weekly: return String(localized: "Your \(name) run ended at \(n) weeks.")
+        }
+    }
+
+    private var reviveHeadline: String {
+        let n = broken.brokenLength
+        let name = broken.metric.inlineName.uppercased()
+        switch broken.cadence {
+        case .daily: return String(localized: "REVIVE YOUR \(n)-DAY \(name) STREAK.")
+        case .weekly: return String(localized: "REVIVE YOUR \(n)-WEEK \(name) STREAK.")
+        }
+    }
+
+    private var revivalBody: String {
+        let n = broken.brokenLength
+        let name = broken.metric.inlineName
+        switch (broken.cadence, hasTrialOffer) {
+        case (.daily, true):
+            return String(localized: "Start a Streaks+ trial and we'll restore your \(n)-day \(name) run on the spot. Streaks+ auto-saves every missed day so this doesn't happen again.")
+        case (.weekly, true):
+            return String(localized: "Start a Streaks+ trial and we'll restore your \(n)-week \(name) run on the spot. Streaks+ auto-saves every missed day so this doesn't happen again.")
+        case (.daily, false):
+            return String(localized: "Subscribe to Streaks+ and we'll restore your \(n)-day \(name) run on the spot. Streaks+ auto-saves every missed day so this doesn't happen again.")
+        case (.weekly, false):
+            return String(localized: "Subscribe to Streaks+ and we'll restore your \(n)-week \(name) run on the spot. Streaks+ auto-saves every missed day so this doesn't happen again.")
+        }
+    }
+
+    private var revivalAccessibility: String {
+        let n = broken.brokenLength
+        let name = broken.metric.inlineName
+        switch (broken.cadence, hasTrialOffer) {
+        case (.daily, true): return String(localized: "Start a Streaks+ trial to revive your \(n)-day \(name) streak")
+        case (.weekly, true): return String(localized: "Start a Streaks+ trial to revive your \(n)-week \(name) streak")
+        case (.daily, false): return String(localized: "Subscribe to Streaks+ to revive your \(n)-day \(name) streak")
+        case (.weekly, false): return String(localized: "Subscribe to Streaks+ to revive your \(n)-week \(name) streak")
+        }
     }
 
     /// Buy the resolved offer in-context and revive the broken run on success.
@@ -171,12 +216,12 @@ struct BrokenStreakSheet: View {
                 close()
             case .cancelled:
                 trialError = startsTrial
-                    ? "Trial wasn't started. Tap again, or see all plans."
-                    : "Purchase wasn't completed. Tap again, or see all plans."
+                    ? String(localized: "Trial wasn't started. Tap again, or see all plans.")
+                    : String(localized: "Purchase wasn't completed. Tap again, or see all plans.")
             case .failed:
                 trialError = storeKit.lastError ?? (startsTrial
-                    ? "Couldn't start your trial. Please try again."
-                    : "Couldn't complete the purchase. Please try again.")
+                    ? String(localized: "Couldn't start your trial. Please try again.")
+                    : String(localized: "Couldn't complete the purchase. Please try again."))
             }
         }
         #else
@@ -216,22 +261,20 @@ struct BrokenStreakSheet: View {
                     Image(systemName: "shield.lefthalf.filled")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(Theme.retroLime)
-                    Text(trialOfferLabel != nil ? "REVIVE WITH STREAKS+ TRIAL" : "REVIVE WITH STREAKS+")
+                    Text(hasTrialOffer ? "REVIVE WITH STREAKS+ TRIAL" : "REVIVE WITH STREAKS+")
                         .font(RetroFont.pixel(10))
                         .tracking(1)
                         .foregroundStyle(Theme.retroLime)
                     Spacer()
                     PixelChip(text: "STREAKS+", accent: Theme.retroMagenta)
                 }
-                Text(trialOfferLabel != nil
-                    ? "Start a Streaks+ trial and we'll restore your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) run on the spot. Streaks+ auto-saves every missed day so this doesn't happen again."
-                    : "Subscribe to Streaks+ and we'll restore your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) run on the spot. Streaks+ auto-saves every missed day so this doesn't happen again.")
+                Text(revivalBody)
                     .font(RetroFont.mono(11))
                     .foregroundStyle(Theme.retroInk)
                     .lineSpacing(3)
                     .multilineTextAlignment(.leading)
                 HStack {
-                    Text(trialOfferLabel != nil ? "START TRIAL · REVIVE STREAK" : "SUBSCRIBE · REVIVE STREAK")
+                    Text(hasTrialOffer ? "START TRIAL · REVIVE STREAK" : "SUBSCRIBE · REVIVE STREAK")
                         .font(RetroFont.mono(10, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(Theme.retroMagenta)
@@ -247,8 +290,6 @@ struct BrokenStreakSheet: View {
             .pixelPanel(color: Theme.retroLime, fill: Theme.retroBgRaised)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(trialOfferLabel != nil
-            ? "Start a Streaks+ trial to revive your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) streak"
-            : "Subscribe to Streaks+ to revive your \(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) streak")
+        .accessibilityLabel(revivalAccessibility)
     }
 }

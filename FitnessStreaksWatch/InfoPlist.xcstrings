@@ -1,0 +1,112 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "NSHealthShareUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Streaks liest deinen Aktivitätsverlauf (Schritte, Trainingsminuten, Stehstunden, aktive Energie, Workouts, Distanz, Etagen, Achtsamkeitsminuten, Schlaf) aus Apple Health, um die Serien zu finden, die du schon aufgebaut hast. Nur Lesezugriff: Streaks schreibt nie in Apple Health."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Streaks lee tu historial de actividad (pasos, minutos de ejercicio, horas de pie, energía activa, entrenamientos, distancia, pisos subidos, minutos de mindfulness, sueño) de Salud para mostrarte las rachas que ya has construido. Solo lectura: Streaks nunca escribe en Salud."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Streaks lit votre historique d’activité (pas, minutes d’exercice, heures debout, énergie active, entraînements, distance, étages montés, minutes de pleine conscience, sommeil) dans Santé pour faire apparaître les séries que vous avez déjà construites. Lecture seule : Streaks n’écrit jamais dans Santé."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Streaks legge la cronologia delle attività (passi, minuti di esercizio, ore in piedi, energia attiva, allenamenti, distanza, piani saliti, minuti di consapevolezza, sonno) da Salute per mostrarti le serie che hai già costruito. Sola lettura: Streaks non scrive mai in Salute."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Streaksはヘルスケアからアクティビティ履歴（歩数、エクササイズ時間、スタンド時間、アクティブエネルギー、ワークアウト、距離、上った階数、マインドフルネス時間、睡眠）を読み取り、これまでに積み上げた連続記録を表示します。読み取り専用で、Streaksがヘルスケアに書き込むことはありません。"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Streaks leest je activiteitsgeschiedenis (stappen, trainingsminuten, staanuren, actieve energie, workouts, afstand, verdiepingen, mindfulnessminuten, slaap) uit Gezondheid om de reeksen te tonen die je al hebt opgebouwd. Alleen lezen: Streaks schrijft nooit naar Gezondheid."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Streaks odczytuje historię aktywności (kroki, minuty ćwiczeń, godziny na stojąco, energię aktywną, treningi, dystans, pokonane piętra, minuty uważności, sen) ze Zdrowia, by pokazać serie, które już masz na koncie. Tylko odczyt: Streaks nigdy nie zapisuje danych w Zdrowiu."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Streaks lê seu histórico de atividade (passos, minutos de exercício, horas em pé, energia ativa, treinos, distância, andares subidos, minutos de atenção plena, sono) no Saúde para mostrar as sequências que você já construiu. Somente leitura: o Streaks nunca grava dados no Saúde."
+          }
+        }
+      }
+    },
+    "NSHealthUpdateUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Streaks hat nur Lesezugriff und schreibt keine Daten in Apple Health. Apple verlangt diesen Text, sobald das HealthKit-Framework eingebunden ist."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Streaks es de solo lectura y no escribe ningún dato en Salud. Apple exige este texto siempre que se enlaza el framework HealthKit."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Streaks fonctionne en lecture seule et n’écrit aucune donnée dans Santé. Apple exige ce texte dès que le framework HealthKit est intégré."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Streaks è in sola lettura e non scrive alcun dato in Salute. Apple richiede questo testo ogni volta che il framework HealthKit è incluso."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Streaksは読み取り専用で、ヘルスケアにデータを書き込みません。この文言は、HealthKitフレームワークを使用する場合にAppleが必須としているものです。"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Streaks leest alleen en schrijft geen gegevens naar Gezondheid. Apple vereist deze tekst zodra het HealthKit-framework is gekoppeld."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Streaks działa tylko w trybie odczytu i nie zapisuje żadnych danych w Zdrowiu. Apple wymaga tego tekstu zawsze, gdy aplikacja korzysta z HealthKit."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Streaks é somente leitura e não grava nenhum dado no Saúde. A Apple exige este texto sempre que o framework HealthKit é usado."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

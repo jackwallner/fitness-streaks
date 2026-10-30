@@ -149,17 +149,20 @@ struct StreakPickerList: View {
 
     private func subtitle(for streak: Streak) -> String {
         let label = streak.thresholdLabel
+        let count = streak.cadence.count(streak.current)
         if let window = streak.window {
-            return "\(streak.current) \(streak.cadence.pluralLabel) in a row · \(label) between \(window.label)"
+            let hours = window.label
+            return String(localized: "\(count) in a row · \(label) between \(hours)")
         }
-        return "\(streak.current) \(streak.cadence.pluralLabel) in a row · \(label) daily"
+        return String(localized: "\(count) in a row · \(label) daily")
     }
 
     private func cadenceLabel(for streak: Streak) -> String {
         if let w = streak.window {
-            return "BY \(w.label.uppercased())"
+            let hours = w.label.uppercased()
+            return String(localized: "BY \(hours)")
         }
-        return "DAILY"
+        return String(localized: "DAILY")
     }
 }
 
@@ -219,8 +222,8 @@ struct StreakPickerSheet: View {
                                     .tracking(1)
                                     .foregroundStyle(Theme.retroAmber)
                                 Text(storeKit.hasEligibleTrial
-                                    ? "Deselect \(selection.count - Self.freeTrackedLimit) to save, or start a free trial to keep them all."
-                                    : "Deselect \(selection.count - Self.freeTrackedLimit) to save, or unlock Streaks+ to keep them all.")
+                                    ? String(localized: "Deselect \(selection.count - Self.freeTrackedLimit) to save, or start a free trial to keep them all.")
+                                    : String(localized: "Deselect \(selection.count - Self.freeTrackedLimit) to save, or unlock Streaks+ to keep them all."))
                                     .font(RetroFont.mono(10))
                                     .foregroundStyle(Theme.retroInkDim)
                             }
@@ -736,7 +739,9 @@ struct CustomStreakEditSheet: View {
                         .padding(.horizontal, 14)
 
                         if !thresholdIsValid {
-                            Text(allowsFractional ? "Enter a value between \(format(minValue)) and \(format(maxValue))." : "Enter a whole number between \(Int(minValue)) and \(Int(maxValue)).")
+                            Text(allowsFractional
+                                 ? String(localized: "Enter a value between \(format(minValue)) and \(format(maxValue)).")
+                                 : String(localized: "Enter a whole number between \(Int(minValue)) and \(Int(maxValue))."))
                                 .font(RetroFont.mono(10))
                                 .foregroundStyle(Theme.retroRed)
                                 .padding(.horizontal, 14)
@@ -793,7 +798,7 @@ struct CustomStreakEditSheet: View {
 
     private func format(_ value: Double) -> String {
         if allowsFractional {
-            return value < 10 ? String(format: "%.1f", value) : String(format: "%.0f", value)
+            return LocalizedNumber.oneDecimalUnderTen(value)
         }
         return String(Int(value))
     }

@@ -257,9 +257,9 @@ private struct PixelTabBar: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            tab(.streaks, label: "STREAKS", symbol: "flame.fill", accent: Theme.retroMagenta)
-            tab(.saves,   label: "SAVES",   symbol: "shield.lefthalf.filled", accent: Theme.retroLime)
-            tab(.stats,   label: "STATS",   symbol: "chart.bar.fill", accent: Theme.retroCyan)
+            tab(.streaks, label: String(localized: "STREAKS"), symbol: "flame.fill", accent: Theme.retroMagenta)
+            tab(.saves,   label: String(localized: "SAVES"),   symbol: "shield.lefthalf.filled", accent: Theme.retroLime)
+            tab(.stats,   label: String(localized: "STATS"),   symbol: "chart.bar.fill", accent: Theme.retroCyan)
         }
         .padding(.vertical, 6)
         .padding(.horizontal, 4)

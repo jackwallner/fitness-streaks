@@ -58,11 +58,11 @@ struct StatsView: View {
 
     private var topRow: some View {
         HStack(spacing: 8) {
-            cell(title: "ACTIVE", value: "\(activeCount)", unit: "STREAKS", color: Theme.retroLime)
-            cell(title: "TOTAL", value: "\(totalCurrentDays)", unit: "DAYS COMBINED", color: Theme.retroMagenta)
-            cell(title: "BEST", value: "\(longestEver)", unit: longestEverLabel, color: Theme.retroAmber)
+            cell(title: String(localized: "ACTIVE"), value: "\(activeCount)", unit: String(localized: "STREAKS"), color: Theme.retroLime)
+            cell(title: String(localized: "TOTAL"), value: "\(totalCurrentDays)", unit: String(localized: "DAYS COMBINED"), color: Theme.retroMagenta)
+            cell(title: String(localized: "BEST"), value: "\(longestEver)", unit: longestEverLabel, color: Theme.retroAmber)
             if isSplit {
-                cell(title: "SAVES", value: "\(totalSaves)", unit: "STREAKS+", color: Theme.retroLime)
+                cell(title: String(localized: "SAVES"), value: "\(totalSaves)", unit: "STREAKS+", color: Theme.retroLime)
             }
         }
     }
@@ -101,7 +101,7 @@ struct StatsView: View {
     }
 
     private var longestEverLabel: String {
-        guard let top = store.streaks.max(by: { $0.best < $1.best }) else { return "RECORD" }
+        guard let top = store.streaks.max(by: { $0.best < $1.best }) else { return String(localized: "RECORD") }
         return top.metric.displayName.uppercased()
     }
 
@@ -118,7 +118,7 @@ struct StatsView: View {
     private var completionRateCard: some View {
         VStack(alignment: .leading, spacing: 10) {
             if !isSplit {
-                PixelSectionHeader(title: "Across all streaks")
+                PixelSectionHeader(title: String(localized: "Across all streaks"))
             }
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
@@ -159,7 +159,7 @@ struct StatsView: View {
 
     private var streakList: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Streak Breakdown")
+            PixelSectionHeader(title: String(localized: "Streak Breakdown"))
             VStack(spacing: 0) {
                 ForEach(Array(store.streaks.enumerated()), id: \.element.id) { idx, streak in
                     Button {
@@ -169,7 +169,7 @@ struct StatsView: View {
                             .paneSelection(isShown(streak), accent: streak.metric.accent)
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("\(streak.metric.displayName), \(streak.current) \(streak.cadence.pluralLabel), \(Int(streak.completionRate * 100)) percent completion")
+                    .accessibilityLabel("\(streak.displayName), \(streak.cadence.count(streak.current)), \(Int(streak.completionRate * 100)) percent completion")
                     if idx < store.streaks.count - 1 {
                         Rectangle()
                             .fill(Theme.retroInkFaint.opacity(0.6))
@@ -204,7 +204,7 @@ struct StatsView: View {
                     .foregroundStyle(Theme.retroInk)
                     .lineLimit(isSplit ? 1 : nil)
                 if isSplit { Spacer(minLength: 0) }
-                Text("\(streak.current) \(streak.cadence.pluralLabel) · best \(streak.best) · \(Int(streak.completionRate * 100))%")
+                Text("\(streak.cadence.count(streak.current)) · best \(streak.best) · \(streak.completionRate.formatted(.percent.precision(.fractionLength(0))))")
                     .font(RetroFont.mono(10))
                     .foregroundStyle(Theme.retroInkDim)
                     .lineLimit(isSplit ? 1 : nil)

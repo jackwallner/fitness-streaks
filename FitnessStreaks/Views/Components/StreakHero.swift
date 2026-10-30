@@ -123,17 +123,21 @@ struct StreakHero: View {
 
     private var goalContext: String {
         if let w = streak.window {
-            return "\(w.label) target"
+            let hours = w.label
+            return String(localized: "\(hours) target")
         }
-        return streak.cadence == .daily ? "today" : "this week"
+        return streak.cadence == .daily ? String(localized: "today") : String(localized: "this week")
     }
 
     private var streakLine: String {
-        let unit = streak.current == 1 ? streak.cadence.label : streak.cadence.pluralLabel
-        return "\(streak.current) \(unit) streak"
+        let n = streak.current
+        switch streak.cadence {
+        case .daily: return String(localized: "\(n) days streak")
+        case .weekly: return String(localized: "\(n) weeks streak")
+        }
     }
 
     private var statusText: String {
-        streak.currentUnitCompleted ? "DONE" : "\(Int(min(1, streak.currentUnitProgress) * 100))%"
+        streak.currentUnitCompleted ? String(localized: "DONE") : min(1, streak.currentUnitProgress).formatted(.percent.precision(.fractionLength(0)))
     }
 }

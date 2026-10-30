@@ -183,7 +183,7 @@ struct TrialOfferSheet: View {
                     }
 
                     if offerDays != nil {
-                        TrialTimeline(trialDays: trialDays, priceLabel: priceLabel)
+                        TrialTimeline(trialDays: trialDays, priceLabel: priceLabel, zeroPriceLabel: zeroPriceLabel)
                     }
                 }
                 .padding(.horizontal, 24)

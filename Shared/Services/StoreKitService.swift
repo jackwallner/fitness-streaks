@@ -42,11 +42,6 @@ extension Package {
         }
     }
 
-    /// Human-readable trial length, e.g. "7-day free trial".
-    var streaksIntroOfferLabel: String? {
-        streaksIntroOfferDays.map { String(localized: "\($0)-day free trial") }
-    }
-
     /// Recurring-price label, e.g. "$29.99 / year". Used in the trial-offer sheet's
     /// billing disclosure (Apple 3.1.2 requires price + terms before purchase).
     var streaksRecurringPriceLabel: String {
@@ -211,7 +206,7 @@ final class StoreKitService: NSObject, ObservableObject {
     func isEligibleForIntroOffer(_ package: Package) -> Bool {
         TrialOfferResolver.isEligible(
             productID: package.storeProduct.productIdentifier,
-            hasFreeTrial: package.streaksIntroOfferLabel != nil,
+            hasFreeTrial: package.streaksIntroOfferDays != nil,
             introEligibility: introEligibility
         )
     }
@@ -222,7 +217,7 @@ final class StoreKitService: NSObject, ObservableObject {
             in: products,
             introEligibility: introEligibility,
             productID: { $0.storeProduct.productIdentifier },
-            hasFreeTrial: { $0.streaksIntroOfferLabel != nil },
+            hasFreeTrial: { $0.streaksIntroOfferDays != nil },
             isAnnual: { $0.packageType == .annual },
             isSubscription: { $0.storeProduct.subscriptionPeriod != nil }
         )

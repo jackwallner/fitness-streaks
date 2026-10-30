@@ -15,13 +15,13 @@ struct SavesView: View {
 
     private static let freezeDateFormatter: DateFormatter = {
         let f = DateFormatter()
-        f.dateFormat = "EEE, MMM d"
+        f.setLocalizedDateFormatFromTemplate("EEEMMMd")
         return f
     }()
 
     private static let saveDateFormatter: DateFormatter = {
         let f = DateFormatter()
-        f.dateFormat = "MMM d"
+        f.setLocalizedDateFormatFromTemplate("MMMd")
         return f
     }()
 
@@ -121,7 +121,7 @@ struct SavesView: View {
 
     private var savesLog: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Recent Saves")
+            PixelSectionHeader(title: String(localized: "Recent Saves"))
             VStack(spacing: 0) {
                 ForEach(Array(recentPreservations.prefix(10).enumerated()), id: \.element.key) { idx, p in
                     HStack(spacing: 10) {
@@ -154,7 +154,7 @@ struct SavesView: View {
 
     private var plannedFreezesCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Planned Freezes")
+            PixelSectionHeader(title: String(localized: "Planned Freezes"))
             if storeKit.isPro {
                 proFreezesContent
             } else {
@@ -290,12 +290,12 @@ struct SavesView: View {
 
     private var perksStrip: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "With Streaks+")
+            PixelSectionHeader(title: String(localized: "With Streaks+"))
             VStack(spacing: 0) {
-                perkRow("shield.lefthalf.filled", "Unlimited auto-saves", first: true)
-                perkRow("snowflake", "Planned freeze days")
-                perkRow("bell.badge.fill", "At-risk alerts")
-                perkRow("infinity", "Unlimited streaks")
+                perkRow("shield.lefthalf.filled", String(localized: "Unlimited auto-saves"), first: true)
+                perkRow("snowflake", String(localized: "Planned freeze days"))
+                perkRow("bell.badge.fill", String(localized: "At-risk alerts"))
+                perkRow("infinity", String(localized: "Unlimited streaks"))
             }
             .pixelPanel(color: Theme.retroMagenta, fill: Theme.retroBgRaised)
         }

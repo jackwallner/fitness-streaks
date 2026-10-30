@@ -124,7 +124,7 @@ struct SettingsView: View {
                     if let days = pendingLookbackDays {
                         settings.lookbackDays = days
                         settings.committedThresholds = [:]
-                        recalibrateAllMessage = "RECALIBRATING…"
+                        recalibrateAllMessage = String(localized: "RECALIBRATING…")
                         Task { await store.load() }
                     }
                     pendingLookbackDays = nil
@@ -146,7 +146,7 @@ struct SettingsView: View {
 
     private var proSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: storeKit.isPro ? "Streaks+ · Auto-save" : "Auto-save · Streaks+")
+            PixelSectionHeader(title: storeKit.isPro ? String(localized: "Streaks+ · Auto-save") : String(localized: "Auto-save · Streaks+"))
 
             VStack(alignment: .leading, spacing: 12) {
                 HStack(alignment: .top, spacing: 12) {
@@ -158,9 +158,9 @@ struct SettingsView: View {
                                 .tracking(1)
                                 .foregroundStyle(Theme.retroInk)
                             if storeKit.isPro {
-                                PixelChip(text: "ON", accent: Theme.retroLime)
+                                PixelChip(text: String(localized: "ON"), accent: Theme.retroLime)
                             } else {
-                                PixelChip(text: "LOCKED", accent: Theme.retroMagenta)
+                                PixelChip(text: String(localized: "LOCKED"), accent: Theme.retroMagenta)
                             }
                         }
                         Text(storeKit.isPro ? "Unlimited · Streaks+" : "Streaks+ only")
@@ -226,11 +226,11 @@ struct SettingsView: View {
 
     private var autoSaveCopy: String {
         if storeKit.isPro {
-            return "Streaks+ auto-saves any day you miss. Your streak survives and the count keeps climbing tomorrow. Unlimited, automatic, no action needed."
+            return String(localized: "Streaks+ auto-saves any day you miss. Your streak survives and the count keeps climbing tomorrow. Unlimited, automatic, no action needed.")
         }
         return storeKit.hasEligibleTrial
-            ? "Free streaks end on the first missed day. Start a Streaks+ trial when it happens and we'll revive the run on the spot, then auto-save every miss after that."
-            : "Free streaks end on the first missed day. Subscribe to Streaks+ when it happens and we'll revive the run on the spot, then auto-save every miss after that."
+            ? String(localized: "Free streaks end on the first missed day. Start a Streaks+ trial when it happens and we'll revive the run on the spot, then auto-save every miss after that.")
+            : String(localized: "Free streaks end on the first missed day. Subscribe to Streaks+ when it happens and we'll revive the run on the spot, then auto-save every miss after that.")
     }
 
     private var recentPreservations: [GracePreservation] {
@@ -266,7 +266,7 @@ struct SettingsView: View {
 
     private var appearanceSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Appearance")
+            PixelSectionHeader(title: String(localized: "Appearance"))
             HStack(spacing: 0) {
                 ForEach(AppAppearance.allCases, id: \.rawValue) { a in
                     Button {
@@ -290,7 +290,7 @@ struct SettingsView: View {
 
     private var intensitySection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Intensity")
+            PixelSectionHeader(title: String(localized: "Intensity"))
             HStack(spacing: 0) {
                 ForEach(DiscoveryIntensity.allCases, id: \.rawValue) { v in
                     Button {
@@ -339,7 +339,7 @@ struct SettingsView: View {
             .alert("Recalibrate All Goals?", isPresented: $showingRecalibrateAllConfirm) {
                 Button("Recalibrate (Apple Health)", role: .destructive) {
                     settings.committedThresholds = [:]
-                    recalibrateAllMessage = "RECALIBRATING…"
+                    recalibrateAllMessage = String(localized: "RECALIBRATING…")
                     Task { await store.load() }
                 }
                 Button("Cancel", role: .cancel) {}
@@ -406,16 +406,16 @@ struct SettingsView: View {
 
     private var trackedSummary: String {
         if let set = settings.trackedStreaks {
-            return "\(set.count) PICKED"
+            return String(localized: "\(set.count) PICKED")
         }
-        return "ALL"
+        return String(localized: "ALL")
     }
 
     // MARK: - Notifications
 
     private var notificationsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Notifications")
+            PixelSectionHeader(title: String(localized: "Notifications"))
             if !storeKit.isPro {
                 lockedProactiveAlertsCard
             } else {
@@ -574,7 +574,7 @@ struct SettingsView: View {
 
     private var metricsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Metrics Tracked")
+            PixelSectionHeader(title: String(localized: "Metrics Tracked"))
             VStack(spacing: 0) {
                 let visibleMetrics = StreakMetric.allCases.filter { $0 != .earlySteps }
                 ForEach(Array(visibleMetrics.enumerated()), id: \.offset) { idx, metric in
@@ -643,7 +643,7 @@ struct SettingsView: View {
 
     private var dataSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Data")
+            PixelSectionHeader(title: String(localized: "Data"))
             Button {
                 Task { await store.load() }
             } label: {
@@ -666,7 +666,7 @@ struct SettingsView: View {
 
     private var plannedFreezesSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Planned Freezes")
+            PixelSectionHeader(title: String(localized: "Planned Freezes"))
 
             if storeKit.isPro {
                 proFreezesContent
@@ -801,7 +801,7 @@ struct SettingsView: View {
                     .lineSpacing(2)
 
                 if !settings.plannedFreezes.isEmpty {
-                    Text("\(settings.plannedFreezes.count) freeze day\(settings.plannedFreezes.count == 1 ? "" : "s") set")
+                    Text("\(settings.plannedFreezes.count) freeze days set")
                         .font(RetroFont.mono(10))
                         .foregroundStyle(Theme.retroInkFaint)
                 }
@@ -819,7 +819,7 @@ struct SettingsView: View {
 
     private func formatFreezeDate(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "EEE, MMM d"
+        formatter.setLocalizedDateFormatFromTemplate("EEEMMMd")
         return formatter.string(from: date)
     }
 
@@ -827,7 +827,7 @@ struct SettingsView: View {
 
     private var coachSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Coaching")
+            PixelSectionHeader(title: String(localized: "Coaching"))
 
             VStack(alignment: .leading, spacing: 14) {
                 HStack(alignment: .top, spacing: 12) {
@@ -857,25 +857,25 @@ struct SettingsView: View {
 
                 ViewThatFits(in: .horizontal) {
                     HStack(spacing: 8) {
-                        coachTag(title: "1-on-1 live", systemImage: "video.fill", tint: CoachBrand.aquamarine)
-                        coachTag(title: "Custom plans", systemImage: "checklist", tint: CoachBrand.dustyRose)
+                        coachTag(title: String(localized: "1-on-1 live"), systemImage: "video.fill", tint: CoachBrand.aquamarine)
+                        coachTag(title: String(localized: "Custom plans"), systemImage: "checklist", tint: CoachBrand.dustyRose)
                     }
 
                     VStack(alignment: .leading, spacing: 8) {
-                        coachTag(title: "1-on-1 live", systemImage: "video.fill", tint: CoachBrand.aquamarine)
-                        coachTag(title: "Custom plans", systemImage: "checklist", tint: CoachBrand.dustyRose)
+                        coachTag(title: String(localized: "1-on-1 live"), systemImage: "video.fill", tint: CoachBrand.aquamarine)
+                        coachTag(title: String(localized: "Custom plans"), systemImage: "checklist", tint: CoachBrand.dustyRose)
                     }
                 }
 
                 ViewThatFits(in: .horizontal) {
                     HStack(spacing: 10) {
-                        coachLinkButton(title: "Contact Elsa", systemImage: "arrow.up.right", destination: Self.coachContactURL, prominent: true)
-                        coachLinkButton(title: "View services", systemImage: "list.bullet.clipboard", destination: Self.coachServicesURL, prominent: false)
+                        coachLinkButton(title: String(localized: "Contact Elsa"), systemImage: "arrow.up.right", destination: Self.coachContactURL, prominent: true)
+                        coachLinkButton(title: String(localized: "View services"), systemImage: "list.bullet.clipboard", destination: Self.coachServicesURL, prominent: false)
                     }
 
                     VStack(spacing: 10) {
-                        coachLinkButton(title: "Contact Elsa", systemImage: "arrow.up.right", destination: Self.coachContactURL, prominent: true)
-                        coachLinkButton(title: "View services", systemImage: "list.bullet.clipboard", destination: Self.coachServicesURL, prominent: false)
+                        coachLinkButton(title: String(localized: "Contact Elsa"), systemImage: "arrow.up.right", destination: Self.coachContactURL, prominent: true)
+                        coachLinkButton(title: String(localized: "View services"), systemImage: "list.bullet.clipboard", destination: Self.coachServicesURL, prominent: false)
                     }
                 }
             }
@@ -967,9 +967,9 @@ struct SettingsView: View {
 
     private var aboutSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "About")
+            PixelSectionHeader(title: String(localized: "About"))
             VStack(spacing: 0) {
-                aboutRow(label: "VERSION",
+                aboutRow(label: String(localized: "VERSION"),
                          value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
                 dashedLine
                 if let url = URL(string: "https://jackwallner.github.io/fitness-streaks/privacy-policy.html") {

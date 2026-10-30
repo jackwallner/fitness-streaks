@@ -48,17 +48,17 @@ struct WatchTodayView: View {
 
     private var dataFreshness: (icon: String, text: String, color: Color) {
         guard let updated = store.lastUpdated else {
-            return ("exclamationmark.triangle", "Data age unknown", .orange)
+            return ("exclamationmark.triangle", String(localized: "Data age unknown"), .orange)
         }
         let age = Date().timeIntervalSince(updated)
         if age < 300 { // < 5 minutes
-            return ("checkmark.circle", "Just updated", .green)
+            return ("checkmark.circle", String(localized: "Just updated"), .green)
         } else if age < 3600 { // < 1 hour
-            return ("checkmark.circle", "Updated \(Int(age/60))m ago", .secondary)
+            return ("checkmark.circle", String(localized: "Updated \(Int(age/60))m ago"), .secondary)
         } else if age < 86400 { // < 24 hours
-            return ("clock", "Updated \(Int(age/3600))h ago", .secondary)
+            return ("clock", String(localized: "Updated \(Int(age/3600))h ago"), .secondary)
         } else {
-            return ("exclamationmark.circle", "Updated \(Int(age/86400))d ago", .orange)
+            return ("exclamationmark.circle", String(localized: "Updated \(Int(age/86400))d ago"), .orange)
         }
     }
 
@@ -112,7 +112,7 @@ struct WatchTodayView: View {
 
             HStack(spacing: 6) {
                 detailPill(streak.thresholdLabel, systemImage: "target")
-                detailPill("Best \(streak.best)", systemImage: "crown.fill")
+                detailPill(String(localized: "Best \(streak.best)"), systemImage: "crown.fill")
             }
         }
         .padding(10)
@@ -189,15 +189,15 @@ struct WatchTodayView: View {
     private func unitLabel(for streak: Streak, abbreviated: Bool) -> String {
         switch streak.cadence {
         case .daily:
-            return abbreviated ? "d" : (streak.current == 1 ? "day" : "days")
+            return abbreviated ? String(localized: "unit.dayShort", defaultValue: "d") : streak.cadence.unitWord(streak.current)
         case .weekly:
-            return abbreviated ? "w" : (streak.current == 1 ? "week" : "weeks")
+            return abbreviated ? String(localized: "unit.weekShort", defaultValue: "w") : streak.cadence.unitWord(streak.current)
         }
     }
 
     private func progressText(for streak: Streak) -> String {
         if streak.currentUnitCompleted {
-            return streak.cadence == .daily ? "Today is locked in" : "This week is locked in"
+            return streak.cadence == .daily ? String(localized: "Today is locked in") : String(localized: "This week is locked in")
         }
         let current = streak.format(currentUnitValue: streak.currentUnitValue)
         return "\(current) / \(streak.thresholdLabel)"

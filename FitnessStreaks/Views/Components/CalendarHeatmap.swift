@@ -9,10 +9,10 @@ enum HeatmapDateRange: String, CaseIterable {
 
     var label: String {
         switch self {
-        case .last30Days: return "30d"
-        case .last90Days: return "90d"
-        case .last180Days: return "6mo"
-        case .fullYear: return "1yr"
+        case .last30Days: return String(localized: "range.30d", defaultValue: "30d")
+        case .last90Days: return String(localized: "range.90d", defaultValue: "90d")
+        case .last180Days: return String(localized: "range.6mo", defaultValue: "6mo")
+        case .fullYear: return String(localized: "range.1yr", defaultValue: "1yr")
         }
     }
 
@@ -229,7 +229,7 @@ struct CalendarHeatmap: View {
 
     private func weekdayLabels(cellHeight: CGFloat) -> some View {
         VStack(spacing: gap) {
-            ForEach(["M", "T", "W", "T", "F", "S", "S"], id: \.self) { label in
+            ForEach(Array(Self.mondayFirstWeekdayInitials.enumerated()), id: \.offset) { _, label in
                 Text(label)
                     .font(RetroFont.pixel(7))
                     .foregroundStyle(Theme.retroInkDim)
@@ -294,21 +294,27 @@ struct CalendarHeatmap: View {
         return Theme.retroInkFaint.opacity(0.2)
     }
 
+    /// "M T W T F S S" in the user's language, Monday first like the grid rows.
+    private static let mondayFirstWeekdayInitials: [String] = {
+        let symbols = Calendar.current.veryShortStandaloneWeekdaySymbols
+        return Array(symbols[1...]) + [symbols[0]]
+    }()
+
     private func monthName(for date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMM"
+        formatter.setLocalizedDateFormatFromTemplate("MMM")
         return formatter.string(from: date).uppercased()
     }
 
     private var rangeLabelStart: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d"
+        formatter.setLocalizedDateFormatFromTemplate("MMMd")
         return formatter.string(from: firstVisibleDay).uppercased()
     }
 
     private var rangeLabelEnd: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d"
+        formatter.setLocalizedDateFormatFromTemplate("MMMd")
         return formatter.string(from: today).uppercased()
     }
 }

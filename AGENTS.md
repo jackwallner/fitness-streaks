@@ -60,3 +60,4 @@ the global agent rules + the `ios-dev` skill.
 
 - [Android](.claude/rules/android.md): native phone port, local Pro verification, Health Connect differences and billing.
 - [iPhone Duo](.claude/rules/iphone-duo.md): unfolded two-pane layout (tabs beside the streak detail), split math and capture tour.
+- [Localization](.claude/rules/localization.md): one string catalog in Shared for 8 languages, `Tools/Localization/check.py`, whole-sentence keys, plurals and inline metric names.

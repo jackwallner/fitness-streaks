@@ -65,7 +65,7 @@ struct DashboardView: View {
                                 StreakHero(streak: hero)
                             }
                             .buttonStyle(.plain)
-                            .accessibilityLabel("\(hero.metric.displayName) streak: \(hero.current) \(hero.cadence.pluralLabel), threshold \(Int(hero.threshold)) \(hero.metric.unitLabel)")
+                            .accessibilityLabel("\(hero.displayName) streak: \(hero.cadence.count(hero.current)), threshold \(hero.thresholdLabel)")
                             .accessibilityHint("View streak details")
                             .padding(.horizontal, 6)
                             .coachmarkAnchor("hero")
@@ -79,8 +79,8 @@ struct DashboardView: View {
 
                         if !gridCells.isEmpty {
                             PixelSectionHeader(title: detailPane == nil
-                                ? "Other Streaks · \(store.badges.count) Active"
-                                : "Your Streaks · \(store.badges.count + 1) Active")
+                                ? String(localized: "Other Streaks · \(store.badges.count) Active")
+                                : String(localized: "Your Streaks · \(store.badges.count + 1) Active"))
                                 .padding(.top, 2)
 
                             badgeGrid
@@ -202,26 +202,26 @@ struct DashboardView: View {
         var steps: [CoachmarkStep] = [
             CoachmarkStep(
                 anchorID: "hero",
-                title: "YOUR HERO STREAK",
-                body: "The longest active run we found in your Apple Health history. Today doesn't break it. Stay above the threshold and the count climbs tomorrow."
+                title: String(localized: "YOUR HERO STREAK"),
+                body: String(localized: "The longest active run we found in your Apple Health history. Today doesn't break it. Stay above the threshold and the count climbs tomorrow.")
             )
         ]
         if !visibleBadges.isEmpty {
             steps.append(CoachmarkStep(
                 anchorID: "badges",
-                title: "OTHER ACTIVE STREAKS",
-                body: "Every other streak we found, ranked by your intensity setting. Tap any badge for history, threshold, and recent days."
+                title: String(localized: "OTHER ACTIVE STREAKS"),
+                body: String(localized: "Every other streak we found, ranked by your intensity setting. Tap any badge for history, threshold, and recent days.")
             ))
         }
         steps.append(CoachmarkStep(
             anchorID: "findMore",
-            title: "FIND MORE STREAKS",
-            body: "Add ones you skipped at setup, build a custom streak for a specific workout, or surface streaks that just got long enough to count."
+            title: String(localized: "FIND MORE STREAKS"),
+            body: String(localized: "Add ones you skipped at setup, build a custom streak for a specific workout, or surface streaks that just got long enough to count.")
         ))
         steps.append(CoachmarkStep(
             anchorID: "gear",
-            title: "TUNE EVERYTHING ELSE",
-            body: "Change intensity, schedule planned freezes for travel or sick days, set a daily reminder, or replay this tour from About."
+            title: String(localized: "TUNE EVERYTHING ELSE"),
+            body: String(localized: "Change intensity, schedule planned freezes for travel or sick days, set a daily reminder, or replay this tour from About.")
         ))
         return steps
     }
@@ -361,14 +361,15 @@ struct DashboardView: View {
     private var topBar: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("▶ \(FitnessBrand.name.uppercased())")
+                Text(verbatim: "▶ \(FitnessBrand.name.uppercased())")
                     .font(RetroFont.mono(11, weight: .bold))
                     .tracking(1)
                     .foregroundStyle(Theme.retroMagenta)
                 if let updated = store.lastUpdated {
+                    let age = relative(updated)
                     Text(store.isRefreshing
-                         ? "\(relative(updated)) · refreshing…"
-                         : "\(relative(updated)) · apple health")
+                         ? String(localized: "\(age) · refreshing…")
+                         : String(localized: "\(age) · apple health"))
                         .font(RetroFont.mono(10))
                         .foregroundStyle(Theme.retroInkDim)
                 } else {
@@ -480,12 +481,12 @@ struct DashboardView: View {
 
     private func riskText(for streak: Streak) -> String {
         let remaining = max(0, streak.threshold - streak.currentUnitValue)
-        let v = streak.metric.format(value: remaining)
-        let unit = streak.metric.unitLabel
+        let amount = StreakMetric.valueLabel(streak.metric, streak.metric.format(value: remaining))
         if let window = streak.window {
-            return "\(v) \(unit) between \(window.label) to finish today"
+            let hours = window.label
+            return String(localized: "\(amount) between \(hours) to finish today")
         }
-        return "\(v) \(unit) to finish today"
+        return String(localized: "\(amount) to finish today")
     }
 
     private var streaksPlusActive: Bool { storeKit.isPro }
@@ -538,21 +539,21 @@ struct DashboardView: View {
     }
 
     private func graceStatusTitle(for hero: Streak) -> String {
-        if streaksPlusActive { return "AUTO-SAVE ON" }
-        if streaksPlusActivating { return "ACTIVATING STREAKS+" }
-        return storeKit.hasEligibleTrial ? "TRY STREAKS+ FREE" : "UNLOCK STREAKS+"
+        if streaksPlusActive { return String(localized: "AUTO-SAVE ON") }
+        if streaksPlusActivating { return String(localized: "ACTIVATING STREAKS+") }
+        return storeKit.hasEligibleTrial ? String(localized: "TRY STREAKS+ FREE") : String(localized: "UNLOCK STREAKS+")
     }
 
     private func graceStatusDetail(for hero: Streak) -> String {
         if streaksPlusActive {
-            return "Streaks+ auto-saves any missed day. Your streak survives."
+            return String(localized: "Streaks+ auto-saves any missed day. Your streak survives.")
         }
         if streaksPlusActivating {
-            return "Your purchase is syncing. Streak picks restore in a moment."
+            return String(localized: "Your purchase is syncing. Streak picks restore in a moment.")
         }
         return storeKit.hasEligibleTrial
-            ? "Start a trial. Streaks+ auto-saves every missed day."
-            : "Streaks+ auto-saves every missed day."
+            ? String(localized: "Start a trial. Streaks+ auto-saves every missed day.")
+            : String(localized: "Streaks+ auto-saves every missed day.")
     }
 
     private func brokenBanner(_ broken: BrokenStreak) -> some View {
@@ -564,7 +565,7 @@ struct DashboardView: View {
                     .font(RetroFont.mono(9, weight: .bold))
                     .tracking(1)
                     .foregroundStyle(Theme.retroRed)
-                Text("\(broken.brokenLength)-\(broken.cadence.label) \(broken.metric.displayName.lowercased()) run · TAP FOR OPTIONS")
+                Text(brokenBannerText(broken))
                     .font(RetroFont.mono(10))
                     .foregroundStyle(Theme.retroInk)
                     .lineLimit(1)
@@ -576,7 +577,25 @@ struct DashboardView: View {
             .pixelPanel(color: Theme.retroRed, fill: Theme.retroBg)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Streak ended: \(broken.brokenLength) \(broken.cadence.pluralLabel) \(broken.metric.displayName.lowercased()) run. Tap for recovery options.")
+        .accessibilityLabel(brokenBannerAccessibility(broken))
+    }
+
+    private func brokenBannerText(_ broken: BrokenStreak) -> String {
+        let n = broken.brokenLength
+        let name = broken.metric.inlineName
+        switch broken.cadence {
+        case .daily: return String(localized: "\(n)-day \(name) run · TAP FOR OPTIONS")
+        case .weekly: return String(localized: "\(n)-week \(name) run · TAP FOR OPTIONS")
+        }
+    }
+
+    private func brokenBannerAccessibility(_ broken: BrokenStreak) -> String {
+        let n = broken.brokenLength
+        let name = broken.metric.inlineName
+        switch broken.cadence {
+        case .daily: return String(localized: "Streak ended: \(n)-day \(name) run. Tap for recovery options.")
+        case .weekly: return String(localized: "Streak ended: \(n)-week \(name) run. Tap for recovery options.")
+        }
     }
 
     private var findMoreButton: some View {
@@ -614,7 +633,7 @@ struct DashboardView: View {
                             .paneSelection(isShown(streak), accent: streak.metric.accent)
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("\(streak.metric.displayName) streak: \(streak.current) \(streak.cadence.pluralLabel)")
+                    .accessibilityLabel("\(streak.displayName) streak: \(streak.cadence.count(streak.current))")
                     .modifier(HeroCoachmark(isHero: streak.id == store.hero?.id))
                 case .findMore:
                     if let hero = store.hero {
@@ -640,7 +659,7 @@ struct DashboardView: View {
                         Text("+")
                             .font(RetroFont.mono(22, weight: .bold))
                             .foregroundStyle(Theme.retroLime)
-                        Text("FIND MORE STREAKS")
+                        Text(String(localized: "FIND MORE STREAKS"))
                             .font(RetroFont.mono(9, weight: .bold))
                             .tracking(1)
                             .foregroundStyle(Theme.retroInkDim)
@@ -734,8 +753,8 @@ struct DashboardView: View {
 
     private func relative(_ date: Date) -> String {
         let age = Date().timeIntervalSince(date)
-        if age < 30 { return "just updated" }
-        if age < 60 { return "<1 min ago" }
+        if age < 30 { return String(localized: "just updated") }
+        if age < 60 { return String(localized: "<1 min ago") }
         return Self.relativeFormatter.localizedString(for: date, relativeTo: .now)
     }
 
@@ -762,10 +781,10 @@ struct DashboardView: View {
             await store.load()
         } catch is HealthKitError {
             log.error("Manual health access request failed with HealthKitError")
-            healthAccessErrorText = "Could not request Health access from iOS. If the prompt does not appear, open Health or Settings and enable access for Streaks."
+            healthAccessErrorText = String(localized: "Could not request Health access from iOS. If the prompt does not appear, open Health or Settings and enable access for Streaks.")
         } catch {
             log.error("Manual health access request failed: \(String(describing: error))")
-            healthAccessErrorText = "Could not request Health access from iOS. Open Settings and enable Health access for Streaks."
+            healthAccessErrorText = String(localized: "Could not request Health access from iOS. Open Settings and enable Health access for Streaks.")
         }
     }
 }

@@ -109,12 +109,12 @@ struct StreakBadgeCard: View {
     }
 
     private var chargeLabel: String {
-        let unit = streak.current == 1 ? streak.cadence.label : streak.cadence.pluralLabel
+        let count = streak.cadence.count(streak.current)
         if streak.currentUnitCompleted {
-            return "\(streak.current) \(unit) · DONE"
+            return String(localized: "\(count) · DONE")
         } else {
-            let pct = Int(min(1, streak.currentUnitProgress) * 100)
-            return "\(pct)% · \(streak.current) \(unit)"
+            let pct = min(1, streak.currentUnitProgress).formatted(.percent.precision(.fractionLength(0)))
+            return "\(pct) · \(count)"
         }
     }
 
