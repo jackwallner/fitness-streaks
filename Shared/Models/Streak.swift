@@ -7,9 +7,11 @@ struct HourWindow: Hashable, Sendable, Codable {
     let startHour: Int   // 0...23
 
     var label: String {
-        let s = Self.format(hour: startHour)
-        let e = Self.format(hour: (startHour + 1) % 24)
-        return "\(s)-\(e)"
+        let end = (startHour + 1) % 24
+        guard Bundle.main.preferredLocalizations.first == "en" else {
+            return String(localized: "\(startHour)-\(end) (24-hour window)")
+        }
+        return "\(Self.format(hour: startHour))-\(Self.format(hour: end))"
     }
 
     static func format(hour: Int) -> String {
@@ -139,6 +141,12 @@ struct Streak: Identifiable, Hashable, Sendable {
         return metric.displayName
     }
 
+    /// The name inside a sentence; see `StreakMetric.inlineName`.
+    var inlineName: String {
+        if let entry = workoutTypeEntry { return entry.inlineName }
+        return metric.inlineName
+    }
+
     /// Best symbol for this streak — uses workout type when set, else metric.
     var displaySymbol: String {
         if let entry = workoutTypeEntry { return entry.symbol }
@@ -170,8 +178,7 @@ struct Streak: Identifiable, Hashable, Sendable {
             case .count: return "\(Int(currentUnitValue))"
             case .minutes: return "\(Int(currentUnitValue))"
             case .miles:
-                let truncated = floor(currentUnitValue * 10) / 10
-                return String(format: truncated < 10 ? "%.1f" : "%.0f", truncated)
+                return LocalizedNumber.oneDecimalUnderTen(floor(currentUnitValue * 10) / 10)
             }
         }
         return metric.formatTruncating(value: currentUnitValue)
@@ -183,30 +190,33 @@ struct Streak: Identifiable, Hashable, Sendable {
     }
 
     static func workoutThresholdLabel(_ threshold: Double, entry: WorkoutTypeCatalog.Entry, measure: WorkoutMeasure) -> String {
-        let name = entry.displayName.lowercased()
+        let name = entry.inlineName
         switch measure {
         case .count:
-            let n = Int(threshold.rounded())
-            return n <= 1 ? "1 \(name) session" : "\(n) \(name) sessions"
+            let n = max(1, Int(threshold.rounded()))
+            return String(localized: "\(n) \(name) sessions")
         case .minutes:
-            return "\(Int(threshold.rounded())) min \(name)"
+            let n = Int(threshold.rounded())
+            return String(localized: "\(n) min \(name)")
         case .miles:
-            let formatted = threshold < 10 ? String(format: "%.1f", threshold) : String(format: "%.0f", threshold)
-            return "\(formatted) mi \(name)"
+            let v = LocalizedNumber.oneDecimalUnderTen(threshold)
+            return String(localized: "\(v) mi \(name)")
         }
     }
 
     static func workoutProse(_ threshold: Double, entry: WorkoutTypeCatalog.Entry, measure: WorkoutMeasure) -> String {
-        let name = entry.displayName.lowercased()
+        let name = entry.inlineName
         switch measure {
         case .count:
             let n = Int(threshold.rounded())
-            return n <= 1 ? "A \(name) session every day" : "\(n)+ \(name) sessions every day"
+            if n <= 1 { return String(localized: "A \(name) session every day") }
+            return String(localized: "\(n)+ \(name) sessions every day")
         case .minutes:
-            return "\(Int(threshold.rounded()))+ min of \(name) every day"
+            let n = Int(threshold.rounded())
+            return String(localized: "\(n)+ min of \(name) every day")
         case .miles:
-            let formatted = threshold < 10 ? String(format: "%.1f", threshold) : String(format: "%.0f", threshold)
-            return "\(formatted)+ mi of \(name) every day"
+            let v = LocalizedNumber.oneDecimalUnderTen(threshold)
+            return String(localized: "\(v)+ mi of \(name) every day")
         }
     }
 }

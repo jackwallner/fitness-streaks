@@ -58,19 +58,20 @@ enum NotificationService {
               let reminder = bestReminderCandidate(from: streaks) else { return }
 
         let heroLabel = reminder.metric.thresholdLabel(reminder.threshold, cadence: reminder.cadence)
-        let unit = reminder.cadence.pluralLabel
-        let deadline: String
-        if let window = reminder.window {
-            deadline = "by \(window.label)"
-        } else if reminder.cadence == .weekly {
-            deadline = "this week"
-        } else {
-            deadline = "before midnight"
-        }
+        let n = reminder.current
 
         let content = UNMutableNotificationContent()
-        content.title = "Keep the \(heroLabel) streak alive"
-        content.body = "You're at \(reminder.current) \(unit). Get it in \(deadline)."
+        content.title = String(localized: "Keep the \(heroLabel) streak alive")
+        if let window = reminder.window {
+            let hours = window.label
+            content.body = reminder.cadence == .weekly
+                ? String(localized: "You're at \(n) weeks. Get it in by \(hours).")
+                : String(localized: "You're at \(n) days. Get it in by \(hours).")
+        } else if reminder.cadence == .weekly {
+            content.body = String(localized: "You're at \(n) weeks. Get it in this week.")
+        } else {
+            content.body = String(localized: "You're at \(n) days. Get it in before midnight.")
+        }
         content.sound = .default
         content.interruptionLevel = .active
 
@@ -102,8 +103,12 @@ enum NotificationService {
         guard await isAuthorized() else { return }
 
         let content = UNMutableNotificationContent()
-        content.title = "Streak ended"
-        content.body = "Your \(broken.metric.displayName.lowercased()) streak ended at \(broken.brokenLength) \(broken.cadence.pluralLabel). Keep the same goal or pick a new one in the app."
+        let name = broken.metric.inlineName
+        let n = broken.brokenLength
+        content.title = String(localized: "Streak ended")
+        content.body = broken.cadence == .weekly
+            ? String(localized: "Your \(name) streak ended at \(n) weeks. Keep the same goal or pick a new one in the app.")
+            : String(localized: "Your \(name) streak ended at \(n) days. Keep the same goal or pick a new one in the app.")
         content.sound = .default
         content.interruptionLevel = .active
 

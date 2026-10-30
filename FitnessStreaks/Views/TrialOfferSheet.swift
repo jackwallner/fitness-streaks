@@ -37,11 +37,12 @@ struct TrialOfferSheet: View {
 
     @State private var restoreStatus: String?
 
-    private var offerLabel: String? {
+    /// Free-trial length in days when the resolved package still has an unused trial.
+    private var offerDays: Int? {
         #if REVENUECAT
         guard let package = storeKit.preferredOfferPackage,
               storeKit.isEligibleForIntroOffer(package) else { return nil }
-        return package.streaksIntroOfferLabel
+        return package.streaksIntroOfferDays
         #else
         return nil
         #endif
@@ -57,10 +58,20 @@ struct TrialOfferSheet: View {
 
     private var directPurchase: Bool { priceLabel != nil }
 
+    /// "$0.00" in the offer's currency.
+    private var zeroPriceLabel: String {
+        #if REVENUECAT
+        if let package = storeKit.preferredOfferPackage { return package.streaksZeroPriceLabel }
+        #endif
+        return Decimal(0).formatted(.currency(code: Locale.current.currency?.identifier ?? "USD"))
+    }
+
     struct LongestStreakInfo {
         let displayName: String
+        /// Sentence form of the name; see `StreakMetric.inlineName`.
+        let inlineName: String
         let current: Int
-        let cadenceLabel: String  // "day" / "week"
+        let cadence: StreakCadence
     }
 
     private static let privacyURL = URL(string: "https://jackwallner.github.io/fitness-streaks/privacy-policy.html")!
@@ -73,64 +84,73 @@ struct TrialOfferSheet: View {
         (longestStreak?.current ?? 0) >= 3
     }
 
-    /// Trial length parsed from `offerLabel` (e.g. "7-day free trial" → 7).
-    /// Defaults to 7 when unparseable so the timeline still renders sensibly.
-    private var trialDays: Int {
-        guard let offerLabel,
-              let first = offerLabel.split(separator: "-").first,
-              let days = Int(first) else {
-            return 7
-        }
-        return days
-    }
+    /// Defaults to 7 so the timeline still renders sensibly.
+    private var trialDays: Int { offerDays ?? 7 }
 
     private var headline: String {
         if let headlineOverride { return headlineOverride }
         if let s = longestStreak, hasMeaningfulStreak {
-            return "KEEP YOUR \(s.current)-\(s.cadenceLabel.uppercased()) \(s.displayName.uppercased()) STREAK ALIVE."
+            let n = s.current
+            let name = s.inlineName.uppercased()
+            return s.cadence == .weekly
+                ? String(localized: "KEEP YOUR \(n)-WEEK \(name) STREAK ALIVE.")
+                : String(localized: "KEEP YOUR \(n)-DAY \(name) STREAK ALIVE.")
         }
-        if let offerLabel {
-            return "\(offerLabel.uppercased()), ON US."
+        if let offerDays {
+            return String(localized: "\(offerDays)-DAY FREE TRIAL, ON US.")
         }
-        return "UNLOCK STREAKS+."
+        return String(localized: "UNLOCK STREAKS+.")
     }
 
     private var subheadline: String {
         if let subheadlineOverride { return subheadlineOverride }
-        // "7-day free trial" -> ", free for your 7-day trial" (keeping "trial" so the
-        // sentence doesn't dangle as "...earned, free for your 7-day.").
-        let trialClause = offerLabel.map { ", free for your \($0.replacingOccurrences(of: " free trial", with: " trial"))" } ?? ""
         if hasMeaningfulStreak {
-            return "One missed \(longestStreak?.cadenceLabel ?? "day") zeroes it out. Streaks+ auto-saves the run and tracks every streak you've earned\(trialClause)."
+            let weekly = longestStreak?.cadence == .weekly
+            switch (weekly, offerDays) {
+            case (false, let days?):
+                return String(localized: "One missed day zeroes it out. Streaks+ auto-saves the run and tracks every streak you've earned, free for your \(days)-day trial.")
+            case (true, let days?):
+                return String(localized: "One missed week zeroes it out. Streaks+ auto-saves the run and tracks every streak you've earned, free for your \(days)-day trial.")
+            case (false, nil):
+                return String(localized: "One missed day zeroes it out. Streaks+ auto-saves the run and tracks every streak you've earned.")
+            case (true, nil):
+                return String(localized: "One missed week zeroes it out. Streaks+ auto-saves the run and tracks every streak you've earned.")
+            }
         }
-        if offerLabel != nil {
-            return "Unlock the full Streaks+ toolkit free. No charge until your trial ends."
+        if offerDays != nil {
+            return String(localized: "Unlock the full Streaks+ toolkit free. No charge until your trial ends.")
         }
-        return "Unlock the full Streaks+ toolkit."
+        return String(localized: "Unlock the full Streaks+ toolkit.")
     }
 
     private var bullets: [TrialBullet] {
-        let unlimitedDetail = "Free caps you at \(freeCap). Streaks+ tracks every metric you've earned, including future picks."
+        let unlimitedDetail = String(localized: "Free caps you at \(freeCap). Streaks+ tracks every metric you've earned, including future picks.")
+        let autoSaveTitle: String = {
+            guard hasMeaningfulStreak, let name = longestStreak?.displayName else {
+                return String(localized: "Auto-save when one breaks")
+            }
+            return String(localized: "Auto-save your \(name) if you miss a day")
+        }()
         return [
             TrialBullet(
                 icon: "flame.fill",
                 tint: Theme.retroMagenta,
-                title: hasMeaningfulStreak
-                    ? "Auto-save your \(longestStreak?.displayName ?? "streak") if you miss a day"
-                    : "Auto-save when one breaks",
-                detail: "Miss a \(longestStreak?.cadenceLabel ?? "day") later on? Streaks+ revives the run instead of zeroing it."
+                title: autoSaveTitle,
+                detail: longestStreak?.cadence == .weekly
+                    ? String(localized: "Miss a week later on? Streaks+ revives the run instead of zeroing it.")
+                    : String(localized: "Miss a day later on? Streaks+ revives the run instead of zeroing it.")
             ),
             TrialBullet(
                 icon: "infinity",
                 tint: Theme.retroCyan,
-                title: "Track every streak",
+                title: String(localized: "Track every streak"),
                 detail: unlimitedDetail
             ),
             TrialBullet(
                 icon: "wand.and.stars",
                 tint: Theme.retroLime,
-                title: "Custom streaks",
-                detail: "Define your own threshold, cadence, and hour window, beyond the discovered set."
+                title: String(localized: "Custom streaks"),
+                detail: String(localized: "Define your own threshold, cadence, and hour window, beyond the discovered set.")
             )
         ]
     }
@@ -162,7 +182,7 @@ struct TrialOfferSheet: View {
                         ForEach(bullets) { TrialBulletRow(bullet: $0) }
                     }
 
-                    if offerLabel != nil {
+                    if offerDays != nil {
                         TrialTimeline(trialDays: trialDays, priceLabel: priceLabel)
                     }
                 }
@@ -190,7 +210,7 @@ struct TrialOfferSheet: View {
                         )
                     }
                     #endif
-                    return "\(priceLabel). Renews automatically; cancel in Settings > Subscriptions."
+                    return String(localized: "\(priceLabel). Renews automatically; cancel in Settings > Subscriptions.")
                 }()
                 Text(footnote)
                     .font(.system(.caption2, design: .rounded))
@@ -249,8 +269,8 @@ struct TrialOfferSheet: View {
 
             // Subordinate to the billed amount in the CTA (Apple 3.1.2(c)):
             // dim ink, caption size — reassurance, not the headline price.
-            if offerLabel != nil {
-                Text("$0.00 due today · Billed by Apple")
+            if offerDays != nil {
+                Text("\(zeroPriceLabel) due today · Billed by Apple")
                     .font(.system(.caption2, design: .monospaced))
                     .foregroundStyle(Theme.retroInkDim)
                     .multilineTextAlignment(.center)
@@ -308,26 +328,27 @@ struct TrialOfferSheet: View {
     /// CTA names the plan + recurring price (Apple 3.1.2). "Start my free trial"
     /// alone has been rejected for not disclosing the subscription term.
     private var primaryCTATitle: String {
-        if !directPurchase { return "SEE PLANS" }
-        if offerLabel != nil { return "START FREE TRIAL" }
-        return "SUBSCRIBE"
+        if !directPurchase { return String(localized: "SEE PLANS") }
+        if offerDays != nil { return String(localized: "START FREE TRIAL") }
+        return String(localized: "SUBSCRIBE")
     }
 
     private var primaryCTASubtitle: String? {
         guard directPurchase, let priceLabel else { return nil }
-        if offerLabel != nil {
-            return "THEN \(priceLabel.uppercased())"
+        if offerDays != nil {
+            let price = priceLabel.uppercased()
+            return String(localized: "THEN \(price)")
         }
         return priceLabel.uppercased()
     }
 
     private func restorePurchases() async {
-        restoreStatus = "Restoring…"
+        restoreStatus = String(localized: "Restoring…")
         await storeKit.restore()
         if storeKit.isPro {
-            restoreStatus = "Streaks+ restored."
+            restoreStatus = String(localized: "Streaks+ restored.")
         } else {
-            restoreStatus = storeKit.lastError ?? "No active subscription found."
+            restoreStatus = storeKit.lastError ?? String(localized: "No active subscription found.")
         }
     }
 

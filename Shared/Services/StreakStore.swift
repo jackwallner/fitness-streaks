@@ -20,10 +20,10 @@ final class StreakStore: ObservableObject {
         var label: String {
             switch self {
             case .idle: ""
-            case .readingHistory: "READING ACTIVITY HISTORY"
-            case .analyzingPatterns: "ANALYZING TIME-OF-DAY PATTERNS"
-            case .discoveringStreaks: "DISCOVERING STREAKS"
-            case .finalizing: "FINALIZING"
+            case .readingHistory: String(localized: "READING ACTIVITY HISTORY")
+            case .analyzingPatterns: String(localized: "ANALYZING TIME-OF-DAY PATTERNS")
+            case .discoveringStreaks: String(localized: "DISCOVERING STREAKS")
+            case .finalizing: String(localized: "FINALIZING")
             }
         }
     }

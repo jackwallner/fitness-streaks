@@ -20,18 +20,38 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .steps: "Steps"
-        case .exerciseMinutes: "Exercise"
-        case .standHours: "Stand"
-        case .activeEnergy: "Active energy"
-        case .workouts: "Workouts"
-        case .mindfulMinutes: "Mindfulness"
-        case .sleepHours: "Sleep"
-        case .distanceMiles: "Distance"
-        case .flightsClimbed: "Flights climbed"
-        case .earlySteps: "Early Steps"
-        case .intensityRatio: "Intensity"
-        case .heartRateMinutes: "Cardio Minutes"
+        case .steps: String(localized: "Steps")
+        case .exerciseMinutes: String(localized: "Exercise")
+        case .standHours: String(localized: "Stand")
+        case .activeEnergy: String(localized: "Active energy")
+        case .workouts: String(localized: "Workouts")
+        case .mindfulMinutes: String(localized: "Mindfulness")
+        case .sleepHours: String(localized: "Sleep")
+        case .distanceMiles: String(localized: "Distance")
+        case .flightsClimbed: String(localized: "Flights climbed")
+        case .earlySteps: String(localized: "Early Steps")
+        case .intensityRatio: String(localized: "Intensity")
+        case .heartRateMinutes: String(localized: "Cardio Minutes")
+        }
+    }
+
+    /// The name as it reads inside a sentence ("your steps run", "deine
+    /// Schritte-Serie", "seria kroków"): lowercase in English, the noun form
+    /// each language needs after "streak of" / "N minutes of".
+    var inlineName: String {
+        switch self {
+        case .steps: String(localized: "inline.steps", defaultValue: "steps")
+        case .exerciseMinutes: String(localized: "inline.exercise", defaultValue: "exercise")
+        case .standHours: String(localized: "inline.stand", defaultValue: "stand")
+        case .activeEnergy: String(localized: "inline.activeEnergy", defaultValue: "active energy")
+        case .workouts: String(localized: "inline.workouts", defaultValue: "workouts")
+        case .mindfulMinutes: String(localized: "inline.mindfulness", defaultValue: "mindfulness")
+        case .sleepHours: String(localized: "inline.sleep", defaultValue: "sleep")
+        case .distanceMiles: String(localized: "inline.distance", defaultValue: "distance")
+        case .flightsClimbed: String(localized: "inline.flightsClimbed", defaultValue: "flights climbed")
+        case .earlySteps: String(localized: "inline.earlySteps", defaultValue: "early steps")
+        case .intensityRatio: String(localized: "inline.intensity", defaultValue: "intensity")
+        case .heartRateMinutes: String(localized: "inline.cardioMinutes", defaultValue: "cardio minutes")
         }
     }
 
@@ -107,18 +127,18 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
 
     var unitLabel: String {
         switch self {
-        case .steps: "steps"
-        case .exerciseMinutes: "min"
-        case .standHours: "hr"
-        case .activeEnergy: "kcal"
-        case .workouts: "workout"
-        case .mindfulMinutes: "min mindful"
-        case .sleepHours: "hr sleep"
-        case .distanceMiles: "mi"
-        case .flightsClimbed: "flights"
-        case .earlySteps: "early steps"
-        case .intensityRatio: "kcal/min"
-        case .heartRateMinutes: "min cardio"
+        case .steps: String(localized: "unit.steps", defaultValue: "steps")
+        case .exerciseMinutes: String(localized: "unit.min", defaultValue: "min")
+        case .standHours: String(localized: "unit.hr", defaultValue: "hr")
+        case .activeEnergy: String(localized: "unit.kcal", defaultValue: "kcal")
+        case .workouts: String(localized: "unit.workout", defaultValue: "workout")
+        case .mindfulMinutes: String(localized: "unit.minMindful", defaultValue: "min mindful")
+        case .sleepHours: String(localized: "unit.hrSleep", defaultValue: "hr sleep")
+        case .distanceMiles: String(localized: "unit.mi", defaultValue: "mi")
+        case .flightsClimbed: String(localized: "unit.flights", defaultValue: "flights")
+        case .earlySteps: String(localized: "unit.earlySteps", defaultValue: "early steps")
+        case .intensityRatio: String(localized: "unit.kcalPerMin", defaultValue: "kcal/min")
+        case .heartRateMinutes: String(localized: "unit.minCardio", defaultValue: "min cardio")
         }
     }
 
@@ -134,14 +154,11 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
         case .workouts:
             return value >= 1 ? "\(Int(floor(value)))" : "0"
         case .sleepHours:
-            let truncated = floor(value * 10) / 10
-            return String(format: "%.1f", truncated)
+            return LocalizedNumber.fixed(floor(value * 10) / 10, digits: 1)
         case .distanceMiles:
-            let truncated = floor(value * 10) / 10
-            return String(format: truncated < 10 ? "%.1f" : "%.0f", truncated)
+            return LocalizedNumber.oneDecimalUnderTen(floor(value * 10) / 10)
         case .intensityRatio:
-            let truncated = floor(value * 10) / 10
-            return String(format: "%.1f", truncated)
+            return LocalizedNumber.fixed(floor(value * 10) / 10, digits: 1)
         }
     }
 
@@ -155,49 +172,58 @@ enum StreakMetric: String, CaseIterable, Codable, Sendable, Identifiable {
         case .workouts:
             return value >= 1 ? "\(Int(value.rounded()))" : "0"
         case .sleepHours:
-            return String(format: "%.1f", value)
+            return LocalizedNumber.fixed(value, digits: 1)
         case .distanceMiles:
-            return String(format: value < 10 ? "%.1f" : "%.0f", value)
+            return LocalizedNumber.oneDecimalUnderTen(value)
         case .earlySteps:
             let v = Int(value.rounded())
             return "\(v)"
         case .intensityRatio:
-            return String(format: "%.1f", value)
+            return LocalizedNumber.fixed(value, digits: 1)
         case .heartRateMinutes:
             return "\(Int(value.rounded()))"
         }
     }
 
-    /// Short label used in UI: e.g. "10k steps", "30 min", "8 hr".
+    /// Short label used in UI: e.g. "10000 steps", "30 min", "8 hr".
     func thresholdLabel(_ threshold: Double, cadence: StreakCadence) -> String {
-        switch self {
-        case .workouts:
-            return "any workout"
-        default:
-            let v = format(value: threshold)
-            return "\(v) \(unitLabel)"
+        Self.valueLabel(self, format(value: threshold))
+    }
+
+    /// Value plus unit as one phrase, so each language orders and inflects it.
+    static func valueLabel(_ metric: StreakMetric, _ v: String) -> String {
+        switch metric {
+        case .steps: String(localized: "\(v) steps")
+        case .exerciseMinutes: String(localized: "\(v) min")
+        case .standHours: String(localized: "\(v) hr")
+        case .activeEnergy: String(localized: "\(v) kcal")
+        case .workouts: String(localized: "any workout")
+        case .mindfulMinutes: String(localized: "\(v) min mindful")
+        case .sleepHours: String(localized: "\(v) hr sleep")
+        case .distanceMiles: String(localized: "\(v) mi")
+        case .flightsClimbed: String(localized: "\(v) flights")
+        case .earlySteps: String(localized: "\(v) early steps")
+        case .intensityRatio: String(localized: "\(v) kcal/min")
+        case .heartRateMinutes: String(localized: "\(v) min cardio")
         }
     }
 
     /// Human-readable prose for the detail view, e.g. "10,000+ steps every day".
     func prose(_ threshold: Double, cadence: StreakCadence) -> String {
+        let v = self == .sleepHours ? LocalizedNumber.fixed(threshold, digits: 1) : LocalizedNumber.grouped(threshold)
         switch self {
-        case .workouts:
-            return "A workout every day"
-        default:
-            let formatted = formatWithCommas(threshold)
-            return "\(formatted)+ \(unitLabel) every day"
-        }
-    }
-
-    private func formatWithCommas(_ value: Double) -> String {
-        switch self {
-        case .sleepHours: return String(format: "%.1f", value)
-        default:
-            let nf = NumberFormatter()
-            nf.numberStyle = .decimal
-            nf.maximumFractionDigits = 0
-            return nf.string(from: NSNumber(value: value)) ?? "\(Int(value))"
+        case .steps: return String(localized: "\(v)+ steps every day")
+        case .exerciseMinutes: return String(localized: "\(v)+ min every day")
+        case .standHours: return String(localized: "\(v)+ hr every day")
+        case .activeEnergy: return String(localized: "\(v)+ kcal every day")
+        case .workouts: return String(localized: "A workout every day")
+        case .mindfulMinutes: return String(localized: "\(v)+ min mindful every day")
+        case .sleepHours: return String(localized: "\(v)+ hr sleep every day")
+        case .distanceMiles: return String(localized: "\(v)+ mi every day")
+        case .flightsClimbed: return String(localized: "\(v)+ flights every day")
+        case .earlySteps: return String(localized: "\(v)+ early steps every day")
+        case .intensityRatio: return String(localized: "\(v)+ kcal/min every day")
+        case .heartRateMinutes: return String(localized: "\(v)+ min cardio every day")
         }
     }
 }
@@ -206,17 +232,44 @@ enum StreakCadence: String, Codable, Sendable, CaseIterable {
     case daily
     case weekly
 
-    var label: String {
+    /// "12 days" / "3 weeks", pluralized per language.
+    func count(_ n: Int) -> String {
         switch self {
-        case .daily: "day"
-        case .weekly: "week"
+        case .daily: String(localized: "\(n) days")
+        case .weekly: String(localized: "\(n) weeks")
         }
     }
 
-    var pluralLabel: String {
-        switch self {
-        case .daily: "days"
-        case .weekly: "weeks"
+    /// The unit word drawn beside a separately rendered number ("12" over
+    /// "DAYS"). It can't be a plural key (Xcode rejects plural variants that
+    /// omit the number), so it picks one whole key per CLDR category.
+    func unitWord(_ n: Int) -> String {
+        switch (self, PluralLabel.category(n)) {
+        case (.daily, .one): String(localized: "day")
+        case (.daily, .few): String(localized: "days (few)", defaultValue: "days")
+        case (.daily, .many): String(localized: "days (many)", defaultValue: "days")
+        case (.daily, .other): String(localized: "days")
+        case (.weekly, .one): String(localized: "week")
+        case (.weekly, .few): String(localized: "weeks (few)", defaultValue: "weeks")
+        case (.weekly, .many): String(localized: "weeks (many)", defaultValue: "weeks")
+        case (.weekly, .other): String(localized: "weeks")
+        }
+    }
+}
+
+/// CLDR plural category of a count in the current language, read from the
+/// catalog's `"%lld plural category"` key (its variants are "one %lld",
+/// "few %lld", ...), so Polish 2-4 picks "few" without hardcoding rules.
+enum PluralLabel {
+    enum Category { case one, few, many, other }
+
+    static func category(_ n: Int) -> Category {
+        let raw = String(localized: "\(n) plural category")
+        switch raw.split(separator: " ").first {
+        case "one": return .one
+        case "few": return .few
+        case "many": return .many
+        default: return .other
         }
     }
 }

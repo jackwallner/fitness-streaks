@@ -12,25 +12,25 @@ enum DiscoveryIntensity: Int, CaseIterable, Codable, Sendable {
 
     var label: String {
         switch self {
-        case .sustainable: "Sustained"
-        case .challenging: "Challenging"
-        case .lifeChanging: "Life Changing"
+        case .sustainable: String(localized: "Sustained")
+        case .challenging: String(localized: "Challenging")
+        case .lifeChanging: String(localized: "Life Changing")
         }
     }
 
     var tagline: String {
         switch self {
-        case .sustainable: "Goals you already hit most days. Turn them into unbroken streaks."
-        case .challenging: "Goals you hit roughly 2 of 3 days. Push to make them daily."
-        case .lifeChanging: "Goals you hit about half the time. Building the daily habit changes everything."
+        case .sustainable: String(localized: "Goals you already hit most days. Turn them into unbroken streaks.")
+        case .challenging: String(localized: "Goals you hit roughly 2 of 3 days. Push to make them daily.")
+        case .lifeChanging: String(localized: "Goals you hit about half the time. Building the daily habit changes everything.")
         }
     }
 
     var short: String {
         switch self {
-        case .sustainable: "sustained"
-        case .challenging: "challenging"
-        case .lifeChanging: "life changing"
+        case .sustainable: String(localized: "short.sustained", defaultValue: "sustained")
+        case .challenging: String(localized: "short.challenging", defaultValue: "challenging")
+        case .lifeChanging: String(localized: "short.lifeChanging", defaultValue: "life changing")
         }
     }
 
@@ -51,9 +51,9 @@ enum AppAppearance: Int, CaseIterable {
 
     var label: String {
         switch self {
-        case .system: "System"
-        case .light: "Light"
-        case .dark: "Dark"
+        case .system: String(localized: "System")
+        case .light: String(localized: "Light")
+        case .dark: String(localized: "Dark")
         }
     }
 
@@ -142,8 +142,10 @@ struct StreakSnapshot: Codable, Sendable {
 
         var progressValueLabel: String {
             let unit = unitLabel
-            let values = "\(currentUnitValueLabel) / \(goalValueLabel)"
-            return unit.isEmpty ? values : "\(values) \(unit)"
+            let current = currentUnitValueLabel
+            let goal = goalValueLabel
+            if unit.isEmpty { return "\(current) / \(goal)" }
+            return String(localized: "\(current) / \(goal) \(unit)")
         }
 
         private func formatValue(_ value: Double, rounded: Bool, compact: Bool) -> String {
@@ -155,8 +157,7 @@ struct StreakSnapshot: Codable, Sendable {
                 case .count, .minutes:
                     return Self.integerFormat(rounded ? value.rounded() : floor(value))
                 case .miles:
-                    let displayed = rounded ? value : floor(value * 10) / 10
-                    return String(format: displayed < 10 ? "%.1f" : "%.0f", displayed)
+                    return LocalizedNumber.oneDecimalUnderTen(rounded ? value : floor(value * 10) / 10)
                 }
             }
             guard let metric = streakMetric else {
@@ -164,8 +165,7 @@ struct StreakSnapshot: Codable, Sendable {
             }
             switch metric {
             case .sleepHours, .distanceMiles, .intensityRatio:
-                let displayed = rounded ? value : floor(value * 10) / 10
-                return String(format: displayed < 10 ? "%.1f" : "%.0f", displayed)
+                return LocalizedNumber.oneDecimalUnderTen(rounded ? value : floor(value * 10) / 10)
             default:
                 return Self.integerFormat(rounded ? value.rounded() : floor(value))
             }
@@ -185,13 +185,13 @@ struct StreakSnapshot: Codable, Sendable {
             }
             if absValue >= 1_000 {
                 let truncated = floor(value / 100) / 10
-                return String(format: truncated.truncatingRemainder(dividingBy: 1) == 0 ? "%.0fk" : "%.1fk", truncated)
+                return LocalizedNumber.fixed(truncated, digits: truncated.truncatingRemainder(dividingBy: 1) == 0 ? 0 : 1) + "k"
             }
             if absValue >= 10 {
                 return "\(Int(value.rounded()))"
             }
             let truncated = floor(value * 10) / 10
-            return String(format: truncated.truncatingRemainder(dividingBy: 1) == 0 ? "%.0f" : "%.1f", truncated)
+            return LocalizedNumber.fixed(truncated, digits: truncated.truncatingRemainder(dividingBy: 1) == 0 ? 0 : 1)
         }
     }
 
