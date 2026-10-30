@@ -216,7 +216,7 @@ struct TrialOfferSheet: View {
                             .foregroundStyle(Theme.retroBg)
                         // Apple 3.1.2(c): the billed amount must be the most
                         // conspicuous price on the sheet — footnote size keeps it
-                        // above every other pricing element ($0.00 line, legal copy).
+                        // above every other pricing element ("nothing due today" line, legal copy).
                         if let subtitle = primaryCTASubtitle {
                             Text(subtitle)
                                 .font(.system(.footnote, design: .monospaced, weight: .heavy))
@@ -250,7 +250,7 @@ struct TrialOfferSheet: View {
             // Subordinate to the billed amount in the CTA (Apple 3.1.2(c)):
             // dim ink, caption size — reassurance, not the headline price.
             if offerLabel != nil {
-                Text("$0.00 due today · Billed by Apple")
+                Text("Nothing due today · Billed by Apple")
                     .font(.system(.caption2, design: .monospaced))
                     .foregroundStyle(Theme.retroInkDim)
                     .multilineTextAlignment(.center)

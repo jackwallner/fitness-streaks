@@ -229,7 +229,7 @@ struct CalendarHeatmap: View {
 
     private func weekdayLabels(cellHeight: CGFloat) -> some View {
         VStack(spacing: gap) {
-            ForEach(["M", "T", "W", "T", "F", "S", "S"], id: \.self) { label in
+            ForEach(Array(["M", "T", "W", "T", "F", "S", "S"].enumerated()), id: \.offset) { _, label in
                 Text(label)
                     .font(RetroFont.pixel(7))
                     .foregroundStyle(Theme.retroInkDim)

@@ -111,8 +111,20 @@ struct PaywallView: View {
         }
     }
 
-    /// Single viewport — hero, features, plans, and CTA always visible together.
+    /// Single viewport (hero, features, plans and CTA together) when it fits.
+    /// At large text sizes it scrolls, so the disclosure, Terms, Privacy and
+    /// Restore stay reachable.
     private var paywallContent: some View {
+        ViewThatFits(in: .vertical) {
+            paywallStack
+                .frame(maxHeight: .infinity)
+            ScrollView {
+                paywallStack
+            }
+        }
+    }
+
+    private var paywallStack: some View {
         VStack(alignment: .leading, spacing: 10) {
             heroBlock
             featureBlock
@@ -124,7 +136,6 @@ struct PaywallView: View {
         .padding(.horizontal, 14)
         .padding(.top, 10)
         .padding(.bottom, 10)
-        .frame(maxHeight: .infinity)
     }
 
     // MARK: - Context
@@ -510,7 +521,7 @@ struct PaywallView: View {
     private var primaryReassurance: String? {
         guard let package = selectedPackage else { return nil }
         if package.packageType == .lifetime { return "ONE-TIME PURCHASE · NEVER RENEWS" }
-        if storeKit.isEligibleForIntroOffer(package) { return "$0.00 DUE TODAY" }
+        if storeKit.isEligibleForIntroOffer(package) { return "NOTHING DUE TODAY" }
         return nil
     }
 
