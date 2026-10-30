@@ -13,5 +13,5 @@ Tvoji zapisi Zdravlja služe samo za čitanje, a izračuni se odvijaju na tvom u
 
 Oba se automatski obnavljaju i uključuju 7-dnevnu besplatnu probu ako ispunjavaš uvjete. Apple tereti tvoj Apple račun pri potvrdi kupnje ili nakon prihvatljive probe. Ako nemaš pravo, naplata se vrši pri potvrdi. Naknada za obnovu naplaćuje se unutar 24 sata prije završetka razdoblja. Upravljaj pretplatom ili je otkaži u Postavke › Apple račun › Pretplate najmanje 24 sata prije završetka. Cijene ovise o regiji i prikazuju se prije kupnje.
 Dostupno je i jednokratno doživotno otključavanje.
-Pravila privatnosti: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
+Pravila privatnosti: https://jackwallner.com/ios/fitness-streaks/privacy-policy.html
 Uvjeti korištenja (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

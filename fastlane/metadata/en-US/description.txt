@@ -1,4 +1,4 @@
-A habit tracker should not become another habit to maintain. Turn the activity already recorded in Apple Health into visible proof that you're showing up.
+Fitness Habit Tracker finds your streaks automatically from the activity already in Apple Health, including steps, workouts, exercise, sleep and mindful minutes. There is nothing to check off each day, and three streaks are free.
 
 CONNECT HEALTH. SEE YOUR CONSISTENCY.
 With your permission, the app reads your existing Health history and finds streaks across nine supported metrics, including steps, workouts, exercise, sleep and mindful minutes. No daily check-off or duplicate activity entry is needed. What appears depends on your available history and read permissions.
@@ -13,5 +13,5 @@ Your Health records are read-only and calculations run on your device. The app d
 
 Both subscriptions renew automatically, and each offers a 7-day free trial when eligible. Apple charges your Apple Account when you confirm the purchase or after an eligible trial. If you are not eligible, Apple charges at confirmation. The renewal charge is made within 24 hours before the current period ends. Manage or cancel in Settings › Apple Account › Subscriptions at least 24 hours before the period ends. Prices vary by region and are shown before purchase.
 A one-time lifetime unlock is also available.
-Privacy Policy: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
+Privacy Policy: https://jackwallner.com/ios/fitness-streaks/privacy-policy.html
 Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

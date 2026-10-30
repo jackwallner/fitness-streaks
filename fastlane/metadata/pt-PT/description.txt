@@ -13,5 +13,5 @@ Os seus registos de Saúde são apenas de leitura, e os cálculos ocorrem no seu
 
 Ambos renovam automaticamente e incluem um teste gratuito de 7 dias se fores elegível. A Apple cobra a tua Conta Apple ao confirmares a compra ou após um teste elegível. Se não fores elegível, a cobrança é feita na confirmação. A cobrança da renovação ocorre nas 24 horas anteriores ao fim do período atual. Gere ou cancele em Definições › Conta Apple › Subscrições pelo menos 24 horas antes do fim. Os preços variam consoante a região e são mostrados antes da compra.
 Também está disponível um desbloqueio vitalício com um único pagamento.
-Política de privacidade: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
+Política de privacidade: https://jackwallner.com/ios/fitness-streaks/privacy-policy.html
 Termos de utilização (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

@@ -13,5 +13,5 @@
 
 دونوں خودکار طور پر تجدید ہوتے ہیں اور اہل ہونے پر 7 دن کا مفت ٹرائل دیتے ہیں۔ Apple خریداری کی تصدیق پر یا اہل ٹرائل کے بعد آپ کے Apple اکاؤنٹ سے رقم وصول کرتا ہے۔ اہل نہ ہونے کی صورت میں تصدیق کے وقت رقم لی جاتی ہے۔ موجودہ مدت ختم ہونے سے پہلے 24 گھنٹوں کے اندر تجدید کی رقم وصول کی جاتی ہے۔ مدت ختم ہونے سے کم از کم 24 گھنٹے پہلے Settings › Apple Account › Subscriptions میں انتظام یا منسوخی کریں۔ قیمتیں خطے کے مطابق مختلف ہوتی ہیں اور خریداری سے پہلے دکھائی جاتی ہیں۔
 ایک بار ادائیگی کے ساتھ لائف ٹائم ان لاک بھی دستیاب ہے۔
-رازداری کی پالیسی: https://jackwallner.github.io/fitness-streaks/privacy-policy.html
+رازداری کی پالیسی: https://jackwallner.com/ios/fitness-streaks/privacy-policy.html
 استعمال کی شرائط (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
