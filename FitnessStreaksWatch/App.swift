@@ -90,6 +90,9 @@ struct FitnessStreaksWatchApp: App {
                     await store.load()
                     Self.scheduleBackgroundRefresh()
                 }
+                .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
+                    Task { await store.load() }
+                }
         }
         .modelContainer(DataService.sharedModelContainer)
         .backgroundTask(.appRefresh("streaks.watch.refresh")) {
@@ -127,26 +130,11 @@ struct WatchRootView: View {
     @EnvironmentObject var settings: StreakSettings
 
     var body: some View {
-        if !settings.hasCompletedSetup {
+        switch WatchRootScreen.resolve(hasCompletedSetup: settings.hasCompletedSetup, hasSnapshot: store.lastUpdated != nil) {
+        case .setup:
             WatchOnboardingView()
-        } else if store.streaks.isEmpty {
-            // Data is still loading — show a minimal placeholder instead of
-            // flashing the onboarding screen, which looks like a bug.
-            WatchLoadingView()
-        } else {
+        case .streaks:
             WatchTodayView()
-        }
-    }
-}
-
-struct WatchLoadingView: View {
-    var body: some View {
-        VStack(spacing: 10) {
-            Image(systemName: "flame.fill")
-                .font(.system(size: 40))
-                .foregroundStyle(Theme.streakHot)
-            ProgressView()
-                .progressViewStyle(.circular)
         }
     }
 }

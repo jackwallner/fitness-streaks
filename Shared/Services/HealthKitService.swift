@@ -128,6 +128,11 @@ final class HealthKitService: ObservableObject {
         }
     }
 
+    /// True when Health access was never requested on this device; nil when unknown.
+    func healthNeverRequested() async -> Bool? {
+        await authorizationRequestStatus().map { $0 == .shouldRequest }
+    }
+
     /// Helper to add timeout to async operations. Returns fallback if operation times out.
     private func withTimeout<T: Sendable>(seconds: TimeInterval, operation: @escaping () async -> T, fallback: @escaping @Sendable () -> T) async -> T {
         let timeoutTask = Task { () -> T? in
@@ -390,7 +395,7 @@ final class HealthKitService: ObservableObject {
 
     // MARK: - Sleep
 
-    /// Sum "asleep" sample durations, attributing to the day each sample ended on.
+    /// Asleep hours per day, each night credited to the day it ended.
     private func sleepHoursByDay(start: Date, end: Date) async throws -> [Date: Double] {
         guard let type = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else { return [:] }
 
@@ -428,34 +433,45 @@ final class HealthKitService: ObservableObject {
         return Self.mergedHoursByDay(intervals: intervals, start: start, end: end)
     }
 
+    /// Longest awake gap that still counts as the same night.
+    nonisolated static let sleepSessionGap: TimeInterval = 2 * 60 * 60
+
+    /// Asleep hours per day. Overlapping samples are merged, samples less than
+    /// `sleepSessionGap` apart form one session, and each session's asleep time
+    /// is credited to the day it ended. Apple Watch writes a night as several
+    /// stage samples, so crediting each sample on its own split a night that
+    /// began before midnight across two days.
     nonisolated static func mergedHoursByDay(intervals: [(start: Date, end: Date)], start: Date, end: Date) -> [Date: Double] {
-        var grouped: [Date: [(Date, Date)]] = [:]
-        for interval in intervals {
-            let clippedStart = max(interval.start, start)
-            let clippedEnd = min(interval.end, end)
-            guard clippedEnd > clippedStart else { continue }
-            grouped[DateHelpers.startOfDay(clippedEnd), default: []].append((clippedStart, clippedEnd))
+        let sorted = intervals
+            .map { (start: $0.start, end: min($0.end, end)) }
+            .filter { $0.end > $0.start }
+            .sorted { $0.start < $1.start }
+
+        var merged: [(start: Date, end: Date)] = []
+        for interval in sorted {
+            if let last = merged.last, interval.start <= last.end {
+                merged[merged.count - 1].end = max(last.end, interval.end)
+            } else {
+                merged.append(interval)
+            }
         }
 
         var out: [Date: Double] = [:]
-        for (day, dayIntervals) in grouped {
-            let sorted = dayIntervals.sorted { $0.0 < $1.0 }
-            var merged: [(Date, Date)] = []
-            for interval in sorted {
-                guard let last = merged.last else {
-                    merged.append(interval)
-                    continue
-                }
-                if interval.0 <= last.1 {
-                    merged[merged.count - 1] = (last.0, max(last.1, interval.1))
-                } else {
-                    merged.append(interval)
-                }
-            }
-            out[day] = merged.reduce(0) { total, interval in
-                total + interval.1.timeIntervalSince(interval.0) / 3600.0
-            }
+        var sessionEnd: Date?
+        var sessionHours = 0.0
+        func closeSession() {
+            guard let sessionEnd, sessionEnd > start else { return }
+            out[DateHelpers.startOfDay(sessionEnd), default: 0] += sessionHours
         }
+        for interval in merged {
+            if let current = sessionEnd, interval.start.timeIntervalSince(current) > sleepSessionGap {
+                closeSession()
+                sessionHours = 0
+            }
+            sessionHours += interval.end.timeIntervalSince(interval.start) / 3600.0
+            sessionEnd = interval.end
+        }
+        closeSession()
         return out
     }
 
@@ -482,7 +498,8 @@ final class HealthKitService: ObservableObject {
                 sampleType: type,
                 predicate: predicate,
                 limit: sampleLimit,
-                sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)]
+                // Newest first, so the cap trims old history rather than recent weeks.
+                sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)]
             ) { _, results, error in
                 if let error {
                     continuation.resume(throwing: error)
@@ -500,7 +517,9 @@ final class HealthKitService: ObservableObject {
 
         var out: [Date: Double] = [:]
         for (day, daySamples) in byDay {
-            let elevated = daySamples.filter { $0.quantity.doubleValue(for: unit) > thresholdBPM }
+            let elevated = daySamples
+                .filter { $0.quantity.doubleValue(for: unit) > thresholdBPM }
+                .sorted { $0.startDate < $1.startDate }
             guard !elevated.isEmpty else { continue }
 
             var totalSeconds: Double = 0
@@ -574,6 +593,12 @@ final class HealthKitService: ObservableObject {
             }
         }
         try context.save()
+    }
+
+    /// Whether any day was ever cached on this device, however old.
+    func hasAnyCachedHistory() -> Bool {
+        let context = DataService.sharedModelContainer.mainContext
+        return ((try? context.fetchCount(FetchDescriptor<DailyActivity>())) ?? 0) > 0
     }
 
     /// Read cached history (used by widgets when they can't re-run the engine cheaply).

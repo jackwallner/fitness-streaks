@@ -377,16 +377,18 @@ final class PaidFeatureTests: XCTestCase {
 
     func testRestoreOnboardingTrackedStreaksWhenTrimmedBelowSavedIntent() {
         let settings = StreakSettings.shared
-        settings.lastOnboardingTrackedKeys = ["steps-daily", "exerciseMinutes-daily", "standHours-daily", "activeEnergy-daily", "workouts-daily"]
-        settings.trackedStreaks = Set(settings.lastOnboardingTrackedKeys.prefix(3))
-        settings.manualStreakOrder = Array(settings.lastOnboardingTrackedKeys.prefix(3))
+        let keys = ["steps-daily", "exerciseMinutes-daily", "standHours-daily", "activeEnergy-daily", "workouts-daily"]
+        settings.lastOnboardingTrackedKeys = keys
+        settings.trackedStreaks = Set(keys.prefix(3))
+        settings.manualStreakOrder = Array(keys.prefix(3))
         settings.lastOnboardingPickedCount = 5
 
         settings.restoreOnboardingTrackedStreaksIfNeeded()
 
         XCTAssertEqual(settings.trackedStreaks?.count, 5)
         XCTAssertEqual(settings.manualStreakOrder.count, 5)
-        XCTAssertEqual(settings.trackedStreaks, Set(settings.lastOnboardingTrackedKeys))
+        XCTAssertEqual(settings.trackedStreaks, Set(keys))
+        XCTAssertEqual(settings.lastOnboardingTrackedKeys, [], "the restore runs once")
     }
 
     func testRestoreOnboardingTrackedStreaksNoOpWhenAlreadyFull() {

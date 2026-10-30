@@ -37,39 +37,19 @@ struct StreakTimelineProvider: TimelineProvider {
         let now = Date.now
         let calendar = DateHelpers.gregorian
         let tomorrow = calendar.startOfDay(for: calendar.date(byAdding: .day, value: 1, to: now) ?? now)
-        let nowEntry = currentEntry(at: now, resetForNewDay: false)
-        // Emit a second entry at midnight that resets today's "locked-in" state to false,
-        // so the lock-screen widget doesn't keep claiming today is done after midnight rolls.
-        let midnightEntry = currentEntry(at: tomorrow, resetForNewDay: true)
+        let nowEntry = currentEntry(at: now)
+        // A second entry at midnight resets today's "locked-in" state, so the
+        // widget doesn't keep claiming today is done after the day rolls over.
+        let midnightEntry = currentEntry(at: tomorrow)
         completion(Timeline(entries: [nowEntry, midnightEntry], policy: .after(tomorrow)))
     }
 
-    private func currentEntry(at date: Date = .now, resetForNewDay: Bool = false) -> StreakEntry {
-        guard let snap = SnapshotStore.load() else {
+    /// Built with `asOf`, so a snapshot from an earlier day never reads as done today.
+    private func currentEntry(at date: Date = .now) -> StreakEntry {
+        guard let snap = SnapshotStore.load()?.asOf(date) else {
             return StreakEntry(date: date, hero: nil, badges: [])
         }
-        let hero = resetForNewDay ? snap.hero.map(Self.resetForNewDay) : snap.hero
-        let badges = resetForNewDay ? snap.badges.map(Self.resetForNewDay) : snap.badges
-        return StreakEntry(date: date, hero: hero, badges: badges)
-    }
-
-    static func resetForNewDay(_ item: StreakSnapshot.Item) -> StreakSnapshot.Item {
-        var copy = item
-        copy = StreakSnapshot.Item(
-            metric: item.metric,
-            cadence: item.cadence,
-            threshold: item.threshold,
-            current: item.current,
-            best: item.best,
-            currentUnitCompleted: false,
-            currentUnitProgress: 0,
-            currentUnitValue: 0,
-            hourWindow: item.hourWindow,
-            customID: item.customID,
-            workoutType: item.workoutType,
-            workoutMeasure: item.workoutMeasure
-        )
-        return copy
+        return StreakEntry(date: date, hero: snap.hero, badges: snap.badges)
     }
 }
 

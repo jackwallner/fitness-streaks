@@ -46,7 +46,7 @@ struct OnboardingView: View {
     /// pre-selects *more* than this (all core metrics) and lets the user keep
     /// them all through the selection step. The trial page at Start is the gate:
     /// pay to keep everything, or dismiss and we trim down to the top N.
-    static let freeTrackedLimit = 3
+    static let freeTrackedLimit = StreakSettings.freeTrackedLimit
 
     // Timer publishers - stored to allow proper cleanup
     private let tipTimerPublisher = Timer.publish(every: 3.5, on: .main, in: .common)

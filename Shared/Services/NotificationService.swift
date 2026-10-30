@@ -4,8 +4,8 @@ import os
 
 private let log = Logger(subsystem: "com.jackwallner.streaks", category: "Notifications")
 
-/// Local notifications for at-risk streaks. Fires once daily if the most urgent tracked streak
-/// hasn't been completed yet for today.
+/// Local notifications for at-risk streaks. One reminder at a time, for the next occurrence,
+/// rebuilt on every load.
 @MainActor
 enum NotificationService {
     static let dailyReminderID = "streaks.dailyReminder"
@@ -55,30 +55,20 @@ enum NotificationService {
         guard enabled,
               StoreKitService.shared.isPro,
               await isAuthorized(),
-              let reminder = bestReminderCandidate(from: streaks) else { return }
-
-        let heroLabel = reminder.metric.thresholdLabel(reminder.threshold, cadence: reminder.cadence)
-        let unit = reminder.cadence.pluralLabel
-        let deadline: String
-        if let window = reminder.window {
-            deadline = "by \(window.label)"
-        } else if reminder.cadence == .weekly {
-            deadline = "this week"
-        } else {
-            deadline = "before midnight"
-        }
+              let plan = reminderPlan(
+                  for: streaks,
+                  now: .now,
+                  hour: StreakSettings.shared.notificationHour,
+                  minute: StreakSettings.shared.notificationMinute
+              ) else { return }
 
         let content = UNMutableNotificationContent()
-        content.title = "Keep the \(heroLabel) streak alive"
-        content.body = "You're at \(reminder.current) \(unit). Get it in \(deadline)."
+        content.title = plan.title
+        content.body = plan.body
         content.sound = .default
         content.interruptionLevel = .active
 
-        var comps = DateComponents()
-        comps.hour = StreakSettings.shared.notificationHour
-        comps.minute = StreakSettings.shared.notificationMinute
-        let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: true)
-
+        let trigger = UNCalendarNotificationTrigger(dateMatching: plan.fireComponents, repeats: plan.repeats)
         let request = UNNotificationRequest(identifier: dailyReminderID, content: content, trigger: trigger)
         do {
             try await center.add(request)
@@ -86,6 +76,56 @@ enum NotificationService {
         } catch {
             log.error("Failed to schedule reminder: \(String(describing: error))")
         }
+    }
+
+    struct ReminderPlan: Equatable {
+        let title: String
+        let body: String
+        let fireComponents: DateComponents
+        let repeats: Bool
+    }
+
+    /// The next reminder, as a one-shot request rebuilt on every load. A repeating
+    /// trigger would keep firing the same text and count on days the app never
+    /// checked, met or not.
+    ///
+    /// Today's reminder names the most urgent unfinished streak. Once today's time
+    /// has passed, or every goal is already met, it moves to tomorrow and names
+    /// the longest streak, since every goal starts unfinished then.
+    nonisolated static func reminderPlan(for streaks: [Streak], now: Date, hour: Int, minute: Int) -> ReminderPlan? {
+        let calendar = DateHelpers.gregorian
+        let today = DateHelpers.startOfDay(now)
+        guard let todayFire = calendar.date(bySettingHour: hour, minute: minute, second: 0, of: today) else { return nil }
+
+        let fireDate: Date
+        let reminder: Streak
+        let body: String
+        if todayFire > now, let urgent = bestReminderCandidate(from: streaks) {
+            fireDate = todayFire
+            reminder = urgent
+            body = "You're at \(urgent.current) \(urgent.cadence.pluralLabel). Get it in \(deadline(for: urgent))."
+        } else {
+            let longest = streaks
+                .filter { $0.current >= 2 }
+                .max { $0.current < $1.current }
+            guard let longest,
+                  let tomorrowFire = calendar.date(byAdding: .day, value: 1, to: todayFire) else { return nil }
+            fireDate = tomorrowFire
+            reminder = longest
+            body = "Get it in \(deadline(for: longest))."
+        }
+
+        return ReminderPlan(
+            title: "Keep the \(reminder.thresholdLabel) streak alive",
+            body: body,
+            fireComponents: calendar.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate),
+            repeats: false
+        )
+    }
+
+    nonisolated private static func deadline(for streak: Streak) -> String {
+        if let window = streak.window { return "by \(window.label)" }
+        return streak.cadence == .weekly ? "this week" : "before midnight"
     }
 
     nonisolated static func bestReminderCandidate(from streaks: [Streak]) -> Streak? {
@@ -99,7 +139,7 @@ enum NotificationService {
     }
 
     static func notifyStreakBroken(_ broken: BrokenStreak) async {
-        guard await isAuthorized() else { return }
+        guard StreakSettings.shared.notificationsEnabled, await isAuthorized() else { return }
 
         let content = UNMutableNotificationContent()
         content.title = "Streak ended"

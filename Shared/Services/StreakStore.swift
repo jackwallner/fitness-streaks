@@ -54,15 +54,34 @@ final class StreakStore: ObservableObject {
     /// Re-apply the tracked-streaks filter without refetching — used after the user
     /// edits their selections in Settings or during onboarding.
     func refilter() {
-        var filtered = Self.applyTrackedFilter(allCandidates)
-        filtered = Self.applyManualOrder(filtered, manualOrder: StreakSettings.shared.manualStreakOrder)
-        streaks = filtered
+        streaks = Self.visibleStreaks(allCandidates)
         StreakSettings.shared.commitThresholds(for: streaks)
         persistCurrentSnapshot()
     }
 
     static func applyTrackedFilter(_ streaks: [Streak]) -> [Streak] {
         applyTrackedFilter(streaks, tracked: StreakSettings.shared.trackedStreaks)
+    }
+
+    /// The dashboard's streaks: tracked, in manual order, capped for free users.
+    static func visibleStreaks(_ all: [Streak]) -> [Streak] {
+        let settings = StreakSettings.shared
+        return visibleStreaks(
+            all,
+            tracked: settings.trackedStreaks,
+            manualOrder: settings.manualStreakOrder,
+            unlimited: StoreKitService.shared.grantsUnlimitedTrackedStreaks
+        )
+    }
+
+    nonisolated static func visibleStreaks(
+        _ all: [Streak],
+        tracked: Set<String>?,
+        manualOrder: [String],
+        unlimited: Bool
+    ) -> [Streak] {
+        let ordered = applyManualOrder(applyTrackedFilter(all, tracked: tracked), manualOrder: manualOrder)
+        return unlimited ? ordered : Array(ordered.prefix(StreakSettings.freeTrackedLimit))
     }
 
     nonisolated static func applyTrackedFilter(_ streaks: [Streak], tracked: Set<String>?) -> [Streak] {
@@ -131,7 +150,7 @@ final class StreakStore: ObservableObject {
 
     /// Apply manual ordering: items in manualOrder come first in that order,
     /// remaining items follow sorted by their original engine ranking.
-    static func applyManualOrder(_ streaks: [Streak], manualOrder: [String]) -> [Streak] {
+    nonisolated static func applyManualOrder(_ streaks: [Streak], manualOrder: [String]) -> [Streak] {
         guard !manualOrder.isEmpty else { return streaks }
         let orderIndex = Dictionary(uniqueKeysWithValues: manualOrder.enumerated().map { ($0.element, $0.offset) })
         return streaks.sorted {
@@ -283,11 +302,11 @@ final class StreakStore: ObservableObject {
                 gracePreservations: settings.gracePreservations,
                 plannedFreezes: effectiveFreezes
             )
-            var filtered = Self.applyTrackedFilter(all)
-            let graceBefore = settings.gracePreservations.count
+            var filtered = Self.visibleStreaks(all)
+            let graceBefore = settings.gracePreservations
             let brokenBefore = settings.recentlyBroken.count
             await handleBreaks(previous: previous, fresh: filtered, hourly: hourly, history: enriched)
-            let needsRediscover = settings.gracePreservations.count > graceBefore
+            let needsRediscover = settings.gracePreservations != graceBefore
                                || settings.recentlyBroken.count > brokenBefore
             if needsRediscover {
                 all = StreakEngine.discover(
@@ -302,8 +321,7 @@ final class StreakStore: ObservableObject {
                     plannedFreezes: effectiveFreezes
                 )
             }
-            filtered = Self.applyTrackedFilter(all)
-            filtered = Self.applyManualOrder(filtered, manualOrder: settings.manualStreakOrder)
+            filtered = Self.visibleStreaks(all)
             self.allCandidates = all
             self.streaks = filtered
             settings.commitThresholds(for: filtered)
@@ -324,17 +342,18 @@ final class StreakStore: ObservableObject {
             }
         } catch {
             log.error("StreakStore load error: \(String(describing: error))")
-            // Fall back to cached snapshot values if HK read failed
+            // HealthKit can't be read (most often a locked phone during background
+            // refresh). The cache's last day may be a partial value, so rebuilding
+            // from it would show live streaks as broken on every widget. Keep the
+            // last good streaks and snapshot; only fill in from the cache when
+            // nothing is on screen yet.
             let cached = HealthKitService.shared.cachedHistory()
-            if !cached.isEmpty {
+            if self.history.isEmpty { self.history = cached }
+            if self.streaks.isEmpty, !cached.isEmpty {
                 let settings = StreakSettings.shared
-                self.history = cached
-                let hourly = (try? await HealthKitService.shared.fetchHourlySteps(days: 90)) ?? [:]
-                self.hourlySteps = hourly
                 let effectiveFreezes = StoreKitService.shared.isPro ? settings.plannedFreezes : []
                 let all = StreakEngine.discover(
                     history: cached,
-                    hourlySteps: hourly,
                     hiddenMetrics: settings.hiddenMetrics,
                     intensity: settings.intensity,
                     lookbackDays: settings.lookbackDays,
@@ -344,10 +363,7 @@ final class StreakStore: ObservableObject {
                     plannedFreezes: effectiveFreezes
                 )
                 self.allCandidates = all
-                var filtered = Self.applyTrackedFilter(all)
-                filtered = Self.applyManualOrder(filtered, manualOrder: settings.manualStreakOrder)
-                self.streaks = filtered
-                persistCurrentSnapshot()
+                self.streaks = Self.visibleStreaks(all)
             }
         }
         #endif
@@ -499,7 +515,8 @@ final class StreakStore: ObservableObject {
     }
     #endif
 
-    private func restore(_ snapshot: StreakSnapshot) {
+    private func restore(_ stored: StreakSnapshot) {
+        let snapshot = stored.asOf(.now)
         let restored = ([snapshot.hero].compactMap { $0 } + snapshot.badges).compactMap { item -> Streak? in
             guard let metric = item.streakMetric else { return nil }
             let workoutMeasure = item.workoutMeasureValue
@@ -520,14 +537,73 @@ final class StreakStore: ObservableObject {
                 currentUnitValue: item.currentUnitValue
             )
         }
-        guard !restored.isEmpty else { return }
-        // Re-apply tracked filter and manual order to ensure consistency with iPhone
-        let settings = StreakSettings.shared
-        var filtered = Self.applyTrackedFilter(restored, tracked: settings.trackedStreaks)
-        filtered = Self.applyManualOrder(filtered, manualOrder: settings.manualStreakOrder)
-        streaks = filtered
+        #if os(watchOS)
+        // The iPhone already filtered, ordered and capped the snapshot. The Watch's
+        // own App Group holds none of the iPhone's settings.
+        streaks = restored
         allCandidates = restored
         lastUpdated = snapshot.updated
+        #else
+        guard !restored.isEmpty else { return }
+        streaks = Self.visibleStreaks(restored)
+        allCandidates = restored
+        lastUpdated = snapshot.updated
+        #endif
+    }
+
+    struct DetectedBreak: Equatable {
+        let key: String
+        /// The day that was missed.
+        let missedDate: Date
+        /// Length of the run that broke.
+        let length: Int
+        /// Supplies metric, cadence, threshold and window for the save or broken record.
+        let streak: Streak
+    }
+
+    /// Which tracked streaks broke since the last successful load.
+    ///
+    /// - Only streaks present in `fresh` are judged: one that vanished because the
+    ///   user hid its metric, untracked it or recalibrated it did not break.
+    /// - The baseline length is the last successful load's (`lastKnownLengths`),
+    ///   not whatever is on screen, which a restored snapshot can make stale.
+    /// - A streak at 0 missed yesterday. A shorter run than before also broke when
+    ///   its most recent miss came after the last load, at the same goal: the user
+    ///   missed a day and then met today's goal before opening the app.
+    nonisolated static func detectBreaks(
+        previous: [Streak],
+        lastKnownLengths: [String: Int],
+        lastKnownDate: Date?,
+        fresh: [Streak],
+        preservations: [String: GracePreservation],
+        today: Date
+    ) -> [DetectedBreak] {
+        let previousByKey = Dictionary(previous.map { ($0.trackingKey, $0) }, uniquingKeysWith: { first, _ in first })
+        let yesterday = DateHelpers.addDays(-1, to: today)
+        let lastLoadDay = lastKnownDate.map { DateHelpers.startOfDay($0) }
+        var out: [DetectedBreak] = []
+
+        for now in fresh {
+            let key = now.trackingKey
+            let before = previousByKey[key]
+            guard let length = lastKnownLengths[key] ?? before?.current, length >= 3 else { continue }
+
+            let missed: Date
+            if now.current == 0 {
+                missed = yesterday
+            } else if now.current < length,
+                      let lastMissed = now.lastMissedDate.map({ DateHelpers.startOfDay($0) }),
+                      let lastLoadDay, lastMissed >= lastLoadDay, lastMissed < today,
+                      before.map({ $0.threshold == now.threshold }) ?? true {
+                missed = lastMissed
+            } else {
+                continue
+            }
+
+            if let saved = preservations[key], DateHelpers.startOfDay(saved.missedDate) == missed { continue }
+            out.append(DetectedBreak(key: key, missedDate: missed, length: length, streak: before ?? now))
+        }
+        return out.sorted { $0.key < $1.key }
     }
 
     private func handleBreaks(
@@ -537,49 +613,28 @@ final class StreakStore: ObservableObject {
         history: [ActivityDay]
     ) async {
         let settings = StreakSettings.shared
-        let freshByKey = Dictionary(uniqueKeysWithValues: fresh.map { ($0.trackingKey, $0) })
-        let today = DateHelpers.startOfDay()
         var newBroken = settings.recentlyBroken
         var preservations = settings.gracePreservations
 
-        // Build a baseline of "what we last saw before this load." Use in-memory `previous`
-        // when present; otherwise fall back to persisted last-known lengths so we still detect
-        // breaks after a cold start (force-quit, reboot, post-midnight launch).
-        var baseline: [String: Streak] = Dictionary(uniqueKeysWithValues: previous.map { ($0.trackingKey, $0) })
-        for (key, length) in settings.lastKnownStreakLengths where baseline[key] == nil {
-            // Reconstruct just enough of a Streak to drive break detection.
-            // Threshold/metric come from fresh (post-break) when available; otherwise default to
-            // values we can't recover (the user will still see the broken banner with `?` cadence).
-            if let f = freshByKey[key] {
-                baseline[key] = Streak(
-                    customID: f.customID,
-                    metric: f.metric,
-                    cadence: f.cadence,
-                    threshold: f.threshold,
-                    window: f.window,
-                    workoutType: f.workoutType,
-                    workoutMeasure: f.workoutMeasure,
-                    current: length,
-                    best: max(length, f.best),
-                    startDate: nil,
-                    lastHitDate: nil,
-                    currentUnitCompleted: false,
-                    currentUnitProgress: 0,
-                    currentUnitValue: 0
-                )
-            }
-        }
+        let breaks = Self.detectBreaks(
+            previous: previous,
+            lastKnownLengths: settings.lastKnownStreakLengths,
+            lastKnownDate: settings.lastKnownStreakLengthsDate,
+            fresh: fresh,
+            preservations: preservations,
+            today: DateHelpers.startOfDay()
+        )
 
-        for (key, old) in baseline where old.current >= 3 {
-            let newCurrent = freshByKey[key]?.current ?? 0
-            guard newCurrent == 0 else { continue }
+        for detected in breaks {
+            let key = detected.key
+            let old = detected.streak
             guard !newBroken.contains(where: { $0.key == key }) else { continue }
 
             if settings.attemptAutoSave(isPro: StoreKitService.shared.isPro) {
                 preservations[key] = GracePreservation(
                     key: key,
-                    missedDate: DateHelpers.addDays(-1, to: today),
-                    preservedLength: old.current,
+                    missedDate: detected.missedDate,
+                    preservedLength: detected.length,
                     threshold: old.threshold,
                     metric: old.metric,
                     cadence: old.cadence,
@@ -595,8 +650,9 @@ final class StreakStore: ObservableObject {
                 cadence: old.cadence,
                 threshold: old.threshold,
                 hourWindow: old.window?.startHour,
-                brokenLength: old.current,
-                brokenAt: .now
+                brokenLength: detected.length,
+                brokenAt: .now,
+                missedDate: detected.missedDate
             )
             newBroken.append(broken)
             await NotificationService.notifyStreakBroken(broken)
@@ -617,7 +673,9 @@ final class StreakStore: ObservableObject {
         var preservations = settings.gracePreservations
         preservations[broken.key] = GracePreservation(
             key: broken.key,
-            missedDate: DateHelpers.startOfDay(broken.brokenAt),
+            // Older records carry no missed day; they were always for the day
+            // before the break was noticed.
+            missedDate: broken.missedDate ?? DateHelpers.addDays(-1, to: DateHelpers.startOfDay(broken.brokenAt)),
             preservedLength: broken.brokenLength,
             threshold: broken.threshold,
             metric: broken.metric,
@@ -635,6 +693,7 @@ final class StreakStore: ObservableObject {
     fileprivate func recordLastKnownLengths() {
         let map = Dictionary(uniqueKeysWithValues: streaks.map { ($0.trackingKey, $0.current) })
         StreakSettings.shared.lastKnownStreakLengths = map
+        StreakSettings.shared.lastKnownStreakLengthsDate = .now
     }
 
     #if os(iOS)

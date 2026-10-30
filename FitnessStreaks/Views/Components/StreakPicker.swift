@@ -180,8 +180,7 @@ struct StreakPickerSheet: View {
     /// Free tier gets one custom streak; Pro unlocks unlimited.
     static let freeCustomLimit = 3
 
-    /// Mirror of `OnboardingView.freeTrackedLimit` — kept in sync manually.
-    static let freeTrackedLimit = 3
+    static let freeTrackedLimit = StreakSettings.freeTrackedLimit
 
     private var canBuildCustom: Bool {
         storeKit.isPro || settings.customStreaks.count < Self.freeCustomLimit
@@ -356,11 +355,8 @@ struct StreakPickerSheet: View {
             }
         }
         .onAppear {
-            if let current = settings.trackedStreaks {
-                selection = current
-            } else {
-                selection = []
-            }
+            // nil means everything is tracked.
+            selection = settings.trackedStreaks ?? Set(store.allCandidates.map(\.trackingKey))
         }
     }
 
@@ -370,6 +366,8 @@ struct StreakPickerSheet: View {
 
     private func save() {
         settings.trackedStreaks = selection
+        // A deliberate pick replaces the onboarding picks for good.
+        settings.lastOnboardingTrackedKeys = []
         store.refilter()
         dismiss()
     }
@@ -670,8 +668,8 @@ struct CustomStreakEditSheet: View {
         case .activeEnergy: return 2000
         case .distanceMiles: return 26.0
         case .sleepHours: return 12.0
-        case .intensityRatio: return 2.0
-        case .exerciseMinutes, .mindfulMinutes, .heartRateMinutes: return 60
+        case .intensityRatio: return 30
+        case .exerciseMinutes, .mindfulMinutes, .heartRateMinutes: return 300
         case .standHours: return 12
         case .flightsClimbed: return 50
         case .workouts:

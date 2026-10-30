@@ -45,7 +45,7 @@ Widgets never query HealthKit. They render from the `StreakSnapshot` that the ma
 - Falls back to the lowest threshold with `current ≥ 2` if nothing higher qualifies.
 
 Today / this-week is treated as "live". It doesn't break the streak until the unit actually ends.
-Sleep attribution: an asleep sample is credited to the day it *ended*.
+Sleep attribution: asleep samples less than 2 h apart form one night, credited to the day it *ended*.
 Weekly totals: summed per ISO week starting Monday (see `DateHelpers.startOfWeek`).
 
 ## App-specific notes

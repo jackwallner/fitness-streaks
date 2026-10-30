@@ -217,12 +217,10 @@ struct FitnessStreaksApp: App {
                     #else
                     await storeKit.refreshState()
                     #endif
-                    // If setup was completed previously but this device has never actually
-                    // fetched HealthKit data (cache is empty), force onboarding so the user
-                    // gets a clear path to trigger the Health permission prompt.
-                    // We check for actual data rather than authorization status because
-                    // authorizationStatus(for:) always returns .notDetermined for read-only
-                    // types, making status-based checks unreliable on cold launch.
+                    // If setup was completed previously but Health was never requested on
+                    // this device and nothing was ever cached, force onboarding so the user
+                    // gets a clear path to the Health permission prompt. A user returning
+                    // after weeks away has old cached days and keeps their setup.
                     #if DEBUG
                     let skipsHealthKitCheck = CommandLine.arguments.contains("-UITestSkipHealthKit")
                     #else
@@ -230,14 +228,24 @@ struct FitnessStreaksApp: App {
                     #endif
                     if settings.hasCompletedSetup,
                        !FitnessBrand.isScreenshotMode,
-                       !skipsHealthKitCheck {
-                        let cached = HealthKitService.shared.cachedHistory(days: 30)
-                        if cached.isEmpty {
-                            log.warning("Resetting onboarding — hasCompletedSetup=true but HealthKit cache is empty (never authorized)")
+                       !skipsHealthKitCheck,
+                       !HealthKitService.shared.hasAnyCachedHistory() {
+                        let restart = SetupGate.shouldRestartOnboarding(
+                            hasCompletedSetup: true,
+                            hasAnyCachedDay: false,
+                            healthNeverRequested: await HealthKitService.shared.healthNeverRequested()
+                        )
+                        if restart {
+                            log.warning("Resetting onboarding: setup done but Health never requested on this device")
                             settings.hasCompletedSetup = false
                         }
                     }
                     await store.load(allowCachedSnapshot: true)
+                }
+                .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
+                    // Left open across midnight, the dashboard would keep showing
+                    // yesterday's goal as done.
+                    Task { await store.refreshIfNeeded(force: true) }
                 }
                 .onChange(of: scenePhase) { _, phase in
                     guard phase == .active else { return }
@@ -308,10 +316,8 @@ private struct RootView: View {
     /// trial sheet finishes dismissing — presenting both bindings in the same tick
     /// is racy in SwiftUI and frequently drops the second sheet.
     @State private var pendingPaywallAfterTrialDismiss = false
-    /// Free-tier cap used for the "Keep all N streaks" pitch. Mirrors
-    /// `OnboardingView.freeTrackedLimit` — kept in sync manually since that
-    /// constant is fileprivate to OnboardingView.
-    private static let freeTrackedLimit = 3
+    /// Free-tier cap used for the "Keep all N streaks" pitch.
+    private static let freeTrackedLimit = StreakSettings.freeTrackedLimit
 
     var body: some View {
         Group {

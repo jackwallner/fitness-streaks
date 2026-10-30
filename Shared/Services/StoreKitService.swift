@@ -367,7 +367,6 @@ final class StoreKitService: NSObject, ObservableObject {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         formatter.locale = product.priceFormatter?.locale ?? .current
-        formatter.maximumFractionDigits = 2
         guard let formatted = formatter.string(from: monthly) else { return nil }
         return "\(formatted) / mo"
     }

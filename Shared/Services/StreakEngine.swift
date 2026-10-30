@@ -573,8 +573,13 @@ enum StreakEngine {
         // Later days: bridge only while the natural post-miss run reaches back to the
         // day right after the miss — i.e. no *further* miss has happened. Once it has,
         // the run resets and a fresh preservation is written on that break instead.
+        // A run that already reaches back to the saved day means the day was met
+        // after all (late Watch sync, sleep written after the morning refresh).
+        // There is nothing to bridge, and adding the save would count it twice.
         let canBridge: Bool
-        if daysAfterMiss <= 1 {
+        if let start = streak.startDate, DateHelpers.startOfDay(start) <= missed {
+            canBridge = false
+        } else if daysAfterMiss <= 1 {
             canBridge = true
         } else if let start = streak.startDate {
             canBridge = DateHelpers.startOfDay(start) <= DateHelpers.addDays(1, to: missed)

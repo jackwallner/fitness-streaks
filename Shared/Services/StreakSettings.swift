@@ -99,6 +99,24 @@ struct StreakSnapshot: Codable, Sendable {
             workoutMeasure.flatMap(WorkoutMeasure.init(rawValue:))
         }
         var streakMetric: StreakMetric? { StreakMetric(rawValue: metric) }
+
+        /// The same streak at the start of a new day: count kept, today not started.
+        func resetForNewDay() -> Item {
+            Item(
+                metric: metric,
+                cadence: cadence,
+                threshold: threshold,
+                current: current,
+                best: best,
+                currentUnitCompleted: false,
+                currentUnitProgress: 0,
+                currentUnitValue: 0,
+                hourWindow: hourWindow,
+                customID: customID,
+                workoutType: workoutType,
+                workoutMeasure: workoutMeasure
+            )
+        }
         var streakCadence: StreakCadence { StreakCadence(rawValue: cadence) ?? .daily }
 
         /// "Cycling" / "Steps" — falls back to the metric name if no workout type.
@@ -199,6 +217,15 @@ struct StreakSnapshot: Codable, Sendable {
     let hero: Item?
     let badges: [Item]
     var recentlyBroken: [BrokenStreak] = []
+
+    /// The snapshot as it should read at `date`. A snapshot written on an earlier
+    /// day says nothing about today's progress, so today reads as not started.
+    func asOf(_ date: Date) -> StreakSnapshot {
+        guard !DateHelpers.gregorian.isDate(updated, inSameDayAs: date) else { return self }
+        var copy = StreakSnapshot(updated: updated, hero: hero?.resetForNewDay(), badges: badges.map { $0.resetForNewDay() })
+        copy.recentlyBroken = recentlyBroken
+        return copy
+    }
 }
 
 struct BrokenStreak: Codable, Sendable, Identifiable, Hashable {
@@ -210,6 +237,8 @@ struct BrokenStreak: Codable, Sendable, Identifiable, Hashable {
     let hourWindow: Int?
     let brokenLength: Int
     let brokenAt: Date
+    /// The day that was missed. Nil on older records.
+    var missedDate: Date? = nil
 }
 
 struct CustomStreak: Codable, Sendable, Identifiable, Hashable {
@@ -390,6 +419,14 @@ final class StreakSettings: ObservableObject {
         didSet { saveCodable(lastKnownStreakLengths, key: "lastKnownStreakLengths") }
     }
 
+    /// When `lastKnownStreakLengths` was last written by a successful load.
+    @Published var lastKnownStreakLengthsDate: Date? {
+        didSet { defaults.set(lastKnownStreakLengthsDate, forKey: "lastKnownStreakLengthsDate") }
+    }
+
+    /// Tracked streaks shown without Streaks+.
+    nonisolated static let freeTrackedLimit = 3
+
     nonisolated static func streakKey(metric: StreakMetric, cadence: StreakCadence, window: HourWindow? = nil) -> String {
         if let w = window {
             return "\(metric.rawValue)-\(cadence.rawValue)-h\(w.startHour)"
@@ -454,6 +491,7 @@ final class StreakSettings: ObservableObject {
         self.gracePreservations = Self.loadCodable([String: GracePreservation].self, key: "gracePreservations", defaults: defaults) ?? [:]
         self.manualStreakOrder = Self.loadCodable([String].self, key: "manualStreakOrder", defaults: defaults) ?? []
         self.lastKnownStreakLengths = Self.loadCodable([String: Int].self, key: "lastKnownStreakLengths", defaults: defaults) ?? [:]
+        self.lastKnownStreakLengthsDate = defaults.object(forKey: "lastKnownStreakLengthsDate") as? Date
         let storedFreezes = Self.loadCodable([Date].self, key: "plannedFreezes", defaults: defaults) ?? []
         self.plannedFreezes = Set(storedFreezes.map { DateHelpers.startOfDay($0) })
     }
@@ -514,13 +552,16 @@ final class StreakSettings: ObservableObject {
 
     /// Re-applies the user's full onboarding streak picks when they upgraded but
     /// were trimmed to the free cap before RevenueCat reported an active entitlement.
+    ///
+    /// Runs only while tracking is still exactly the trimmed onboarding picks, and
+    /// only once: a subscriber's later edits always win.
     func restoreOnboardingTrackedStreaksIfNeeded() {
         let keys = lastOnboardingTrackedKeys
-        guard !keys.isEmpty else { return }
-        let current = trackedStreaks?.count ?? Int.max
-        guard current < keys.count else { return }
+        guard !keys.isEmpty, let tracked = trackedStreaks, tracked.count < keys.count else { return }
+        guard tracked == Set(keys.prefix(Self.freeTrackedLimit)) else { return }
         trackedStreaks = Set(keys)
         manualStreakOrder = keys
+        lastOnboardingTrackedKeys = []
     }
 
     func pruneBroken(now: Date = .now) {

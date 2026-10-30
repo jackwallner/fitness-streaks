@@ -32,30 +32,13 @@ struct WatchStreakProvider: TimelineProvider {
         let calendar = DateHelpers.gregorian
         let tomorrow = calendar.startOfDay(for: calendar.date(byAdding: .day, value: 1, to: now) ?? now)
         let snap = SnapshotStore.load()
-        let nowEntry = WatchStreakEntry(date: now, hero: snap?.hero)
-        let midnightEntry = WatchStreakEntry(date: tomorrow, hero: snap?.hero.map(Self.resetForNewDay))
+        let nowEntry = WatchStreakEntry(date: now, hero: snap?.asOf(now).hero)
+        let midnightEntry = WatchStreakEntry(date: tomorrow, hero: snap?.asOf(tomorrow).hero)
         completion(Timeline(entries: [nowEntry, midnightEntry], policy: .after(tomorrow)))
     }
 
     private func currentEntry() -> WatchStreakEntry {
-        WatchStreakEntry(date: .now, hero: SnapshotStore.load()?.hero)
-    }
-
-    static func resetForNewDay(_ item: StreakSnapshot.Item) -> StreakSnapshot.Item {
-        StreakSnapshot.Item(
-            metric: item.metric,
-            cadence: item.cadence,
-            threshold: item.threshold,
-            current: item.current,
-            best: item.best,
-            currentUnitCompleted: false,
-            currentUnitProgress: 0,
-            currentUnitValue: 0,
-            hourWindow: item.hourWindow,
-            customID: item.customID,
-            workoutType: item.workoutType,
-            workoutMeasure: item.workoutMeasure
-        )
+        WatchStreakEntry(date: .now, hero: SnapshotStore.load()?.asOf(.now).hero)
     }
 }
 
