@@ -1,17 +1,39 @@
-Fitness Habit Tracker finds your streaks automatically from the activity already in Apple Health, including steps, workouts, exercise, sleep and mindful minutes. There is nothing to check off each day, and three streaks are free.
+Fitness Habit Tracker is a streak tracker that finds your fitness streaks automatically from the activity already in Apple Health, so there is nothing to check off each day. Three streaks are free, with no account, and it works on iPhone and Apple Watch.
 
-CONNECT HEALTH. SEE YOUR CONSISTENCY.
-With your permission, the app reads your existing Health history and finds streaks across nine supported metrics, including steps, workouts, exercise, sleep and mindful minutes. No daily check-off or duplicate activity entry is needed. What appears depends on your available history and read permissions.
+STREAKS FROM YOUR HEALTH DATA
+• With your permission, it reads your Health history and finds the streaks you already have, instead of starting every habit at zero
+• Streaks for steps, exercise minutes, stand hours, active energy, workouts, mindful minutes, sleep, distance and flights climbed
+• Three more built from your data: early steps, intensity (active calories per minute) and cardio minutes
+• Daily and weekly streaks, with this day or week counted as live until it ends
+• It picks the highest goal you have kept up, such as a 7,500 step day or a weekly workout count
 
-START WITH THREE
-Track three streaks free. Choose the health habits that matter to you and see how consistent you've been, instead of starting every habit counter at zero.
+BUILD YOUR OWN
+• Custom streaks with your own metric, goal and daily or weekly cadence
+• Track one workout type, such as running or yoga, instead of all workouts
+• Step streaks can count only the steps in one hour of the day you choose, such as 6 to 7 a.m.
 
-MAKE ROOM FOR MORE
-The paid upgrade unlocks unlimited tracking and more ways to follow your progress. Calendar views, widgets and the Apple Watch companion help keep your habits visible.
+WIDGETS AND APPLE WATCH
+• Home Screen and Lock Screen widgets show your streaks
+• The Apple Watch app shows your streaks, synced from your iPhone
+• Watch face complications, including the corner style
 
-Your Health records are read-only and calculations run on your device. The app does not write activity into Apple Health or guarantee a streak length. It is a fitness awareness tool, not medical advice.
+PRIVACY
+• No account, no ads and no cross-app tracking
+• Apple Health is read only, and the app never writes to it
+• Streak calculations run on your device
 
-Both subscriptions renew automatically, and each offers a 7-day free trial when eligible. Apple charges your Apple Account when you confirm the purchase or after an eligible trial. If you are not eligible, Apple charges at confirmation. The renewal charge is made within 24 hours before the current period ends. Manage or cancel in Settings › Apple Account › Subscriptions at least 24 hours before the period ends. Prices vary by region and are shown before purchase.
-A one-time lifetime unlock is also available.
-Privacy Policy: https://jackwallner.com/ios/fitness-streaks/privacy-policy.html
-Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+FREE AND STREAKS+
+Three tracked streaks, three custom streaks, widgets and the Apple Watch app are free and do not expire. Streaks+ is an optional upgrade, as a monthly or yearly subscription or a one-time lifetime purchase. Subscriptions include a free trial for eligible new subscribers, and the app shows its length before you start. Streaks+ adds:
+• Unlimited tracked and custom streaks
+• Auto-save, which keeps a streak alive when you miss a day
+• Revive a streak that broke yesterday
+• Planned freeze days for vacation, travel or sick days, which neither break nor extend a streak
+• At-risk alerts before a streak breaks
+• A history heatmap for each streak
+
+Prices appear in the app before you buy and vary by region. Subscriptions renew automatically unless canceled at least 24 hours before the current period ends. Manage or cancel in Settings > Apple ID > Subscriptions.
+
+Fitness Habit Tracker is a fitness awareness tool, not medical advice.
+
+Terms (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Privacy: https://jackwallner.com/ios/fitness-streaks/privacy-policy.html
