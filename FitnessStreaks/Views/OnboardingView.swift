@@ -995,6 +995,15 @@ struct OnboardingView: View {
         }
         defer { requesting = false }
 
+        #if DEBUG
+        // The simulator has no Health permission sheet. UI tests that seed
+        // streaks skip the request so onboarding can run to its later steps.
+        if CommandLine.arguments.contains("-UITestSkipHealthKit") {
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            return
+        }
+        #endif
+
         do {
             try await healthKit.requestAuthorization()
             withAnimation(.linear(duration: 0.2)) {

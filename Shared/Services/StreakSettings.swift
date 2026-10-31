@@ -443,6 +443,20 @@ final class StreakSettings: ObservableObject {
         let defaults = UserDefaults(suiteName: DataService.appGroupID) ?? .standard
         self.defaults = defaults
 
+        #if DEBUG
+        // A UI test that needs a first launch without reinstalling the app.
+        if CommandLine.arguments.contains("-UITestResetSetup") {
+            let keys = [
+                "hasCompletedSetup", "hasSeenTutorial", "hasSeenTrialOffer", "firstTrialOfferShownAt",
+                "hasReofferedTrial", "lastOnboardingPickedCount", "lastOnboardingTrackedKeys", "discoveryVibe",
+                "lookbackDays", "hiddenMetrics", "trackedStreaks", "committedThresholds", "customStreaks",
+                "recentlyBroken", "gracePreservations", "plannedFreezes", "manualStreakOrder",
+                "lastKnownStreakLengths", "lastKnownStreakLengthsDate"
+            ]
+            for key in keys { defaults.removeObject(forKey: key) }
+        }
+        #endif
+
         self.hasCompletedSetup = defaults.bool(forKey: "hasCompletedSetup")
         self.hasWatchCompletedSetup = defaults.bool(forKey: "hasWatchCompletedSetup")
         self.hasSeenTutorial = defaults.bool(forKey: "hasSeenTutorial")
