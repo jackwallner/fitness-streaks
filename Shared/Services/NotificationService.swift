@@ -4,11 +4,11 @@ import os
 
 private let log = Logger(subsystem: "com.jackwallner.streaks", category: "Notifications")
 
-/// Local notifications for at-risk streaks. One reminder at a time, for the next occurrence,
+/// Local notifications for at-risk streaks. A queue of one-shot daily reminders,
 /// rebuilt on every load.
 @MainActor
 enum NotificationService {
-    static let dailyReminderID = "streaks.dailyReminder"
+    nonisolated static let dailyReminderID = "streaks.dailyReminder"
     static let brokenPrefix = "streaks.broken."
 
     enum AuthorizationOutcome {
@@ -45,82 +45,104 @@ enum NotificationService {
         return false
     }
 
-    /// Schedule a daily reminder. The body uses the most urgent incomplete streak so the nudge feels personal.
-    /// Never prompts for permission — that only happens via a user-initiated toggle.
+    /// How many days of reminders are queued ahead. Each successful load replaces
+    /// the whole queue, so a user who stops opening the app (and stops getting
+    /// background refresh) still gets a nudge every day for this long.
+    nonisolated static let reminderHorizonDays = 30
+
+    /// Queue the daily reminder: today's with the live count when it is still ahead,
+    /// then one per day for `reminderHorizonDays` days with text that holds no count.
+    /// Never prompts for permission. That only happens via a user-initiated toggle.
     static func scheduleDailyReminder(for streaks: [Streak]) async {
-        let enabled = StreakSettings.shared.notificationsEnabled
         let center = UNUserNotificationCenter.current()
-        center.removePendingNotificationRequests(withIdentifiers: [dailyReminderID])
+        cancelAll()
 
-        guard enabled,
+        guard StreakSettings.shared.notificationsEnabled,
               StoreKitService.shared.isPro,
-              await isAuthorized(),
-              let plan = reminderPlan(
-                  for: streaks,
-                  now: .now,
-                  hour: StreakSettings.shared.notificationHour,
-                  minute: StreakSettings.shared.notificationMinute
-              ) else { return }
+              await isAuthorized() else { return }
 
-        let content = UNMutableNotificationContent()
-        content.title = plan.title
-        content.body = plan.body
-        content.sound = .default
-        content.interruptionLevel = .active
+        let plans = reminderPlans(
+            for: streaks,
+            now: .now,
+            hour: StreakSettings.shared.notificationHour,
+            minute: StreakSettings.shared.notificationMinute
+        )
+        for (index, plan) in plans.enumerated() {
+            let content = UNMutableNotificationContent()
+            content.title = plan.title
+            content.body = plan.body
+            content.sound = .default
+            content.interruptionLevel = .active
 
-        let trigger = UNCalendarNotificationTrigger(dateMatching: plan.fireComponents, repeats: plan.repeats)
-        let request = UNNotificationRequest(identifier: dailyReminderID, content: content, trigger: trigger)
-        do {
-            try await center.add(request)
-            log.info("Scheduled daily streak reminder")
-        } catch {
-            log.error("Failed to schedule reminder: \(String(describing: error))")
+            let trigger = UNCalendarNotificationTrigger(dateMatching: plan.fireComponents, repeats: false)
+            let request = UNNotificationRequest(identifier: reminderID(index), content: content, trigger: trigger)
+            do {
+                try await center.add(request)
+            } catch {
+                log.error("Failed to schedule reminder: \(String(describing: error))")
+            }
         }
+        log.info("Scheduled \(plans.count) streak reminders")
+    }
+
+    nonisolated static func reminderID(_ index: Int) -> String {
+        "\(dailyReminderID).\(index)"
+    }
+
+    /// Every reminder ID this or an earlier build may have queued, including the
+    /// single repeating request from before the queue.
+    nonisolated static var allReminderIDs: [String] {
+        [dailyReminderID] + (0...reminderHorizonDays).map(reminderID)
     }
 
     struct ReminderPlan: Equatable {
         let title: String
         let body: String
         let fireComponents: DateComponents
-        let repeats: Bool
     }
 
-    /// The next reminder, as a one-shot request rebuilt on every load. A repeating
-    /// trigger would keep firing the same text and count on days the app never
-    /// checked, met or not.
+    /// The queued reminders, soonest first, as one-shot requests. A repeating
+    /// trigger would keep firing the same count on days the app never checked.
     ///
-    /// Today's reminder names the most urgent unfinished streak. Once today's time
-    /// has passed, or every goal is already met, it moves to tomorrow and names
-    /// the longest streak, since every goal starts unfinished then.
-    nonisolated static func reminderPlan(for streaks: [Streak], now: Date, hour: Int, minute: Int) -> ReminderPlan? {
+    /// Today's reminder names the most urgent unfinished streak and its count.
+    /// Once today's time has passed, or every goal is already met, today is
+    /// skipped. Every later day names the longest streak's goal with no count,
+    /// so it still reads true however many days go by without a load.
+    /// Empty when no streak has reached 2, which clears the queue.
+    nonisolated static func reminderPlans(
+        for streaks: [Streak],
+        now: Date,
+        hour: Int,
+        minute: Int,
+        days: Int = reminderHorizonDays
+    ) -> [ReminderPlan] {
         let calendar = DateHelpers.gregorian
         let today = DateHelpers.startOfDay(now)
-        guard let todayFire = calendar.date(bySettingHour: hour, minute: minute, second: 0, of: today) else { return nil }
+        guard let todayFire = calendar.date(bySettingHour: hour, minute: minute, second: 0, of: today),
+              let longest = streaks.filter({ $0.current >= 2 }).max(by: { $0.current < $1.current })
+        else { return [] }
 
-        let fireDate: Date
-        let reminder: Streak
-        let body: String
-        if todayFire > now, let urgent = bestReminderCandidate(from: streaks) {
-            fireDate = todayFire
-            reminder = urgent
-            body = "You're at \(urgent.current) \(urgent.cadence.pluralLabel). Get it in \(deadline(for: urgent))."
-        } else {
-            let longest = streaks
-                .filter { $0.current >= 2 }
-                .max { $0.current < $1.current }
-            guard let longest,
-                  let tomorrowFire = calendar.date(byAdding: .day, value: 1, to: todayFire) else { return nil }
-            fireDate = tomorrowFire
-            reminder = longest
-            body = "Get it in \(deadline(for: longest))."
+        func components(_ date: Date) -> DateComponents {
+            calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
         }
 
-        return ReminderPlan(
-            title: "Keep the \(reminder.thresholdLabel) streak alive",
-            body: body,
-            fireComponents: calendar.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate),
-            repeats: false
-        )
+        var plans: [ReminderPlan] = []
+        if todayFire > now, let urgent = bestReminderCandidate(from: streaks) {
+            plans.append(ReminderPlan(
+                title: "Keep the \(urgent.thresholdLabel) streak alive",
+                body: "You're at \(urgent.current) \(urgent.cadence.pluralLabel). Get it in \(deadline(for: urgent)).",
+                fireComponents: components(todayFire)
+            ))
+        }
+        for offset in 1...max(days, 1) {
+            guard let fire = calendar.date(byAdding: .day, value: offset, to: todayFire) else { continue }
+            plans.append(ReminderPlan(
+                title: "Time for \(longest.thresholdLabel)",
+                body: "Get it in \(deadline(for: longest)) to keep your streak going.",
+                fireComponents: components(fire)
+            ))
+        }
+        return plans
     }
 
     nonisolated private static func deadline(for streak: Streak) -> String {
@@ -161,6 +183,6 @@ enum NotificationService {
     }
 
     static func cancelAll() {
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [dailyReminderID])
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: allReminderIDs)
     }
 }

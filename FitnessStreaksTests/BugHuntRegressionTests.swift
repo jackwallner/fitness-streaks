@@ -312,42 +312,95 @@ final class BugHuntRegressionTests: XCTestCase {
 
     // MARK: - FS-08 At-risk reminder
 
-    func testReminderFiresOnceWithTheStreaksOwnLabel() {
+    private func fireDates(_ plans: [NotificationService.ReminderPlan]) -> [Date?] {
+        plans.map { DateHelpers.gregorian.date(from: $0.fireComponents) }
+    }
+
+    func testReminderTodayNamesTheStreaksOwnLabelAndCount() {
         let today = DateHelpers.startOfDay()
         let running = streak(
             .workouts, threshold: 20, current: 12, customID: "run",
             workoutType: "running", workoutMeasure: .minutes
         )
-        let plan = NotificationService.reminderPlan(for: [running], now: at(today, 8, 0), hour: 19, minute: 0)
-        XCTAssertEqual(plan?.repeats, false)
-        XCTAssertEqual(plan?.title, "Keep the \(running.thresholdLabel) streak alive")
-        let fire = plan.flatMap { DateHelpers.gregorian.date(from: $0.fireComponents) }
-        XCTAssertEqual(fire, at(today, 19, 0))
+        let plans = NotificationService.reminderPlans(for: [running], now: at(today, 8, 0), hour: 19, minute: 0)
+        XCTAssertEqual(plans.first?.title, "Keep the \(running.thresholdLabel) streak alive")
+        XCTAssertEqual(plans.first?.body, "You're at 12 days. Get it in before midnight.")
+        XCTAssertEqual(fireDates(plans).first, at(today, 19, 0))
     }
 
-    func testReminderAfterTodaysTimeIsForTomorrow() {
+    func testReminderAfterTodaysTimeStartsTomorrow() {
         let today = DateHelpers.startOfDay()
-        let plan = NotificationService.reminderPlan(
+        let plans = NotificationService.reminderPlans(
             for: [streak(current: 12, completed: true)],
             now: at(today, 20, 0),
             hour: 19,
             minute: 0
         )
-        XCTAssertEqual(plan?.repeats, false)
-        let fire = plan.flatMap { DateHelpers.gregorian.date(from: $0.fireComponents) }
-        XCTAssertEqual(fire, at(DateHelpers.addDays(1, to: today), 19, 0))
+        XCTAssertEqual(fireDates(plans).first, at(DateHelpers.addDays(1, to: today), 19, 0))
     }
 
     func testReminderSkipsTodayWhenEveryGoalIsMet() {
         let today = DateHelpers.startOfDay()
-        let plan = NotificationService.reminderPlan(
+        let plans = NotificationService.reminderPlans(
             for: [streak(current: 12, completed: true)],
             now: at(today, 8, 0),
             hour: 19,
             minute: 0
         )
-        let fire = plan.flatMap { DateHelpers.gregorian.date(from: $0.fireComponents) }
-        XCTAssertEqual(fire, at(DateHelpers.addDays(1, to: today), 19, 0))
+        XCTAssertEqual(fireDates(plans).first, at(DateHelpers.addDays(1, to: today), 19, 0))
+    }
+
+    /// A user who stops opening the app gets no background refresh, so the queue
+    /// must keep nudging every day on its own, as the old repeating request did.
+    func testReminderQueuesEveryDayAheadWithoutALoad() {
+        let today = DateHelpers.startOfDay()
+        let plans = NotificationService.reminderPlans(
+            for: [streak(current: 12)],
+            now: at(today, 8, 0),
+            hour: 19,
+            minute: 0
+        )
+        let horizon = NotificationService.reminderHorizonDays
+        XCTAssertEqual(plans.count, horizon + 1)
+        XCTAssertEqual(
+            fireDates(plans),
+            (0...horizon).map { at(DateHelpers.addDays($0, to: today), 19, 0) }
+        )
+        XCTAssertLessThanOrEqual(plans.count, NotificationService.allReminderIDs.count - 1)
+    }
+
+    func testFutureRemindersHoldNoCountThatCanGoStale() {
+        let today = DateHelpers.startOfDay()
+        let plans = NotificationService.reminderPlans(
+            for: [streak(current: 12), streak(.exerciseMinutes, threshold: 30, current: 40, completed: true)],
+            now: at(today, 8, 0),
+            hour: 19,
+            minute: 0
+        )
+        for plan in plans.dropFirst() {
+            XCTAssertFalse(plan.title.contains("12") || plan.body.contains("12"), plan.body)
+            XCTAssertFalse(plan.title.contains("40") || plan.body.contains("40"), plan.body)
+            XCTAssertFalse(plan.body.contains("You're at"), plan.body)
+        }
+        XCTAssertEqual(Set(plans.dropFirst().map(\.title)).count, 1)
+    }
+
+    func testNoStreakAtRiskQueuesNothing() {
+        let today = DateHelpers.startOfDay()
+        XCTAssertTrue(NotificationService.reminderPlans(
+            for: [streak(current: 1)], now: at(today, 8, 0), hour: 19, minute: 0
+        ).isEmpty)
+        XCTAssertTrue(NotificationService.reminderPlans(
+            for: [], now: at(today, 8, 0), hour: 19, minute: 0
+        ).isEmpty)
+    }
+
+    func testCancelCoversTheLegacyRepeatingRequestAndTheWholeQueue() {
+        let ids = Set(NotificationService.allReminderIDs)
+        XCTAssertTrue(ids.contains(NotificationService.dailyReminderID))
+        for index in 0...NotificationService.reminderHorizonDays {
+            XCTAssertTrue(ids.contains(NotificationService.reminderID(index)))
+        }
     }
 
     // MARK: - FS-09 Returning after 30 days
