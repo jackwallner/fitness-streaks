@@ -65,6 +65,7 @@ struct StatsView: View {
                 cell(title: "SAVES", value: "\(totalSaves)", unit: "STREAKS+", color: Theme.retroLime)
             }
         }
+        .fixedSize(horizontal: false, vertical: true)
     }
 
     private func cell(title: String, value: String, unit: String, color: Color) -> some View {
@@ -86,7 +87,7 @@ struct StatsView: View {
                 .minimumScaleFactor(0.7)
         }
         .padding(.vertical, 14)
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .pixelPanel(color: Theme.retroInkFaint)
     }
 

@@ -55,12 +55,14 @@ struct RootTabView: View {
         // these frames, so the open tab keeps its scroll position.
         ZStack(alignment: .bottomLeading) {
             content
-                .padding(.bottom, 64)  // leave room for the pixel tab bar
                 .frame(maxWidth: split?.primaryWidth ?? .infinity, maxHeight: .infinity)
-
-            PixelTabBar(selection: $selection)
-                // Within the leading pane while split, never across the fold.
-                .frame(maxWidth: split?.primaryWidth ?? .infinity)
+                // The inset follows the tab bar's height as the text size grows.
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    PixelTabBar(selection: $selection)
+                        // Within the leading pane while split, never across the fold.
+                        .frame(maxWidth: split?.primaryWidth ?? .infinity)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
 
             if let split {
                 detailPane

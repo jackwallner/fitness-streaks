@@ -97,7 +97,7 @@ struct StreakDetailView: View {
                 Text("DETAIL")
                     .font(RetroFont.pixel(9))
                     .tracking(3)
-                    .foregroundStyle(Theme.retroInkFaint)
+                    .foregroundStyle(Theme.retroInkDim)
             }
         }
         .toolbarBackground(Theme.retroBg, for: .navigationBar)

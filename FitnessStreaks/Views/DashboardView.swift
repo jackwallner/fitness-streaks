@@ -544,7 +544,7 @@ struct DashboardView: View {
 
     private func graceStatusDetail(for hero: Streak) -> String {
         if streaksPlusActive {
-            return "Streaks+ auto-saves any missed day. Your streak survives."
+            return "Streaks+ auto-saves every missed day."
         }
         if streaksPlusActivating {
             return "Your purchase is syncing. Streak picks restore in a moment."
