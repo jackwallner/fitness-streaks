@@ -26,7 +26,8 @@ struct StreakBadgeCard: View {
                     .foregroundStyle(streak.metric.accent)
                     .retroGlow(streak.metric.accent, radius: 6)
                     .frame(width: 18, height: 18)
-                Text(titleText)
+                Text(streak.headline)
+                    .textCase(.uppercase)
                     .font(RetroFont.mono(TypeScale.title, weight: .bold))
                     .tracking(1)
                     .foregroundStyle(Theme.retroInkDim)
@@ -49,7 +50,8 @@ struct StreakBadgeCard: View {
                         .retroGlow(streak.metric.accent, radius: 6)
                         .minimumScaleFactor(0.45)
                         .lineLimit(1)
-                    Text(streak.unitLabel.uppercased())
+                    Text(streak.unitLabel)
+                        .textCase(.uppercase)
                         .font(RetroFont.mono(TypeScale.unit, weight: .bold))
                         .foregroundStyle(Theme.retroInkDim)
                         .lineLimit(1)
@@ -64,7 +66,8 @@ struct StreakBadgeCard: View {
                         .font(RetroFont.mono(TypeScale.goalLabel, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(Theme.retroInkDim)
-                    Text(goalValueLine.uppercased())
+                    Text(goalValueLine)
+                        .textCase(.uppercase)
                         .font(RetroFont.mono(TypeScale.goalValue, weight: .bold))
                         .foregroundStyle(streak.metric.accent)
                         .lineLimit(1)
@@ -96,25 +99,24 @@ struct StreakBadgeCard: View {
         )
     }
 
-    private var titleText: String {
-        if let w = streak.window {
-            return "\(streak.displayName.uppercased()) · \(w.label.uppercased())"
-        }
-        return streak.displayName.uppercased()
-    }
-
     private var goalValueLine: String {
         let target = streak.format(currentUnitValue: streak.threshold)
-        return "\(target) \(streak.unitLabel)"
+        return streak.amount(target)
     }
 
     private var chargeLabel: String {
-        let unit = streak.current == 1 ? streak.cadence.label : streak.cadence.pluralLabel
+        let n = streak.current
         if streak.currentUnitCompleted {
-            return "\(streak.current) \(unit) · DONE"
+            switch streak.cadence {
+            case .daily: return String(localized: "\(n) days · DONE")
+            case .weekly: return String(localized: "\(n) weeks · DONE")
+            }
         } else {
             let pct = Int(min(1, streak.currentUnitProgress) * 100)
-            return "\(pct)% · \(streak.current) \(unit)"
+            switch streak.cadence {
+            case .daily: return String(localized: "\(pct)% · \(n) days")
+            case .weekly: return String(localized: "\(pct)% · \(n) weeks")
+            }
         }
     }
 

@@ -180,7 +180,7 @@ private struct CoachmarkPresenter: View {
                 Button {
                     advance()
                 } label: {
-                    Text(index == steps.count - 1 ? "▶ GOT IT" : "▶ NEXT")
+                    Text(index == steps.count - 1 ? String(localized: "▶ GOT IT") : String(localized: "▶ NEXT"))
                         .font(RetroFont.mono(12, weight: .bold))
                         .foregroundStyle(Theme.retroBg)
                         .padding(.vertical, 10)

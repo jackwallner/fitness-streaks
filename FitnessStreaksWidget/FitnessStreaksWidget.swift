@@ -154,7 +154,8 @@ struct StreakWidgetView: View {
                 let valueColor: Color = hero.currentUnitCompleted ? Theme.retroLime : accent
                 VStack(alignment: .leading, spacing: 0) {
                     HStack(alignment: .top, spacing: 6) {
-                        Text(hero.displayName.uppercased())
+                        Text(hero.displayName)
+                            .textCase(.uppercase)
                             .font(.system(size: 12, weight: .heavy, design: .rounded))
                             .tracking(0.8)
                             .foregroundStyle(accent)
@@ -175,7 +176,8 @@ struct StreakWidgetView: View {
                             .monospacedDigit()
                             .lineLimit(1)
                             .minimumScaleFactor(0.5)
-                        Text(hero.unitLabel.uppercased())
+                        Text(hero.unitLabel)
+                            .textCase(.uppercase)
                             .font(.system(size: 11, weight: .heavy, design: .rounded))
                             .tracking(0.6)
                             .foregroundStyle(Theme.retroInkDim)
@@ -195,7 +197,8 @@ struct StreakWidgetView: View {
                         Image(systemName: "flame.fill")
                             .font(.system(size: 10, weight: .bold))
                             .foregroundStyle(hero.currentUnitCompleted ? Theme.retroLime : Theme.retroAmber)
-                        Text(streakLengthLabel(hero).uppercased())
+                        Text(streakLengthLabel(hero))
+                            .textCase(.uppercase)
                             .font(.system(size: 11, weight: .heavy, design: .rounded))
                             .tracking(0.4)
                             .foregroundStyle(Theme.retroInk)
@@ -225,7 +228,8 @@ struct StreakWidgetView: View {
                     let valueColor: Color = hero.currentUnitCompleted ? Theme.retroLime : accent
                     VStack(alignment: .leading, spacing: 0) {
                         HStack(alignment: .top, spacing: 6) {
-                            Text(hero.displayName.uppercased())
+                            Text(hero.displayName)
+                                .textCase(.uppercase)
                                 .font(.system(size: 12, weight: .heavy, design: .rounded))
                                 .tracking(0.8)
                                 .foregroundStyle(accent)
@@ -246,7 +250,8 @@ struct StreakWidgetView: View {
                                 .monospacedDigit()
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.5)
-                            Text(hero.unitLabel.uppercased())
+                            Text(hero.unitLabel)
+                                .textCase(.uppercase)
                                 .font(.system(size: 10, weight: .heavy, design: .rounded))
                                 .tracking(0.6)
                                 .foregroundStyle(Theme.retroInkDim)
@@ -266,7 +271,8 @@ struct StreakWidgetView: View {
                             Image(systemName: "flame.fill")
                                 .font(.system(size: 9, weight: .bold))
                                 .foregroundStyle(hero.currentUnitCompleted ? Theme.retroLime : Theme.retroAmber)
-                            Text(streakLengthLabel(hero).uppercased())
+                            Text(streakLengthLabel(hero))
+                                .textCase(.uppercase)
                                 .font(.system(size: 10, weight: .heavy, design: .rounded))
                                 .tracking(0.4)
                                 .foregroundStyle(Theme.retroInk)
@@ -371,10 +377,7 @@ struct StreakWidgetView: View {
     }
 
     private func streakLengthLabel(_ item: StreakSnapshot.Item) -> String {
-        if item.cadence == "daily" {
-            return item.current == 1 ? "1 day" : "\(item.current) days"
-        }
-        return item.current == 1 ? "1 week" : "\(item.current) weeks"
+        item.streakCadence.count(item.current)
     }
 }
 

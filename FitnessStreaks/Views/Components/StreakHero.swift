@@ -25,14 +25,16 @@ struct StreakHero: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .top, spacing: 12) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(titleText)
+                    Text(streak.headline)
+                        .textCase(.uppercase)
                         .font(RetroFont.mono(TypeScale.title, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(streak.metric.accent)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
 
-                    Text(goalContext.uppercased())
+                    Text(goalContext)
+                        .textCase(.uppercase)
                         .font(RetroFont.mono(TypeScale.context, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(Theme.retroInkDim)
@@ -59,7 +61,8 @@ struct StreakHero: View {
                         .retroGlow(valueColor)
                         .minimumScaleFactor(0.45)
                         .lineLimit(1)
-                    Text(streak.unitLabel.uppercased())
+                    Text(streak.unitLabel)
+                        .textCase(.uppercase)
                         .font(RetroFont.mono(TypeScale.unit, weight: .bold))
                         .foregroundStyle(Theme.retroInkDim)
                         .lineLimit(1)
@@ -73,7 +76,8 @@ struct StreakHero: View {
                         .font(RetroFont.mono(TypeScale.goalLabel, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(Theme.retroInkDim)
-                    Text(goalLine.uppercased())
+                    Text(goalLine)
+                        .textCase(.uppercase)
                         .font(RetroFont.mono(TypeScale.goalValue, weight: .bold))
                         .foregroundStyle(streak.metric.accent)
                         .lineLimit(1)
@@ -105,35 +109,30 @@ struct StreakHero: View {
         .pixelPanel(color: panelColor)
     }
 
-    private var titleText: String {
-        if let w = streak.window {
-            return "\(streak.displayName.uppercased()) · \(w.label.uppercased())"
-        }
-        return streak.displayName.uppercased()
-    }
-
     private var currentValue: String {
         streak.format(currentUnitValue: streak.currentUnitValue)
     }
 
     private var goalLine: String {
         let target = streak.format(currentUnitValue: streak.threshold)
-        return "\(target) \(streak.unitLabel)"
+        return streak.amount(target)
     }
 
     private var goalContext: String {
         if let w = streak.window {
-            return "\(w.label) target"
+            return String(localized: "\(w.label) target")
         }
-        return streak.cadence == .daily ? "today" : "this week"
+        return streak.cadence == .daily ? String(localized: "today") : String(localized: "this week")
     }
 
     private var streakLine: String {
-        let unit = streak.current == 1 ? streak.cadence.label : streak.cadence.pluralLabel
-        return "\(streak.current) \(unit) streak"
+        switch streak.cadence {
+        case .daily: return String(localized: "\(streak.current) days streak")
+        case .weekly: return String(localized: "\(streak.current) weeks streak")
+        }
     }
 
     private var statusText: String {
-        streak.currentUnitCompleted ? "DONE" : "\(Int(min(1, streak.currentUnitProgress) * 100))%"
+        streak.currentUnitCompleted ? String(localized: "DONE") : String(localized: "\(Int(min(1, streak.currentUnitProgress) * 100))%")
     }
 }

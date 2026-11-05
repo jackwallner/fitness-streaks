@@ -1,0 +1,28 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "NSHealthShareUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Streaks reads your activity history (steps, exercise minutes, stand hours, active energy, workouts, distance, flights climbed, mindful minutes, sleep) from Apple Health to surface the streaks you've already built and encourage you to keep them going. Read-only — Streaks never writes to Apple Health."
+          }
+        }
+      }
+    },
+    "NSHealthUpdateUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Streaks is read-only and does not write any data to Apple Health. This string is required by Apple whenever the HealthKit framework is linked."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}
