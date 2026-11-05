@@ -4,10 +4,46 @@
     "NSHealthShareUsageDescription": {
       "extractionState": "manual",
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fitness Habit liest deinen Aktivitätsverlauf (Schritte, Trainingsminuten, Stehstunden, aktive Energie, Trainings, Distanz, bestiegene Etagen, Achtsamkeitsminuten, Schlaf) aus Apple Health, um die Serien sichtbar zu machen, die du dir bereits aufgebaut hast, und dich zu motivieren, sie fortzusetzen. Nur Lesezugriff. Fitness Habit schreibt niemals Daten in Apple Health."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Fitness Habit reads your activity history (steps, exercise minutes, stand hours, active energy, workouts, distance, flights climbed, mindful minutes, sleep) from Apple Health to surface the streaks you've already built. Read-only. Fitness Habit never writes to Apple Health."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fitness Habit lee tu historial de actividad (pasos, minutos de ejercicio, horas de pie, energía activa, entrenamientos, distancia, pisos subidos, minutos de atención plena, sueño) de Apple Health para mostrar las rachas que ya has construido y animarte a mantenerlas. Solo lectura. Fitness Habit nunca escribe en Apple Health."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fitness Habit leest je activiteitengeschiedenis (stappen, trainingsminuten, staanuren, actieve energie, workouts, afstand, trappen beklommen, mindfulminuten, slaap) uit Apple Health om de reeksen te tonen die je al hebt opgebouwd en je aan te moedigen ze vol te houden. Alleen-lezen. Fitness Habit schrijft nooit gegevens naar Apple Health."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fitness Habit считывает из Apple Health историю твоей активности (шаги, минуты тренировки, часы стояния, активная энергия, тренировки, расстояние, пройденные лестничные пролёты, минуты осознанности, сон), чтобы показать серии, которые у тебя уже есть, и помочь тебе их не прерывать. Только чтение. Fitness Habit никогда ничего не записывает в Apple Health."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fitness Habit đọc lịch sử hoạt động của bạn (bước chân, phút tập luyện, giờ đứng, năng lượng hoạt động, bài tập, quãng đường, số tầng đã leo, phút chánh niệm, giấc ngủ) từ Apple Health để hiển thị các chuỗi bạn đã xây dựng và khuyến khích bạn duy trì chúng. Chỉ đọc. Fitness Habit không bao giờ ghi dữ liệu vào Apple Health."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fitness Habit 会从 Apple Health 读取你的活动历史记录（步数、锻炼分钟数、站立小时数、活动能量、体能训练、距离、已爬楼层、正念分钟数、睡眠），以呈现你已经养成的连续记录，并鼓励你继续保持。仅读取。Fitness Habit 绝不会向 Apple Health 写入数据。"
           }
         }
       }
@@ -15,10 +51,46 @@
     "NSHealthUpdateUsageDescription": {
       "extractionState": "manual",
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fitness Habit hat nur Lesezugriff und schreibt keine Daten in Apple Health. Dieser Text ist von Apple vorgeschrieben, sobald das HealthKit-Framework eingebunden ist."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Fitness Habit is read-only and does not write any data to Apple Health. This string is required by Apple whenever the HealthKit framework is linked."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fitness Habit es de solo lectura y no escribe ningún dato en Apple Health. Apple exige este texto siempre que se enlaza el framework HealthKit."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fitness Habit is alleen-lezen en schrijft geen gegevens naar Apple Health. Apple vereist deze tekst zodra het HealthKit-framework is gekoppeld."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fitness Habit работает только на чтение и не записывает никакие данные в Apple Health. Apple требует этот текст всегда, когда подключён фреймворк HealthKit."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fitness Habit chỉ đọc và không ghi bất kỳ dữ liệu nào vào Apple Health. Apple yêu cầu chuỗi này bất cứ khi nào khung HealthKit được liên kết."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fitness Habit 仅读取数据，不会向 Apple Health 写入任何数据。只要链接了 HealthKit 框架，Apple 就要求提供此文字。"
           }
         }
       }

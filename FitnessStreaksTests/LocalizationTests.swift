@@ -5,7 +5,7 @@ import XCTest
 /// survive the trip. Translations arrive in later runs; until then these prove
 /// the catalog is wired into every build and the plural machinery works.
 final class LocalizationTests: XCTestCase {
-    static let languages: [String] = []
+    static let languages = ["de", "ru", "nl", "zh-Hans", "es", "vi"]
 
     private func bundle(_ language: String) -> Bundle? {
         let hosts = [Bundle.main] + Bundle.allBundles
