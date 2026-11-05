@@ -106,7 +106,7 @@ enum Theme {
         #if os(iOS)
         Color(UIColor { trait in
             trait.userInterfaceStyle == .light
-                ? UIColor(Color(hex: 0x0099bb))
+                ? UIColor(Color(hex: 0x00789a))
                 : UIColor(Color(hex: 0x2dd4ff))
         })
         #else
@@ -117,7 +117,7 @@ enum Theme {
         #if os(iOS)
         Color(UIColor { trait in
             trait.userInterfaceStyle == .light
-                ? UIColor(Color(hex: 0x8aaa00))
+                ? UIColor(Color(hex: 0x5a7000))
                 : UIColor(Color(hex: 0xc8ff00))
         })
         #else
@@ -128,7 +128,7 @@ enum Theme {
         #if os(iOS)
         Color(UIColor { trait in
             trait.userInterfaceStyle == .light
-                ? UIColor(Color(hex: 0xcc7a00))
+                ? UIColor(Color(hex: 0x9a5c00))
                 : UIColor(Color(hex: 0xffb020))
         })
         #else
@@ -203,7 +203,7 @@ enum Theme {
         #if os(iOS)
         Color(UIColor { trait in
             trait.userInterfaceStyle == .light
-                ? UIColor(Color(hex: 0x2a9955))
+                ? UIColor(Color(hex: 0x1f7a43))
                 : UIColor(Color(hex: 0x7aff9e))
         })
         #else

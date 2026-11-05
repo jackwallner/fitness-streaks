@@ -332,6 +332,8 @@ struct HeatmapRangePicker: View {
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                         .background(selectedRange == range ? Theme.retroCyan : Color.clear)
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
             }
