@@ -76,6 +76,34 @@ final class ReleaseJourneysUITests: XCTestCase {
         QA.checkpoint(app, "streaks-after-relaunch")
     }
 
+    /// Core loop: the mined streaks are listed, one opens to its detail with
+    /// the same count, and the list is still there after a relaunch.
+    func testCoreLoopStreakListsOpensAndPersists() {
+        continueAfterFailure = false
+        let app = launch(Self.seeded + ["-UITestSetPro"])
+        let streak = NSPredicate(format: "label CONTAINS[c] %@", " streak: ")
+        let first = app.buttons.matching(streak).firstMatch
+        XCTAssertTrue(first.waitForExistence(timeout: 15), "no streak listed")
+        let label = first.label
+        XCTAssertTrue(label.range(of: #"streak: [1-9]\d* "#, options: .regularExpression) != nil,
+                      "streak count missing or zero: \(label)")
+        QA.checkpoint(app, "core-streak-list")
+
+        first.tap()
+        let untrack = app.buttons["Untrack this streak"]
+        XCTAssertTrue(untrack.waitForExistence(timeout: 15), "streak detail never opened")
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(
+            format: "label CONTAINS[c] %@", "streak")).firstMatch.exists, "detail shows no streak")
+        QA.checkpoint(app, "core-streak-detail")
+
+        QA.relaunch(app)
+        XCTAssertTrue(app.buttons["Open settings"].waitForExistence(timeout: 25), "Streaks never rendered after relaunch")
+        let again = app.buttons.matching(streak).firstMatch
+        XCTAssertTrue(again.waitForExistence(timeout: 15), "streaks gone after relaunch")
+        XCTAssertEqual(again.label, label, "streak changed across relaunch")
+        QA.checkpoint(app, "core-streak-after-relaunch")
+    }
+
     private func launch(_ arguments: [String], environment: [String: String] = [:]) -> XCUIApplication {
         let app = XCUIApplication(bundleIdentifier: Self.bundle)
         QA.launch(app, environment: environment, arguments: arguments)
