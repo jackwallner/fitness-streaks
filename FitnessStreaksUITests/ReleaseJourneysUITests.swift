@@ -90,10 +90,11 @@ final class ReleaseJourneysUITests: XCTestCase {
         QA.checkpoint(app, "core-streak-list")
 
         first.tap()
-        let untrack = app.buttons["Untrack this streak"]
-        XCTAssertTrue(untrack.waitForExistence(timeout: 15), "streak detail never opened")
-        XCTAssertTrue(app.staticTexts.matching(NSPredicate(
-            format: "label CONTAINS[c] %@", "streak")).firstMatch.exists, "detail shows no streak")
+        // The list says "Steps streak: 12 days[, threshold ...]", the detail header "... 12 days in a row, ...".
+        let count = label.components(separatedBy: ",")[0]
+        let header = app.descendants(matching: .any).matching(NSPredicate(
+            format: "label BEGINSWITH %@", "\(count) in a row")).firstMatch
+        XCTAssertTrue(header.waitForExistence(timeout: 15), "streak detail never opened with \(count)")
         QA.checkpoint(app, "core-streak-detail")
 
         QA.relaunch(app)
