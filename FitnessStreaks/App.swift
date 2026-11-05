@@ -19,7 +19,7 @@ enum FitnessBrand {
     #endif
 
     static var name: String {
-        isScreenshotMode ? "Fitness Habit Tracker" : "Streak Finder"
+        isScreenshotMode ? "Fitness Habit Tracker" : "Streak Finder" // l10n-ignore: brand names
     }
 }
 
@@ -418,7 +418,7 @@ private struct RootView: View {
         return .init(
             displayName: top.displayName,
             current: top.current,
-            cadenceLabel: top.cadence.label
+            cadence: top.cadence
         )
     }
 
@@ -489,12 +489,12 @@ private struct RootView: View {
                 showTrialOffer = false
             case .cancelled:
                 trialPurchaseError = startsTrial
-                    ? "Trial wasn't started. Tap again, or pick a different plan."
-                    : "Purchase wasn't completed. Tap again, or pick a different plan."
+                    ? String(localized: "Trial wasn't started. Tap again, or pick a different plan.")
+                    : String(localized: "Purchase wasn't completed. Tap again, or pick a different plan.")
             case .failed:
                 trialPurchaseError = storeKit.lastError ?? (startsTrial
-                    ? "Couldn't start your trial. Please try again."
-                    : "Couldn't complete the purchase. Please try again.")
+                    ? String(localized: "Couldn't start your trial. Please try again.")
+                    : String(localized: "Couldn't complete the purchase. Please try again."))
             }
         }
     }

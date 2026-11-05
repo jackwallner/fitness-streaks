@@ -37,7 +37,7 @@ struct SettingsView: View {
         components.scheme = "mailto"
         components.path = AppStoreReviewLinks.feedbackEmail
         components.queryItems = [
-            URLQueryItem(name: "subject", value: "\(AppStoreReviewLinks.displayName) feedback"),
+            URLQueryItem(name: "subject", value: String(localized: "\(AppStoreReviewLinks.displayName) feedback")),
         ]
         return components.url
     }()
@@ -124,7 +124,7 @@ struct SettingsView: View {
                     if let days = pendingLookbackDays {
                         settings.lookbackDays = days
                         settings.committedThresholds = [:]
-                        recalibrateAllMessage = "RECALIBRATING…"
+                        recalibrateAllMessage = String(localized: "RECALIBRATING…")
                         Task { await store.load() }
                     }
                     pendingLookbackDays = nil
@@ -146,7 +146,7 @@ struct SettingsView: View {
 
     private var proSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: storeKit.isPro ? "Streaks+ · Auto-save" : "Auto-save · Streaks+")
+            PixelSectionHeader(title: storeKit.isPro ? String(localized: "Streaks+ · Auto-save") : String(localized: "Auto-save · Streaks+"))
 
             VStack(alignment: .leading, spacing: 12) {
                 HStack(alignment: .top, spacing: 12) {
@@ -158,12 +158,12 @@ struct SettingsView: View {
                                 .tracking(1)
                                 .foregroundStyle(Theme.retroInk)
                             if storeKit.isPro {
-                                PixelChip(text: "ON", accent: Theme.retroLime)
+                                PixelChip(text: String(localized: "ON"), accent: Theme.retroLime)
                             } else {
-                                PixelChip(text: "LOCKED", accent: Theme.retroMagenta)
+                                PixelChip(text: String(localized: "LOCKED"), accent: Theme.retroMagenta)
                             }
                         }
-                        Text(storeKit.isPro ? "Unlimited · Streaks+" : "Streaks+ only")
+                        Text(storeKit.isPro ? String(localized: "Unlimited · Streaks+") : String(localized: "Streaks+ only"))
                             .font(RetroFont.mono(11, weight: .bold))
                             .foregroundStyle(storeKit.isPro ? Theme.retroLime : Theme.retroAmber)
                     }
@@ -226,11 +226,11 @@ struct SettingsView: View {
 
     private var autoSaveCopy: String {
         if storeKit.isPro {
-            return "Streaks+ auto-saves any day you miss. Your streak survives and the count keeps climbing tomorrow. Unlimited, automatic, no action needed."
+            return String(localized: "Streaks+ auto-saves any day you miss. Your streak survives and the count keeps climbing tomorrow. Unlimited, automatic, no action needed.")
         }
         return storeKit.hasEligibleTrial
-            ? "Free streaks end on the first missed day. Start a Streaks+ trial when it happens and we'll revive the run on the spot, then auto-save every miss after that."
-            : "Free streaks end on the first missed day. Subscribe to Streaks+ when it happens and we'll revive the run on the spot, then auto-save every miss after that."
+            ? String(localized: "Free streaks end on the first missed day. Start a Streaks+ trial when it happens and we'll revive the run on the spot, then auto-save every miss after that.")
+            : String(localized: "Free streaks end on the first missed day. Subscribe to Streaks+ when it happens and we'll revive the run on the spot, then auto-save every miss after that.")
     }
 
     private var recentPreservations: [GracePreservation] {
@@ -266,13 +266,14 @@ struct SettingsView: View {
 
     private var appearanceSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Appearance")
+            PixelSectionHeader(title: String(localized: "Appearance"))
             HStack(spacing: 0) {
                 ForEach(AppAppearance.allCases, id: \.rawValue) { a in
                     Button {
                         settings.appearance = a
                     } label: {
-                        Text(a.label.uppercased())
+                        Text(a.label)
+                            .textCase(.uppercase)
                             .font(RetroFont.pixel(10))
                             .foregroundStyle(settings.appearance == a ? Theme.retroBg : Theme.retroInk)
                             .padding(.vertical, 10)
@@ -290,14 +291,15 @@ struct SettingsView: View {
 
     private var intensitySection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Intensity")
+            PixelSectionHeader(title: String(localized: "Intensity"))
             HStack(spacing: 0) {
                 ForEach(DiscoveryIntensity.allCases, id: \.rawValue) { v in
                     Button {
                         settings.intensity = v
                         Task { await store.load() }
                     } label: {
-                        Text(v.short.uppercased())
+                        Text(v.short)
+                            .textCase(.uppercase)
                             .font(RetroFont.mono(9, weight: .bold))
                             .foregroundStyle(settings.intensity == v ? Theme.retroBg : Theme.retroInk)
                             .padding(.vertical, 10)
@@ -339,7 +341,7 @@ struct SettingsView: View {
             .alert("Recalibrate All Goals?", isPresented: $showingRecalibrateAllConfirm) {
                 Button("Recalibrate (Apple Health)", role: .destructive) {
                     settings.committedThresholds = [:]
-                    recalibrateAllMessage = "RECALIBRATING…"
+                    recalibrateAllMessage = String(localized: "RECALIBRATING…")
                     Task { await store.load() }
                 }
                 Button("Cancel", role: .cancel) {}
@@ -406,16 +408,16 @@ struct SettingsView: View {
 
     private var trackedSummary: String {
         if let set = settings.trackedStreaks {
-            return "\(set.count) PICKED"
+            return String(localized: "\(set.count) PICKED")
         }
-        return "ALL"
+        return String(localized: "ALL")
     }
 
     // MARK: - Notifications
 
     private var notificationsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Notifications")
+            PixelSectionHeader(title: String(localized: "Notifications"))
             if !storeKit.isPro {
                 lockedProactiveAlertsCard
             } else {
@@ -444,7 +446,7 @@ struct SettingsView: View {
             .pixelPanel(color: Theme.retroInkFaint)
             .accessibilityElement(children: .combine)
             .accessibilityLabel("At-risk reminder notifications")
-            .accessibilityValue(settings.notificationsEnabled ? "On" : "Off")
+            .accessibilityValue(settings.notificationsEnabled ? String(localized: "On") : String(localized: "Off"))
 
             if notificationsBlockedBySystem {
                 Button {
@@ -505,7 +507,7 @@ struct SettingsView: View {
                         .tracking(1)
                         .foregroundStyle(Theme.retroInk)
                     Spacer()
-                    PixelChip(text: "STREAKS+", accent: Theme.retroMagenta)
+                    PixelChip(text: String(localized: "STREAKS+"), accent: Theme.retroMagenta)
                 }
                 Text("You already see at-risk warnings inside the app for free. Streaks+ adds a daily push reminder so a streak never slips just because you didn't open the app. Reminder time: \(notificationTimeLabel).")
                     .font(RetroFont.mono(10))
@@ -574,7 +576,7 @@ struct SettingsView: View {
 
     private var metricsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Metrics Tracked")
+            PixelSectionHeader(title: String(localized: "Metrics Tracked"))
             VStack(spacing: 0) {
                 let visibleMetrics = StreakMetric.allCases.filter { $0 != .earlySteps }
                 ForEach(Array(visibleMetrics.enumerated()), id: \.offset) { idx, metric in
@@ -584,7 +586,8 @@ struct SettingsView: View {
                             .foregroundStyle(metric.accent)
                             .shadow(color: metric.accent.opacity(0.6), radius: 4)
                             .frame(width: 24)
-                        Text(metric.displayName.uppercased())
+                        Text(metric.displayName)
+                            .textCase(.uppercase)
                             .font(RetroFont.pixel(10))
                             .foregroundStyle(Theme.retroInk)
                         Spacer()
@@ -604,8 +607,8 @@ struct SettingsView: View {
                     .padding(.vertical, 12)
                     .padding(.horizontal, 14)
                     .accessibilityElement(children: .combine)
-                    .accessibilityLabel("\(metric.displayName) tracking")
-                    .accessibilityValue(!settings.isHidden(metric) ? "On" : "Off")
+                    .accessibilityLabel(String(localized: "\(metric.displayName) tracking"))
+                    .accessibilityValue(!settings.isHidden(metric) ? String(localized: "On") : String(localized: "Off"))
                     if idx < visibleMetrics.count - 1 {
                         dashedLine
                     }
@@ -643,7 +646,7 @@ struct SettingsView: View {
 
     private var dataSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Data")
+            PixelSectionHeader(title: String(localized: "Data"))
             Button {
                 Task { await store.load() }
             } label: {
@@ -666,7 +669,7 @@ struct SettingsView: View {
 
     private var plannedFreezesSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Planned Freezes")
+            PixelSectionHeader(title: String(localized: "Planned Freezes"))
 
             if storeKit.isPro {
                 proFreezesContent
@@ -788,7 +791,7 @@ struct SettingsView: View {
                     Image(systemName: "lock.fill")
                         .font(.system(size: 12))
                         .foregroundStyle(Theme.retroMagenta)
-                    PixelChip(text: "STREAKS+", accent: Theme.retroMagenta)
+                    PixelChip(text: String(localized: "STREAKS+"), accent: Theme.retroMagenta)
                     Spacer()
                     Text("UNLOCK →")
                         .font(RetroFont.mono(9, weight: .bold))
@@ -801,7 +804,7 @@ struct SettingsView: View {
                     .lineSpacing(2)
 
                 if !settings.plannedFreezes.isEmpty {
-                    Text("\(settings.plannedFreezes.count) freeze day\(settings.plannedFreezes.count == 1 ? "" : "s") set")
+                    Text("\(settings.plannedFreezes.count) freeze days set")
                         .font(RetroFont.mono(10))
                         .foregroundStyle(Theme.retroInkFaint)
                 }
@@ -819,7 +822,7 @@ struct SettingsView: View {
 
     private func formatFreezeDate(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "EEE, MMM d"
+        formatter.setLocalizedDateFormatFromTemplate("EEEMMMd")
         return formatter.string(from: date)
     }
 
@@ -827,7 +830,7 @@ struct SettingsView: View {
 
     private var coachSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Coaching")
+            PixelSectionHeader(title: String(localized: "Coaching"))
 
             VStack(alignment: .leading, spacing: 14) {
                 HStack(alignment: .top, spacing: 12) {
@@ -913,7 +916,7 @@ struct SettingsView: View {
         colorScheme == .dark ? CoachBrand.aquamarine.opacity(0.24) : CoachBrand.dustyRose.opacity(0.18)
     }
 
-    private func coachTag(title: String, systemImage: String, tint: Color) -> some View {
+    private func coachTag(title: LocalizedStringKey, systemImage: String, tint: Color) -> some View {
         HStack(spacing: 6) {
             Image(systemName: systemImage)
                 .font(.system(.caption, design: .rounded, weight: .bold))
@@ -926,7 +929,7 @@ struct SettingsView: View {
         .background(tint.opacity(colorScheme == .dark ? 0.18 : 0.12), in: Capsule())
     }
 
-    private func coachLinkButton(title: String, systemImage: String, destination: URL, prominent: Bool) -> some View {
+    private func coachLinkButton(title: LocalizedStringKey, systemImage: String, destination: URL, prominent: Bool) -> some View {
         Link(destination: destination) {
             HStack(spacing: 8) {
                 Text(title)
@@ -967,7 +970,7 @@ struct SettingsView: View {
 
     private var aboutSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "About")
+            PixelSectionHeader(title: String(localized: "About"))
             VStack(spacing: 0) {
                 aboutRow(label: "VERSION",
                          value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
@@ -995,7 +998,8 @@ struct SettingsView: View {
                     UIApplication.shared.open(AppStoreReviewLinks.writeReviewURL)
                 } label: {
                     HStack {
-                        Text("RATE \(AppStoreReviewLinks.displayName.uppercased())")
+                        Text("RATE \(AppStoreReviewLinks.displayName)")
+                            .textCase(.uppercase)
                             .font(RetroFont.pixel(10))
                             .foregroundStyle(Theme.retroInk)
                         Spacer()
@@ -1007,7 +1011,7 @@ struct SettingsView: View {
                     .padding(.horizontal, 14)
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("Rate \(AppStoreReviewLinks.displayName) on the App Store")
+                .accessibilityLabel(String(localized: "Rate \(AppStoreReviewLinks.displayName) on the App Store"))
                 dashedLine
                 if let url = Self.feedbackMailURL {
                     Link(destination: url) {
@@ -1048,7 +1052,7 @@ struct SettingsView: View {
         }
     }
 
-    private func aboutRow(label: String, value: String) -> some View {
+    private func aboutRow(label: LocalizedStringKey, value: String) -> some View {
         HStack {
             Text(label)
                 .font(RetroFont.pixel(10))

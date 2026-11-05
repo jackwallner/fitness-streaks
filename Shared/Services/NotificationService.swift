@@ -129,25 +129,39 @@ enum NotificationService {
         var plans: [ReminderPlan] = []
         if todayFire > now, let urgent = bestReminderCandidate(from: streaks) {
             plans.append(ReminderPlan(
-                title: "Keep the \(urgent.thresholdLabel) streak alive",
-                body: "You're at \(urgent.current) \(urgent.cadence.pluralLabel). Get it in \(deadline(for: urgent)).",
+                title: String(localized: "Keep the \(urgent.thresholdLabel) streak alive"),
+                body: urgentBody(for: urgent),
                 fireComponents: components(todayFire)
             ))
         }
         for offset in 1...max(days, 1) {
             guard let fire = calendar.date(byAdding: .day, value: offset, to: todayFire) else { continue }
             plans.append(ReminderPlan(
-                title: "Time for \(longest.thresholdLabel)",
-                body: "Get it in \(deadline(for: longest)) to keep your streak going.",
+                title: String(localized: "Time for \(longest.thresholdLabel)"),
+                body: laterBody(for: longest),
                 fireComponents: components(fire)
             ))
         }
         return plans
     }
 
-    nonisolated private static func deadline(for streak: Streak) -> String {
-        if let window = streak.window { return "by \(window.label)" }
-        return streak.cadence == .weekly ? "this week" : "before midnight"
+    nonisolated private static func urgentBody(for streak: Streak) -> String {
+        let n = streak.current
+        switch (streak.window?.label, streak.cadence) {
+        case let (window?, .daily): return String(localized: "You're at \(n) days. Get it in by \(window).")
+        case let (window?, .weekly): return String(localized: "You're at \(n) weeks. Get it in by \(window).")
+        case (nil, .weekly): return String(localized: "You're at \(n) weeks. Get it in this week.")
+        case (nil, .daily): return String(localized: "You're at \(n) days. Get it in before midnight.")
+        }
+    }
+
+    nonisolated private static func laterBody(for streak: Streak) -> String {
+        if let window = streak.window?.label {
+            return String(localized: "Get it in by \(window) to keep your streak going.")
+        }
+        return streak.cadence == .weekly
+            ? String(localized: "Get it in this week to keep your streak going.")
+            : String(localized: "Get it in before midnight to keep your streak going.")
     }
 
     nonisolated static func bestReminderCandidate(from streaks: [Streak]) -> Streak? {
@@ -164,8 +178,15 @@ enum NotificationService {
         guard StreakSettings.shared.notificationsEnabled, await isAuthorized() else { return }
 
         let content = UNMutableNotificationContent()
-        content.title = "Streak ended"
-        content.body = "Your \(broken.metric.displayName.lowercased()) streak ended at \(broken.brokenLength) \(broken.cadence.pluralLabel). Keep the same goal or pick a new one in the app."
+        content.title = String(localized: "Streak ended")
+        let metricName = broken.metric.lowerName
+        let length = broken.brokenLength
+        switch broken.cadence {
+        case .daily:
+            content.body = String(localized: "Your \(metricName) streak ended at \(length) days. Keep the same goal or pick a new one in the app.")
+        case .weekly:
+            content.body = String(localized: "Your \(metricName) streak ended at \(length) weeks. Keep the same goal or pick a new one in the app.")
+        }
         content.sound = .default
         content.interruptionLevel = .active
 

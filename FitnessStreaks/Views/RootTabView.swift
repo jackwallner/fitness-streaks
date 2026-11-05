@@ -140,7 +140,7 @@ struct RootTabView: View {
                 try? await Task.sleep(for: .milliseconds(100))
                 waited += 1
             }
-            NSLog("DUOSCREEN %@ route=%@ waited=%d", isSplit ? "inner" : "outer", route, waited)
+            NSLog("DUOSCREEN %@ route=%@ waited=%d", isSplit ? "inner" : "outer", route, waited) // l10n-ignore: log text
             openDuoRoute(route)
             // Open it again once any later reload settles.
             try? await Task.sleep(for: .seconds(2))
@@ -153,7 +153,7 @@ struct RootTabView: View {
         while !Task.isCancelled {
             for route in DuoScreenshotTour.routes(split: isSplit) {
                 guard !Task.isCancelled else { return }
-                NSLog("DUOTOUR %@ route=%@", isSplit ? "inner" : "outer", route)
+                NSLog("DUOTOUR %@ route=%@", isSplit ? "inner" : "outer", route) // l10n-ignore: log text
                 NSLog("DUOGEOM root=%.1f fold=%@ split=%@", paneGeometry.width,
                       String(describing: paneGeometry.fold), String(describing: split))
                 withAnimation(.easeInOut(duration: 0.3)) { openDuoRoute(route) }
@@ -204,7 +204,7 @@ enum DuoScreenshotTour {
         let list = value(split ? "-DuoRoutesRegular" : "-DuoRoutes")
             ?? (split
                 ? "streaks,streaks/exerciseMinutes,stats/standHours,saves/sleepHours,streaks/settings"
-                : "streaks,stats,saves")
+                : "streaks,stats,saves") // l10n-ignore: route ids
         return list.split(separator: ",").map(String.init)
     }
 
@@ -257,9 +257,9 @@ private struct PixelTabBar: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            tab(.streaks, label: "STREAKS", symbol: "flame.fill", accent: Theme.retroMagenta)
-            tab(.saves,   label: "SAVES",   symbol: "shield.lefthalf.filled", accent: Theme.retroLime)
-            tab(.stats,   label: "STATS",   symbol: "chart.bar.fill", accent: Theme.retroCyan)
+            tab(.streaks, label: String(localized: "STREAKS"), spoken: String(localized: "Streaks"), symbol: "flame.fill", accent: Theme.retroMagenta)
+            tab(.saves,   label: String(localized: "SAVES"), spoken: String(localized: "Saves"), symbol: "shield.lefthalf.filled", accent: Theme.retroLime)
+            tab(.stats,   label: String(localized: "STATS"), spoken: String(localized: "Stats"), symbol: "chart.bar.fill", accent: Theme.retroCyan)
         }
         .padding(.vertical, 6)
         .padding(.horizontal, 4)
@@ -276,7 +276,7 @@ private struct PixelTabBar: View {
         )
     }
 
-    private func tab(_ tab: RootTab, label: String, symbol: String, accent: Color) -> some View {
+    private func tab(_ tab: RootTab, label: String, spoken: String, symbol: String, accent: Color) -> some View {
         Button {
             withAnimation(.easeInOut(duration: 0.15)) { selection = tab }
         } label: {
@@ -300,6 +300,6 @@ private struct PixelTabBar: View {
             }
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(label.capitalized)
+        .accessibilityLabel(spoken)
     }
 }

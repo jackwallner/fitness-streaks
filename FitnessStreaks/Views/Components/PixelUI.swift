@@ -168,7 +168,8 @@ struct PixelButton: View {
 
     var body: some View {
         Button(action: action) {
-            Text(title.uppercased())
+            Text(title)
+                .textCase(.uppercase)
                 .font(RetroFont.pixel(12))
                 .tracking(1)
                 .lineLimit(2)
@@ -227,7 +228,8 @@ struct PixelChip: View {
     var accent: Color = Theme.retroCyan
 
     var body: some View {
-        Text(text.uppercased())
+        Text(text)
+            .textCase(.uppercase)
             .font(RetroFont.pixel(9))
             .tracking(1)
             .foregroundStyle(Theme.retroBg)
@@ -243,7 +245,8 @@ struct PixelSectionHeader: View {
     var title: String
 
     var body: some View {
-        Text("■ " + title.uppercased())
+        Text(verbatim: "■ " + title)
+            .textCase(.uppercase)
             .font(RetroFont.pixel(10))
             .tracking(2)
             .foregroundStyle(Theme.retroInkDim)

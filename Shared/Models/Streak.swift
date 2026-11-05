@@ -9,15 +9,15 @@ struct HourWindow: Hashable, Sendable, Codable {
     var label: String {
         let s = Self.format(hour: startHour)
         let e = Self.format(hour: (startHour + 1) % 24)
-        return "\(s)-\(e)"
+        return String(localized: "\(s)-\(e)")
     }
 
     static func format(hour: Int) -> String {
         switch hour {
-        case 0: return "12a"
-        case 12: return "12p"
-        case 1..<12: return "\(hour)a"
-        default: return "\(hour - 12)p"
+        case 0: return String(localized: "12a")
+        case 12: return String(localized: "12p")
+        case 1..<12: return String(localized: "\(hour)a")
+        default: return String(localized: "\(hour - 12)p")
         }
     }
 }
@@ -167,11 +167,11 @@ struct Streak: Identifiable, Hashable, Sendable {
     func format(currentUnitValue: Double) -> String {
         if let measure = workoutMeasure {
             switch measure {
-            case .count: return "\(Int(currentUnitValue))"
-            case .minutes: return "\(Int(currentUnitValue))"
+            case .count: return Int(currentUnitValue).plain
+            case .minutes: return Int(currentUnitValue).plain
             case .miles:
                 let truncated = floor(currentUnitValue * 10) / 10
-                return String(format: truncated < 10 ? "%.1f" : "%.0f", truncated)
+                return truncated.plain(fractionDigits: truncated < 10 ? 1 : 0)
             }
         }
         return metric.formatTruncating(value: currentUnitValue)
@@ -182,31 +182,55 @@ struct Streak: Identifiable, Hashable, Sendable {
         return metric.unitLabel
     }
 
+    /// A value with this streak's unit, floored like `format(currentUnitValue:)`,
+    /// e.g. "10000 steps", "3 session".
+    func amount(_ value: Double) -> String {
+        if let measure = workoutMeasure { return measure.amount(value) }
+        return metric.amount(value, truncating: true)
+    }
+
+    /// "Steps" or "Steps · 5p-6p": the card title before any all-caps styling,
+    /// which views apply with `.textCase(.uppercase)`.
+    var headline: String {
+        if let w = window {
+            return String(localized: "\(displayName) · \(w.label)")
+        }
+        return displayName
+    }
+
     static func workoutThresholdLabel(_ threshold: Double, entry: WorkoutTypeCatalog.Entry, measure: WorkoutMeasure) -> String {
-        let name = entry.displayName.lowercased()
+        let name = entry.lowerName
         switch measure {
         case .count:
             let n = Int(threshold.rounded())
-            return n <= 1 ? "1 \(name) session" : "\(n) \(name) sessions"
+            return n <= 1 ? String(localized: "1 \(name) session") : String(localized: "\(n) \(name) sessions")
         case .minutes:
-            return "\(Int(threshold.rounded())) min \(name)"
+            let n = Int(threshold.rounded())
+            return String(localized: "\(n) min \(name)")
         case .miles:
-            let formatted = threshold < 10 ? String(format: "%.1f", threshold) : String(format: "%.0f", threshold)
-            return "\(formatted) mi \(name)"
+            if threshold < 10 {
+                return String(localized: "\(threshold.plain(fractionDigits: 1)) mi \(name)")
+            }
+            let n = Int(threshold.rounded(.toNearestOrEven))
+            return String(localized: "\(n) mi \(name)")
         }
     }
 
     static func workoutProse(_ threshold: Double, entry: WorkoutTypeCatalog.Entry, measure: WorkoutMeasure) -> String {
-        let name = entry.displayName.lowercased()
+        let name = entry.lowerName
         switch measure {
         case .count:
             let n = Int(threshold.rounded())
-            return n <= 1 ? "A \(name) session every day" : "\(n)+ \(name) sessions every day"
+            return n <= 1 ? String(localized: "A \(name) session every day") : String(localized: "\(n)+ \(name) sessions every day")
         case .minutes:
-            return "\(Int(threshold.rounded()))+ min of \(name) every day"
+            let n = Int(threshold.rounded())
+            return String(localized: "\(n)+ min of \(name) every day")
         case .miles:
-            let formatted = threshold < 10 ? String(format: "%.1f", threshold) : String(format: "%.0f", threshold)
-            return "\(formatted)+ mi of \(name) every day"
+            if threshold < 10 {
+                return String(localized: "\(threshold.plain(fractionDigits: 1))+ mi of \(name) every day")
+            }
+            let n = Int(threshold.rounded(.toNearestOrEven))
+            return String(localized: "\(n)+ mi of \(name) every day")
         }
     }
 }

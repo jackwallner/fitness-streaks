@@ -15,13 +15,13 @@ struct SavesView: View {
 
     private static let freezeDateFormatter: DateFormatter = {
         let f = DateFormatter()
-        f.dateFormat = "EEE, MMM d"
+        f.setLocalizedDateFormatFromTemplate("EEEMMMd")
         return f
     }()
 
     private static let saveDateFormatter: DateFormatter = {
         let f = DateFormatter()
-        f.dateFormat = "MMM d"
+        f.setLocalizedDateFormatFromTemplate("MMMd")
         return f
     }()
 
@@ -77,13 +77,13 @@ struct SavesView: View {
                 AutoSavePulse(tint: accent, lit: storeKit.isPro)
 
                 VStack(alignment: detailPane == nil ? .center : .leading, spacing: 6) {
-                    Text(storeKit.isPro ? "AUTO-SAVE ON" : "AUTO-SAVE LOCKED")
+                    Text(storeKit.isPro ? String(localized: "AUTO-SAVE ON") : String(localized: "AUTO-SAVE LOCKED"))
                         .font(RetroFont.pixel(14))
                         .tracking(2)
                         .foregroundStyle(accent)
                     Text(storeKit.isPro
-                         ? "Miss a day, keep your streak."
-                         : "One miss ends a streak. Streaks+ saves it.")
+                         ? String(localized: "Miss a day, keep your streak.")
+                         : String(localized: "One miss ends a streak. Streaks+ saves it."))
                         .font(RetroFont.mono(11, weight: .bold))
                         .foregroundStyle(Theme.retroInk)
                         .multilineTextAlignment(detailPane == nil ? .center : .leading)
@@ -94,7 +94,7 @@ struct SavesView: View {
                 Button {
                     showingPaywall = true
                 } label: {
-                    Text(storeKit.hasEligibleTrial ? "START STREAKS+ TRIAL" : "UNLOCK STREAKS+")
+                    Text(storeKit.hasEligibleTrial ? String(localized: "START STREAKS+ TRIAL") : String(localized: "UNLOCK STREAKS+"))
                         .font(RetroFont.mono(11, weight: .bold))
                         .tracking(2)
                         .foregroundStyle(Theme.retroBg)
@@ -103,7 +103,7 @@ struct SavesView: View {
                         .background(Theme.retroMagenta)
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(storeKit.hasEligibleTrial ? "Start Streaks+ trial" : "Unlock Streaks+")
+                .accessibilityLabel(storeKit.hasEligibleTrial ? String(localized: "Start Streaks+ trial") : String(localized: "Unlock Streaks+"))
             }
         }
         .padding(.vertical, detailPane == nil ? 20 : 12)
@@ -121,14 +121,15 @@ struct SavesView: View {
 
     private var savesLog: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Recent Saves")
+            PixelSectionHeader(title: String(localized: "Recent Saves"))
             VStack(spacing: 0) {
                 ForEach(Array(recentPreservations.prefix(10).enumerated()), id: \.element.key) { idx, p in
                     HStack(spacing: 10) {
                         Image(systemName: "shield.lefthalf.filled")
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(Theme.retroLime)
-                        Text("\(p.metric.displayName.uppercased()) · \(p.preservedLength)-DAY RUN")
+                        Text("\(p.metric.displayName) · \(p.preservedLength)-DAY RUN")
+                            .textCase(.uppercase)
                             .font(RetroFont.pixel(10))
                             .foregroundStyle(Theme.retroInk)
                         Spacer()
@@ -154,7 +155,7 @@ struct SavesView: View {
 
     private var plannedFreezesCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "Planned Freezes")
+            PixelSectionHeader(title: String(localized: "Planned Freezes"))
             if storeKit.isPro {
                 proFreezesContent
             } else {
@@ -290,7 +291,7 @@ struct SavesView: View {
 
     private var perksStrip: some View {
         VStack(alignment: .leading, spacing: 10) {
-            PixelSectionHeader(title: "With Streaks+")
+            PixelSectionHeader(title: String(localized: "With Streaks+"))
             VStack(spacing: 0) {
                 perkRow("shield.lefthalf.filled", "Unlimited auto-saves", first: true)
                 perkRow("snowflake", "Planned freeze days")
@@ -301,7 +302,7 @@ struct SavesView: View {
         }
     }
 
-    private func perkRow(_ symbol: String, _ title: String, first: Bool = false) -> some View {
+    private func perkRow(_ symbol: String, _ title: LocalizedStringKey, first: Bool = false) -> some View {
         VStack(spacing: 0) {
             if !first {
                 Rectangle()

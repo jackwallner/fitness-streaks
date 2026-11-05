@@ -37,11 +37,11 @@ struct TrialOfferSheet: View {
 
     @State private var restoreStatus: String?
 
-    private var offerLabel: String? {
+    private var trialLength: TrialLength? {
         #if REVENUECAT
         guard let package = storeKit.preferredOfferPackage,
               storeKit.isEligibleForIntroOffer(package) else { return nil }
-        return package.streaksIntroOfferLabel
+        return package.streaksTrialLength
         #else
         return nil
         #endif
@@ -55,12 +55,22 @@ struct TrialOfferSheet: View {
         #endif
     }
 
+    private var trialNumber: Int? {
+        #if REVENUECAT
+        guard let package = storeKit.preferredOfferPackage,
+              storeKit.isEligibleForIntroOffer(package) else { return nil }
+        return package.streaksIntroOfferNumber
+        #else
+        return nil
+        #endif
+    }
+
     private var directPurchase: Bool { priceLabel != nil }
 
     struct LongestStreakInfo {
         let displayName: String
         let current: Int
-        let cadenceLabel: String  // "day" / "week"
+        let cadence: StreakCadence
     }
 
     private static let privacyURL = URL(string: "https://jackwallner.github.io/fitness-streaks/privacy-policy.html")!
@@ -73,64 +83,80 @@ struct TrialOfferSheet: View {
         (longestStreak?.current ?? 0) >= 3
     }
 
-    /// Trial length parsed from `offerLabel` (e.g. "7-day free trial" → 7).
-    /// Defaults to 7 when unparseable so the timeline still renders sensibly.
+    /// Trial length from the package's intro offer (e.g. a 7-day trial is 7).
+    /// Defaults to 7 when there is none so the timeline still renders sensibly.
     private var trialDays: Int {
-        guard let offerLabel,
-              let first = offerLabel.split(separator: "-").first,
-              let days = Int(first) else {
-            return 7
-        }
-        return days
+        trialNumber ?? 7
     }
 
     private var headline: String {
         if let headlineOverride { return headlineOverride }
         if let s = longestStreak, hasMeaningfulStreak {
-            return "KEEP YOUR \(s.current)-\(s.cadenceLabel.uppercased()) \(s.displayName.uppercased()) STREAK ALIVE."
+            switch s.cadence {
+            case .daily: return String(localized: "KEEP YOUR \(s.current)-DAY \(s.displayName) STREAK ALIVE.")
+            case .weekly: return String(localized: "KEEP YOUR \(s.current)-WEEK \(s.displayName) STREAK ALIVE.")
+            }
         }
-        if let offerLabel {
-            return "\(offerLabel.uppercased()), ON US."
+        if let trialLength {
+            return trialLength.onUsHeadline
         }
-        return "UNLOCK STREAKS+."
+        return String(localized: "UNLOCK STREAKS+.")
     }
 
     private var subheadline: String {
         if let subheadlineOverride { return subheadlineOverride }
-        // "7-day free trial" -> ", free for your 7-day trial" (keeping "trial" so the
-        // sentence doesn't dangle as "...earned, free for your 7-day.").
-        let trialClause = offerLabel.map { ", free for your \($0.replacingOccurrences(of: " free trial", with: " trial"))" } ?? ""
+        // With a trial the sentence ends ", free for your 7-day trial."
         if hasMeaningfulStreak {
-            return "One missed \(longestStreak?.cadenceLabel ?? "day") zeroes it out. Streaks+ auto-saves the run and tracks every streak you've earned\(trialClause)."
+            let cadence = longestStreak?.cadence ?? .daily
+            if let trialLength {
+                return trialLength.freeForYourTrial(cadence: cadence)
+            }
+            switch cadence {
+            case .daily: return String(localized: "One missed day zeroes it out. Streaks+ auto-saves the run and tracks every streak you've earned.")
+            case .weekly: return String(localized: "One missed week zeroes it out. Streaks+ auto-saves the run and tracks every streak you've earned.")
+            }
         }
-        if offerLabel != nil {
-            return "Unlock the full Streaks+ toolkit free. No charge until your trial ends."
+        if trialLength != nil {
+            return String(localized: "Unlock the full Streaks+ toolkit free. No charge until your trial ends.")
         }
-        return "Unlock the full Streaks+ toolkit."
+        return String(localized: "Unlock the full Streaks+ toolkit.")
     }
 
     private var bullets: [TrialBullet] {
-        let unlimitedDetail = "Free caps you at \(freeCap). Streaks+ tracks every metric you've earned, including future picks."
+        let unlimitedDetail = String(localized: "Free caps you at \(freeCap). Streaks+ tracks every metric you've earned, including future picks.")
+        let missedDetail: String
+        switch longestStreak?.cadence ?? .daily {
+        case .daily: missedDetail = String(localized: "Miss a day later on? Streaks+ revives the run instead of zeroing it.")
+        case .weekly: missedDetail = String(localized: "Miss a week later on? Streaks+ revives the run instead of zeroing it.")
+        }
+        let autoSaveTitle: String
+        if hasMeaningfulStreak {
+            if let name = longestStreak?.displayName {
+                autoSaveTitle = String(localized: "Auto-save your \(name) if you miss a day")
+            } else {
+                autoSaveTitle = String(localized: "Auto-save your streak if you miss a day")
+            }
+        } else {
+            autoSaveTitle = String(localized: "Auto-save when one breaks")
+        }
         return [
             TrialBullet(
                 icon: "flame.fill",
                 tint: Theme.retroMagenta,
-                title: hasMeaningfulStreak
-                    ? "Auto-save your \(longestStreak?.displayName ?? "streak") if you miss a day"
-                    : "Auto-save when one breaks",
-                detail: "Miss a \(longestStreak?.cadenceLabel ?? "day") later on? Streaks+ revives the run instead of zeroing it."
+                title: autoSaveTitle,
+                detail: missedDetail
             ),
             TrialBullet(
                 icon: "infinity",
                 tint: Theme.retroCyan,
-                title: "Track every streak",
+                title: String(localized: "Track every streak"),
                 detail: unlimitedDetail
             ),
             TrialBullet(
                 icon: "wand.and.stars",
                 tint: Theme.retroLime,
-                title: "Custom streaks",
-                detail: "Define your own threshold, cadence, and hour window, beyond the discovered set."
+                title: String(localized: "Custom streaks"),
+                detail: String(localized: "Define your own threshold, cadence, and hour window, beyond the discovered set.")
             )
         ]
     }
@@ -146,6 +172,7 @@ struct TrialOfferSheet: View {
 
                     VStack(spacing: 8) {
                         Text(headline)
+                            .textCase(.uppercase)
                             .font(.system(.title3, design: .monospaced, weight: .heavy))
                             .foregroundStyle(Theme.retroInk)
                             .multilineTextAlignment(.center)
@@ -162,7 +189,7 @@ struct TrialOfferSheet: View {
                         ForEach(bullets) { TrialBulletRow(bullet: $0) }
                     }
 
-                    if offerLabel != nil {
+                    if trialLength != nil {
                         TrialTimeline(trialDays: trialDays, priceLabel: priceLabel)
                     }
                 }
@@ -190,7 +217,7 @@ struct TrialOfferSheet: View {
                         )
                     }
                     #endif
-                    return "\(priceLabel). Renews automatically; cancel in Settings > Subscriptions."
+                    return String(localized: "\(priceLabel). Renews automatically; cancel in Settings > Subscriptions.")
                 }()
                 Text(footnote)
                     .font(.system(.caption2, design: .rounded))
@@ -219,6 +246,7 @@ struct TrialOfferSheet: View {
                         // above every other pricing element ("nothing due today" line, legal copy).
                         if let subtitle = primaryCTASubtitle {
                             Text(subtitle)
+                                .textCase(.uppercase)
                                 .font(.system(.footnote, design: .monospaced, weight: .heavy))
                                 .foregroundStyle(Theme.retroBg)
                                 .tracking(0.5)
@@ -249,7 +277,7 @@ struct TrialOfferSheet: View {
 
             // Subordinate to the billed amount in the CTA (Apple 3.1.2(c)):
             // dim ink, caption size — reassurance, not the headline price.
-            if offerLabel != nil {
+            if trialLength != nil {
                 Text("Nothing due today · Billed by Apple")
                     .font(.system(.caption2, design: .monospaced))
                     .foregroundStyle(Theme.retroInkDim)
@@ -308,26 +336,26 @@ struct TrialOfferSheet: View {
     /// CTA names the plan + recurring price (Apple 3.1.2). "Start my free trial"
     /// alone has been rejected for not disclosing the subscription term.
     private var primaryCTATitle: String {
-        if !directPurchase { return "SEE PLANS" }
-        if offerLabel != nil { return "START FREE TRIAL" }
-        return "SUBSCRIBE"
+        if !directPurchase { return String(localized: "SEE PLANS") }
+        if trialLength != nil { return String(localized: "START FREE TRIAL") }
+        return String(localized: "SUBSCRIBE")
     }
 
     private var primaryCTASubtitle: String? {
         guard directPurchase, let priceLabel else { return nil }
-        if offerLabel != nil {
-            return "THEN \(priceLabel.uppercased())"
+        if trialLength != nil {
+            return String(localized: "THEN \(priceLabel)")
         }
-        return priceLabel.uppercased()
+        return priceLabel
     }
 
     private func restorePurchases() async {
-        restoreStatus = "Restoring…"
+        restoreStatus = String(localized: "Restoring…")
         await storeKit.restore()
         if storeKit.isPro {
-            restoreStatus = "Streaks+ restored."
+            restoreStatus = String(localized: "Streaks+ restored.")
         } else {
-            restoreStatus = storeKit.lastError ?? "No active subscription found."
+            restoreStatus = storeKit.lastError ?? String(localized: "No active subscription found.")
         }
     }
 

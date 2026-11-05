@@ -89,7 +89,8 @@ struct StreakPickerList: View {
 
                     VStack(alignment: .leading, spacing: 2) {
                         HStack(spacing: 6) {
-                            Text(streak.displayName.uppercased())
+                            Text(streak.displayName)
+                                .textCase(.uppercase)
                                 .font(RetroFont.mono(11, weight: .bold))
                                 .tracking(1)
                                 .foregroundStyle(Theme.retroInk)
@@ -99,6 +100,7 @@ struct StreakPickerList: View {
                                     .foregroundStyle(Theme.retroLime)
                             }
                             Text(cadenceLabel(for: streak))
+                                .textCase(.uppercase)
                                 .font(RetroFont.mono(9, weight: .bold))
                                 .foregroundStyle(streak.window != nil ? Theme.retroAmber : Theme.retroInkDim)
                             if recommended {
@@ -119,7 +121,7 @@ struct StreakPickerList: View {
                             .font(.system(size: 13, weight: .bold))
                             .foregroundStyle(Theme.retroMagenta)
                     } else {
-                        Text(on ? "◉" : "○")
+                        Text(verbatim: on ? "◉" : "○")
                             .font(RetroFont.mono(18, weight: .bold))
                             .foregroundStyle(on ? accent : Theme.retroInkFaint)
                     }
@@ -149,17 +151,24 @@ struct StreakPickerList: View {
 
     private func subtitle(for streak: Streak) -> String {
         let label = streak.thresholdLabel
-        if let window = streak.window {
-            return "\(streak.current) \(streak.cadence.pluralLabel) in a row · \(label) between \(window.label)"
+        let n = streak.current
+        switch (streak.window, streak.cadence) {
+        case let (window?, .daily):
+            return String(localized: "\(n) days in a row · \(label) between \(window.label)")
+        case let (window?, .weekly):
+            return String(localized: "\(n) weeks in a row · \(label) between \(window.label)")
+        case (nil, .daily):
+            return String(localized: "\(n) days in a row · \(label) daily")
+        case (nil, .weekly):
+            return String(localized: "\(n) weeks in a row · \(label) daily")
         }
-        return "\(streak.current) \(streak.cadence.pluralLabel) in a row · \(label) daily"
     }
 
     private func cadenceLabel(for streak: Streak) -> String {
         if let w = streak.window {
-            return "BY \(w.label.uppercased())"
+            return String(localized: "BY \(w.label)")
         }
-        return "DAILY"
+        return String(localized: "DAILY")
     }
 }
 
@@ -218,8 +227,8 @@ struct StreakPickerSheet: View {
                                     .tracking(1)
                                     .foregroundStyle(Theme.retroAmber)
                                 Text(storeKit.hasEligibleTrial
-                                    ? "Deselect \(selection.count - Self.freeTrackedLimit) to save, or start a free trial to keep them all."
-                                    : "Deselect \(selection.count - Self.freeTrackedLimit) to save, or unlock Streaks+ to keep them all.")
+                                    ? String(localized: "Deselect \(selection.count - Self.freeTrackedLimit) to save, or start a free trial to keep them all.")
+                                    : String(localized: "Deselect \(selection.count - Self.freeTrackedLimit) to save, or unlock Streaks+ to keep them all."))
                                     .font(RetroFont.mono(10))
                                     .foregroundStyle(Theme.retroInkDim)
                             }
@@ -258,12 +267,12 @@ struct StreakPickerSheet: View {
                         }
                     } label: {
                         HStack {
-                            Text(canBuildCustom ? "+ BUILD YOUR OWN" : "+ BUILD YOUR OWN (STREAKS+)")
+                            Text(canBuildCustom ? String(localized: "+ BUILD YOUR OWN") : String(localized: "+ BUILD YOUR OWN (STREAKS+)"))
                                 .font(RetroFont.mono(10, weight: .bold))
                                 .tracking(1)
                                 .foregroundStyle(canBuildCustom ? Theme.retroLime : Theme.retroMagenta)
                             Spacer()
-                            Text(canBuildCustom ? "CUSTOM" : "LOCKED")
+                            Text(canBuildCustom ? String(localized: "CUSTOM") : String(localized: "LOCKED"))
                                 .font(RetroFont.mono(9, weight: .bold))
                                 .foregroundStyle(canBuildCustom ? Theme.retroInkDim : Theme.retroMagenta)
                         }
@@ -459,14 +468,15 @@ struct CustomStreakBuilderSheet: View {
                                 .foregroundStyle(Theme.retroLime)
                                 .frame(width: 120)
                                 .disabled(metric == .workouts)
-                            Text(metric.unitLabel.uppercased())
+                            Text(metric.unitLabel)
+                                .textCase(.uppercase)
                                 .font(RetroFont.mono(9, weight: .bold))
                                 .foregroundStyle(Theme.retroInkDim)
                         }
                         .padding(14)
 
                         if !thresholdIsValid {
-                            Text(allowsFractionalThreshold ? "Enter a value greater than 0." : "Enter a whole number greater than 0.")
+                            Text(allowsFractionalThreshold ? String(localized: "Enter a value greater than 0.") : String(localized: "Enter a whole number greater than 0."))
                                 .font(RetroFont.mono(10))
                                 .foregroundStyle(Theme.retroRed)
                                 .padding(.horizontal, 14)
@@ -705,7 +715,8 @@ struct CustomStreakEditSheet: View {
                                 .font(RetroFont.mono(10, weight: .bold))
                                 .foregroundStyle(Theme.retroInkDim)
                             Spacer()
-                            Text(metric.displayName.uppercased())
+                            Text(metric.displayName)
+                                .textCase(.uppercase)
                                 .font(RetroFont.mono(11, weight: .bold))
                                 .foregroundStyle(Theme.retroInk)
                         }
@@ -727,14 +738,15 @@ struct CustomStreakEditSheet: View {
                                 .font(RetroFont.mono(12, weight: .bold))
                                 .foregroundStyle(Theme.retroLime)
                                 .frame(width: 120)
-                            Text(metric.unitLabel.uppercased())
+                            Text(metric.unitLabel)
+                                .textCase(.uppercase)
                                 .font(RetroFont.mono(9, weight: .bold))
                                 .foregroundStyle(Theme.retroInkDim)
                         }
                         .padding(.horizontal, 14)
 
                         if !thresholdIsValid {
-                            Text(allowsFractional ? "Enter a value between \(format(minValue)) and \(format(maxValue))." : "Enter a whole number between \(Int(minValue)) and \(Int(maxValue)).")
+                            Text(allowsFractional ? String(localized: "Enter a value between \(format(minValue)) and \(format(maxValue)).") : String(localized: "Enter a whole number between \(Int(minValue)) and \(Int(maxValue))."))
                                 .font(RetroFont.mono(10))
                                 .foregroundStyle(Theme.retroRed)
                                 .padding(.horizontal, 14)
@@ -791,8 +803,8 @@ struct CustomStreakEditSheet: View {
 
     private func format(_ value: Double) -> String {
         if allowsFractional {
-            return value < 10 ? String(format: "%.1f", value) : String(format: "%.0f", value)
+            return value.plain(fractionDigits: value < 10 ? 1 : 0)
         }
-        return String(Int(value))
+        return Int(value).plain
     }
 }

@@ -25,25 +25,25 @@ struct TrialTimeline: View {
                     index: 1,
                     accent: Theme.retroLime,
                     icon: "lock.open.fill",
-                    title: "TODAY",
-                    detail: "Streaks+ unlocks instantly. Nothing charged."
+                    title: String(localized: "TODAY"),
+                    detail: String(localized: "Streaks+ unlocks instantly. Nothing charged.")
                 )
                 connector(Theme.retroInkFaint)
                 step(
                     index: 2,
                     accent: Theme.retroCyan,
                     icon: "bell.fill",
-                    title: "DAY \(reminderDay)",
-                    detail: "Apple emails you a heads-up before the trial ends."
+                    title: String(localized: "DAY \(reminderDay)"),
+                    detail: String(localized: "Apple emails you a heads-up before the trial ends.")
                 )
                 connector(Theme.retroInkFaint)
                 step(
                     index: 3,
                     accent: Theme.retroMagenta,
                     icon: "creditcard.fill",
-                    title: "DAY \(trialDays)",
-                    detail: priceLabel.map { "Trial ends · \($0) renews." }
-                        ?? "Trial ends · subscription renews."
+                    title: String(localized: "DAY \(trialDays)"),
+                    detail: priceLabel.map { String(localized: "Trial ends · \($0) renews.") }
+                        ?? String(localized: "Trial ends · subscription renews.")
                 )
             }
         }

@@ -46,9 +46,15 @@ enum DateHelpers {
 
     private static let dayOfWeekFormatter: DateFormatter = {
         let f = DateFormatter()
-        f.dateFormat = "EEE"
+        f.setLocalizedDateFormatFromTemplate("EEE")
         return f
     }()
+
+    /// Single-letter weekday symbols for the user's language, Monday first.
+    static var mondayFirstWeekdayInitials: [String] {
+        let symbols = Calendar.current.veryShortStandaloneWeekdaySymbols
+        return Array(symbols[1...]) + [symbols[0]]
+    }
 
     static func shortDate(_ date: Date) -> String { shortFormatter.string(from: date) }
     static func dayOfWeek(_ date: Date) -> String { dayOfWeekFormatter.string(from: date) }
