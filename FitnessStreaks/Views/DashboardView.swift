@@ -24,6 +24,7 @@ struct DashboardView: View {
     @State private var reviewRequestedThisSession = false
     @Environment(\.requestReview) private var requestReview
     @Environment(\.streakDetailPane) private var detailPane
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private let grid = [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)]
     private static let relativeFormatter: RelativeDateTimeFormatter = {
@@ -385,7 +386,7 @@ struct DashboardView: View {
                 Image(systemName: "arrow.clockwise")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(refreshing ? Theme.retroInkFaint : Theme.retroInkDim)
-                    .rotationEffect(.degrees(refreshing ? 360 : 0))
+                    .rotationEffect(.degrees(refreshing && !reduceMotion ? 360 : 0))
                     .animation(refreshing ? .linear(duration: 0.9).repeatForever(autoreverses: false) : .default, value: refreshing)
                     .frame(width: 36, height: 36)
                     .background(Theme.retroBgRaised)

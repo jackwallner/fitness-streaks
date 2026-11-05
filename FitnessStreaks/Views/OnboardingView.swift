@@ -21,6 +21,7 @@ struct OnboardingView: View {
     @State private var errorText: String? = nil
     @State private var tipIndex: Int = 0
     @State private var loadTask: Task<Void, Never>? = nil
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var flameVisible = true
     @State private var selection: Set<String> = []
     @State private var authProgress: Double = 0
@@ -255,7 +256,7 @@ struct OnboardingView: View {
                     .opacity(flameVisible ? 1 : 0.25)
                     .animation(.linear(duration: 0.6).repeatForever(autoreverses: true), value: flameVisible)
                     .padding(.top, 30)
-                    .onAppear { flameVisible = false }
+                    .onAppear { flameVisible = reduceMotion }
 
                 VStack(spacing: 10) {
                     Text("STREAK\nFINDER")

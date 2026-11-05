@@ -111,11 +111,13 @@ struct AnimatedStripes: View {
     var speed: CGFloat = 18
     var color: Color = .white.opacity(0.22)
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { context in
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: reduceMotion)) { context in
             Canvas { ctx, size in
                 let period = stripeWidth + gap
-                let phase = CGFloat(context.date.timeIntervalSinceReferenceDate * Double(speed))
+                let phase = reduceMotion ? 0 : CGFloat(context.date.timeIntervalSinceReferenceDate * Double(speed))
                     .truncatingRemainder(dividingBy: period)
                 let slant = size.height
                 var x: CGFloat = -slant - period + phase
