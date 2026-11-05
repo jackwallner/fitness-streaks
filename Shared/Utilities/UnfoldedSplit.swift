@@ -55,7 +55,7 @@ enum DashboardGridCell: Hashable, Identifiable {
     var id: String {
         switch self {
         case .streak(let streak): return streak.id
-        case .findMore: return "findMore"
+        case .findMore: return "findMore" // l10n-ignore: id
         }
     }
 

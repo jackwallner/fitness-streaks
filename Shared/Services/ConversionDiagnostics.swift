@@ -197,7 +197,7 @@ enum ConversionDiagnostics {
             attributes["pitch_views_at_convert"] = String(d.integer(forKey: Key.viewsAtConvert))
             attributes["days_to_convert"] = String(d.integer(forKey: Key.daysToConvert))
             attributes["converted_plan"] = d.string(forKey: Key.convertedPlan) ?? "unknown"
-            attributes["converted_with_trial"] = d.bool(forKey: Key.convertedWithTrial) ? "true" : "false"
+            attributes["converted_with_trial"] = d.bool(forKey: Key.convertedWithTrial) ? "true" : "false" // l10n-ignore: RevenueCat attribute
             if let offering = d.string(forKey: Key.convertedOffering) {
                 attributes["converted_offering"] = offering
             }

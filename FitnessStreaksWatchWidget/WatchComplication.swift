@@ -151,7 +151,7 @@ struct WatchComplicationView: View {
 
     private func rectangularProgressLabel(_ item: StreakSnapshot.Item) -> String {
         if item.currentUnitCompleted {
-            return "\(item.progressValueLabel) done"
+            return String(localized: "\(item.progressValueLabel) done")
         }
         return item.progressValueLabel
     }

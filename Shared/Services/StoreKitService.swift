@@ -21,29 +21,131 @@ enum TrialOfferResolver {
     }
 }
 
+/// Currency helpers. Prices themselves come only from StoreKit.
+/// Unit of a free trial after a week is folded into days.
+enum TrialUnit: Sendable, Equatable {
+    case day, month, year
+}
+
+/// How long the free trial runs. Sentences take the number and unit directly,
+/// one whole key per unit, so no language has to inflect a pre-translated
+/// "7-day trial" phrase.
+struct TrialLength: Sendable, Equatable {
+    let value: Int
+    let unit: TrialUnit
+
+    /// "7-day free trial ON US", the trial hook on the offer sheet.
+    var onUsHeadline: String {
+        switch unit {
+        case .day: String(localized: "\(value)-day free trial, ON US.")
+        case .month: String(localized: "\(value)-month free trial, ON US.")
+        case .year: String(localized: "\(value)-year free trial, ON US.")
+        }
+    }
+
+    /// The offer sheet's pitch for a streak worth keeping, free for the trial.
+    func freeForYourTrial(cadence: StreakCadence) -> String {
+        switch (cadence, unit) {
+        case (.daily, .day): String(localized: "One missed day zeroes it out. Streaks+ auto-saves the run and tracks every streak you've earned, free for your \(value)-day trial.")
+        case (.daily, .month): String(localized: "One missed day zeroes it out. Streaks+ auto-saves the run and tracks every streak you've earned, free for your \(value)-month trial.")
+        case (.daily, .year): String(localized: "One missed day zeroes it out. Streaks+ auto-saves the run and tracks every streak you've earned, free for your \(value)-year trial.")
+        case (.weekly, .day): String(localized: "One missed week zeroes it out. Streaks+ auto-saves the run and tracks every streak you've earned, free for your \(value)-day trial.")
+        case (.weekly, .month): String(localized: "One missed week zeroes it out. Streaks+ auto-saves the run and tracks every streak you've earned, free for your \(value)-month trial.")
+        case (.weekly, .year): String(localized: "One missed week zeroes it out. Streaks+ auto-saves the run and tracks every streak you've earned, free for your \(value)-year trial.")
+        }
+    }
+
+    /// Onboarding pitch when more streaks were picked than the free plan keeps.
+    func startToKeepTheOthers(freeLimit: Int, locked: Int) -> String {
+        switch unit {
+        case .day: String(localized: "Free keeps \(freeLimit). Start your \(value)-day free trial to keep the other \(locked) and protect every run.")
+        case .month: String(localized: "Free keeps \(freeLimit). Start your \(value)-month free trial to keep the other \(locked) and protect every run.")
+        case .year: String(localized: "Free keeps \(freeLimit). Start your \(value)-year free trial to keep the other \(locked) and protect every run.")
+        }
+    }
+
+    /// Onboarding pitch when every pick fits the free plan.
+    var startToAutoSave: String {
+        switch unit {
+        case .day: String(localized: "Start your \(value)-day free trial to auto-save misses and protect every streak you just found.")
+        case .month: String(localized: "Start your \(value)-month free trial to auto-save misses and protect every streak you just found.")
+        case .year: String(localized: "Start your \(value)-year free trial to auto-save misses and protect every streak you just found.")
+        }
+    }
+
+    /// Primary button on the onboarding trial page. The button upper-cases it.
+    var keepAllButton: String {
+        switch unit {
+        case .day: String(localized: "▶ KEEP ALL · START \(value)-day free trial")
+        case .month: String(localized: "▶ KEEP ALL · START \(value)-month free trial")
+        case .year: String(localized: "▶ KEEP ALL · START \(value)-year free trial")
+        }
+    }
+
+    /// Apple 3.1.2 disclosure on the onboarding trial page.
+    func onboardingDisclosure(then price: String) -> String {
+        switch unit {
+        case .day: String(localized: "\(value)-Day Free Trial, then \(price). Auto-renews unless canceled at least 24 hours before the trial ends.")
+        case .month: String(localized: "\(value)-Month Free Trial, then \(price). Auto-renews unless canceled at least 24 hours before the trial ends.")
+        case .year: String(localized: "\(value)-Year Free Trial, then \(price). Auto-renews unless canceled at least 24 hours before the trial ends.")
+        }
+    }
+
+    /// Apple 3.1.2 disclosure under the paywall's selected plan.
+    func paywallDisclosure(then price: String) -> String {
+        switch unit {
+        case .day: String(localized: "\(value)-Day Free Trial, then \(price). Renews automatically unless you cancel at least 24 hours before the trial ends.")
+        case .month: String(localized: "\(value)-Month Free Trial, then \(price). Renews automatically unless you cancel at least 24 hours before the trial ends.")
+        case .year: String(localized: "\(value)-Year Free Trial, then \(price). Renews automatically unless you cancel at least 24 hours before the trial ends.")
+        }
+    }
+}
+
+enum StreaksPricing {
+    /// "$0.00" in the plan's currency (or the device's when the store gave none).
+    static func zeroLabel(currencyCode: String?) -> String {
+        let code = currencyCode ?? Locale.current.currency?.identifier ?? "USD"
+        return Decimal(0).formatted(.currency(code: code))
+    }
+}
+
 #if REVENUECAT
 import RevenueCat
 
 extension Package {
-    /// Human-readable trial length, e.g. "7-day free trial". Nil unless this
-    /// package's intro offer is a free trial (vs intro pricing).
-    var streaksIntroOfferLabel: String? {
+    /// "$0.00" in this plan's currency, for "$0.00 due today" lines.
+    var streaksZeroPriceLabel: String {
+        StreaksPricing.zeroLabel(currencyCode: storeProduct.currencyCode)
+    }
+
+    /// Length of the free trial as a number of days (or months, or years, per
+    /// `streaksTrialLength`). A week counts as 7.
+    var streaksIntroOfferNumber: Int? {
         guard let intro = storeProduct.introductoryDiscount, intro.paymentMode == .freeTrial else {
             return nil
         }
         let period = intro.subscriptionPeriod
-        let unit: String
+        return period.unit == .week ? period.value * 7 : period.value
+    }
+
+    /// "7 DAYS FREE", the short chip on plan cards and the purchase button.
+    var streaksTrialChip: String? {
+        streaksIntroOfferNumber.map { n in String(localized: "\(n) DAYS FREE") }
+    }
+
+    /// The free trial's length, with a week folded into days. Nil unless this
+    /// package's intro offer is a free trial (vs intro pricing).
+    var streaksTrialLength: TrialLength? {
+        guard let intro = storeProduct.introductoryDiscount, intro.paymentMode == .freeTrial else {
+            return nil
+        }
+        let period = intro.subscriptionPeriod
         switch period.unit {
-        case .day:   unit = period.value == 1 ? "day"   : "days"
-        case .week:  unit = period.value == 1 ? "week"  : "weeks"
-        case .month: unit = period.value == 1 ? "month" : "months"
-        case .year:  unit = period.value == 1 ? "year"  : "years"
-        @unknown default: unit = ""
+        case .day: return TrialLength(value: period.value, unit: .day)
+        case .week: return TrialLength(value: period.value * 7, unit: .day)
+        case .month: return TrialLength(value: period.value, unit: .month)
+        default: return TrialLength(value: period.value, unit: .year)
         }
-        if period.unit == .week {
-            return "\(period.value * 7)-day free trial"
-        }
-        return "\(period.value)-\(unit.dropLast(period.value == 1 ? 0 : 1)) free trial"
     }
 
     /// Recurring-price label, e.g. "$29.99 / year". Used in the trial-offer sheet's
@@ -52,17 +154,22 @@ extension Package {
         guard let period = storeProduct.subscriptionPeriod else {
             return storeProduct.localizedPriceString
         }
-        let unit: String
-        switch period.unit {
-        case .day:   unit = period.value == 1 ? "day"   : "days"
-        case .week:  unit = period.value == 1 ? "week"  : "weeks"
-        case .month: unit = period.value == 1 ? "month" : "months"
-        case .year:  unit = period.value == 1 ? "year"  : "years"
-        @unknown default: unit = ""
+        let price = storeProduct.localizedPriceString
+        let n = period.value
+        if n == 1 {
+            switch period.unit {
+            case .day: return String(localized: "\(price) / day")
+            case .week: return String(localized: "\(price) / week")
+            case .month: return String(localized: "\(price) / month")
+            default: return String(localized: "\(price) / year")
+            }
         }
-        return period.value == 1
-            ? "\(storeProduct.localizedPriceString) / \(unit)"
-            : "\(storeProduct.localizedPriceString) / \(period.value) \(unit)"
+        switch period.unit {
+        case .day: return String(localized: "\(price) / \(n) days")
+        case .week: return String(localized: "\(price) / \(n) weeks")
+        case .month: return String(localized: "\(price) / \(n) months")
+        default: return String(localized: "\(price) / \(n) years")
+        }
     }
 }
 
@@ -180,7 +287,7 @@ final class StoreKitService: NSObject, ObservableObject {
         #endif
         #if targetEnvironment(simulator)
         if !probing {
-            lastError = "Plans are available on device and TestFlight."
+            lastError = String(localized: "Plans are available on device and TestFlight.")
             return
         }
         #endif
@@ -191,14 +298,14 @@ final class StoreKitService: NSObject, ObservableObject {
             self.offerings = try await Purchases.shared.offerings()
             await refreshIntroEligibility()
         } catch {
-            self.lastError = "Couldn't load products: \(error.localizedDescription)"
+            self.lastError = String(localized: "Couldn't load products: \(error.localizedDescription)")
         }
     }
 
     func isEligibleForIntroOffer(_ package: Package) -> Bool {
         TrialOfferResolver.isEligible(
             productID: package.storeProduct.productIdentifier,
-            hasFreeTrial: package.streaksIntroOfferLabel != nil,
+            hasFreeTrial: package.streaksTrialLength != nil,
             introEligibility: introEligibility
         )
     }
@@ -209,7 +316,7 @@ final class StoreKitService: NSObject, ObservableObject {
             in: products,
             introEligibility: introEligibility,
             productID: { $0.storeProduct.productIdentifier },
-            hasFreeTrial: { $0.streaksIntroOfferLabel != nil },
+            hasFreeTrial: { $0.streaksTrialLength != nil },
             isAnnual: { $0.packageType == .annual },
             isSubscription: { $0.storeProduct.subscriptionPeriod != nil }
         )
@@ -289,7 +396,7 @@ final class StoreKitService: NSObject, ObservableObject {
         #endif
         #if targetEnvironment(simulator)
         if !probing {
-            lastError = "Purchases are available on device and TestFlight."
+            lastError = String(localized: "Purchases are available on device and TestFlight.")
             return .failed
         }
         #endif
@@ -323,7 +430,7 @@ final class StoreKitService: NSObject, ObservableObject {
 
     func restore() async {
         #if targetEnvironment(simulator)
-        lastError = "Restore is available on device and TestFlight."
+        lastError = String(localized: "Restore is available on device and TestFlight.")
         #else
         do {
             let customerInfo = try await Purchases.shared.restorePurchases()
@@ -368,7 +475,7 @@ final class StoreKitService: NSObject, ObservableObject {
         formatter.numberStyle = .currency
         formatter.locale = product.priceFormatter?.locale ?? .current
         guard let formatted = formatter.string(from: monthly) else { return nil }
-        return "\(formatted) / mo"
+        return String(localized: "\(formatted) / mo")
     }
 
     /// Percent savings of the annual plan vs paying monthly for a year.
@@ -387,20 +494,23 @@ final class StoreKitService: NSObject, ObservableObject {
 
     func introOfferDescription(for package: Package) -> String? {
         guard let discount = package.storeProduct.introductoryDiscount else { return nil }
-        let unit: String = {
-            switch discount.subscriptionPeriod.unit {
-            case .day: return discount.subscriptionPeriod.value == 1 ? "day" : "days"
-            case .week: return discount.subscriptionPeriod.value == 1 ? "week" : "weeks"
-            case .month: return discount.subscriptionPeriod.value == 1 ? "month" : "months"
-            case .year: return discount.subscriptionPeriod.value == 1 ? "year" : "years"
-            @unknown default: return ""
-            }
-        }()
         let qty = discount.subscriptionPeriod.value
+        let price = package.storeProduct.localizedPriceString
+        let intro = discount.localizedPriceString
         if discount.paymentMode == .freeTrial {
-            return "\(qty) \(unit) free, then \(package.storeProduct.localizedPriceString)"
+            switch discount.subscriptionPeriod.unit {
+            case .day: return String(localized: "\(qty) days free, then \(price)")
+            case .week: return String(localized: "\(qty) weeks free, then \(price)")
+            case .month: return String(localized: "\(qty) months free, then \(price)")
+            default: return String(localized: "\(qty) years free, then \(price)")
+            }
         }
-        return "\(discount.localizedPriceString) for \(qty) \(unit), then \(package.storeProduct.localizedPriceString)"
+        switch discount.subscriptionPeriod.unit {
+        case .day: return String(localized: "\(intro) for \(qty) days, then \(price)")
+        case .week: return String(localized: "\(intro) for \(qty) weeks, then \(price)")
+        case .month: return String(localized: "\(intro) for \(qty) months, then \(price)")
+        default: return String(localized: "\(intro) for \(qty) years, then \(price)")
+        }
     }
 
     // MARK: - Internals

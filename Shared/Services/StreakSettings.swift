@@ -12,25 +12,25 @@ enum DiscoveryIntensity: Int, CaseIterable, Codable, Sendable {
 
     var label: String {
         switch self {
-        case .sustainable: "Sustained"
-        case .challenging: "Challenging"
-        case .lifeChanging: "Life Changing"
+        case .sustainable: String(localized: "Sustained")
+        case .challenging: String(localized: "Challenging")
+        case .lifeChanging: String(localized: "Life Changing")
         }
     }
 
     var tagline: String {
         switch self {
-        case .sustainable: "Goals you already hit most days. Turn them into unbroken streaks."
-        case .challenging: "Goals you hit roughly 2 of 3 days. Push to make them daily."
-        case .lifeChanging: "Goals you hit about half the time. Building the daily habit changes everything."
+        case .sustainable: String(localized: "Goals you already hit most days. Turn them into unbroken streaks.")
+        case .challenging: String(localized: "Goals you hit roughly 2 of 3 days. Push to make them daily.")
+        case .lifeChanging: String(localized: "Goals you hit about half the time. Building the daily habit changes everything.")
         }
     }
 
     var short: String {
         switch self {
-        case .sustainable: "sustained"
-        case .challenging: "challenging"
-        case .lifeChanging: "life changing"
+        case .sustainable: String(localized: "sustained")
+        case .challenging: String(localized: "challenging")
+        case .lifeChanging: String(localized: "life changing")
         }
     }
 
@@ -51,9 +51,9 @@ enum AppAppearance: Int, CaseIterable {
 
     var label: String {
         switch self {
-        case .system: "System"
-        case .light: "Light"
-        case .dark: "Dark"
+        case .system: String(localized: "System")
+        case .light: String(localized: "Light")
+        case .dark: String(localized: "Dark")
         }
     }
 
@@ -160,8 +160,10 @@ struct StreakSnapshot: Codable, Sendable {
 
         var progressValueLabel: String {
             let unit = unitLabel
-            let values = "\(currentUnitValueLabel) / \(goalValueLabel)"
-            return unit.isEmpty ? values : "\(values) \(unit)"
+            let current = currentUnitValueLabel
+            let goal = goalValueLabel
+            if unit.isEmpty { return String(localized: "\(current) / \(goal)") }
+            return String(localized: "\(current) / \(goal) \(unit)")
         }
 
         private func formatValue(_ value: Double, rounded: Bool, compact: Bool) -> String {
@@ -174,7 +176,7 @@ struct StreakSnapshot: Codable, Sendable {
                     return Self.integerFormat(rounded ? value.rounded() : floor(value))
                 case .miles:
                     let displayed = rounded ? value : floor(value * 10) / 10
-                    return String(format: displayed < 10 ? "%.1f" : "%.0f", displayed)
+                    return displayed.plain(fractionDigits: displayed < 10 ? 1 : 0)
                 }
             }
             guard let metric = streakMetric else {
@@ -183,33 +185,30 @@ struct StreakSnapshot: Codable, Sendable {
             switch metric {
             case .sleepHours, .distanceMiles, .intensityRatio:
                 let displayed = rounded ? value : floor(value * 10) / 10
-                return String(format: displayed < 10 ? "%.1f" : "%.0f", displayed)
+                return displayed.plain(fractionDigits: displayed < 10 ? 1 : 0)
             default:
                 return Self.integerFormat(rounded ? value.rounded() : floor(value))
             }
         }
 
         private static func integerFormat(_ value: Double) -> String {
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .decimal
-            formatter.maximumFractionDigits = 0
-            return formatter.string(from: NSNumber(value: value)) ?? "\(Int(value))"
+            value.formatted(.number.precision(.fractionLength(0)))
         }
 
         private static func compactFormat(_ value: Double) -> String {
             let absValue = abs(value)
             if absValue >= 10_000 {
-                return "\(Int((value / 1_000).rounded()))k"
+                return String(localized: "\(Int((value / 1_000).rounded()).plain)k")
             }
             if absValue >= 1_000 {
                 let truncated = floor(value / 100) / 10
-                return String(format: truncated.truncatingRemainder(dividingBy: 1) == 0 ? "%.0fk" : "%.1fk", truncated)
+                return String(localized: "\(truncated.plain(fractionDigits: truncated.truncatingRemainder(dividingBy: 1) == 0 ? 0 : 1))k")
             }
             if absValue >= 10 {
-                return "\(Int(value.rounded()))"
+                return Int(value.rounded()).plain
             }
             let truncated = floor(value * 10) / 10
-            return String(format: truncated.truncatingRemainder(dividingBy: 1) == 0 ? "%.0f" : "%.1f", truncated)
+            return truncated.plain(fractionDigits: truncated.truncatingRemainder(dividingBy: 1) == 0 ? 0 : 1)
         }
     }
 

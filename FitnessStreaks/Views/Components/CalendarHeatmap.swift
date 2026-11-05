@@ -9,10 +9,10 @@ enum HeatmapDateRange: String, CaseIterable {
 
     var label: String {
         switch self {
-        case .last30Days: return "30d"
-        case .last90Days: return "90d"
-        case .last180Days: return "6mo"
-        case .fullYear: return "1yr"
+        case .last30Days: return String(localized: "30d")
+        case .last90Days: return String(localized: "90d")
+        case .last180Days: return String(localized: "6mo")
+        case .fullYear: return String(localized: "1yr")
         }
     }
 
@@ -182,6 +182,7 @@ struct CalendarHeatmap: View {
                 ForEach(labels.indices, id: \.self) { i in
                     let label = labels[i]
                     Text(label.name)
+                        .textCase(.uppercase)
                         .font(RetroFont.pixel(7))
                         .foregroundStyle(Theme.retroInkDim)
                         .position(
@@ -229,7 +230,7 @@ struct CalendarHeatmap: View {
 
     private func weekdayLabels(cellHeight: CGFloat) -> some View {
         VStack(spacing: gap) {
-            ForEach(Array(["M", "T", "W", "T", "F", "S", "S"].enumerated()), id: \.offset) { _, label in
+            ForEach(Array(DateHelpers.mondayFirstWeekdayInitials.enumerated()), id: \.offset) { _, label in
                 Text(label)
                     .font(RetroFont.pixel(7))
                     .foregroundStyle(Theme.retroInkDim)
@@ -241,6 +242,7 @@ struct CalendarHeatmap: View {
     private func legendRow() -> some View {
         HStack(spacing: 8) {
             Text("\(rangeLabelStart) - \(rangeLabelEnd)")
+                .textCase(.uppercase)
                 .font(RetroFont.pixel(8))
                 .foregroundStyle(Theme.retroInkDim)
 
@@ -296,20 +298,20 @@ struct CalendarHeatmap: View {
 
     private func monthName(for date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMM"
-        return formatter.string(from: date).uppercased()
+        formatter.setLocalizedDateFormatFromTemplate("MMM")
+        return formatter.string(from: date)
     }
 
     private var rangeLabelStart: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d"
-        return formatter.string(from: firstVisibleDay).uppercased()
+        formatter.setLocalizedDateFormatFromTemplate("MMMd")
+        return formatter.string(from: firstVisibleDay)
     }
 
     private var rangeLabelEnd: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d"
-        return formatter.string(from: today).uppercased()
+        formatter.setLocalizedDateFormatFromTemplate("MMMd")
+        return formatter.string(from: today)
     }
 }
 
