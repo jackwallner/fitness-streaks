@@ -210,7 +210,8 @@ struct SavesView: View {
                         .tracking(1)
                 }
                 .foregroundStyle(Theme.retroCyan)
-                .padding(.vertical, 8)
+                .frame(minHeight: 44)
+                .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
         }

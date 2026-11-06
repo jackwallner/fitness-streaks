@@ -469,20 +469,28 @@ struct PaywallView: View {
                         .font(RetroFont.mono(9, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(Theme.retroCyan)
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
                 }
                 Link(destination: PaywallLinks.privacyPolicy) {
                     Text("PRIVACY")
                         .font(RetroFont.mono(9, weight: .bold))
                         .tracking(1)
                         .foregroundStyle(Theme.retroCyan)
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
                 }
                 Spacer()
-                Button("RESTORE") {
+                Button {
                     Task { await restore() }
+                } label: {
+                    Text("RESTORE")
+                        .font(RetroFont.mono(9, weight: .bold))
+                        .tracking(1)
+                        .foregroundStyle(Theme.retroCyan)
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
                 }
-                .font(RetroFont.mono(9, weight: .bold))
-                .tracking(1)
-                .foregroundStyle(Theme.retroCyan)
                 .buttonStyle(.plain)
                 .disabled(storeKit.purchaseInProgress)
             }

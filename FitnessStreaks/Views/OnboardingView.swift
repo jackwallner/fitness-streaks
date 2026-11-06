@@ -338,9 +338,10 @@ struct OnboardingView: View {
                 }
                 .font(RetroFont.mono(9, weight: .bold))
                 .foregroundStyle(Theme.retroCyan)
+                .frame(minWidth: 44, minHeight: 44)
+                .contentShape(Rectangle())
             }
         }
-        .padding(.bottom, 6)
     }
 
     private func errorBlock(_ err: String) -> some View {
