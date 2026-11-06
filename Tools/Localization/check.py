@@ -24,7 +24,7 @@ import sys
 
 ROOT = os.getcwd()
 DIRS = ['FitnessStreaks', 'Shared', 'FitnessStreaksWatch', 'FitnessStreaksWidget', 'FitnessStreaksWatchWidget']
-LANGS = []
+LANGS = ['de', 'ru', 'nl', 'zh-Hans', 'es', 'vi']
 UI_FUNCS = {'Text', 'Button', 'Label', 'Section', 'Toggle', 'TextField', 'navigationTitle', 'accessibilityLabel',
             'alert', 'DatePicker', 'Stepper', 'Link', 'configurationDisplayName', 'description', 'eyebrow',
             'confirmationDialog', 'Picker', 'LocalizedStringKey', 'accessibilityHint', 'SecureField',
