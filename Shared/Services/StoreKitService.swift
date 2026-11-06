@@ -474,6 +474,8 @@ final class StoreKitService: NSObject, ObservableObject {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         formatter.locale = product.priceFormatter?.locale ?? .current
+        // The locale alone names the device's region currency, which can differ from the storefront's.
+        if let code = product.currencyCode { formatter.currencyCode = code }
         guard let formatted = formatter.string(from: monthly) else { return nil }
         return String(localized: "\(formatted) / mo")
     }

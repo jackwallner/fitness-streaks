@@ -510,6 +510,8 @@ struct StreakDetailView: View {
                 .font(RetroFont.mono(10, weight: .bold))
                 .tracking(1)
                 .foregroundStyle(color)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 9)
                 .padding(.horizontal, 8)
