@@ -18,7 +18,7 @@ final class ReleaseJourneysUITests: XCTestCase {
         continueAfterFailure = false
         let app = XCUIApplication(bundleIdentifier: Self.bundle)
         QA.launch(app)
-        XCTAssertTrue(app.staticTexts["DISCOVER YOUR STREAKS"].waitForExistence(timeout: 20), "welcome never rendered")
+        XCTAssertTrue(app.staticTexts[L("DISCOVER YOUR STREAKS")].waitForExistence(timeout: 20), "welcome never rendered")
         QA.checkpoint(app, "welcome")
     }
 
@@ -27,10 +27,10 @@ final class ReleaseJourneysUITests: XCTestCase {
         let app = launch(Self.seeded + ["-UITestSetPro"])
         QA.checkpoint(app, "streaks")
 
-        app.buttons["Saves"].firstMatch.tap()
+        app.buttons[L("Saves")].firstMatch.tap()
         QA.checkpoint(app, "saves")
 
-        app.buttons["Stats"].firstMatch.tap()
+        app.buttons[L("Stats")].firstMatch.tap()
         QA.checkpoint(app, "stats")
 
         app.buttons["Streaks"].firstMatch.tap()
@@ -46,16 +46,16 @@ final class ReleaseJourneysUITests: XCTestCase {
         // The auto-save banner is the free user's way in; the screenshot brand
         // hides Settings' Streaks+ section.
         let unlock = app.buttons.matching(NSPredicate(
-            format: "label BEGINSWITH[c] %@ OR label BEGINSWITH[c] %@", "UNLOCK STREAKS+", "TRY STREAKS+ FREE")).firstMatch
+            format: "label BEGINSWITH[c] %@ OR label BEGINSWITH[c] %@", L("UNLOCK STREAKS+"), L("TRY STREAKS+ FREE"))).firstMatch
         XCTAssertTrue(unlock.waitForExistence(timeout: 15), "Streaks+ banner missing for a free user")
         QA.checkpoint(app, "streaks-free")
 
         for _ in 0..<4 where !unlock.isHittable { app.swipeUp() }
         unlock.tap()
-        XCTAssertTrue(app.staticTexts["DON'T BREAK THE STREAK."].waitForExistence(timeout: 20), "paywall never rendered")
+        XCTAssertTrue(app.staticTexts[L("DON'T BREAK THE STREAK.")].waitForExistence(timeout: 20), "paywall never rendered")
         QA.checkpoint(app, "streaks-plus-paywall", paywall: true)
 
-        let close = app.buttons.containing(NSPredicate(format: "label CONTAINS[c] %@", "close")).firstMatch
+        let close = app.buttons.containing(NSPredicate(format: "label CONTAINS[c] %@", L("close"))).firstMatch
         XCTAssertTrue(close.waitForExistence(timeout: 10))
         close.tap()
         XCTAssertTrue(unlock.waitForExistence(timeout: 15), "paywall never closed")
@@ -65,14 +65,14 @@ final class ReleaseJourneysUITests: XCTestCase {
     func test04ReturnVisitWithInterruption() {
         continueAfterFailure = false
         let app = launch(Self.seeded + ["-UITestSetPro"])
-        app.buttons["Stats"].firstMatch.tap()
+        app.buttons[L("Stats")].firstMatch.tap()
         QA.checkpoint(app, "stats-before-interruption")
 
         QA.interrupt(app)
         QA.checkpoint(app, "stats-after-interruption")
 
         QA.relaunch(app)
-        XCTAssertTrue(app.buttons["Open settings"].waitForExistence(timeout: 25))
+        XCTAssertTrue(app.buttons[L("Open settings")].waitForExistence(timeout: 25))
         QA.checkpoint(app, "streaks-after-relaunch")
     }
 
@@ -81,11 +81,11 @@ final class ReleaseJourneysUITests: XCTestCase {
     func testCoreLoopStreakListsOpensAndPersists() {
         continueAfterFailure = false
         let app = launch(Self.seeded + ["-UITestSetPro"])
-        let streak = NSPredicate(format: "label CONTAINS[c] %@", " streak: ")
+        let streak = NSPredicate(format: "label CONTAINS[c] %@", L(" streak: "))
         let first = app.buttons.matching(streak).firstMatch
         XCTAssertTrue(first.waitForExistence(timeout: 15), "no streak listed")
         let label = first.label
-        XCTAssertTrue(label.range(of: #"streak: [1-9]\d* "#, options: .regularExpression) != nil,
+        XCTAssertTrue(label.range(of: #"streak: [1-9]\d* "#, options: [.regularExpression, .caseInsensitive]) != nil,
                       "streak count missing or zero: \(label)")
         QA.checkpoint(app, "core-streak-list")
 
@@ -93,22 +93,34 @@ final class ReleaseJourneysUITests: XCTestCase {
         // The list says "Steps streak: 12 days[, threshold ...]", the detail header "... 12 days in a row, ...".
         let count = label.components(separatedBy: ",")[0]
         let header = app.descendants(matching: .any).matching(NSPredicate(
-            format: "label BEGINSWITH %@", "\(count) in a row")).firstMatch
+            format: "label BEGINSWITH %@", "\(count) \(L("in a row"))")).firstMatch
         XCTAssertTrue(header.waitForExistence(timeout: 15), "streak detail never opened with \(count)")
         QA.checkpoint(app, "core-streak-detail")
 
         QA.relaunch(app)
-        XCTAssertTrue(app.buttons["Open settings"].waitForExistence(timeout: 25), "Streaks never rendered after relaunch")
+        XCTAssertTrue(app.buttons[L("Open settings")].waitForExistence(timeout: 25), "Streaks never rendered after relaunch")
         let again = app.buttons.matching(streak).firstMatch
         XCTAssertTrue(again.waitForExistence(timeout: 15), "streaks gone after relaunch")
         XCTAssertEqual(again.label, label, "streak changed across relaunch")
         QA.checkpoint(app, "core-streak-after-relaunch")
     }
 
+    /// The German strings the journeys look for; other personas see the English source.
+    private static let german = [
+        "DISCOVER YOUR STREAKS": "ENTDECKE DEINE STREAKS", "Open settings": "Einstellungen öffnen",
+        "Saves": "Rettungen", "Stats": "Statistik", "UNLOCK STREAKS+": "STREAKS+ FREISCHALTEN",
+        "TRY STREAKS+ FREE": "STREAKS+ GRATIS TESTEN", "DON'T BREAK THE STREAK.": "LASS DEINEN STREAK NICHT ABREISSEN.",
+        "close": "schliessen", " streak: ": "-Streak: ", "in a row": "in Folge",
+    ]
+
+    private func L(_ english: String) -> String {
+        QA.persona == "german" ? Self.german[english] ?? english : english
+    }
+
     private func launch(_ arguments: [String], environment: [String: String] = [:]) -> XCUIApplication {
         let app = XCUIApplication(bundleIdentifier: Self.bundle)
         QA.launch(app, environment: environment, arguments: arguments)
-        XCTAssertTrue(app.buttons["Open settings"].waitForExistence(timeout: 25), "Streaks never rendered")
+        XCTAssertTrue(app.buttons[L("Open settings")].waitForExistence(timeout: 25), "Streaks never rendered")
         return app
     }
 }
