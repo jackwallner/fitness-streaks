@@ -54,12 +54,10 @@ enum NotificationService {
     /// then one per day for `reminderHorizonDays` days with text that holds no count.
     /// Never prompts for permission. That only happens via a user-initiated toggle.
     static func scheduleDailyReminder(for streaks: [Streak]) async {
-        let center = UNUserNotificationCenter.current()
         cancelAll()
+        let generation = queueGeneration
 
-        guard StreakSettings.shared.notificationsEnabled,
-              StoreKitService.shared.isPro,
-              await isAuthorized() else { return }
+        guard remindersWanted, await reminderQueue.isAuthorized() else { return }
 
         let plans = reminderPlans(
             for: streaks,
@@ -76,10 +74,18 @@ enum NotificationService {
 
             let trigger = UNCalendarNotificationTrigger(dateMatching: plan.fireComponents, repeats: false)
             let request = UNNotificationRequest(identifier: reminderID(index), content: content, trigger: trigger)
+            // A toggle off, a lapse or a newer schedule cancelled the queue while
+            // this one was suspended: stop.
+            guard generation == queueGeneration else { return }
             do {
-                try await center.add(request)
+                try await reminderQueue.add(request)
             } catch {
                 log.error("Failed to schedule reminder: \(String(describing: error))")
+            }
+            guard generation == queueGeneration else {
+                // The request added across the cancel must not outlive a toggle off.
+                if !remindersWanted { cancelAll() }
+                return
             }
         }
         log.info("Scheduled \(plans.count) streak reminders")
@@ -204,8 +210,21 @@ enum NotificationService {
     }
 
     static func cancelAll() {
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: allReminderIDs)
+        queueGeneration += 1
+        reminderQueue.removePending(withIdentifiers: allReminderIDs)
     }
+
+    /// Bumped by every cancel, so a schedule still adding requests can tell that
+    /// the queue was cleared or rebuilt after it started.
+    private static var queueGeneration = 0
+
+    private static var remindersWanted: Bool {
+        StreakSettings.shared.notificationsEnabled && StoreKitService.shared.isPro
+    }
+
+    /// Where reminder requests go. Tests swap in a fake; the hostless test bundle
+    /// cannot use the notification center.
+    static var reminderQueue: any ReminderQueue = SystemReminderQueue()
 
     /// Whether Settings shows the "blocked in iOS Settings" banner for this
     /// permission. Read again whenever Settings appears or the app comes back,
@@ -221,5 +240,27 @@ enum NotificationService {
 
     static func authorizationStatus() async -> UNAuthorizationStatus {
         await UNUserNotificationCenter.current().notificationSettings().authorizationStatus
+    }
+}
+
+@MainActor
+protocol ReminderQueue {
+    func isAuthorized() async -> Bool
+    func add(_ request: UNNotificationRequest) async throws
+    func removePending(withIdentifiers identifiers: [String])
+}
+
+@MainActor
+struct SystemReminderQueue: ReminderQueue {
+    func isAuthorized() async -> Bool {
+        await NotificationService.isAuthorized()
+    }
+
+    func add(_ request: UNNotificationRequest) async throws {
+        try await UNUserNotificationCenter.current().add(request)
+    }
+
+    func removePending(withIdentifiers identifiers: [String]) {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
     }
 }
