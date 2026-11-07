@@ -55,7 +55,12 @@ final class StreakStore: ObservableObject {
     /// edits their selections in Settings or during onboarding.
     func refilter() {
         streaks = Self.visibleStreaks(allCandidates)
-        StreakSettings.shared.commitThresholds(for: streaks)
+        // A running or requested load commits from fresh goals when it ends. These
+        // may predate a recalibration the user just asked for, and committing them
+        // now would write the old goals back.
+        if !isLoading && !reloadRequested {
+            StreakSettings.shared.commitThresholds(for: streaks)
+        }
         persistCurrentSnapshot()
         // The queued reminders name tracked streaks; rebuild them for the new set.
         if StreakSettings.shared.notificationsEnabled {
@@ -69,6 +74,11 @@ final class StreakStore: ObservableObject {
     var scheduleReminders: @MainActor ([Streak]) async -> Void = { streaks in
         await NotificationService.scheduleDailyReminder(for: streaks)
     }
+
+    /// A load was asked for while one was running. Its inputs (goals, lookback,
+    /// freezes, saves) are read once per load, so the request runs when the
+    /// current load ends instead of being dropped.
+    private(set) var reloadRequested = false
 
     static func applyTrackedFilter(_ streaks: [Streak]) -> [Streak] {
         applyTrackedFilter(streaks, tracked: StreakSettings.shared.trackedStreaks)
@@ -203,6 +213,18 @@ final class StreakStore: ObservableObject {
     /// Fetches fresh history from HealthKit, runs the engine, updates published state + widget snapshot.
     /// On watchOS, skips HealthKit and reads only from the snapshot written by the iPhone app.
     func load(allowCachedSnapshot: Bool = false) async {
+        if isLoading {
+            reloadRequested = true
+            return
+        }
+        await performLoad(allowCachedSnapshot: allowCachedSnapshot)
+        while reloadRequested {
+            reloadRequested = false
+            await performLoad(allowCachedSnapshot: false)
+        }
+    }
+
+    private func performLoad(allowCachedSnapshot: Bool) async {
         if isLoading { return }
         #if DEBUG
         // Seeded screenshot data stands in for Apple Health. A load started on
