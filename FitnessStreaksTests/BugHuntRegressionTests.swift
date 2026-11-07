@@ -811,6 +811,27 @@ final class StateMachineRegressionTests: XCTestCase {
         XCTAssertNil(StreakSettings.shared.committedThresholds[steps])
     }
 
+    func testStreakTrackedDuringALoadsLastStepGetsItsGoalCommitted() {
+        let store = StreakStore.shared
+        let saved = (store.allCandidates, store.streaks, store.isLoading)
+        defer {
+            store.allCandidates = saved.0
+            store.streaks = saved.1
+            store.isLoading = saved.2
+        }
+        StreakSettings.shared.committedThresholds = [:]
+        store.allCandidates = [streak(.steps, threshold: 10_000, current: 12)]
+        // The load has committed its goals and is queuing reminders when the
+        // user tracks a streak.
+        store.isLoading = true
+        store.refilter()
+        XCTAssertNil(StreakSettings.shared.committedThresholds[steps], "precondition: the refilter skipped its commit")
+
+        store.commitThresholdsAfterLoad()
+
+        XCTAssertEqual(StreakSettings.shared.committedThresholds[steps], 10_000)
+    }
+
     func testLoadRequestedDuringALoadRunsAfterIt() async {
         let store = StreakStore.shared
         let wasLoading = store.isLoading

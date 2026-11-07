@@ -69,6 +69,14 @@ final class StreakStore: ObservableObject {
         }
     }
 
+    /// A refilter during this load's reminder step skipped its commit. The
+    /// streaks on screen now come from this load's fresh goals, so commit them,
+    /// unless another load is queued to commit instead.
+    func commitThresholdsAfterLoad() {
+        guard !reloadRequested else { return }
+        StreakSettings.shared.commitThresholds(for: streaks)
+    }
+
     /// Rebuilds the reminder queue. Tests replace it; the notification center is
     /// not usable from the hostless test bundle.
     var scheduleReminders: @MainActor ([Streak]) async -> Void = { streaks in
@@ -370,6 +378,7 @@ final class StreakStore: ObservableObject {
             }
 
             await scheduleReminders(self.streaks)
+            commitThresholdsAfterLoad()
             withAnimation(.linear(duration: 0.2)) {
                 loadProgress = 1.0
             }
