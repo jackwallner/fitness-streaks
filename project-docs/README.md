@@ -9,6 +9,7 @@ Developer notes and historical audits for this repository. The published site re
 - [state-machines-2026-11-06.md](audits/state-machines-2026-11-06.md): state machine audit: entitlement, trial, streak break and save, reminders (repro suite alongside)
 - [state-machines-2026-11-06-review.md](audits/state-machines-2026-11-06-review.md): independent review of the state machine audit: 8 confirmed, 1 not a bug, method changes
 - [state-machines-2026-11-06-fixes.md](audits/state-machines-2026-11-06-fixes.md): fixes for the reviewed state machine audit: 10 fixed, 0 held, 0 skipped, with regression tests
+- [state-machines-2026-11-06-verify.md](audits/state-machines-2026-11-06-verify.md): independent verification of the state machine fixes: FAIL, P-11 hides the paywall's price-load retry on Restore; 9 of 10 fixes verified, 157 tests pass
 
 ## Design
 
