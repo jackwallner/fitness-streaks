@@ -57,6 +57,17 @@ final class StreakStore: ObservableObject {
         streaks = Self.visibleStreaks(allCandidates)
         StreakSettings.shared.commitThresholds(for: streaks)
         persistCurrentSnapshot()
+        // The queued reminders name tracked streaks; rebuild them for the new set.
+        if StreakSettings.shared.notificationsEnabled {
+            let visible = streaks
+            Task { await self.scheduleReminders(visible) }
+        }
+    }
+
+    /// Rebuilds the reminder queue. Tests replace it; the notification center is
+    /// not usable from the hostless test bundle.
+    var scheduleReminders: @MainActor ([Streak]) async -> Void = { streaks in
+        await NotificationService.scheduleDailyReminder(for: streaks)
     }
 
     static func applyTrackedFilter(_ streaks: [Streak]) -> [Streak] {
@@ -336,7 +347,7 @@ final class StreakStore: ObservableObject {
                 loadStage = .finalizing
             }
 
-            await NotificationService.scheduleDailyReminder(for: self.streaks)
+            await scheduleReminders(self.streaks)
             withAnimation(.linear(duration: 0.2)) {
                 loadProgress = 1.0
             }
