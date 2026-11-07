@@ -1,10 +1,23 @@
 import Foundation
+import os
 
 enum DateHelpers {
-    static let gregorian: Calendar = {
+    /// The app's calendar, in the device's current time zone. It follows a zone
+    /// change (travel) while the app stays in memory; a calendar built once
+    /// would keep the zone it was first used in until the process ended.
+    static var gregorian: Calendar {
+        let zone = TimeZone.current
+        return calendarCache.withLock { cal in
+            if cal.timeZone != zone { cal.timeZone = zone }
+            return cal
+        }
+    }
+
+    private static let calendarCache: OSAllocatedUnfairLock<Calendar> = {
         var cal = Calendar(identifier: .gregorian)
         cal.firstWeekday = 2 // Monday; matches ISO week and how weekly thresholds read most naturally
-        return cal
+        cal.timeZone = TimeZone.current
+        return OSAllocatedUnfairLock(initialState: cal)
     }()
 
     static func startOfDay(_ date: Date = .now) -> Date {
