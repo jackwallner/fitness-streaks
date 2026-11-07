@@ -1,3 +1,4 @@
+import UserNotifications
 import XCTest
 
 /// Regression tests for the 2026-10-30 bug hunt (FS-01 to FS-11).
@@ -471,5 +472,400 @@ final class BugHuntRegressionTests: XCTestCase {
         )
         XCTAssertEqual(totals[wake] ?? 0, 1 + 40.0 / 60 + 6 + 1, accuracy: 0.01)
         XCTAssertEqual(totals[evening] ?? 0, 0, accuracy: 0.01)
+    }
+}
+
+/// Regression tests for the 2026-11-06 state machine audit and its review
+/// (project-docs/audits/state-machines-2026-11-06*.md).
+@MainActor
+final class StateMachineRegressionTests: XCTestCase {
+
+    private let steps = StreakSettings.streakKey(metric: .steps, cadence: .daily)
+    private let exercise = StreakSettings.streakKey(metric: .exerciseMinutes, cadence: .daily)
+
+    private var saved: (
+        grace: [String: GracePreservation], log: [GracePreservation], broken: [BrokenStreak],
+        tracked: Set<String>?, order: [String], onboarding: [String], committed: [String: Double],
+        notifications: Bool
+    )!
+
+    override func setUp() {
+        super.setUp()
+        let s = StreakSettings.shared
+        saved = (s.gracePreservations, s.saveLog, s.recentlyBroken, s.trackedStreaks, s.manualStreakOrder,
+                 s.lastOnboardingTrackedKeys, s.committedThresholds, s.notificationsEnabled)
+        s.gracePreservations = [:]
+        s.saveLog = []
+        s.recentlyBroken = []
+        s.trackedStreaks = nil
+        s.manualStreakOrder = []
+        s.lastOnboardingTrackedKeys = []
+        s.notificationsEnabled = false
+    }
+
+    override func tearDown() {
+        let s = StreakSettings.shared
+        s.gracePreservations = saved.grace
+        s.saveLog = saved.log
+        s.recentlyBroken = saved.broken
+        s.trackedStreaks = saved.tracked
+        s.manualStreakOrder = saved.order
+        s.lastOnboardingTrackedKeys = saved.onboarding
+        s.committedThresholds = saved.committed
+        s.notificationsEnabled = saved.notifications
+        super.tearDown()
+    }
+
+    private func day(_ offset: Int) -> Date {
+        let d = DateHelpers.gregorian.date(from: DateComponents(year: 2026, month: 6, day: 10))!
+        return DateHelpers.addDays(offset, to: d)
+    }
+
+    private func at(_ date: Date, _ hour: Int) -> Date {
+        DateHelpers.gregorian.date(bySettingHour: hour, minute: 0, second: 0, of: date)!
+    }
+
+    // MARK: - SM-1 revive on the day after the break was noticed
+
+    /// 30 hit days (D-31 ... D-2), a miss on D-1, then `dValue` on D and a partial D+1.
+    private func history(dValue: Double) -> [ActivityDay] {
+        (-31...1).map { offset in
+            let value: Double
+            switch offset {
+            case ...(-2): value = 12_000
+            case -1: value = 4_000
+            case 0: value = dValue
+            default: value = 500
+            }
+            return ActivityDay(date: day(offset), steps: value)
+        }
+    }
+
+    private func engineSteps(_ history: [ActivityDay], now: Date, grace: [String: GracePreservation]) -> Streak? {
+        StreakEngine.discover(
+            history: history.filter { $0.date <= DateHelpers.startOfDay(now) },
+            committedThresholds: [steps: 10_000],
+            gracePreservations: grace,
+            now: now
+        ).first { $0.trackingKey == steps }
+    }
+
+    private var brokenOnD: BrokenStreak {
+        BrokenStreak(
+            key: steps, metric: .steps, cadence: .daily, threshold: 10_000, hourWindow: nil,
+            brokenLength: 30, brokenAt: at(day(0), 7), missedDate: day(-1)
+        )
+    }
+
+    private func revivedLength(dValue: Double, now: Date) -> Int? {
+        let h = history(dValue: dValue)
+        let current = engineSteps(h, now: now, grace: [:])
+        let save = StreakStore.revivePreservation(for: brokenOnD, current: current, now: now)
+        return engineSteps(h, now: now, grace: [steps: save])?.current
+    }
+
+    func testReviveOnTheDetectionDayRestoresTheRun() {
+        XCTAssertEqual(revivedLength(dValue: 3_000, now: at(day(0), 9)), 30)
+    }
+
+    func testReviveOnTheNextDayAfterAnotherMissRestoresTheRun() {
+        let now = at(day(1), 9)
+        XCTAssertEqual(engineSteps(history(dValue: 3_000), now: now, grace: [:])?.current, 0, "precondition: run is dead")
+        XCTAssertEqual(revivedLength(dValue: 3_000, now: now), 30)
+    }
+
+    func testReviveOnTheNextDayAfterMeetingTheGoalKeepsThatDay() {
+        XCTAssertEqual(revivedLength(dValue: 12_000, now: at(day(1), 9)), 31)
+    }
+
+    // MARK: - SM-2 an open record does not block a later miss
+
+    private var openRecord: BrokenStreak {
+        BrokenStreak(
+            key: steps, metric: .steps, cadence: .daily, threshold: 10_000, hourWindow: nil,
+            brokenLength: 30, brokenAt: at(day(-8), 8), missedDate: day(-9)
+        )
+    }
+
+    private var laterBreak: [StreakStore.DetectedBreak] {
+        let before = Streak(metric: .steps, cadence: .daily, threshold: 10_000, current: 6, best: 30,
+                            startDate: day(-7), lastHitDate: day(-2), currentUnitCompleted: false,
+                            currentUnitProgress: 0.1, currentUnitValue: 1_000)
+        let now = Streak(metric: .steps, cadence: .daily, threshold: 10_000, current: 0, best: 30,
+                         startDate: nil, lastHitDate: day(-2), lastMissedDate: day(-1),
+                         currentUnitCompleted: false, currentUnitProgress: 0.1, currentUnitValue: 1_000)
+        return StreakStore.detectBreaks(
+            previous: [before], lastKnownLengths: [steps: 6], lastKnownDate: at(day(-1), 20),
+            fresh: [now], preservations: [:], today: day(0)
+        )
+    }
+
+    func testProMissIsSavedWhileAnOlderRecordIsOpen() {
+        XCTAssertEqual(laterBreak.map(\.key), [steps], "precondition: detectBreaks reports the new miss")
+        let outcome = StreakStore.applyBreaks(laterBreak, broken: [openRecord], autoSave: true, now: at(day(0), 9))
+        XCTAssertEqual(outcome.saves.map(\.key), [steps])
+        XCTAssertEqual(outcome.saves.first?.missedDate, day(-1))
+        XCTAssertEqual(outcome.saves.first?.preservedLength, 6)
+        XCTAssertTrue(outcome.newRecords.isEmpty)
+    }
+
+    func testFreeMissReplacesAnOlderRecord() {
+        let outcome = StreakStore.applyBreaks(laterBreak, broken: [openRecord], autoSave: false, now: at(day(0), 9))
+        XCTAssertEqual(outcome.newRecords.map(\.key), [steps])
+        XCTAssertEqual(outcome.broken.count, 1)
+        XCTAssertEqual(outcome.broken.first?.missedDate, day(-1))
+    }
+
+    func testRecordForTheSameMissIsNotRecordedTwice() {
+        let same = BrokenStreak(
+            key: steps, metric: .steps, cadence: .daily, threshold: 10_000, hourWindow: nil,
+            brokenLength: 6, brokenAt: at(day(0), 7), missedDate: day(-1)
+        )
+        for autoSave in [true, false] {
+            let outcome = StreakStore.applyBreaks(laterBreak, broken: [same], autoSave: autoSave, now: at(day(0), 9))
+            XCTAssertEqual(outcome, StreakStore.BreakOutcome(broken: [same], saves: [], newRecords: []))
+        }
+    }
+
+    // MARK: - SM-4 every save is counted and logged
+
+    private func save(missed: Int, length: Int) -> GracePreservation {
+        GracePreservation(
+            key: steps, missedDate: day(missed), preservedLength: length, threshold: 10_000,
+            metric: .steps, cadence: .daily, hourWindow: nil, grantedAt: at(day(missed + 1), 8)
+        )
+    }
+
+    func testSecondSaveOnTheSameStreakIsCounted() {
+        let s = StreakSettings.shared
+        s.recordSave(save(missed: -10, length: 30))
+        s.recordSave(save(missed: -4, length: 35))
+        XCTAssertEqual(s.saveLog.count, 2)
+        XCTAssertEqual(s.gracePreservations.count, 1, "the engine keeps the latest save per streak")
+        let history = (-40...0).map { o in
+            ActivityDay(date: day(o), steps: o == 0 ? 500 : ([-10, -4].contains(o) ? 2_000 : 12_000))
+        }
+        let current = StreakEngine.discover(
+            history: history, committedThresholds: [steps: 10_000],
+            gracePreservations: s.gracePreservations, now: at(day(0), 9)
+        ).first { $0.trackingKey == steps }?.current
+        XCTAssertEqual(current, 38, "bridging is unchanged")
+    }
+
+    func testSaveLogUpgradeKeepsTheSavesStoredBeforeIt() throws {
+        let suite = "StateMachineRegressionTests.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let older = save(missed: -10, length: 30)
+        var other = save(missed: -4, length: 5)
+        other = GracePreservation(
+            key: exercise, missedDate: other.missedDate, preservedLength: 5, threshold: 30,
+            metric: .exerciseMinutes, cadence: .daily, hourWindow: nil, grantedAt: other.grantedAt
+        )
+        let stored = [steps: older, exercise: other]
+        defaults.set(try JSONEncoder().encode(stored), forKey: "gracePreservations")
+
+        XCTAssertEqual(StreakSettings.loadSaveLog(defaults: defaults, latest: stored), [older, other])
+
+        defaults.set(try JSONEncoder().encode([older, older, other]), forKey: "saveLog")
+        XCTAssertEqual(StreakSettings.loadSaveLog(defaults: defaults, latest: stored).count, 3)
+    }
+
+    // MARK: - SM-5 untrack or re-pick rebuilds the reminders
+
+    private func streak(_ metric: StreakMetric, threshold: Double, current: Int) -> Streak {
+        Streak(
+            metric: metric, cadence: .daily, threshold: threshold,
+            current: current, best: current, startDate: nil, lastHitDate: nil,
+            currentUnitCompleted: false, currentUnitProgress: 0.2, currentUnitValue: threshold * 0.2
+        )
+    }
+
+    func testRefilterRebuildsTheReminderQueue() async {
+        let store = StreakStore.shared
+        let saved = (store.allCandidates, store.streaks, store.scheduleReminders)
+        defer {
+            store.allCandidates = saved.0
+            store.streaks = saved.1
+            store.scheduleReminders = saved.2
+        }
+        let rebuilt = expectation(description: "reminders rebuilt")
+        let scheduled = KeyBox()
+        store.scheduleReminders = { streaks in
+            scheduled.keys = streaks.map(\.trackingKey)
+            rebuilt.fulfill()
+        }
+        StreakSettings.shared.notificationsEnabled = true
+        store.allCandidates = [streak(.steps, threshold: 10_000, current: 40), streak(.exerciseMinutes, threshold: 30, current: 10)]
+        StreakSettings.shared.trackedStreaks = [exercise]
+
+        store.refilter()
+
+        await fulfillment(of: [rebuilt], timeout: 2)
+        XCTAssertEqual(scheduled.keys, [exercise])
+    }
+
+    // MARK: - SM-6 subscribing keeps PIN TO TOP
+
+    private var onboardingKeys: [String] {
+        [StreakMetric.steps, .exerciseMinutes, .standHours, .activeEnergy, .workouts]
+            .map { StreakSettings.streakKey(metric: $0, cadence: .daily) }
+    }
+
+    func testPinToTopSurvivesTheOnboardingRestore() {
+        let s = StreakSettings.shared
+        let pinned = onboardingKeys[2]
+        var order = Array(onboardingKeys.prefix(3)).filter { $0 != pinned }
+        order.insert(pinned, at: 0)
+        s.lastOnboardingTrackedKeys = onboardingKeys
+        s.trackedStreaks = Set(onboardingKeys.prefix(StreakSettings.freeTrackedLimit))
+        s.manualStreakOrder = order
+
+        s.restoreOnboardingTrackedStreaksIfNeeded()
+
+        XCTAssertEqual(s.trackedStreaks, Set(onboardingKeys), "precondition: the restore ran")
+        XCTAssertEqual(s.manualStreakOrder, order + Array(onboardingKeys.suffix(2)))
+    }
+
+    func testOnboardingRestoreWithoutAPinKeepsTheOnboardingOrder() {
+        let s = StreakSettings.shared
+        s.lastOnboardingTrackedKeys = onboardingKeys
+        s.trackedStreaks = Set(onboardingKeys.prefix(StreakSettings.freeTrackedLimit))
+        s.manualStreakOrder = Array(onboardingKeys.prefix(3))
+        s.restoreOnboardingTrackedStreaksIfNeeded()
+        XCTAssertEqual(s.manualStreakOrder, onboardingKeys)
+    }
+
+    // MARK: - SM-3 the blocked banner follows the iOS permission
+
+    func testBlockedBannerFollowsThePermission() {
+        XCTAssertTrue(NotificationService.showsBlockedBanner(status: .denied, remindersOn: true, showing: false),
+                      "reminders on but revoked in iOS Settings")
+        XCTAssertFalse(NotificationService.showsBlockedBanner(status: .authorized, remindersOn: false, showing: true),
+                       "fixed in iOS Settings")
+        XCTAssertTrue(NotificationService.showsBlockedBanner(status: .denied, remindersOn: false, showing: true))
+        XCTAssertFalse(NotificationService.showsBlockedBanner(status: .denied, remindersOn: false, showing: false))
+        XCTAssertFalse(NotificationService.showsBlockedBanner(status: .notDetermined, remindersOn: true, showing: false))
+    }
+
+    // MARK: - SM-8 a toggle off during scheduling leaves nothing queued
+
+    #if DEBUG
+    func testTurningRemindersOffWhileSchedulingLeavesNothingQueued() async {
+        let fake = FakeReminderQueue()
+        let wasPro = StoreKitService.shared.isPro
+        defer {
+            NotificationService.reminderQueue = SystemReminderQueue()
+            StoreKitService.shared.debugSetPro(wasPro)
+        }
+        NotificationService.reminderQueue = fake
+        StoreKitService.shared.debugSetPro(true)
+        StreakSettings.shared.notificationsEnabled = true
+        fake.onAdd = { count in
+            guard count == 3 else { return }
+            // SettingsView's toggle off.
+            StreakSettings.shared.notificationsEnabled = false
+            NotificationService.cancelAll()
+        }
+
+        await NotificationService.scheduleDailyReminder(for: [streak(.steps, threshold: 10_000, current: 40)])
+
+        XCTAssertGreaterThanOrEqual(fake.added, 3, "precondition: scheduling was under way")
+        XCTAssertTrue(fake.pending.isEmpty, "queued after the toggle off: \(fake.pending.sorted())")
+    }
+
+    func testScheduleQueuesTheWholeHorizon() async {
+        let fake = FakeReminderQueue()
+        let wasPro = StoreKitService.shared.isPro
+        defer {
+            NotificationService.reminderQueue = SystemReminderQueue()
+            StoreKitService.shared.debugSetPro(wasPro)
+        }
+        NotificationService.reminderQueue = fake
+        StoreKitService.shared.debugSetPro(true)
+        StreakSettings.shared.notificationsEnabled = true
+
+        await NotificationService.scheduleDailyReminder(for: [streak(.steps, threshold: 10_000, current: 40)])
+
+        XCTAssertGreaterThanOrEqual(fake.pending.count, NotificationService.reminderHorizonDays)
+    }
+    #endif
+
+    // MARK: - SM-7r a recalibration during a load is not lost
+
+    func testRefilterDuringALoadDoesNotWriteOldGoalsBack() {
+        let store = StreakStore.shared
+        let saved = (store.allCandidates, store.streaks, store.isLoading)
+        defer {
+            store.allCandidates = saved.0
+            store.streaks = saved.1
+            store.isLoading = saved.2
+        }
+        store.allCandidates = [streak(.steps, threshold: 10_000, current: 12)]
+        store.isLoading = true
+        // RECALIBRATE ALL GOALS while a load runs.
+        StreakSettings.shared.committedThresholds = [:]
+
+        store.refilter()
+
+        XCTAssertNil(StreakSettings.shared.committedThresholds[steps])
+    }
+
+    func testLoadRequestedDuringALoadRunsAfterIt() async {
+        let store = StreakStore.shared
+        let wasLoading = store.isLoading
+        defer { store.isLoading = wasLoading }
+        store.isLoading = true
+        await store.load()
+        XCTAssertTrue(store.reloadRequested, "a load asked for during a load is kept")
+        store.isLoading = false
+        await store.load()
+        XCTAssertFalse(store.reloadRequested, "and runs once the load ends")
+    }
+
+    // MARK: - SM-9 day math follows a device time zone change
+
+    func testSharedCalendarFollowsASystemZoneChange() {
+        let pinned = DateHelpers.gregorian.timeZone.identifier
+        let target = pinned == "Pacific/Auckland" ? "America/Los_Angeles" : "Pacific/Auckland"
+        let oldTZ = ProcessInfo.processInfo.environment["TZ"]
+        setenv("TZ", target, 1)
+        tzset()
+        NSTimeZone.resetSystemTimeZone()
+        defer {
+            if let oldTZ { setenv("TZ", oldTZ, 1) } else { unsetenv("TZ") }
+            tzset()
+            NSTimeZone.resetSystemTimeZone()
+        }
+        XCTAssertEqual(TimeZone.current.identifier, target, "precondition: the system zone moved")
+        XCTAssertEqual(DateHelpers.gregorian.timeZone.identifier, target)
+        XCTAssertEqual(DateHelpers.gregorian.firstWeekday, 2, "weeks still start on Monday")
+        let noonThere = DateHelpers.gregorian.date(from: DateComponents(year: 2026, month: 6, day: 10, hour: 12))!
+        XCTAssertEqual(DateHelpers.gregorian.component(.hour, from: DateHelpers.startOfDay(noonThere)), 0)
+    }
+}
+
+@MainActor
+private final class KeyBox {
+    var keys: [String] = []
+}
+
+@MainActor
+private final class FakeReminderQueue: ReminderQueue {
+    var pending: Set<String> = []
+    var added = 0
+    var onAdd: @MainActor (Int) -> Void = { _ in }
+
+    func isAuthorized() async -> Bool { true }
+
+    func add(_ request: UNNotificationRequest) async throws {
+        await Task.yield()
+        pending.insert(request.identifier)
+        added += 1
+        onAdd(added)
+    }
+
+    func removePending(withIdentifiers identifiers: [String]) {
+        pending.subtract(identifiers)
     }
 }
