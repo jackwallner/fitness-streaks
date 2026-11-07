@@ -559,7 +559,10 @@ final class StreakSettings: ObservableObject {
         guard !keys.isEmpty, let tracked = trackedStreaks, tracked.count < keys.count else { return }
         guard tracked == Set(keys.prefix(Self.freeTrackedLimit)) else { return }
         trackedStreaks = Set(keys)
-        manualStreakOrder = keys
+        // Keep the order the user set on the trimmed picks (PIN TO TOP), and add
+        // the restored picks after them.
+        let kept = manualStreakOrder.filter { keys.contains($0) }
+        manualStreakOrder = kept + keys.filter { !kept.contains($0) }
         lastOnboardingTrackedKeys = []
     }
 
