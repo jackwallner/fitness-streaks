@@ -206,4 +206,20 @@ enum NotificationService {
     static func cancelAll() {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: allReminderIDs)
     }
+
+    /// Whether Settings shows the "blocked in iOS Settings" banner for this
+    /// permission. Read again whenever Settings appears or the app comes back,
+    /// since the user changes the permission outside the app.
+    nonisolated static func showsBlockedBanner(
+        status: UNAuthorizationStatus,
+        remindersOn: Bool,
+        showing: Bool
+    ) -> Bool {
+        guard status == .denied else { return false }
+        return remindersOn || showing
+    }
+
+    static func authorizationStatus() async -> UNAuthorizationStatus {
+        await UNUserNotificationCenter.current().notificationSettings().authorizationStatus
+    }
 }

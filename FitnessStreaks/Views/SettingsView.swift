@@ -13,6 +13,7 @@ struct SettingsView: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.scenePhase) private var scenePhase
     @State private var showingPicker = false
     @State private var notificationsBlockedBySystem = false
     @State private var showingRecalibrateAllConfirm = false
@@ -112,6 +113,10 @@ struct SettingsView: View {
             }
             .onChange(of: store.isLoading) { _, isLoading in
                 if !isLoading { recalibrateAllMessage = nil }
+            }
+            .task { await refreshNotificationsBlocked() }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active { Task { await refreshNotificationsBlocked() } }
             }
             .onChange(of: storeKit.isPro) { _, isPro in
                 if !isPro && settings.notificationsEnabled {
@@ -590,6 +595,16 @@ struct SettingsView: View {
     private var notificationTimeLabel: String {
         let date = notificationTimeBinding.wrappedValue
         return Self.notificationTimeFormatter.string(from: date)
+    }
+
+    /// The user can change the permission in iOS Settings at any time.
+    private func refreshNotificationsBlocked() async {
+        let status = await NotificationService.authorizationStatus()
+        notificationsBlockedBySystem = NotificationService.showsBlockedBanner(
+            status: status,
+            remindersOn: settings.notificationsEnabled,
+            showing: notificationsBlockedBySystem
+        )
     }
 
     private func enableNotifications() async {
