@@ -284,7 +284,43 @@ struct SettingsView: View {
                     .buttonStyle(.plain)
                 }
             }
+            languageRow
         }
+    }
+
+    private static var currentLanguageName: String {
+        let code = Bundle.main.preferredLocalizations.first ?? "en"
+        let locale = Locale(identifier: code)
+        guard let name = locale.localizedString(forLanguageCode: code) else { return code }
+        return name.prefix(1).uppercased(with: locale) + name.dropFirst()
+    }
+
+    private var languageRow: some View {
+        Button {
+            if let url = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(url)
+            }
+        } label: {
+            HStack(spacing: 8) {
+                Text("Language")
+                    .textCase(.uppercase)
+                    .font(RetroFont.pixel(10))
+                    .foregroundStyle(Theme.retroInk)
+                Spacer()
+                Text(Self.currentLanguageName)
+                    .font(RetroFont.mono(11))
+                    .foregroundStyle(Theme.retroInkDim)
+                Image(systemName: "arrow.up.forward")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Theme.retroCyan)
+                    .accessibilityHidden(true)
+            }
+            .padding(.vertical, 12)
+            .padding(.horizontal, 14)
+            .pixelPanel(color: Theme.retroInkFaint)
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint("Opens iOS Settings")
     }
 
     // MARK: - Intensity
