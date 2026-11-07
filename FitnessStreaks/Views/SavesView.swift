@@ -115,7 +115,7 @@ struct SavesView: View {
     // MARK: - Saves log
 
     private var recentPreservations: [GracePreservation] {
-        settings.gracePreservations.values
+        settings.saveLog
             .sorted { $0.grantedAt > $1.grantedAt }
     }
 
@@ -123,7 +123,7 @@ struct SavesView: View {
         VStack(alignment: .leading, spacing: 10) {
             PixelSectionHeader(title: String(localized: "Recent Saves"))
             VStack(spacing: 0) {
-                ForEach(Array(recentPreservations.prefix(10).enumerated()), id: \.element.key) { idx, p in
+                ForEach(Array(recentPreservations.prefix(10).enumerated()), id: \.element) { idx, p in
                     HStack(spacing: 10) {
                         Image(systemName: "shield.lefthalf.filled")
                             .font(.system(size: 13, weight: .semibold))

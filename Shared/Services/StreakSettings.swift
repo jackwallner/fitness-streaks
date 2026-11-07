@@ -388,8 +388,15 @@ final class StreakSettings: ObservableObject {
         }
     }
 
+    /// The latest save per streak, which is all the engine needs to bridge a run.
     @Published var gracePreservations: [String: GracePreservation] {
         didSet { saveCodable(gracePreservations, key: "gracePreservations") }
+    }
+
+    /// Every save, oldest first. The saves count and history read this, because
+    /// `gracePreservations` keeps only one save per streak.
+    @Published var saveLog: [GracePreservation] {
+        didSet { saveCodable(saveLog, key: "saveLog") }
     }
 
     /// Days the user has marked as planned freezes (vacation / sick / travel).
@@ -487,7 +494,9 @@ final class StreakSettings: ObservableObject {
         self.committedThresholds = Self.loadCodable([String: Double].self, key: "committedThresholds", defaults: defaults) ?? [:]
         self.customStreaks = Self.loadCodable([CustomStreak].self, key: "customStreaks", defaults: defaults) ?? []
         self.recentlyBroken = Self.loadCodable([BrokenStreak].self, key: "recentlyBroken", defaults: defaults) ?? []
-        self.gracePreservations = Self.loadCodable([String: GracePreservation].self, key: "gracePreservations", defaults: defaults) ?? [:]
+        let grace = Self.loadCodable([String: GracePreservation].self, key: "gracePreservations", defaults: defaults) ?? [:]
+        self.gracePreservations = grace
+        self.saveLog = Self.loadSaveLog(defaults: defaults, latest: grace)
         self.manualStreakOrder = Self.loadCodable([String].self, key: "manualStreakOrder", defaults: defaults) ?? []
         self.lastKnownStreakLengths = Self.loadCodable([String: Int].self, key: "lastKnownStreakLengths", defaults: defaults) ?? [:]
         self.lastKnownStreakLengthsDate = defaults.object(forKey: "lastKnownStreakLengthsDate") as? Date
@@ -564,6 +573,19 @@ final class StreakSettings: ObservableObject {
         let kept = manualStreakOrder.filter { keys.contains($0) }
         manualStreakOrder = kept + keys.filter { !kept.contains($0) }
         lastOnboardingTrackedKeys = []
+    }
+
+    /// Records a save: the engine's bridging entry for the streak and a log row.
+    func recordSave(_ save: GracePreservation) {
+        gracePreservations[save.key] = save
+        saveLog.append(save)
+    }
+
+    /// The stored log, or, before the first save after this build, the saves that
+    /// survive in `gracePreservations` (one per streak, the earlier ones are gone).
+    static func loadSaveLog(defaults: UserDefaults, latest: [String: GracePreservation]) -> [GracePreservation] {
+        if let stored = loadCodable([GracePreservation].self, key: "saveLog", defaults: defaults) { return stored }
+        return latest.values.sorted { $0.grantedAt < $1.grantedAt }
     }
 
     func pruneBroken(now: Date = .now) {

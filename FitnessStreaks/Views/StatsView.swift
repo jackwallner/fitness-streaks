@@ -115,7 +115,7 @@ struct StatsView: View {
         return sum / Double(store.streaks.count)
     }
 
-    private var totalSaves: Int { settings.gracePreservations.count }
+    private var totalSaves: Int { settings.saveLog.count }
 
     private var completionRateCard: some View {
         VStack(alignment: .leading, spacing: 10) {

@@ -304,10 +304,10 @@ final class StreakStore: ObservableObject {
             )
             var filtered = Self.visibleStreaks(all)
             let graceBefore = settings.gracePreservations
-            let brokenBefore = settings.recentlyBroken.count
+            let brokenBefore = settings.recentlyBroken
             await handleBreaks(previous: previous, fresh: filtered, hourly: hourly, history: enriched)
             let needsRediscover = settings.gracePreservations != graceBefore
-                               || settings.recentlyBroken.count > brokenBefore
+                               || settings.recentlyBroken != brokenBefore
             if needsRediscover {
                 all = StreakEngine.discover(
                     history: enriched,
@@ -504,6 +504,7 @@ final class StreakStore: ObservableObject {
             )
         }
         StreakSettings.shared.gracePreservations = Dictionary(uniqueKeysWithValues: saves.map { ($0.key, $0) })
+        StreakSettings.shared.saveLog = saves
         StreakSettings.shared.plannedFreezes = [DateHelpers.addDays(9, to: today)]
 
         StreakSettings.shared.trackedStreaks = nil
@@ -613,25 +614,58 @@ final class StreakStore: ObservableObject {
         history: [ActivityDay]
     ) async {
         let settings = StreakSettings.shared
-        var newBroken = settings.recentlyBroken
-        var preservations = settings.gracePreservations
-
         let breaks = Self.detectBreaks(
             previous: previous,
             lastKnownLengths: settings.lastKnownStreakLengths,
             lastKnownDate: settings.lastKnownStreakLengthsDate,
             fresh: fresh,
-            preservations: preservations,
+            preservations: settings.gracePreservations,
             today: DateHelpers.startOfDay()
         )
 
+        let outcome = Self.applyBreaks(
+            breaks,
+            broken: settings.recentlyBroken,
+            autoSave: settings.attemptAutoSave(isPro: StoreKitService.shared.isPro),
+            now: .now
+        )
+        for save in outcome.saves { settings.recordSave(save) }
+        settings.recentlyBroken = outcome.broken
+        for broken in outcome.newRecords {
+            await NotificationService.notifyStreakBroken(broken)
+        }
+    }
+
+    struct BreakOutcome: Equatable {
+        /// The broken records to keep, including the new ones.
+        var broken: [BrokenStreak]
+        /// Saves to record, one per auto-saved miss.
+        var saves: [GracePreservation]
+        /// Records created for these breaks, each announced once.
+        var newRecords: [BrokenStreak]
+    }
+
+    /// What each detected break turns into: a save when auto-save applies, else a
+    /// broken record. A record still open for an earlier miss of the same streak
+    /// does not stop a later miss from being saved or recorded; a free user's new
+    /// record replaces it. Only a record for this same miss means nothing is new.
+    nonisolated static func applyBreaks(
+        _ breaks: [DetectedBreak],
+        broken: [BrokenStreak],
+        autoSave: Bool,
+        now: Date
+    ) -> BreakOutcome {
+        var out = BreakOutcome(broken: broken, saves: [], newRecords: [])
         for detected in breaks {
             let key = detected.key
             let old = detected.streak
-            guard !newBroken.contains(where: { $0.key == key }) else { continue }
+            let alreadyRecorded = out.broken.contains {
+                $0.key == key && recordedMissedDate(of: $0) == DateHelpers.startOfDay(detected.missedDate)
+            }
+            if alreadyRecorded { continue }
 
-            if settings.attemptAutoSave(isPro: StoreKitService.shared.isPro) {
-                preservations[key] = GracePreservation(
+            if autoSave {
+                out.saves.append(GracePreservation(
                     key: key,
                     missedDate: detected.missedDate,
                     preservedLength: detected.length,
@@ -639,53 +673,76 @@ final class StreakStore: ObservableObject {
                     metric: old.metric,
                     cadence: old.cadence,
                     hourWindow: old.window?.startHour,
-                    grantedAt: .now
-                )
+                    grantedAt: now
+                ))
                 continue
             }
 
-            let broken = BrokenStreak(
+            let record = BrokenStreak(
                 key: key,
                 metric: old.metric,
                 cadence: old.cadence,
                 threshold: old.threshold,
                 hourWindow: old.window?.startHour,
                 brokenLength: detected.length,
-                brokenAt: .now,
+                brokenAt: now,
                 missedDate: detected.missedDate
             )
-            newBroken.append(broken)
-            await NotificationService.notifyStreakBroken(broken)
+            out.broken.removeAll { $0.key == key }
+            out.broken.append(record)
+            out.newRecords.append(record)
         }
+        return out
+    }
 
-        settings.gracePreservations = preservations
-        settings.recentlyBroken = newBroken
+    /// The missed day a record stands for. Older records carry none; they were
+    /// always for the day before the break was noticed.
+    nonisolated static func recordedMissedDate(of broken: BrokenStreak) -> Date {
+        if let missed = broken.missedDate { return DateHelpers.startOfDay(missed) }
+        return DateHelpers.addDays(-1, to: DateHelpers.startOfDay(broken.brokenAt))
     }
 
     /// Convert a recently-broken streak into a grace preservation so the engine
     /// bridges the missed day on the next load. Called when the user upgrades to
     /// Pro from the BrokenStreakSheet — the trial *is* the revival.
     ///
-    /// The engine only bridges yesterday's miss (see `applyPreservation` in
-    /// StreakEngine), so callers should gate this on `canRevive`.
+    /// The engine bridges a save only while the run after it reaches back to the
+    /// day after the miss, so callers should gate this on `canRevive`.
     func reviveBrokenStreak(_ broken: BrokenStreak) async {
         let settings = StreakSettings.shared
-        var preservations = settings.gracePreservations
-        preservations[broken.key] = GracePreservation(
+        let current = allCandidates.first { $0.trackingKey == broken.key }
+        settings.recordSave(Self.revivePreservation(for: broken, current: current, now: .now))
+        settings.recentlyBroken.removeAll { $0.id == broken.id }
+        await load()
+    }
+
+    /// The save a revive writes. The record names the miss that broke the run, but
+    /// the sheet still offers the revive the day after the break was noticed, by
+    /// when the user may have missed again. A daily save covers the latest miss
+    /// (yesterday when no run has started since, else the day before the new run),
+    /// which is what a Streaks+ auto-save on that load would have written.
+    nonisolated static func revivePreservation(for broken: BrokenStreak, current: Streak?, now: Date) -> GracePreservation {
+        var missed = recordedMissedDate(of: broken)
+        if broken.cadence == .daily {
+            let today = DateHelpers.startOfDay(now)
+            let latest: Date
+            if let current, current.current > 0, let start = current.startDate {
+                latest = DateHelpers.addDays(-1, to: DateHelpers.startOfDay(start))
+            } else {
+                latest = DateHelpers.addDays(-1, to: today)
+            }
+            missed = max(missed, min(latest, DateHelpers.addDays(-1, to: today)))
+        }
+        return GracePreservation(
             key: broken.key,
-            // Older records carry no missed day; they were always for the day
-            // before the break was noticed.
-            missedDate: broken.missedDate ?? DateHelpers.addDays(-1, to: DateHelpers.startOfDay(broken.brokenAt)),
+            missedDate: missed,
             preservedLength: broken.brokenLength,
             threshold: broken.threshold,
             metric: broken.metric,
             cadence: broken.cadence,
             hourWindow: broken.hourWindow,
-            grantedAt: .now
+            grantedAt: now
         )
-        settings.gracePreservations = preservations
-        settings.recentlyBroken.removeAll { $0.id == broken.id }
-        await load()
     }
 
     /// Snapshot the current tracked streak lengths so the next launch can detect breaks

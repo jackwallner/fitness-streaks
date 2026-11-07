@@ -201,7 +201,7 @@ struct SettingsView: View {
                                 .font(RetroFont.pixel(9))
                                 .tracking(1)
                                 .foregroundStyle(Theme.retroInkDim)
-                            ForEach(recentPreservations, id: \.key) { p in
+                            ForEach(recentPreservations, id: \.self) { p in
                                 HStack(spacing: 8) {
                                     Image(systemName: "shield.lefthalf.filled")
                                         .font(.system(size: 12, weight: .semibold))
@@ -235,7 +235,7 @@ struct SettingsView: View {
 
     private var recentPreservations: [GracePreservation] {
         let cutoff = Date().addingTimeInterval(-30 * 24 * 60 * 60)
-        return settings.gracePreservations.values
+        return settings.saveLog
             .filter { $0.grantedAt >= cutoff }
             .sorted { $0.grantedAt > $1.grantedAt }
     }
