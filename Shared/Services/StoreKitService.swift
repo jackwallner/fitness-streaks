@@ -195,6 +195,9 @@ final class StoreKitService: NSObject, ObservableObject {
     @Published private(set) var purchaseInProgress: Bool = false
     @Published private(set) var isLoadingProducts: Bool = false
     @Published private(set) var lastError: String? = nil
+    /// Why the plans failed to load. Kept apart from `lastError`, which a
+    /// purchase or restore clears, so the paywall's retry block stays up.
+    @Published private(set) var productLoadError: String? = nil
     /// Per-product intro/trial eligibility for native paywall copy (Apple 3.1.2).
     @Published private(set) var introEligibility: [String: Bool] = [:]
 
@@ -287,18 +290,18 @@ final class StoreKitService: NSObject, ObservableObject {
         #endif
         #if targetEnvironment(simulator)
         if !probing {
-            lastError = String(localized: "Plans are available on device and TestFlight.")
+            productLoadError = String(localized: "Plans are available on device and TestFlight.")
             return
         }
         #endif
         isLoadingProducts = true
         defer { isLoadingProducts = false }
         do {
-            self.lastError = nil
+            self.productLoadError = nil
             self.offerings = try await Purchases.shared.offerings()
             await refreshIntroEligibility()
         } catch {
-            self.lastError = String(localized: "Couldn't load products: \(error.localizedDescription)")
+            self.productLoadError = String(localized: "Couldn't load products: \(error.localizedDescription)")
         }
     }
 

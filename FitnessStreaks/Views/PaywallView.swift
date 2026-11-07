@@ -242,7 +242,7 @@ struct PaywallView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 20)
-                } else if let error = storeKit.lastError {
+                } else if let error = storeKit.productLoadError {
                     productLoadErrorBlock(error)
                 }
             } else {
