@@ -100,3 +100,13 @@ language is listed in `CFBundleLocalizations`.
 Screenshots per language: `gh-sim all` with one `--screen` per language, e.g.
 `--screen "-AppleLanguages (de) -AppleLocale de_DE"`. Never set the production
 RevenueCat `appl_` key on a simulator run.
+
+## Language row
+
+Settings has a Language row, under the Appearance buttons, that names the running
+localization in itself (`Bundle.main.preferredLocalizations`) and opens
+`openSettingsURLString`, Apple's route for a per-app language change. iOS hides the
+app's Language option on a device with one preferred language unless
+`UIPrefersShowingLanguageSettings` is YES in `Info.plist`, so keep that key. The
+simulator's Settings opens at its root for this link; check the landing on a real
+iPhone.
