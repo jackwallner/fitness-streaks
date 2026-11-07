@@ -389,6 +389,8 @@ final class StoreKitService: NSObject, ObservableObject {
 
     @discardableResult
     func purchase(package: Package) async -> PurchaseOutcome {
+        // Callers show `lastError` for this attempt only, never an earlier one.
+        lastError = nil
         #if DEBUG
         let probing = RevenueCatProbe.isEnabled
         #else
@@ -429,6 +431,8 @@ final class StoreKitService: NSObject, ObservableObject {
     }
 
     func restore() async {
+        // Callers show `lastError` for this attempt only, never an earlier one.
+        lastError = nil
         #if targetEnvironment(simulator)
         lastError = String(localized: "Restore is available on device and TestFlight.")
         #else
