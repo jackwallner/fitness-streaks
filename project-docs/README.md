@@ -10,7 +10,7 @@ Developer notes and historical audits for this repository. The published site re
 - [state-machines-2026-11-06-review.md](audits/state-machines-2026-11-06-review.md): independent review of the state machine audit: 8 confirmed, 1 not a bug, method changes
 - [state-machines-2026-11-06-fixes.md](audits/state-machines-2026-11-06-fixes.md): fixes for the reviewed state machine audit: 10 fixed, 0 held, 0 skipped, with regression tests; verify round: P-11 regression and note 2 fixed, note 4 held, 158 tests pass
 - [state-machines-2026-11-06-verify.md](audits/state-machines-2026-11-06-verify.md): independent verification of the state machine fixes, round 2: PASS, all 10 fixes and both follow-ups verified, 158 tests pass, revert proof fails as intended
-- [presubmit-review-2026-11-07.md](audits/presubmit-review-2026-11-07.md): pre-submit review of 1.3.3 against live 1.3.2 build 164: 0 P0/P1, 4 P2 not fixed, tests not run (GitHub Macs queued)
+- [presubmit-review-2026-11-07.md](audits/presubmit-review-2026-11-07.md): pre-submit review of 1.3.3 against live 1.3.2 build 164: first pass 0 P0/P1; deep second pass 1 P1 fixed (onboarding Restore feedback), 8 P2 not fixed
 
 ## Design
 
