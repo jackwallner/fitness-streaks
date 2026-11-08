@@ -109,12 +109,12 @@ struct PaywallView: View {
     /// At large text sizes it scrolls, so the disclosure, Terms, Privacy and
     /// Restore stay reachable.
     private var paywallContent: some View {
-        ViewThatFits(in: .vertical) {
-            paywallStack
-                .frame(maxHeight: .infinity)
+        GeometryReader { proxy in
             ScrollView {
                 paywallStack
+                    .frame(minHeight: proxy.size.height)
             }
+            .scrollBounceBehavior(.basedOnSize)
         }
     }
 
