@@ -162,6 +162,9 @@ struct DashboardView: View {
             }
             }
             .onAppear { maybeStartTutorial() }
+            #if DEBUG
+            .task { await openShotScene() }
+            #endif
             .onChange(of: store.hero?.id) { _, _ in maybeStartTutorial() }
             .onChange(of: settings.hasSeenTutorial) { _, seen in
                 if !seen { maybeStartTutorial() }
@@ -611,6 +614,28 @@ struct DashboardView: View {
         case .weekly: return String(localized: "Streak ended: \(broken.brokenLength) weeks \(name) run. Tap for recovery options.")
         }
     }
+
+    #if DEBUG
+    /// Store screenshots: `-ShotScene detail-steps|detail-exercise|picker|builder`
+    /// opens that surface once the seeded streaks are in (`gh-sim --screen`).
+    private func openShotScene() async {
+        let args = ProcessInfo.processInfo.arguments
+        guard let i = args.firstIndex(of: "-ShotScene"), i + 1 < args.count else { return }
+        let scene = args[i + 1]
+        var waited = 0
+        while store.streaks.count < 4, waited < 100 { // l10n-ignore: debug wait
+            try? await Task.sleep(for: .milliseconds(100))
+            waited += 1
+        }
+        try? await Task.sleep(for: .seconds(1))
+        switch scene {
+        case "detail-steps": selectedStreak = store.streaks.first { $0.metric == .steps }
+        case "detail-exercise": selectedStreak = store.streaks.first { $0.metric == .exerciseMinutes }
+        case "picker", "builder": showPicker = true
+        default: break
+        }
+    }
+    #endif
 
     private var findMoreButton: some View {
         Button {

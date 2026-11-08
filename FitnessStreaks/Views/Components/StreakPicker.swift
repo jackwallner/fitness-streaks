@@ -326,6 +326,15 @@ struct StreakPickerSheet: View {
             }
             .toolbarBackground(Theme.retroBg, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
+            #if DEBUG
+            .task {
+                let args = ProcessInfo.processInfo.arguments
+                if let i = args.firstIndex(of: "-ShotScene"), i + 1 < args.count, args[i + 1] == "builder" {
+                    try? await Task.sleep(for: .seconds(1.5))
+                    showingBuilder = true
+                }
+            }
+            #endif
             .sheet(isPresented: $showingBuilder) {
                 CustomStreakBuilderSheet { custom in
                     settings.customStreaks.append(custom)
