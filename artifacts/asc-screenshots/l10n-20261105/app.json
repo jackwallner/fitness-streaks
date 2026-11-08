@@ -1,0 +1,66 @@
+{
+ "repo": "fitness-streaks",
+ "github": "jackwallner/fitness-streaks",
+ "bundle": "com.jackwallner.streaks",
+ "family": "scene",
+ "asc_id": "6762699692",
+ "live_version": "1.3.2",
+ "targets": [
+  {
+   "rank": 1,
+   "store_locale": "de-DE",
+   "lang": "de",
+   "apple_languages": "(de)",
+   "apple_locale": "de_DE",
+   "regions": [],
+   "customers": 0
+  },
+  {
+   "rank": 2,
+   "store_locale": "es-MX",
+   "lang": "es",
+   "apple_languages": "(es)",
+   "apple_locale": "es_MX",
+   "regions": [],
+   "customers": 0
+  },
+  {
+   "rank": 3,
+   "store_locale": "nl-NL",
+   "lang": "nl",
+   "apple_languages": "(nl)",
+   "apple_locale": "nl_NL",
+   "regions": [],
+   "customers": 0
+  },
+  {
+   "rank": 4,
+   "store_locale": "ru",
+   "lang": "ru",
+   "apple_languages": "(ru)",
+   "apple_locale": "ru_RU",
+   "regions": [],
+   "customers": 0
+  },
+  {
+   "rank": 5,
+   "store_locale": "vi",
+   "lang": "vi",
+   "apple_languages": "(vi)",
+   "apple_locale": "vi_VN",
+   "regions": [],
+   "customers": 0
+  },
+  {
+   "rank": 6,
+   "store_locale": "zh-Hans",
+   "lang": "zh-Hans",
+   "apple_languages": "(zh-Hans)",
+   "apple_locale": "zh_CN",
+   "regions": [],
+   "customers": 0
+  }
+ ],
+ "store_locales_missing": [],
+ "dest": "artifacts/asc-screenshots/l10n-20261105"
+}

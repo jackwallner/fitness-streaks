@@ -1,0 +1,49 @@
+{
+ "phone": {
+  "display_type": "APP_IPHONE_67",
+  "frames": [
+   {
+    "file": "01-find-a-streak-worth-keeping.png",
+    "md5": "2a9f0c5f3557f7c6d7391d95407e264e",
+    "url": "https://is1-ssl.mzstatic.com/image/thumb/BrQsW-gHk1DOkdYLHeEmIg/1320x2868bb.png",
+    "w": 1320,
+    "h": 2868
+   },
+   {
+    "file": "02-see-your-best-days.png",
+    "md5": "0a32e7295fe6bb3d398d319fbba0f4c3",
+    "url": "https://is1-ssl.mzstatic.com/image/thumb/CecXSD8-E-jYPSx80lLirg/1320x2868bb.png",
+    "w": 1320,
+    "h": 2868
+   },
+   {
+    "file": "03-measure-the-habits-you-have.png",
+    "md5": "72260b6978a64aa9349173d9f034af48",
+    "url": "https://is1-ssl.mzstatic.com/image/thumb/It3yJTLqMWRDYCnAg_bgjg/1320x2868bb.png",
+    "w": 1320,
+    "h": 2868
+   },
+   {
+    "file": "04-review-your-streak-history.png",
+    "md5": "9e1d4e2e31c43bb6bdfdcf86b3087dc4",
+    "url": "https://is1-ssl.mzstatic.com/image/thumb/DdQwKQHN22LdFd2fkGFbUg/1320x2868bb.png",
+    "w": 1320,
+    "h": 2868
+   },
+   {
+    "file": "05-build-a-custom-streak.png",
+    "md5": "deea0fcc940de7ff23a10ee1f4d4106f",
+    "url": "https://is1-ssl.mzstatic.com/image/thumb/0Rw3StFWT7lKaK5Gs9G_xQ/1320x2868bb.png",
+    "w": 1320,
+    "h": 2868
+   },
+   {
+    "file": "06-see-every-habits-history.png",
+    "md5": "f59e1116183e2481bce75d4e7cdb02ec",
+    "url": "https://is1-ssl.mzstatic.com/image/thumb/j7cAJQ_hfJslxt54Qi73iA/1320x2868bb.png",
+    "w": 1320,
+    "h": 2868
+   }
+  ]
+ }
+}
