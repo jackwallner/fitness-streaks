@@ -238,7 +238,7 @@ struct OnboardingView: View {
             Text("·").foregroundStyle(Theme.retroInkFaint)
             Link("PRIVACY", destination: Self.privacyPolicyURL)
             Text("·").foregroundStyle(Theme.retroInkFaint)
-            Button("RESTORE") { Task { await storeKit.restore() } }
+            Button("RESTORE") { Task { await restoreFromTrial() } }
         }
         .font(RetroFont.mono(9, weight: .bold))
         .tracking(1)
@@ -959,6 +959,18 @@ struct OnboardingView: View {
                 trialPurchaseError = storeKit.lastError ?? String(localized: "Couldn't start your trial. Please try again.")
             }
         }
+    }
+
+    /// Restore from the trial page. Success closes onboarding through the
+    /// entitlement change; anything else says why on the page, which otherwise
+    /// gave no sign the tap did anything.
+    private func restoreFromTrial() async {
+        trialPurchaseError = nil
+        await storeKit.restore()
+        trialPurchaseError = RestoreFeedback.failureMessage(
+            isPro: storeKit.isPro,
+            lastError: storeKit.lastError
+        )
     }
 
     // MARK: - Pro Context
