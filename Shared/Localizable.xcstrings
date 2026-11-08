@@ -25585,49 +25585,49 @@
         }
       }
     },
-    "Free includes 1 custom streak. Unlock Streaks+ for unlimited.": {
+    "Free includes 3 custom streaks. Unlock Streaks+ for unlimited.": {
       "extractionState": "manual",
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kostenlos ist 1 eigener Streak enthalten. Schalte Streaks+ für unbegrenzt viele frei."
+            "value": "Kostenlos sind 3 eigene Streaks enthalten. Schalte Streaks+ für unbegrenzt viele frei."
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Free includes 1 custom streak. Unlock Streaks+ for unlimited."
+            "value": "Free includes 3 custom streaks. Unlock Streaks+ for unlimited."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "El plan gratis incluye 1 racha personalizada. Desbloquea Streaks+ para tener ilimitadas."
+            "value": "El plan gratis incluye 3 rachas personalizadas. Desbloquea Streaks+ para tener ilimitadas."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gratis krijg je 1 eigen reeks. Ontgrendel Streaks+ voor onbeperkt eigen reeksen."
+            "value": "Gratis krijg je 3 eigen reeksen. Ontgrendel Streaks+ voor onbeperkt eigen reeksen."
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "В бесплатной версии одна своя серия. Streaks+ снимает ограничение."
+            "value": "В бесплатной версии три своих серии. Streaks+ снимает ограничение."
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gói miễn phí có 1 chuỗi tùy chỉnh. Mở khóa Streaks+ để không giới hạn."
+            "value": "Gói miễn phí có 3 chuỗi tùy chỉnh. Mở khóa Streaks+ để không giới hạn."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "免费版包含 1 条自定义连续记录。解锁 Streaks+ 即可无限创建。"
+            "value": "免费版包含 3 条自定义连续记录。解锁 Streaks+ 即可无限创建。"
           }
         }
       }
@@ -42487,49 +42487,49 @@
         }
       }
     },
-    "Streaks+ unlocks custom streaks, auto-save, and travel freezes.": {
+    "Streaks+ unlocks unlimited custom streaks, auto-save, and travel freezes.": {
       "extractionState": "manual",
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Streaks+ schaltet eigene Streaks, automatische Rettung und Pausentage für Reisen frei."
+            "value": "Streaks+ schaltet unbegrenzt viele eigene Streaks, automatische Rettung und Pausentage für Reisen frei."
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Streaks+ unlocks custom streaks, auto-save, and travel freezes."
+            "value": "Streaks+ unlocks unlimited custom streaks, auto-save, and travel freezes."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Streaks+ desbloquea rachas personalizadas, protección automática y días de pausa para viajes."
+            "value": "Streaks+ desbloquea rachas personalizadas ilimitadas, protección automática y días de pausa para viajes."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Streaks+ ontgrendelt eigen reeksen, automatisch redden en pauzedagen voor onderweg."
+            "value": "Streaks+ ontgrendelt onbeperkt eigen reeksen, automatisch redden en pauzedagen voor onderweg."
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Streaks+ открывает собственные серии, автозащиту и дни заморозки для поездок."
+            "value": "Streaks+ открывает неограниченные собственные серии, автозащиту и дни заморозки для поездок."
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Streaks+ mở khóa chuỗi tùy chỉnh, tự động bảo vệ và ngày đóng băng khi đi xa."
+            "value": "Streaks+ mở khóa chuỗi tùy chỉnh không giới hạn, tự động bảo vệ và ngày đóng băng khi đi xa."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Streaks+ 可解锁自定义连续记录、自动保护和旅行冻结日。"
+            "value": "Streaks+ 可解锁无限自定义连续记录、自动保护和旅行冻结日。"
           }
         }
       }

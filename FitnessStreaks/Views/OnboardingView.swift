@@ -982,7 +982,7 @@ struct OnboardingView: View {
                      ? (hasDirectTrialPackage
                         ? String(localized: "Tap any locked streak to start a free trial and add it.")
                         : String(localized: "Tap any locked streak to see Streaks+ plans and add it."))
-                     : String(localized: "Streaks+ unlocks custom streaks, auto-save, and travel freezes."))
+                     : String(localized: "Streaks+ unlocks unlimited custom streaks, auto-save, and travel freezes."))
                     .font(RetroFont.mono(9))
                     .foregroundStyle(Theme.retroInkDim)
             }
