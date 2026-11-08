@@ -105,16 +105,20 @@ struct PaywallView: View {
         }
     }
 
-    /// Single viewport (hero, features, plans and CTA together) when it fits.
-    /// At large text sizes it scrolls, so the disclosure, Terms, Privacy and
-    /// Restore stay reachable.
+    /// Hero, features and plans scroll when they overflow; the CTA, disclosure,
+    /// Terms, Privacy and Restore are pinned below so they are always on screen.
     private var paywallContent: some View {
-        GeometryReader { proxy in
-            ScrollView {
-                paywallStack
-                    .frame(minHeight: proxy.size.height)
-            }
-            .scrollBounceBehavior(.basedOnSize)
+        ScrollView {
+            paywallStack
+        }
+        .scrollBounceBehavior(.basedOnSize)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            purchaseBlock
+                .padding(.horizontal, 14)
+                .padding(.top, 8)
+                .padding(.bottom, 6)
+                .frame(maxWidth: .infinity)
+                .background(Theme.retroBg.ignoresSafeArea(edges: .bottom))
         }
     }
 
@@ -124,8 +128,6 @@ struct PaywallView: View {
             featureBlock
             productBlock
             trustBar
-            Spacer(minLength: 0)
-            purchaseBlock
         }
         .padding(.horizontal, 14)
         .padding(.top, 10)
