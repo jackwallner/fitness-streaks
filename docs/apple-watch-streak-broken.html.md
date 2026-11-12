@@ -6,7 +6,7 @@ Web page: https://jackwallner.com/ios/fitness-streaks/apple-watch-streak-broken.
 
 ## Apple Watch Streak Broken? How to Keep a Workout Streak Going
 
-By Jack Wallner. Last updated October 28, 2026.
+By Jack Wallner. Last updated November 12, 2026.
 
 Apple documents one way to protect an Apple Watch award streak: Pause Rings, for a day up to 90 days, without breaking the streak. If a streak already broke, one miss does not undo the habit: habit research found that missing a single opportunity did not materially affect habit formation. To keep a workout streak, set a floor you can hit on your worst day, use weekly streaks if daily ones keep failing, and tie the activity to a fixed time and place.
 
@@ -15,6 +15,18 @@ Apple documents one way to protect an Apple Watch award streak: Pause Rings, for
 Pause your rings. Apple's Watch user guide describes this as the one built-in way to protect an award streak. You can pause for a day, a week, a month or more, up to 90 days in total, and resume whenever you like. Apple says this does not break your award streak. On Apple Watch you open the Activity app, tap the rings, tap Pause Rings, then pick a duration or tap Custom. To end the pause early, tap the rings and choose Resume Rings.
 
 Apple's pages do not spell out every other case, such as a missed day when rings were not paused, so treat a streak you did not pause as at risk the moment a day ends without the goal met. The practical rule is to decide before a sick day, a trip or a rest week whether to pause, not after.
+
+## What breaks an Apple Watch streak, and what doesn't?
+
+A day that ends with the goal unmet breaks the streak unless the rings were paused for that day. Everything else on this list is something you set before the day, not after.
+
+| Situation | Award streak | What to do |
+| --- | --- | --- |
+| Rings paused for that day | Kept | Pause up to 90 days, resume any time |
+| Day ends with the goal unmet, no pause | Broken | Do the next day; there is no restore |
+| Sick day, trip or rest week you can see coming | Kept if paused first | Pause Rings the morning of, or the night before |
+| Goal too high for your busiest days | At risk every busy day | Lower the goal for those weekdays (watchOS 11 and later lets each day have its own goal) |
+| Goal met late in the evening | Kept | The day counts until midnight on the watch's clock |
 
 ## What should you do if your streak already broke?
 
