@@ -202,16 +202,20 @@ struct FitnessStreaksApp: App {
                     #if DEBUG
                     // Seed before the first await so no capture shows the cache.
                     store.seedScreenshotDataIfRequested()
-                    #endif
-                    await healthKit.synchronizeAuthorization()
-                    #if DEBUG
+                    // Set the Pro flag before the first await too, so a capture
+                    // never shows the free state while the audit sees Pro.
                     if CommandLine.arguments.contains("-UITestSetPro") {
                         storeKit.debugSetPro(true)
                     } else if CommandLine.arguments.contains("-UITestSetFree") {
                         // The Pro flag lives in the App Group, which outlives
                         // a reinstall on the simulator.
                         storeKit.debugSetPro(false)
-                    } else {
+                    }
+                    #endif
+                    await healthKit.synchronizeAuthorization()
+                    #if DEBUG
+                    if !CommandLine.arguments.contains("-UITestSetPro"),
+                       !CommandLine.arguments.contains("-UITestSetFree") {
                         await storeKit.refreshState()
                     }
                     #else

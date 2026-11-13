@@ -691,7 +691,7 @@ struct StreakDetailView: View {
                         .frame(width: 10, height: 10)
                     Text("MET")
                         .font(RetroFont.pixel(8))
-                        .foregroundStyle(Theme.retroInkDim)
+                        .foregroundStyle(Theme.retroInk)
                 }
 
                 HStack(spacing: 4) {
@@ -700,7 +700,7 @@ struct StreakDetailView: View {
                         .frame(width: 10, height: 10)
                     Text("MISSED")
                         .font(RetroFont.pixel(8))
-                        .foregroundStyle(Theme.retroInkDim)
+                        .foregroundStyle(Theme.retroInk)
                 }
 
                 HStack(spacing: 4) {
@@ -709,14 +709,14 @@ struct StreakDetailView: View {
                         .frame(width: 10, height: 10)
                     Text("NO DATA")
                         .font(RetroFont.pixel(8))
-                        .foregroundStyle(Theme.retroInkDim)
+                        .foregroundStyle(Theme.retroInk)
                 }
 
                 Spacer()
 
                 Text("\(selectedHeatmapHits) HITS · \(avgHitsPerWeek.plain(fractionDigits: 1)) / WK")
                     .font(RetroFont.pixel(8))
-                    .foregroundStyle(Theme.retroInkDim)
+                    .foregroundStyle(Theme.retroInk)
             }
         }
         .padding(14)
