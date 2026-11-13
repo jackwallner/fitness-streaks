@@ -9,7 +9,7 @@
 ## Guides
 
 - [Apple Watch Streak Broken? How to Keep a Workout Streak](https://jackwallner.com/ios/fitness-streaks/apple-watch-streak-broken.html.md): What Apple documents about protecting an Apple Watch award streak (Pause Rings, up to 90 days), what a missed day really costs, and how to keep a streak.
-- [Streaks App Alternatives: 5 Habit Trackers Compared](https://jackwallner.com/ios/fitness-streaks/streaks-app-alternative.html.md): Looking for a Streaks app alternative? Five iPhone habit trackers compared: Streaks, HabitKit, Habitify, Gentler Streak and Fitness Habit Tracker: Auto.
+- [Streaks App Alternatives: 5 Habit Trackers Compared](https://jackwallner.com/ios/fitness-streaks/streaks-app-alternative.html.md): Five Streaks app alternatives compared on free tier, Apple Health auto-complete, missed-day rules, Apple Watch, account and price: HabitKit, Habitify and more.
 
 ## Optional
 
