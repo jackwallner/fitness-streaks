@@ -154,8 +154,7 @@ struct StreakDetailView: View {
             Button {
                 showingPaywall = true
             } label: {
-                heatmapCard
-                    .redacted(reason: .placeholder)
+                lockedHeatmapPreview
                     .blur(radius: 7)
                     .allowsHitTesting(false)
                     .overlay(heatmapLockOverlay)
@@ -638,6 +637,38 @@ struct StreakDetailView: View {
     }
 
     // MARK: - Heatmap
+
+    /// Textless stand-in for the locked history: cells only, so the blurred
+    /// preview carries no low-contrast copy.
+    private var lockedHeatmapPreview: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                ForEach(0..<4, id: \.self) { i in
+                    Rectangle()
+                        .fill(i == 0 ? streak.metric.accent : Theme.retroInkFaint.opacity(0.3))
+                        .frame(width: 44, height: 24)
+                }
+                Spacer()
+            }
+            .padding(.bottom, 4)
+            VStack(spacing: 4) {
+                ForEach(0..<7, id: \.self) { row in
+                    HStack(spacing: 4) {
+                        ForEach(0..<20, id: \.self) { col in
+                            Rectangle()
+                                .fill((row * 7 + col * 3) % 5 < 3
+                                      ? streak.metric.accent
+                                      : Theme.retroInkFaint.opacity(0.3))
+                        }
+                    }
+                }
+            }
+            .frame(height: 140)
+            Color.clear.frame(height: 12)
+        }
+        .padding(14)
+        .pixelPanel(color: streak.metric.accent)
+    }
 
     private var heatmapCard: some View {
         VStack(alignment: .leading, spacing: 12) {
