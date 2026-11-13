@@ -66,6 +66,16 @@ struct RootTabView: View {
                 detailPane
                     .frame(maxWidth: split.secondaryWidth, maxHeight: .infinity)
                     .padding(.leading, split.secondaryX)
+                // No fold to part the panes (an iPad), so a rule does.
+                if paneGeometry.fold == nil {
+                    Rectangle()
+                        .fill(Theme.retroInkFaint)
+                        .frame(width: 2)
+                        .frame(maxHeight: .infinity)
+                        .padding(.leading, split.secondaryX - 1)
+                        .ignoresSafeArea()
+                        .allowsHitTesting(false)
+                }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
@@ -90,8 +100,10 @@ struct RootTabView: View {
         }
         #if DEBUG
         .task(id: split != nil) { await runDuoTour(split: split != nil) }
+        .forceLandscapeIfRequested()
         #endif
     }
+
 
     @ViewBuilder
     private var content: some View {

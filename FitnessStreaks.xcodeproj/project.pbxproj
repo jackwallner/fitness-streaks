@@ -151,6 +151,7 @@
 		DDD38A8136426AE3698966BE /* StreakSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537E2A9D042442EE2656139A /* StreakSettings.swift */; };
 		E1CE8BA25D7BE55677D54CEF /* StreakEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543D3D4B4FAF0A178E8805F1 /* StreakEngine.swift */; };
 		E29C1E8E77D22BDD8DADEC3B /* StoreKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70A63704F6410AF79F037F69 /* StoreKitService.swift */; };
+		E2A5F3F51640519C0F4FEA43 /* DebugLandscape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E58C0C165EB6FDF07CFAA50 /* DebugLandscape.swift */; };
 		E2E61AC6BCD4B0282B1D6FE6 /* StreakSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537E2A9D042442EE2656139A /* StreakSettings.swift */; };
 		EB3B6FD612EE3C9ABE44168A /* StoreKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70A63704F6410AF79F037F69 /* StoreKitService.swift */; };
 		ECAC6491381BC89960CCAD2B /* DailyActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA88BDC9CCB6015980ECFF3 /* DailyActivity.swift */; };
@@ -162,6 +163,7 @@
 		F3D56D80D5A934D0F6C9EFD8 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDE5E401D8E238E4B790CEF /* HealthKitService.swift */; };
 		F52C7B1C894DA2F2166D9E78 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5499F56557690B4EE92A2E42 /* NotificationService.swift */; };
 		F6DD448CE8E9163395729354 /* StreakMetric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C80A4826A373B331E583A1E /* StreakMetric.swift */; };
+		F75ED9F27A745E4C13392B4B /* ReadableWidth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 126F6098AE7373B67C4C59F5 /* ReadableWidth.swift */; };
 		FB0006BF610B0D59C3686878 /* StreakStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C302E6F3992442B6C651F13 /* StreakStore.swift */; };
 		FB019E441ED033465152096E /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84469F4922FC57E3F0E0CEE /* DashboardView.swift */; };
 		FD1E89116BA358C0C4E12B94 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDE5E401D8E238E4B790CEF /* HealthKitService.swift */; };
@@ -243,6 +245,7 @@
 		0E2AB58A7A47A76EE73924A2 /* LaunchGates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchGates.swift; sourceTree = "<group>"; };
 		0F4F5633F83589C8EB674ADE /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		1207B858E4FFB44108513342 /* PressStart2P-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PressStart2P-Regular.ttf"; sourceTree = "<group>"; };
+		126F6098AE7373B67C4C59F5 /* ReadableWidth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadableWidth.swift; sourceTree = "<group>"; };
 		135A3C0A5AD7A7BA2B0A64CF /* FitnessStreaks.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = FitnessStreaks.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D4AEA661B2CDB0B05946A25 /* FitnessStreaksWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FitnessStreaksWidget.entitlements; sourceTree = "<group>"; };
 		1EDE5E401D8E238E4B790CEF /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
@@ -252,6 +255,7 @@
 		242B2759902C4F6C883A7C7B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		2DE780A4E064FF2F98F94209 /* FitnessStreaks.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FitnessStreaks.entitlements; sourceTree = "<group>"; };
 		2DEDEFE293A66C07B7CF1344 /* PluralLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluralLabel.swift; sourceTree = "<group>"; };
+		2E58C0C165EB6FDF07CFAA50 /* DebugLandscape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLandscape.swift; sourceTree = "<group>"; };
 		2EECD679C4AE189933F0942B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		2F84D0BD12D416165B661A04 /* FitnessStreaksTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FitnessStreaksTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		318D40BD757C19EEA98853C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -469,7 +473,9 @@
 			children = (
 				6F5E8DB49859EF7F550A39DB /* CalendarHeatmap.swift */,
 				8AD92EA0D2588A0993BCFB1F /* CoachmarkOverlay.swift */,
+				2E58C0C165EB6FDF07CFAA50 /* DebugLandscape.swift */,
 				75AE8DBC73B55DCE8482E14D /* PixelUI.swift */,
+				126F6098AE7373B67C4C59F5 /* ReadableWidth.swift */,
 				06EC66CCAA5304A26B7ED85F /* StreakBadge.swift */,
 				5DA2285D9C3624EC0E762310 /* StreakFlame.swift */,
 				0B4AF29EC104B213DA5DD0CA /* StreakHero.swift */,
@@ -722,7 +728,13 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				Base,
+				de,
 				en,
+				es,
+				nl,
+				ru,
+				vi,
+				"zh-Hans",
 			);
 			mainGroup = 7D9957CA91BF6EAF205EAD9B;
 			minimizedProjectReferenceProxies = 1;
@@ -735,11 +747,11 @@
 			projectRoot = "";
 			targets = (
 				DFAE9174135F515541753363 /* FitnessStreaks */,
+				4B86BF423E3FAC2740024275 /* FitnessStreaksWatch */,
+				2715E062A8CA657880138CFD /* FitnessStreaksWidget */,
+				34C0C27A1AB221566A4B4CFC /* FitnessStreaksWatchWidget */,
 				CA65801D5A346C6EF4E2C5BD /* FitnessStreaksTests */,
 				F10F057966B4C8AC571FE806 /* FitnessStreaksUITests */,
-				4B86BF423E3FAC2740024275 /* FitnessStreaksWatch */,
-				34C0C27A1AB221566A4B4CFC /* FitnessStreaksWatchWidget */,
-				2715E062A8CA657880138CFD /* FitnessStreaksWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -864,6 +876,7 @@
 				FB019E441ED033465152096E /* DashboardView.swift in Sources */,
 				7F438B27433392D3D1DBB4D7 /* DataService.swift in Sources */,
 				721F86DDBE75CF3452B58089 /* DateHelpers.swift in Sources */,
+				E2A5F3F51640519C0F4FEA43 /* DebugLandscape.swift in Sources */,
 				725C04D55BBA4E5582F0973E /* HealthKitService.swift in Sources */,
 				EFDCE03174AF0D05D724AD94 /* LaunchGates.swift in Sources */,
 				CEA8D66BF780261F75668F56 /* NotificationService.swift in Sources */,
@@ -873,6 +886,7 @@
 				2E26CBFAF2564062A08A999C /* PaywallView.swift in Sources */,
 				117AE494DDF91AAF1E0C01F7 /* PixelUI.swift in Sources */,
 				670EA48879E7EFFD9802FC6B /* PluralLabel.swift in Sources */,
+				F75ED9F27A745E4C13392B4B /* ReadableWidth.swift in Sources */,
 				11F718E99E9AAA5E42AD19F0 /* ReviewPromptTracker.swift in Sources */,
 				4036868B89ED39858BE39F18 /* RootTabView.swift in Sources */,
 				1E3B9B0FCE2C98347335A466 /* SavesView.swift in Sources */,
@@ -1106,7 +1120,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 162;
+				CURRENT_PROJECT_VERSION = 166;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = YXG4MP6W39;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -1121,7 +1135,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 1.3.2;
+				MARKETING_VERSION = 1.3.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1183,7 +1197,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 162;
+				CURRENT_PROJECT_VERSION = 166;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = YXG4MP6W39;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1204,7 +1218,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 1.3.2;
+				MARKETING_VERSION = 1.3.3;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1280,7 +1294,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.jackwallner.streaks;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) REVENUECAT";
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -1332,7 +1346,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.jackwallner.streaks;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) REVENUECAT";
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

@@ -59,14 +59,17 @@ struct OnboardingView: View {
         ZStack {
             Theme.retroBg.ignoresSafeArea()
 
-            switch phase {
-            case .intro:     introContent
-            case .intensity: intensityContent
-            case .loading:   loadingScreen
-            case .selecting: selectingContent
-            case .empty:     emptyContent
-            case .trial:     trialContent
+            Group {
+                switch phase {
+                case .intro:     introContent
+                case .intensity: intensityContent
+                case .loading:   loadingScreen
+                case .selecting: selectingContent
+                case .empty:     emptyContent
+                case .trial:     trialContent
+                }
             }
+            .readableWidth()
         }
         // Shared bottom CTA bar. Rendering the primary lime button here (rather than
         // inside each phase's content) is what guarantees the zero-shift requirement:
@@ -76,6 +79,8 @@ struct OnboardingView: View {
         // disclosure) grows the bar upward and never moves the button.
         .safeAreaInset(edge: .bottom, spacing: 0) {
             bottomBar
+                .readableWidth()
+                .background(Theme.retroBg)
         }
         .sheet(isPresented: $showingPaywall, onDismiss: {
             // Soft paywall: swipe-to-dismiss is intentionally allowed so a failed
