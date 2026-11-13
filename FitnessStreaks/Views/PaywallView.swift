@@ -124,7 +124,7 @@ struct PaywallView: View {
     }
 
     private var paywallStack: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             heroBlock
             featureBlock
             productBlock
@@ -156,10 +156,14 @@ struct PaywallView: View {
 
     private var heroBlock: some View {
         VStack(alignment: .leading, spacing: 6) {
-            PixelFlame(size: 34, intensity: 1.0, tint: Theme.retroMagenta)
-            Text("DON'T BREAK THE STREAK.")
-                .font(RetroFont.pixel(13))
-                .foregroundStyle(Theme.retroInk)
+            HStack(spacing: 10) {
+                PixelFlame(size: 28, intensity: 1.0, tint: Theme.retroMagenta)
+                Text("DON'T BREAK THE STREAK.")
+                    .font(RetroFont.pixel(13))
+                    .foregroundStyle(Theme.retroInk)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
+            }
             Text("Auto-save every streak. Track every habit you build.")
                 .font(RetroFont.mono(10))
                 .foregroundStyle(Theme.retroInkDim)
@@ -226,7 +230,7 @@ struct PaywallView: View {
             }
             Spacer(minLength: 0)
         }
-        .padding(.vertical, 6)
+        .padding(.vertical, 4)
         .padding(.horizontal, 12)
     }
 
@@ -293,7 +297,7 @@ struct PaywallView: View {
         return Button {
             selectedProductID = productID
         } label: {
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 8) {
                     Text("YEARLY")
                         .font(RetroFont.pixel(12))
@@ -313,7 +317,7 @@ struct PaywallView: View {
                     .font(RetroFont.mono(10))
                     .foregroundStyle(Theme.retroInkDim)
             }
-            .padding(14)
+            .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
             .pixelPanel(
                 color: isSelected ? Theme.retroMagenta : Theme.retroInkFaint,
