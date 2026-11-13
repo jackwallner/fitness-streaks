@@ -331,6 +331,8 @@ struct HeatmapRangePicker: View {
                     Text(range.label)
                         .font(RetroFont.mono(10, weight: selectedRange == range ? .bold : .regular))
                         .foregroundStyle(selectedRange == range ? Theme.retroBg : Theme.retroInk)
+                        .lineLimit(1)
+                        .fixedSize()
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                         .background(selectedRange == range ? Theme.retroCyan : Color.clear)

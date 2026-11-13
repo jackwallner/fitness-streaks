@@ -765,7 +765,7 @@ struct StreakDetailView: View {
     }
 
     private func statCell(title: LocalizedStringKey, value: String, unit: LocalizedStringKey, color: Color) -> some View {
-        VStack(spacing: 4) {
+        VStack(spacing: 8) {
             Text(title)
                 .font(RetroFont.pixel(8))
                 .tracking(1)
@@ -773,7 +773,7 @@ struct StreakDetailView: View {
             Text(value)
                 .font(RetroFont.pixel(20))
                 .foregroundStyle(color)
-                .retroGlow(color, radius: 8)
+                .retroGlow(color, radius: 4)
                 .minimumScaleFactor(0.5)
                 .lineLimit(1)
             Text(unit)

@@ -76,6 +76,7 @@ struct PaywallView: View {
             .toolbarBackground(Theme.retroBg, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
         }
+        .modifier(PaywallFullSizing())
         .task {
             // Already entitled when the paywall opens? onChange won't fire (no
             // transition), so dismiss here — otherwise a subscriber who reaches
@@ -640,3 +641,15 @@ struct PaywallView: View {
 
 }
 #endif
+
+
+/// iPad form sheets are short enough to hide a plan under the pinned CTA; use the full page.
+private struct PaywallFullSizing: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 18.0, *) {
+            content.presentationSizing(.page)
+        } else {
+            content
+        }
+    }
+}

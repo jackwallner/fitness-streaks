@@ -290,7 +290,7 @@ private struct PixelTabBar: View {
 
     private func tab(_ tab: RootTab, label: String, spoken: String, symbol: String, accent: Color) -> some View {
         Button {
-            withAnimation(.easeInOut(duration: 0.15)) { selection = tab }
+            selection = tab
         } label: {
             VStack(spacing: 3) {
                 Image(systemName: symbol)
