@@ -2,6 +2,7 @@ import SwiftUI
 import Combine
 
 struct OnboardingView: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @EnvironmentObject var healthKit: HealthKitService
     @EnvironmentObject var settings: StreakSettings
     @EnvironmentObject var store: StreakStore
@@ -300,7 +301,7 @@ struct OnboardingView: View {
                 .tracking(1)
                 .foregroundStyle(Theme.retroCyan)
 
-            HStack(spacing: 14) {
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 14, alignment: .top), count: dynamicTypeSize.isAccessibilitySize ? 1 : 4), spacing: 14) {
                 streakPreviewItem(icon: "figure.walk", label: String(localized: "STEPS"))
                 streakPreviewItem(icon: "figure.run", label: String(localized: "EXERCISE"))
                 streakPreviewItem(icon: "figure.stand", label: String(localized: "STAND"))

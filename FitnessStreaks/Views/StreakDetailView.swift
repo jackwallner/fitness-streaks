@@ -134,8 +134,8 @@ struct StreakDetailView: View {
                         .overlay(Rectangle().stroke(Theme.retroAmber, lineWidth: 1))
                     Spacer(minLength: 0)
                 }
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
                 .contentShape(Rectangle())
-                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 6)
                 .padding(.bottom, 8)
             }

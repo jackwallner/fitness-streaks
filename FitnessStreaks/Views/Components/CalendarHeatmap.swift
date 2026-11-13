@@ -184,7 +184,7 @@ struct CalendarHeatmap: View {
                     Text(label.name)
                         .textCase(.uppercase)
                         .font(RetroFont.pixel(7))
-                        .foregroundStyle(Theme.retroInkDim)
+                        .foregroundStyle(Theme.retroInk)
                         .position(
                             x: CGFloat(label.index) * (layout.cellWidth + layout.gap) + layout.cellWidth/2,
                             y: headerHeight/2
@@ -233,7 +233,7 @@ struct CalendarHeatmap: View {
             ForEach(Array(DateHelpers.mondayFirstWeekdayInitials.enumerated()), id: \.offset) { _, label in
                 Text(label)
                     .font(RetroFont.pixel(7))
-                    .foregroundStyle(Theme.retroInkDim)
+                    .foregroundStyle(Theme.retroInk)
                     .frame(maxWidth: .infinity, minHeight: cellHeight, maxHeight: cellHeight)
             }
         }
@@ -244,7 +244,7 @@ struct CalendarHeatmap: View {
             Text("\(rangeLabelStart) - \(rangeLabelEnd)")
                 .textCase(.uppercase)
                 .font(RetroFont.pixel(8))
-                .foregroundStyle(Theme.retroInkDim)
+                .foregroundStyle(Theme.retroInk)
 
             HStack(spacing: 4) {
                 Rectangle()
