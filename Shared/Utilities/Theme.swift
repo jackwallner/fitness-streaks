@@ -95,7 +95,7 @@ enum Theme {
         #if os(iOS)
         Color(UIColor { trait in
             trait.userInterfaceStyle == .light
-                ? UIColor(Color(hex: 0xcc2266))
+                ? UIColor(Color(hex: 0xbb1e5c))
                 : UIColor(Color(hex: 0xff2d95))
         })
         #else

@@ -155,6 +155,7 @@ struct StreakDetailView: View {
                 showingPaywall = true
             } label: {
                 heatmapCard
+                    .redacted(reason: .placeholder)
                     .blur(radius: 7)
                     .allowsHitTesting(false)
                     .overlay(heatmapLockOverlay)

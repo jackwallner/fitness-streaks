@@ -108,11 +108,12 @@ struct PaywallView: View {
     /// Hero, features and plans scroll when they overflow; the CTA, disclosure,
     /// Terms, Privacy and Restore are pinned below so they are always on screen.
     private var paywallContent: some View {
-        ScrollView {
-            paywallStack
-        }
-        .scrollBounceBehavior(.basedOnSize)
-        .safeAreaInset(edge: .bottom, spacing: 0) {
+        VStack(spacing: 0) {
+            ScrollView {
+                paywallStack
+            }
+            .scrollBounceBehavior(.basedOnSize)
+            .clipped()
             purchaseBlock
                 .padding(.horizontal, 14)
                 .padding(.top, 8)
