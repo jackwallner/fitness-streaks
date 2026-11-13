@@ -84,8 +84,10 @@ struct StatsView: View {
                 .textCase(.uppercase)
                 .font(RetroFont.pixel(8))
                 .foregroundStyle(Theme.retroInkDim)
-                .lineLimit(1)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
                 .minimumScaleFactor(0.7)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.vertical, 14)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
