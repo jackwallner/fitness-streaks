@@ -326,6 +326,14 @@ struct StreakPickerSheet: View {
             }
             .toolbarBackground(Theme.retroBg, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
+            #if DEBUG
+            .task {
+                // Capture only: opens the builder for store screenshots.
+                guard ProcessInfo.processInfo.arguments.contains("-ShowBuilder") else { return }
+                try? await Task.sleep(for: .seconds(2))
+                showingBuilder = true
+            }
+            #endif
             .sheet(isPresented: $showingBuilder) {
                 CustomStreakBuilderSheet { custom in
                     settings.customStreaks.append(custom)

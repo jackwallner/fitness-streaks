@@ -162,6 +162,14 @@ struct DashboardView: View {
             }
             }
             .onAppear { maybeStartTutorial() }
+            #if DEBUG
+            .task {
+                // Capture only: opens the picker for store screenshots.
+                guard ProcessInfo.processInfo.arguments.contains("-ShowPicker") else { return }
+                try? await Task.sleep(for: .seconds(4))
+                showPicker = true
+            }
+            #endif
             .onChange(of: store.hero?.id) { _, _ in maybeStartTutorial() }
             .onChange(of: settings.hasSeenTutorial) { _, seen in
                 if !seen { maybeStartTutorial() }
