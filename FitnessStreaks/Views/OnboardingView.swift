@@ -300,12 +300,15 @@ struct OnboardingView: View {
                 .font(RetroFont.mono(10, weight: .bold))
                 .tracking(1)
                 .foregroundStyle(Theme.retroCyan)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
 
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 14, alignment: .top), count: dynamicTypeSize.isAccessibilitySize ? 1 : 4), spacing: 14) {
-                streakPreviewItem(icon: "figure.walk", label: String(localized: "STEPS"))
-                streakPreviewItem(icon: "figure.run", label: String(localized: "EXERCISE"))
-                streakPreviewItem(icon: "figure.stand", label: String(localized: "STAND"))
-                streakPreviewItem(icon: "flame.fill", label: String(localized: "WORKOUTS"))
+            ViewThatFits(in: .horizontal) {
+                if !dynamicTypeSize.isAccessibilitySize {
+                    previewGrid(columns: 4, fixedLabels: true)
+                    previewGrid(columns: 2, fixedLabels: false)
+                }
+                previewGrid(columns: 1, fixedLabels: false)
             }
             .padding(.horizontal, 4)
         }
@@ -314,7 +317,16 @@ struct OnboardingView: View {
         .pixelPanel(color: Theme.retroCyan)
     }
 
-    private func streakPreviewItem(icon: String, label: String) -> some View {
+    private func previewGrid(columns: Int, fixedLabels: Bool) -> some View {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 14, alignment: .top), count: columns), spacing: 14) {
+            streakPreviewItem(icon: "figure.walk", label: String(localized: "STEPS"), fixed: fixedLabels)
+            streakPreviewItem(icon: "figure.run", label: String(localized: "EXERCISE"), fixed: fixedLabels)
+            streakPreviewItem(icon: "figure.stand", label: String(localized: "STAND"), fixed: fixedLabels)
+            streakPreviewItem(icon: "flame.fill", label: String(localized: "WORKOUTS"), fixed: fixedLabels)
+        }
+    }
+
+    private func streakPreviewItem(icon: String, label: String, fixed: Bool) -> some View {
         VStack(spacing: 4) {
             Image(systemName: icon)
                 .font(.system(size: 22))
@@ -323,6 +335,7 @@ struct OnboardingView: View {
                 .font(RetroFont.mono(8, weight: .bold))
                 .tracking(1)
                 .foregroundStyle(Theme.retroInkDim)
+                .fixedSize(horizontal: fixed, vertical: true)
         }
         .frame(minWidth: 52)
     }
