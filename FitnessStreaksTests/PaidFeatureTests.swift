@@ -426,4 +426,19 @@ final class PaidFeatureTests: XCTestCase {
         XCTAssertFalse(StoreKitService.shared.isPro, "history must re-lock if entitlement lapses")
     }
     #endif
+
+    // Restore on the onboarding trial page used to discard the outcome, so a tap
+    // that found nothing (or failed) left the page unchanged.
+    func testRestoreFeedbackSaysWhyWhenNothingWasRestored() {
+        XCTAssertEqual(
+            RestoreFeedback.failureMessage(isPro: false, lastError: nil),
+            "NO ACTIVE PURCHASES FOUND."
+        )
+        XCTAssertEqual(
+            RestoreFeedback.failureMessage(isPro: false, lastError: "The network connection was lost."),
+            "The network connection was lost."
+        )
+        XCTAssertNil(RestoreFeedback.failureMessage(isPro: true, lastError: nil))
+        XCTAssertNil(RestoreFeedback.failureMessage(isPro: true, lastError: "stale"))
+    }
 }

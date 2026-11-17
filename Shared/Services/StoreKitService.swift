@@ -21,6 +21,16 @@ enum TrialOfferResolver {
     }
 }
 
+/// What a restore tap says when it leaves the user without Streaks+: the
+/// store's error when there was one, else that nothing was found. Nil once
+/// restored, since the restored surface closes on its own.
+enum RestoreFeedback {
+    static func failureMessage(isPro: Bool, lastError: String?) -> String? {
+        guard !isPro else { return nil }
+        return lastError ?? String(localized: "NO ACTIVE PURCHASES FOUND.")
+    }
+}
+
 /// Currency helpers. Prices themselves come only from StoreKit.
 /// Unit of a free trial after a week is folded into days.
 enum TrialUnit: Sendable, Equatable {
