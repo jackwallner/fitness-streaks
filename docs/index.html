@@ -37,7 +37,7 @@
     "@graph": [
         {
             "@type": "MobileApplication",
-            "dateModified": "2026-10-28",
+            "dateModified": "2026-11-24",
             "@id": "https://jackwallner.com/ios/fitness-streaks/#app",
             "name": "Fitness Habit Tracker: Auto",
             "alternateName": "Fitness Streaks",
@@ -56,7 +56,8 @@
             "featureList": [
                 "Automatic streak detection from Apple Health history",
                 "Hero streak and badges for your best current runs",
-                "Calendar heatmaps of every hit and miss",
+                "Custom streaks with your own metric, goal and cadence",
+                "Calendar heatmaps of every hit and miss with Streaks+",
                 "Home Screen, Lock Screen, and StandBy widgets",
                 "Apple Watch app and complications",
                 "A 7pm reminder when your hero streak is at risk"
@@ -125,7 +126,7 @@
                     "name": "Is Fitness Habit Tracker: Auto free, and does it need an account?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "The app is free to start, has no ads, and needs no account. Streaks+ is an optional upgrade, with prices shown in the app before you buy and varying by region."
+                        "text": "The app is free to start, has no ads, and needs no account. Three tracked streaks, three custom streaks, widgets and the Apple Watch app are free. Streaks+ is an optional upgrade, with prices shown in the app before you buy and varying by region."
                     }
                 },
                 {
@@ -250,7 +251,7 @@ footer .divider{margin:4px 0}
 <section class="hero">
 <h1>Your <span>fitness streaks</span>, found.</h1>
 <p class="tagline">Fitness Habit Tracker is a fitness streak app that finds your workout and activity streaks in Apple Health automatically, all on your device. Free to start, with optional Streaks+.</p>
-<p class="platforms">iPhone &middot; Apple Watch &middot; Widgets</p>
+<p class="platforms">iPhone &middot; iPad &middot; Apple Watch &middot; Widgets</p>
 <a class="download-btn" href="https://apps.apple.com/us/app/fitness-habit-tracker-auto/id6762699692?pt=128748779&amp;ct=jw-fitness-streaks-home&amp;mt=8">Download for free</a>
 </section>
 
@@ -297,6 +298,11 @@ footer .divider{margin:4px 0}
 <div class="feature-card">
 <h3>Calendar heatmaps</h3>
 <p>Every streak gets a year-view heatmap of hits and misses, so you can see your patterns at a glance.</p>
+<p class="tier">Included with Streaks+</p>
+</div>
+<div class="feature-card">
+<h3>Build your own</h3>
+<p>Custom streaks with your own metric, goal and daily or weekly cadence. Track one workout type such as running or yoga, or count only the steps in one hour of the day you choose.</p>
 </div>
 <div class="feature-card">
 <h3>Auto-save a missed day</h3>
@@ -352,6 +358,7 @@ footer .divider{margin:4px 0}
 <p>An optional upgrade for people who don't want a single missed day to end a real streak. Monthly, yearly, or a one-time lifetime purchase is available, with a 7-day free trial on subscriptions. Prices are shown in the app before you buy and vary by region.</p>
 <p><strong>Grace Day auto-save.</strong> Miss a day and Streaks+ automatically covers it with a planned freeze, so the streak keeps going instead of resetting to zero.</p>
 <p><strong>At-risk alerts.</strong> A heads-up before a streak slips, layered on top of the free 7pm hero-streak nudge.</p>
+<p><strong>Unlimited streaks and planned freeze days.</strong> Track and build as many streaks as you like, and plan freeze days for vacation, travel or sick days that neither break nor extend a streak.</p>
 <p><strong>Broken-streak revive.</strong> Just missed one? Starting a Streaks+ trial can revive a recently broken streak instead of losing the progress for good.</p>
 </div>
 
@@ -362,7 +369,7 @@ footer .divider{margin:4px 0}
 <details open><summary><h2 class="faq-q">Does the fitness streak tracker work on Apple Watch?</h2></summary><p>Yes. There is a full Apple Watch app plus watch face complications in circular, rectangular, corner, and inline styles, so your streaks stay visible all day.</p></details>
 <details open><summary><h2 class="faq-q">Can the app warn me before I break a streak?</h2></summary><p>Yes. A free 7pm nudge reminds you when your hero streak is at risk that day. The optional Streaks+ upgrade adds at-risk notifications and Grace Days that save a streak after a missed day.</p></details>
 <details open><summary><h2 class="faq-q">Do I have to check in every day like a habit tracker?</h2></summary><p>No. There is nothing to check off, because streaks come from activity Apple Health already records. You also do not start from day one, since the app looks back through your existing history.</p></details>
-<details open><summary><h2 class="faq-q">Is Fitness Habit Tracker: Auto free, and does it need an account?</h2></summary><p>The app is free to start, has no ads, and needs no account. Streaks+ is an optional upgrade, with prices shown in the app before you buy and varying by region.</p></details>
+<details open><summary><h2 class="faq-q">Is Fitness Habit Tracker: Auto free, and does it need an account?</h2></summary><p>The app is free to start, has no ads, and needs no account. Three tracked streaks, three custom streaks, widgets and the Apple Watch app are free. Streaks+ is an optional upgrade, with prices shown in the app before you buy and varying by region.</p></details>
 <details open><summary><h2 class="faq-q">Is my Apple Health data private?</h2></summary><p>Yes. The app reads Apple Health in read-only mode and processes your data on your device, with no account, no ads, and no analytics. It is a fitness awareness tool, not medical advice.</p></details>
 </div>
 
@@ -382,7 +389,7 @@ footer .divider{margin:4px 0}
 <h3>What Mattered</h3>
 <p><strong>The discovery engine.</strong> Every metric has multiple threshold tiers. The engine evaluates every (metric, cadence, threshold) combination across 400 days of history, finds contiguous streaks, and ranks by a weighted score of length and difficulty.</p>
 <p><strong>One featured streak.</strong> Your best current run gets featured. Everything else appears as tappable badges. The hero rotates automatically as streaks break and new ones form. No manual curation.</p>
-<p><strong>Calendar heatmaps.</strong> Each streak has a year-view heatmap showing every hit and miss, with intensity mapped to how far above threshold you landed that day.</p>
+<p><strong>Calendar heatmaps.</strong> With Streaks+, each streak has a year-view heatmap showing every hit and miss, with intensity mapped to how far above threshold you landed that day.</p>
 <p><strong>Widget reliability.</strong> Widgets never query HealthKit directly. They read a snapshot the main app writes to App Group storage on every refresh, so they stay instant instead of laggy.</p>
 </div>
 </div>
@@ -396,7 +403,7 @@ footer .divider{margin:4px 0}
 </section>
 
 <footer>
-<div class="divider">&copy; 2026 Jack Wallner · Last updated <time datetime="2026-10-28" data-updated>October 28, 2026</time></div>
+<div class="divider">&copy; 2026 Jack Wallner · Last updated <time datetime="2026-11-24" data-updated>November 24, 2026</time></div>
 <div>
 <a href="apple-watch-streak-broken.html">Apple Watch streak broken?</a>
 <a href="streaks-app-alternative.html">Streaks app alternatives</a>

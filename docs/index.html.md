@@ -8,7 +8,7 @@ Web page: https://jackwallner.com/ios/fitness-streaks/
 
 Fitness Habit Tracker is a fitness streak app that finds your workout and activity streaks in Apple Health automatically, all on your device. Free to start, with optional Streaks+.
 
-iPhone · Apple Watch · Widgets
+iPhone · iPad · Apple Watch · Widgets
 
 [Download for free](https://apps.apple.com/us/app/fitness-habit-tracker-auto/id6762699692?pt=128748779&ct=jw-fitness-streaks-home&mt=8)
 
@@ -31,6 +31,12 @@ Your single best current run is always front and center, with the rest as tappab
 ### Calendar heatmaps
 
 Every streak gets a year-view heatmap of hits and misses, so you can see your patterns at a glance.
+
+Included with Streaks+
+
+### Build your own
+
+Custom streaks with your own metric, goal and daily or weekly cadence. Track one workout type such as running or yoga, or count only the steps in one hour of the day you choose.
 
 ### Auto-save a missed day
 
@@ -80,6 +86,8 @@ An optional upgrade for people who don't want a single missed day to end a real 
 
 **At-risk alerts.** A heads-up before a streak slips, layered on top of the free 7pm hero-streak nudge.
 
+**Unlimited streaks and planned freeze days.** Track and build as many streaks as you like, and plan freeze days for vacation, travel or sick days that neither break nor extend a streak.
+
 **Broken-streak revive.** Just missed one? Starting a Streaks+ trial can revive a recently broken streak instead of losing the progress for good.
 
 ### Frequently asked questions
@@ -106,7 +114,7 @@ No. There is nothing to check off, because streaks come from activity Apple Heal
 
 ## Is Fitness Habit Tracker: Auto free, and does it need an account?
 
-The app is free to start, has no ads, and needs no account. Streaks+ is an optional upgrade, with prices shown in the app before you buy and varying by region.
+The app is free to start, has no ads, and needs no account. Three tracked streaks, three custom streaks, widgets and the Apple Watch app are free. Streaks+ is an optional upgrade, with prices shown in the app before you buy and varying by region.
 
 ## Is my Apple Health data private?
 
@@ -128,7 +136,7 @@ Yes. The app reads Apple Health in read-only mode and processes your data on you
 
 **One featured streak.** Your best current run gets featured. Everything else appears as tappable badges. The hero rotates automatically as streaks break and new ones form. No manual curation.
 
-**Calendar heatmaps.** Each streak has a year-view heatmap showing every hit and miss, with intensity mapped to how far above threshold you landed that day.
+**Calendar heatmaps.** With Streaks+, each streak has a year-view heatmap showing every hit and miss, with intensity mapped to how far above threshold you landed that day.
 
 **Widget reliability.** Widgets never query HealthKit directly. They read a snapshot the main app writes to App Group storage on every refresh, so they stay instant instead of laggy.
 
