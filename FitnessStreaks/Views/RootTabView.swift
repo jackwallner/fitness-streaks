@@ -98,6 +98,11 @@ struct RootTabView: View {
             // Folding hands Settings back to the Dashboard's sheet.
             if !isSplit { paneShowsSettings = false }
         }
+        // `fitnesshabits://streaks`, the App Store in-app event link, opens the Streaks tab.
+        .onOpenURL { url in
+            guard url.scheme?.lowercased() == "fitnesshabits" else { return }
+            selection = .streaks
+        }
         #if DEBUG
         .task(id: split != nil) { await runDuoTour(split: split != nil) }
         .forceLandscapeIfRequested()
