@@ -43,11 +43,11 @@
             "alternateName": "Fitness Streaks",
             "description": "Fitness Habit Tracker: Auto is a fitness streak app for iPhone and Apple Watch. It reads your Apple Health history and finds your workout, step, exercise, stand, and sleep streaks automatically, so there is no manual logging. It includes widgets, watch complications, and a reminder before a streak slips.",
             "applicationCategory": "HealthApplication",
-            "operatingSystem": "iOS 17+, watchOS 10+",
+            "operatingSystem": "iOS 17+, watchOS 10+, Android 9+",
             "url": "https://jackwallner.com/ios/fitness-streaks/",
-            "downloadUrl": "https://apps.apple.com/us/app/id6762699692",
-            "installUrl": "https://apps.apple.com/us/app/id6762699692",
-            "sameAs": "https://apps.apple.com/us/app/id6762699692",
+            "downloadUrl": ["https://apps.apple.com/us/app/id6762699692", "https://play.google.com/store/apps/details?id=com.jackwallner.streaks"],
+            "installUrl": ["https://apps.apple.com/us/app/id6762699692", "https://play.google.com/store/apps/details?id=com.jackwallner.streaks"],
+            "sameAs": ["https://apps.apple.com/us/app/id6762699692", "https://play.google.com/store/apps/details?id=com.jackwallner.streaks"],
             "screenshot": [
                 "https://jackwallner.github.io/fitness-streaks/screenshot-1.png",
                 "https://jackwallner.github.io/fitness-streaks/screenshot-2.png",
@@ -234,6 +234,14 @@ footer .divider{margin:4px 0}
             color: #e50071;
         }
         summary > h2.faq-q { display: inline; margin: 0; font: inherit; letter-spacing: inherit; color: inherit; }
+.store-badges { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; }
+.store-badges.start { justify-content: flex-start; }
+.play-badge { display: inline-flex; transition: opacity 0.15s; }
+.play-badge:hover { opacity: 0.85; }
+.play-badge img { display: block; height: 46px; width: auto; }
+.nav-actions { display: flex; align-items: center; gap: 10px; }
+.nav-actions .play-badge img { height: 36px; }
+@media (max-width: 480px) { .nav-actions .play-badge { display: none; } }
 </style>
 </head>
 <body>
@@ -244,15 +252,17 @@ footer .divider{margin:4px 0}
 <img src="icon_64.webp" alt="" width="32" height="32">
 <span>Fitness Habit Tracker: Auto</span>
 </a>
-<a class="nav-link" href="https://apps.apple.com/us/app/fitness-habit-tracker-auto/id6762699692?pt=128748779&amp;ct=jw-fitness-streaks-home&amp;mt=8">Download</a>
+<div class="nav-actions"><a class="nav-link" href="https://apps.apple.com/us/app/fitness-habit-tracker-auto/id6762699692?pt=128748779&amp;ct=jw-fitness-streaks-home&amp;mt=8">Download</a>
+<a class="play-badge" href="https://play.google.com/store/apps/details?id=com.jackwallner.streaks" rel="noopener"><img src="google-play-badge.webp" alt="Get it on Google Play" width="121" height="36"></a></div>
 </div>
 </nav>
 
 <section class="hero">
 <h1>Your <span>fitness streaks</span>, found.</h1>
 <p class="tagline">Fitness Habit Tracker is a fitness streak app that finds your workout and activity streaks in Apple Health automatically, all on your device. Free to start, with optional Streaks+.</p>
-<p class="platforms">iPhone &middot; iPad &middot; Apple Watch &middot; Widgets</p>
-<a class="download-btn" href="https://apps.apple.com/us/app/fitness-habit-tracker-auto/id6762699692?pt=128748779&amp;ct=jw-fitness-streaks-home&amp;mt=8">Download for free</a>
+<p class="platforms">iPhone &middot; iPad &middot; Apple Watch &middot; Android &middot; Widgets</p>
+<div class="store-badges"><a class="download-btn" href="https://apps.apple.com/us/app/fitness-habit-tracker-auto/id6762699692?pt=128748779&amp;ct=jw-fitness-streaks-home&amp;mt=8">Download for free</a>
+<a class="play-badge" href="https://play.google.com/store/apps/details?id=com.jackwallner.streaks" rel="noopener"><img src="google-play-badge.webp" alt="Get it on Google Play" width="155" height="46"></a></div>
 </section>
 
 <section class="showcase">
@@ -398,8 +408,9 @@ footer .divider{margin:4px 0}
 
 <section class="cta">
 <h2>Ready to find your streaks?</h2>
-<p>Free on the App Store. No account required. Upgrade to Streaks+ anytime.</p>
-<a class="download-btn" href="https://apps.apple.com/us/app/fitness-habit-tracker-auto/id6762699692?pt=128748779&amp;ct=jw-fitness-streaks-home&amp;mt=8">Download for free</a>
+<p>Free on the App Store and Google Play. No account required. Upgrade to Streaks+ anytime.</p>
+<div class="store-badges"><a class="download-btn" href="https://apps.apple.com/us/app/fitness-habit-tracker-auto/id6762699692?pt=128748779&amp;ct=jw-fitness-streaks-home&amp;mt=8">Download for free</a>
+<a class="play-badge" href="https://play.google.com/store/apps/details?id=com.jackwallner.streaks" rel="noopener"><img src="google-play-badge.webp" alt="Get it on Google Play" width="155" height="46"></a></div>
 </section>
 
 <footer>

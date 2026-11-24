@@ -41,7 +41,7 @@
         "url": "https://jackwallner.com/"
       },
       "datePublished": "2026-10-12",
-      "dateModified": "2026-11-12",
+      "dateModified": "2026-11-24",
       "inLanguage": "en-US",
       "mainEntityOfPage": "https://jackwallner.com/ios/fitness-streaks/apple-watch-streak-broken.html",
       "image": "https://jackwallner.github.io/fitness-streaks/screenshot-1.png",
@@ -178,6 +178,14 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 footer { text-align: center; padding: 20px 24px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); }
 footer a { display: inline-block; padding: 6px 0; color: var(--muted); text-decoration: none; margin: 0 10px; }
 @media (max-width: 768px) { article h1 { font-size: 28px; } article { padding: 36px 0 56px; } }
+.store-badges { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; }
+.store-badges.start { justify-content: flex-start; }
+.play-badge { display: inline-flex; transition: opacity 0.15s; }
+.play-badge:hover { opacity: 0.85; }
+.play-badge img { display: block; height: 46px; width: auto; }
+.nav-actions { display: flex; align-items: center; gap: 10px; }
+.nav-actions .play-badge img { height: 36px; }
+@media (max-width: 480px) { .nav-actions .play-badge { display: none; } }
 </style>
 </head>
 <body>
@@ -187,14 +195,15 @@ footer a { display: inline-block; padding: 6px 0; color: var(--muted); text-deco
                 <img src="icon_64.webp" alt="" width="32" height="32">
                 <span>Fitness Habit Tracker: Auto</span>
             </a>
-            <a class="nav-link" href="https://apps.apple.com/us/app/fitness-habit-tracker-auto/id6762699692?pt=128748779&amp;ct=jw-fitness-streaks-apple-watch-streak-br&amp;mt=8">Download</a>
+            <div class="nav-actions"><a class="nav-link" href="https://apps.apple.com/us/app/fitness-habit-tracker-auto/id6762699692?pt=128748779&amp;ct=jw-fitness-streaks-apple-watch-streak-br&amp;mt=8">Download</a>
+<a class="play-badge" href="https://play.google.com/store/apps/details?id=com.jackwallner.streaks" rel="noopener"><img src="google-play-badge.webp" alt="Get it on Google Play" width="121" height="36"></a></div>
         </div>
     </nav>
 
     <article>
         <div class="container">
             <h1>Apple Watch Streak Broken? How to Keep a Workout Streak Going</h1>
-            <p class="meta">By Jack Wallner. Last updated <time datetime="2026-11-12" data-updated>November 12, 2026</time>.</p>
+            <p class="meta">By Jack Wallner. Last updated <time datetime="2026-11-24" data-updated>November 24, 2026</time>.</p>
 
             <div class="answer">
                 <p>Apple documents one way to protect an Apple Watch award streak: Pause Rings, for a day up to 90 days, without breaking the streak. If a streak already broke, one miss does not undo the habit: habit research found that missing a single opportunity did not materially affect habit formation. To keep a workout streak, set a floor you can hit on your worst day, use weekly streaks if daily ones keep failing, and tie the activity to a fixed time and place.</p>

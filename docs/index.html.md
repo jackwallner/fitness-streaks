@@ -8,7 +8,7 @@ Web page: https://jackwallner.com/ios/fitness-streaks/
 
 Fitness Habit Tracker is a fitness streak app that finds your workout and activity streaks in Apple Health automatically, all on your device. Free to start, with optional Streaks+.
 
-iPhone · iPad · Apple Watch · Widgets
+iPhone · iPad · Apple Watch · Android · Widgets
 
 [Download for free](https://apps.apple.com/us/app/fitness-habit-tracker-auto/id6762699692?pt=128748779&ct=jw-fitness-streaks-home&mt=8)
 
@@ -142,6 +142,6 @@ Yes. The app reads Apple Health in read-only mode and processes your data on you
 
 ## Ready to find your streaks?
 
-Free on the App Store. No account required. Upgrade to Streaks+ anytime.
+Free on the App Store and Google Play. No account required. Upgrade to Streaks+ anytime.
 
 [Download for free](https://apps.apple.com/us/app/fitness-habit-tracker-auto/id6762699692?pt=128748779&ct=jw-fitness-streaks-home&mt=8)
