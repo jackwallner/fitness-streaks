@@ -1,1 +1,1 @@
-Updated App Store information and subscription diagnostics.
+Bug fixes and improvements.
