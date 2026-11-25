@@ -4,12 +4,12 @@ App Store Connect event `6838894442` (January 2027 Streak Challenge).
 
 ## Status
 
-Held as a DRAFT. App Store Connect refuses to submit an event without a deep link (ENTITY_ERROR.ATTRIBUTE.REQUIRED: deepLink), and this app has no URL scheme or universal link. To ship it: add a URL scheme that opens the main screen, release a version with it, set the event's deepLink, and submit the event with that version. An empty draft review submission (`984763dc-e5ee-4385-93d2-89249ccab8e8`, READY_FOR_REVIEW, not cancellable) is left for the next submission to reuse.
+WAITING_FOR_REVIEW (2026-11-24), submitted with version 1.3.6 (build 173) in review submission `fe7903e6-3a62-4300-ac8d-b2735c629056`. The version adds the `fitnesshabits` URL scheme, which opens the Streaks tab. Release type MANUAL.
 
 ## Settings
 
 - Badge: Challenge
-- Deep link: none (see status)
+- Deep link: `fitnesshabits://streaks`
 - Purpose: appropriate for all users. Priority: high. Purchase: no cost.
 - Shows on the App Store from 2026-12-18 (Apple's limit is 14 days before the start).
 - Runs 2027-01-01 to 2027-01-31 (UTC times 2027-01-01T08:00:00Z to 2027-02-01T07:59:00Z), same 175 territories as Sober's Dry January event.
