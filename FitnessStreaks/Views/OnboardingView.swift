@@ -274,6 +274,10 @@ struct OnboardingView: View {
                         .lineSpacing(4)
                         .retroGlow(Theme.retroMagenta)
                         .minimumScaleFactor(0.7)
+                        // Both lines always draw: a short screen (Display Zoom)
+                        // squeezed the height and cut the title to "STREAK...".
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
 
                     Text("Discover the fitness streaks you've already built.")
                         .font(RetroFont.mono(13))
