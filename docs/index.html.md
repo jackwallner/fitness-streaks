@@ -1,6 +1,6 @@
 # Fitness Streak App for iPhone | Fitness Habit Tracker: Auto
 
-> Fitness Habit Tracker is a fitness streak app for iPhone and Apple Watch that finds your workout, step and sleep streaks in Apple Health automatically. Private.
+> Fitness Habit Tracker is a fitness streak app for iPhone, iPad and Apple Watch that finds your workout, step and sleep streaks in Apple Health automatically. Private.
 
 Web page: https://jackwallner.com/ios/fitness-streaks/
 

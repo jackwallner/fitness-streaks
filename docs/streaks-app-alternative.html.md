@@ -1,16 +1,16 @@
 # Streaks App Alternatives: 5 Habit Trackers Compared
 
-> Five Streaks app alternatives compared on free tier, Apple Health auto-complete, missed-day rules, Apple Watch, account and price: HabitKit, Habitify and more.
+> Five Streaks app alternatives compared on free tier, Apple Health auto-complete, missed-day rules, Apple Watch, iPad, account and price: HabitKit, Habitify and more.
 
 Web page: https://jackwallner.com/ios/fitness-streaks/streaks-app-alternative.html
 
 ## Streaks App Alternatives for iPhone and Apple Watch
 
-By Jack Wallner · Last updated November 24, 2026
+By Jack Wallner · Last updated November 25, 2026
 
 **Best if you like the to-do style of Streaks and want Health-linked tasks:** Streaks itself, a paid download with no subscription. **Best free option with a simple grid:** HabitKit. **Best for logging habits from Apple Health, Strava and Screen Time:** Habitify, with that integration in its Pro tier. **Best for a workout streak that allows rest days:** Gentler Streak. **Best for streaks found in your existing Health history with no check-ins:** Fitness Habit Tracker: Auto, the app I make.
 
-**How we compared (November 12, 2026):** I read each app's US App Store listing and pulled its rating, rating count, supported devices, purchase types and last update from Apple's store data. I did not install or subscribe to the other apps, so what I say about them comes from their own listings. Fitness Habit Tracker: Auto's entry comes from its code and listing. Prices are left out on purpose, because they vary by region and change.
+**How we compared:** Competitor ratings, supported devices, purchase types and update dates come from their US App Store listings checked on November 12, 2026. I did not install or subscribe to the other apps, so their feature details come from their own listings. Fitness Habit Tracker: Auto's details come from its code and live listing, checked on November 25, 2026. Prices are left out because they vary by region and change.
 
 **Disclosure:** Jack Wallner makes Fitness Habit Tracker: Auto, one of the apps below, so read its entry with that in mind.
 
@@ -24,7 +24,7 @@ Four of the five can complete habits from Apple Health, but only Streaks, Gentle
 | [Habit Tracker - HabitKit](https://apps.apple.com/us/app/habit-tracker-habitkit/id6443918070) | A few habits, with streaks, calendar, notes and reminders | Not in listing; logged by hand | Not in listing | No | No | None | Free; Pro monthly, yearly or lifetime | 4.84 (2,579) | Nov 12, 2026 |
 | [Habitify: Habit Tracker](https://apps.apple.com/us/app/habitify-habit-tracker/id1111447047) | Yes, limit not stated; Plus for unlimited habits | With Pro, plus Fitbit, Strava, Screen Time and RescueTime | Mark a habit skipped, or pause it | Yes | Yes | Not stated | Free; Plus or Pro, monthly, yearly or lifetime | 4.59 (7,192) | Nov 10, 2026 |
 | [Gentler Streak Workout Tracker](https://apps.apple.com/us/app/gentler-streak-workout-tracker/id1576857102) | Yes; Premium adds advanced features | Yes, activity, sleep and vitals (it is a workout tracker) | Rest days keep the streak; a sick or break status shifts the focus | Yes | Yes | None (per listing) | Free; Premium monthly, yearly or lifetime | 4.71 (8,833) | Nov 12, 2026 |
-| [Fitness Habit Tracker: Auto](https://apps.apple.com/us/app/fitness-habit-tracker-auto/id6762699692?pt=128748779&ct=jw-fitness-streaks-streaks-app-alternati&mt=8) | 3 tracked and 3 custom streaks, no expiry | Yes, every streak, read only; nothing to check off | With Streaks+: auto-save, revive yesterday's streak, planned freeze days | Yes | No | None | Free; Streaks+ monthly, yearly or lifetime | No ratings yet | Nov 7, 2026 |
+| [Fitness Habit Tracker: Auto](https://apps.apple.com/us/app/fitness-habit-tracker-auto/id6762699692?pt=128748779&ct=jw-fitness-streaks-streaks-app-alternati&mt=8) | 3 tracked and 3 custom streaks, no expiry | Yes, every streak, read only; nothing to check off | With Streaks+: auto-save, revive yesterday's streak, planned freeze days | Yes | Yes | None | Free; Streaks+ monthly, yearly or lifetime | No ratings yet | Nov 24, 2026 |
 
 Ratings and counts are US App Store figures as of November 12, 2026. Apple Watch and iPad show the devices each listing supports. "Not in listing" and "Not stated" mean the App Store listing does not say. Price models describe the structure only.
 
@@ -50,7 +50,7 @@ Gentler Streak is a fitness app first. Its streak follows how active you are and
 
 ### Fitness Habit Tracker: Auto (my app)
 
-This app reads your Apple Health history (read-only, on your device) and finds the streaks you already have in steps, exercise minutes, stand hours, workouts, sleep, mindful minutes and more, daily or weekly. There is nothing to check off, and it starts from your past data instead of day one. Free: three tracked streaks, three custom streaks, widgets and the Apple Watch app, with no account. Its limits are real: it can only track what Apple Health records, so manual habits such as reading are out; unlimited streaks, auto-save, freeze days and the history heatmap are in the paid Streaks+; there is no iPad app; and it has no ratings yet.
+This app reads your Apple Health history (read-only, on your device) and finds the streaks you already have in steps, exercise minutes, stand hours, workouts, sleep, mindful minutes and more, daily or weekly. There is nothing to check off, and it starts from your past data instead of day one. Free: three tracked streaks, three custom streaks, widgets, and the iPad and Apple Watch apps, with no account. Its limits are real: it can only track what Apple Health records, so manual habits such as reading are out; unlimited streaks, auto-save, freeze days and the history heatmap are in the paid Streaks+; and it has no ratings yet.
 
 ## Which should you pick?
 
@@ -65,7 +65,7 @@ Choose Streaks if you want no subscription and Health-linked tasks. Choose an au
 
 ## Which app finds streaks without check-ins?
 
-Fitness Habit Tracker: Auto reads Apple Health on your iPhone and finds your current activity streaks. Free to start, no account.
+Fitness Habit Tracker: Auto runs on iPhone and iPad, reading Apple Health activity to find current streaks. Free to start, no account.
 
 [About Fitness Habit Tracker: Auto](https://jackwallner.com/ios/fitness-streaks/)
 
@@ -109,4 +109,4 @@ Related: [Apple Watch Streak Broken? How to Keep a Workout Streak Going](https:/
 - [Gentler Streak Workout Tracker on the App Store](https://apps.apple.com/us/app/gentler-streak-workout-tracker/id1576857102)
 - [Fitness Habit Tracker: Auto on the App Store](https://apps.apple.com/us/app/fitness-habit-tracker-auto/id6762699692?pt=128748779&ct=jw-fitness-streaks-streaks-app-alternati&mt=8)
 
-Fitness Habit Tracker: Auto is an independent app and is not affiliated with any app compared here. It is a fitness awareness tool, not medical advice. App details were checked on November 12, 2026 and may change.
+Fitness Habit Tracker: Auto is an independent app and is not affiliated with any app compared here. It is a fitness awareness tool, not medical advice. Competitor listings were checked on November 12, 2026, and Fitness Habit Tracker: Auto was checked on November 25, 2026. Details may change.
