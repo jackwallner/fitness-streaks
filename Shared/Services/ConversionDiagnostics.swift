@@ -55,6 +55,7 @@ enum ConversionDiagnostics {
         static let convertedPlan = "conv.convertedPlan"
         static let convertedWithTrial = "conv.convertedWithTrial"
         static let convertedOffering = "conv.convertedOffering"
+        static let trialCTA = "conv.trialCTA"
     }
 
     static func surface(fromImpressionID id: String) -> String {
@@ -76,6 +77,12 @@ enum ConversionDiagnostics {
             d.set(Date.now.timeIntervalSince1970, forKey: Key.installedAt)
         }
         d.set(d.integer(forKey: Key.appOpens) + 1, forKey: Key.appOpens)
+    }
+
+    /// The trial button wording the customer was shown (`trial_cta`), kept as the
+    /// latest arm so the RevenueCat attribute reads the wording they last saw.
+    static func recordTrialCTA(_ arm: String) {
+        defaults.set(arm, forKey: Key.trialCTA)
     }
 
     /// One pitch was put in front of the user. Called from
@@ -174,6 +181,7 @@ enum ConversionDiagnostics {
             attributes[String(key.prefix(40))] = String(count)
         }
         if let last = lastSurface { attributes["pitch_last"] = last }
+        if let arm = d.string(forKey: Key.trialCTA) { attributes["trial_cta"] = arm }
         if let first = firstSeenDate {
             attributes["pitch_first_seen"] = ISO8601DateFormatter().string(from: first)
             let days = Calendar.current.dateComponents([.day], from: first, to: .now).day ?? 0

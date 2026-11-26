@@ -31,6 +31,25 @@ enum RestoreFeedback {
     }
 }
 
+/// Tells an Ask to Buy purchase that is waiting for a parent's approval apart
+/// from a real failure. RevenueCat reports it as `ErrorCode.paymentPendingError`
+/// (domain "RevenueCat.ErrorCode", code 20). Held as plain values so the test
+/// target, which does not link RevenueCat, can cover the mapping.
+enum PurchaseErrorMapping {
+    static let revenueCatDomain = "RevenueCat.ErrorCode"
+    static let paymentPendingCode = 20
+
+    static func isAwaitingApproval(_ error: Error) -> Bool {
+        let nsError = error as NSError
+        return nsError.domain == revenueCatDomain && nsError.code == paymentPendingCode
+    }
+
+    /// Shown wherever a purchase is waiting for approval. Calm, never an error.
+    static var awaitingApprovalMessage: String {
+        String(localized: "Waiting for approval. Your purchase unlocks once it is approved.")
+    }
+}
+
 /// Currency helpers. Prices themselves come only from StoreKit.
 /// Unit of a free trial after a week is folded into days.
 enum TrialUnit: Sendable, Equatable {
@@ -213,6 +232,16 @@ final class StoreKitService: NSObject, ObservableObject {
 
     private var paywallImpressionsThisSession: Set<String> = []
 
+    /// The current offering's metadata, so a running Experiment's variant is read.
+    private var remoteMetadata: [String: Any]? { offerings?.current?.metadata }
+
+    /// The trial button wording this customer sees.
+    var trialCTA: TrialCTA { TrialCTA.from(metadata: remoteMetadata) }
+
+    func isOn(_ remoteSwitch: RemoteSwitch) -> Bool {
+        RemoteConfig.isOn(remoteSwitch, in: remoteMetadata)
+    }
+
     var monthly: Package? { offerings?.current?.monthly }
     var yearly: Package? { offerings?.current?.annual }
     var lifetime: Package? { offerings?.current?.lifetime }
@@ -362,6 +391,7 @@ final class StoreKitService: NSObject, ObservableObject {
         }
         guard isConfigured else { return }
         ConversionDiagnostics.recordPitchView(impressionID: id)
+        recordTrialCTAArm()
         syncConversionAttributes()
         Purchases.shared.trackCustomPaywallImpression(
             CustomPaywallImpressionParams(paywallId: id)
@@ -384,6 +414,14 @@ final class StoreKitService: NSObject, ObservableObject {
         let attributes = ConversionDiagnostics.subscriberAttributes
         guard !attributes.isEmpty else { return }
         Purchases.shared.attribution.setAttributes(attributes)
+    }
+
+    /// Notes the trial wording this customer is shown, so a wording test reads
+    /// by attribute too. Only while a free trial is on offer: an account that
+    /// already used its trial sees no trial button.
+    private func recordTrialCTAArm() {
+        guard hasEligibleTrial else { return }
+        ConversionDiagnostics.recordTrialCTA(trialCTA.rawValue)
     }
 
     private func refreshIntroEligibility() async {
@@ -419,6 +457,7 @@ final class StoreKitService: NSObject, ObservableObject {
         purchaseInProgress = true
         defer { purchaseInProgress = false }
         do {
+            if isEligibleForIntroOffer(package) { recordTrialCTAArm() }
             let (_, customerInfo, userCancelled) = try await Purchases.shared.purchase(package: package)
             if userCancelled {
                 return .cancelled
@@ -438,6 +477,11 @@ final class StoreKitService: NSObject, ObservableObject {
             }
             return outcome
         } catch {
+            // Ask to Buy: the purchase is waiting for approval, not failed. The
+            // delegate's customer-info update unlocks it when it is approved.
+            if PurchaseErrorMapping.isAwaitingApproval(error) {
+                return .awaitingApproval
+            }
             lastError = error.localizedDescription
             return .failed
         }
@@ -476,7 +520,7 @@ final class StoreKitService: NSObject, ObservableObject {
         #endif
     }
 
-    enum PurchaseOutcome { case purchased, cancelled, pending, failed }
+    enum PurchaseOutcome { case purchased, cancelled, pending, awaitingApproval, failed }
 
     // MARK: - Pricing helpers
 
@@ -591,6 +635,10 @@ final class StoreKitService: ObservableObject {
     static let shared = StoreKitService()
 
     var hasEligibleTrial: Bool { false }
+
+    var trialCTA: TrialCTA { .control }
+
+    func isOn(_ remoteSwitch: RemoteSwitch) -> Bool { true }
 
     static let lifetimeID = "com.jackwallner.streaks.lifetime"
     static let yearlyID = "com.jackwallner.streaks.yearly"

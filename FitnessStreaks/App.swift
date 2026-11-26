@@ -315,6 +315,8 @@ private struct RootView: View {
     @State private var showTrialPaywall = false
     @State private var trialPurchaseInFlight = false
     @State private var trialPurchaseError: String?
+    /// Ask to Buy is waiting for approval. Cleared with the sheet that raised it.
+    @State private var trialPurchasePending = false
     /// Set when the user opts into the full paywall from inside the trial sheet.
     /// `.sheet(onDismiss:)` reads this and presents the full paywall *after* the
     /// trial sheet finishes dismissing — presenting both bindings in the same tick
@@ -373,6 +375,7 @@ private struct RootView: View {
             settings.hasSeenTrialOffer = true
             trialPurchaseInFlight = false
             trialPurchaseError = nil
+            trialPurchasePending = false
             // If the user paid inside the trial sheet, skip the hand-off to the
             // full paywall — one payment unlocks everything.
             if storeKit.grantsUnlimitedTrackedStreaks {
@@ -385,6 +388,7 @@ private struct RootView: View {
             TrialOfferSheet(
                 isPurchasing: trialPurchaseInFlight,
                 errorMessage: trialPurchaseError,
+                pendingMessage: trialPurchasePending ? PurchaseErrorMapping.awaitingApprovalMessage : nil,
                 pickedCount: settings.lastOnboardingPickedCount,
                 freeCap: Self.freeTrackedLimit,
                 longestStreak: longestStreakInfo(),
@@ -484,6 +488,7 @@ private struct RootView: View {
         }
         let startsTrial = storeKit.isEligibleForIntroOffer(package)
         trialPurchaseError = nil
+        trialPurchasePending = false
         trialPurchaseInFlight = true
         Task { @MainActor in
             defer { trialPurchaseInFlight = false }
@@ -491,6 +496,8 @@ private struct RootView: View {
             case .purchased, .pending:
                 settings.hasSeenTrialOffer = true
                 showTrialOffer = false
+            case .awaitingApproval:
+                trialPurchasePending = true
             case .cancelled:
                 trialPurchaseError = startsTrial
                     ? String(localized: "Trial wasn't started. Tap again, or pick a different plan.")

@@ -54956,6 +54956,523 @@
           }
         }
       }
+    },
+    "START MY FREE TRIAL": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MEINEN KOSTENLOSEN TEST STARTEN"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "START MY FREE TRIAL"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EMPEZAR MI PRUEBA GRATIS"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "START MIJN GRATIS PROEFPERIODE"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "НАЧАТЬ МОЙ БЕСПЛАТНЫЙ ПЕРИОД"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BẮT ĐẦU DÙNG THỬ MIỄN PHÍ CỦA TÔI"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始我的免费试用"
+          }
+        }
+      }
+    },
+    "START MY FREE TRIAL · %@ %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MEINEN KOSTENLOSEN TEST STARTEN · %@ %@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "START MY FREE TRIAL · %@ %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EMPEZAR MI PRUEBA GRATIS · %@ %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "START MIJN GRATIS PROEFPERIODE · %@ %@"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "НАЧАТЬ МОЙ БЕСПЛАТНЫЙ ПЕРИОД · %@ %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BẮT ĐẦU DÙNG THỬ MIỄN PHÍ CỦA TÔI · %@ %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始我的免费试用 · %@ %@"
+          }
+        }
+      }
+    },
+    "START MY FREE TRIAL · MONTHLY %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MEINEN KOSTENLOSEN TEST STARTEN · MONATLICH %@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "START MY FREE TRIAL · MONTHLY %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EMPEZAR MI PRUEBA GRATIS · MENSUAL %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "START MIJN GRATIS PROEFPERIODE · MAANDELIJKS %@"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "НАЧАТЬ МОЙ БЕСПЛАТНЫЙ ПЕРИОД · %@ В МЕСЯЦ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BẮT ĐẦU DÙNG THỬ MIỄN PHÍ CỦA TÔI · GÓI THÁNG %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始我的免费试用 · 月度 %@"
+          }
+        }
+      }
+    },
+    "START MY FREE TRIAL · YEARLY %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MEINEN KOSTENLOSEN TEST STARTEN · JÄHRLICH %@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "START MY FREE TRIAL · YEARLY %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EMPEZAR MI PRUEBA GRATIS · ANUAL %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "START MIJN GRATIS PROEFPERIODE · JAARLIJKS %@"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "НАЧАТЬ МОЙ БЕСПЛАТНЫЙ ПЕРИОД · %@ В ГОД"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BẮT ĐẦU DÙNG THỬ MIỄN PHÍ CỦA TÔI · GÓI NĂM %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始我的免费试用 · 年度 %@"
+          }
+        }
+      }
+    },
+    "START YOUR FREE TRIAL": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DEINEN KOSTENLOSEN TEST STARTEN"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "START YOUR FREE TRIAL"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EMPEZAR TU PRUEBA GRATIS"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "START JE GRATIS PROEFPERIODE"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "НАЧАТЬ ВАШ БЕСПЛАТНЫЙ ПЕРИОД"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BẮT ĐẦU DÙNG THỬ MIỄN PHÍ CỦA BẠN"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始你的免费试用"
+          }
+        }
+      }
+    },
+    "START YOUR FREE TRIAL · %@ %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DEINEN KOSTENLOSEN TEST STARTEN · %@ %@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "START YOUR FREE TRIAL · %@ %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EMPEZAR TU PRUEBA GRATIS · %@ %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "START JE GRATIS PROEFPERIODE · %@ %@"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "НАЧАТЬ ВАШ БЕСПЛАТНЫЙ ПЕРИОД · %@ %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BẮT ĐẦU DÙNG THỬ MIỄN PHÍ CỦA BẠN · %@ %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始你的免费试用 · %@ %@"
+          }
+        }
+      }
+    },
+    "START YOUR FREE TRIAL · MONTHLY %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DEINEN KOSTENLOSEN TEST STARTEN · MONATLICH %@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "START YOUR FREE TRIAL · MONTHLY %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EMPEZAR TU PRUEBA GRATIS · MENSUAL %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "START JE GRATIS PROEFPERIODE · MAANDELIJKS %@"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "НАЧАТЬ ВАШ БЕСПЛАТНЫЙ ПЕРИОД · %@ В МЕСЯЦ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BẮT ĐẦU DÙNG THỬ MIỄN PHÍ CỦA BẠN · GÓI THÁNG %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始你的免费试用 · 月度 %@"
+          }
+        }
+      }
+    },
+    "START YOUR FREE TRIAL · YEARLY %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DEINEN KOSTENLOSEN TEST STARTEN · JÄHRLICH %@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "START YOUR FREE TRIAL · YEARLY %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EMPEZAR TU PRUEBA GRATIS · ANUAL %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "START JE GRATIS PROEFPERIODE · JAARLIJKS %@"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "НАЧАТЬ ВАШ БЕСПЛАТНЫЙ ПЕРИОД · %@ В ГОД"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BẮT ĐẦU DÙNG THỬ MIỄN PHÍ CỦA BẠN · GÓI NĂM %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始你的免费试用 · 年度 %@"
+          }
+        }
+      }
+    },
+    "Waiting for approval. Your purchase unlocks once it is approved.": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warte auf Genehmigung. Dein Kauf wird freigeschaltet, sobald er genehmigt ist."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waiting for approval. Your purchase unlocks once it is approved."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esperando aprobación. Tu compra se desbloqueará en cuanto se apruebe."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wachten op goedkeuring. Je aankoop wordt ontgrendeld zodra deze is goedgekeurd."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ожидание подтверждения. Покупка откроется, как только её подтвердят."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang chờ phê duyệt. Giao dịch mua của bạn sẽ được mở khóa ngay khi được phê duyệt."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在等待批准。批准后，你的购买将立即解锁。"
+          }
+        }
+      }
+    },
+    "▶ KEEP ALL · START MY FREE TRIAL": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "▶ ALLE BEHALTEN · MEINEN KOSTENLOSEN TEST STARTEN"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "▶ KEEP ALL · START MY FREE TRIAL"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "▶ CONSERVAR TODAS · EMPEZAR MI PRUEBA GRATIS"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "▶ ALLES BEHOUDEN · START MIJN GRATIS PROEFPERIODE"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "▶ СОХРАНИТЬ ВСЕ · НАЧАТЬ МОЙ БЕСПЛАТНЫЙ ПЕРИОД"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "▶ GIỮ TẤT CẢ · BẮT ĐẦU DÙNG THỬ MIỄN PHÍ CỦA TÔI"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "▶ 全部保留 · 开始我的免费试用"
+          }
+        }
+      }
+    },
+    "▶ KEEP ALL · START YOUR FREE TRIAL": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "▶ ALLE BEHALTEN · DEINEN KOSTENLOSEN TEST STARTEN"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "▶ KEEP ALL · START YOUR FREE TRIAL"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "▶ CONSERVAR TODAS · EMPEZAR TU PRUEBA GRATIS"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "▶ ALLES BEHOUDEN · START JE GRATIS PROEFPERIODE"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "▶ СОХРАНИТЬ ВСЕ · НАЧАТЬ ВАШ БЕСПЛАТНЫЙ ПЕРИОД"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "▶ GIỮ TẤT CẢ · BẮT ĐẦU DÙNG THỬ MIỄN PHÍ CỦA BẠN"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "▶ 全部保留 · 开始你的免费试用"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

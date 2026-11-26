@@ -517,11 +517,17 @@ struct PaywallView: View {
         }
         // The button upper-cases its title, so the recurring label needs no case change here.
         if storeKit.isEligibleForIntroOffer(package), let days = package.streaksIntroOfferNumber {
-            switch package.packageType {
-            case .annual: return String(localized: "START \(days) DAYS FREE · YEARLY \(price)")
-            case .monthly: return String(localized: "START \(days) DAYS FREE · MONTHLY \(price)")
-            default: return String(localized: "START \(days) DAYS FREE · \(package.streaksRecurringPriceLabel) \(price)")
+            let plan: PaywallPlan = switch package.packageType {
+            case .annual: .annual
+            case .monthly: .monthly
+            default: .other
             }
+            return storeKit.trialCTA.paywallTitle(
+                plan: plan,
+                days: days,
+                price: price,
+                recurringLabel: package.streaksRecurringPriceLabel
+            )
         }
         switch package.packageType {
         case .annual: return String(localized: "SUBSCRIBE · YEARLY \(price)")
@@ -585,6 +591,8 @@ struct PaywallView: View {
             statusMessage = String(localized: "WELCOME TO STREAKS+.")
         case .pending:
             statusMessage = String(localized: "PURCHASE PENDING APPROVAL.")
+        case .awaitingApproval:
+            statusMessage = PurchaseErrorMapping.awaitingApprovalMessage
         case .cancelled:
             break
         case .failed:

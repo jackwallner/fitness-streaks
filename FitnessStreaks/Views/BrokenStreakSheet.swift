@@ -18,6 +18,8 @@ struct BrokenStreakSheet: View {
     @State private var showingTrialOffer = false
     @State private var trialInFlight = false
     @State private var trialError: String?
+    /// Ask to Buy is waiting for approval. Cleared with the sheet that raised it.
+    @State private var trialPending = false
     @State private var pendingPaywallAfterTrial = false
 
     var body: some View {
@@ -99,12 +101,25 @@ struct BrokenStreakSheet: View {
             }
             .toolbarBackground(Theme.retroBg, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
+            // An Ask to Buy approved while the offer is still up unlocks without
+            // a relaunch: the customer-info update flips isPro, and the run is
+            // revived as it would have been on an instant purchase.
+            .onChange(of: storeKit.isPro) { _, isPro in
+                guard isPro, trialPending else { return }
+                trialPending = false
+                Task { @MainActor in
+                    await store.reviveBrokenStreak(broken)
+                    showingTrialOffer = false
+                    close()
+                }
+            }
             .sheet(isPresented: $showingPaywall, onDismiss: handlePaywallDismiss) {
                 PaywallView(paywallImpressionId: "streaks_broken_sheet")
             }
             .sheet(isPresented: $showingTrialOffer, onDismiss: {
                 trialInFlight = false
                 trialError = nil
+                trialPending = false
                 // Hand off to the full plan list only if the user explicitly asked
                 // for it; a plain dismiss just closes the revive pitch.
                 if pendingPaywallAfterTrial {
@@ -115,6 +130,7 @@ struct BrokenStreakSheet: View {
                 TrialOfferSheet(
                     isPurchasing: trialInFlight,
                     errorMessage: trialError,
+                    pendingMessage: trialPending ? PurchaseErrorMapping.awaitingApprovalMessage : nil,
                     pickedCount: 0,
                     freeCap: 3,
                     longestStreak: .init(
@@ -170,6 +186,7 @@ struct BrokenStreakSheet: View {
         }
         let startsTrial = storeKit.isEligibleForIntroOffer(package)
         trialError = nil
+        trialPending = false
         trialInFlight = true
         Task { @MainActor in
             defer { trialInFlight = false }
@@ -178,6 +195,9 @@ struct BrokenStreakSheet: View {
                 await store.reviveBrokenStreak(broken)
                 showingTrialOffer = false
                 close()
+            case .awaitingApproval:
+                // Nothing is unlocked yet, so the run is not revived yet.
+                trialPending = true
             case .cancelled:
                 trialError = startsTrial
                     ? String(localized: "Trial wasn't started. Tap again, or see all plans.")

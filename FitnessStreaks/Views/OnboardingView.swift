@@ -32,6 +32,8 @@ struct OnboardingView: View {
     @State private var showingPaywall = false
     @State private var trialPurchaseInFlight = false
     @State private var trialPurchaseError: String? = nil
+    /// Ask to Buy is waiting for approval. Cleared when the page is left.
+    @State private var trialPurchasePending = false
 
     private static let tips: [String] = [
         String(localized: "Streaks update automatically from Apple Health. No manual logging."),
@@ -212,6 +214,14 @@ struct OnboardingView: View {
                 Text(trialPurchaseError)
                     .font(RetroFont.mono(10, weight: .bold))
                     .foregroundStyle(Theme.retroRed)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 18)
+            }
+
+            if trialPurchasePending, trialPurchaseError == nil {
+                Text(PurchaseErrorMapping.awaitingApprovalMessage)
+                    .font(RetroFont.mono(10, weight: .bold))
+                    .foregroundStyle(Theme.retroAmber)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 18)
             }
@@ -955,7 +965,7 @@ struct OnboardingView: View {
 
     private var trialPrimaryLabel: String {
         if let trial = trialLength {
-            return trial.keepAllButton
+            return storeKit.trialCTA.onboardingButton(trial: trial)
         }
         return String(localized: "▶ KEEP ALL · SEE PLANS")
     }
@@ -969,6 +979,7 @@ struct OnboardingView: View {
             return
         }
         trialPurchaseError = nil
+        trialPurchasePending = false
         trialPurchaseInFlight = true
         Task { @MainActor in
             defer { trialPurchaseInFlight = false }
@@ -976,6 +987,8 @@ struct OnboardingView: View {
             case .purchased, .pending:
                 settings.hasSeenTrialOffer = true
                 finishFromTrial()
+            case .awaitingApproval:
+                trialPurchasePending = true
             case .cancelled:
                 trialPurchaseError = String(localized: "Trial wasn't started. Tap again to begin your free trial.")
             case .failed:

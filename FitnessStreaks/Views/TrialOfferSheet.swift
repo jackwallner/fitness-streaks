@@ -14,6 +14,8 @@ struct TrialOfferSheet: View {
     @EnvironmentObject private var storeKit: StoreKitService
     let isPurchasing: Bool
     let errorMessage: String?
+    /// Set while an Ask to Buy purchase waits for approval. Calm, not an error.
+    var pendingMessage: String? = nil
     /// How many streaks the user picked at the end of onboarding *before* the free
     /// cap was enforced. When this exceeds `freeCap`, the sheet pivots its pitch
     /// to "keep all N you just earned" — the freshest, most in-the-moment Pro angle
@@ -233,6 +235,12 @@ struct TrialOfferSheet: View {
                     .foregroundStyle(Theme.retroRed)
                     .multilineTextAlignment(.center)
                     .transition(.opacity)
+            } else if let pendingMessage {
+                Text(pendingMessage)
+                    .font(.system(.footnote, design: .rounded))
+                    .foregroundStyle(Theme.retroAmber)
+                    .multilineTextAlignment(.center)
+                    .transition(.opacity)
             }
 
             Button(action: onStartTrial) {
@@ -337,7 +345,7 @@ struct TrialOfferSheet: View {
     /// alone has been rejected for not disclosing the subscription term.
     private var primaryCTATitle: String {
         if !directPurchase { return String(localized: "SEE PLANS") }
-        if trialLength != nil { return String(localized: "START FREE TRIAL") }
+        if trialLength != nil { return storeKit.trialCTA.offerSheetTitle }
         return String(localized: "SUBSCRIBE")
     }
 
