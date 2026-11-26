@@ -798,12 +798,10 @@ final class StreakStore: ObservableObject {
     #if os(iOS)
     /// Fires when the hero streak grows or today's goal is newly completed — used for review prompts.
     private func signalPositiveMomentsIfNeeded(previous: [Streak], newStreaks: [Streak]) {
-        guard let oldHero = previous.first, let newHero = newStreaks.first else { return }
-        guard oldHero.trackingKey == newHero.trackingKey else { return }
-
-        let streakGrew = newHero.current > oldHero.current && oldHero.current >= 2
-        let goalJustMet = newHero.currentUnitCompleted && !oldHero.currentUnitCompleted && newHero.current >= 2
-        guard streakGrew || goalJustMet else { return }
+        func hero(_ streak: Streak?) -> ReviewMoment.Hero? {
+            streak.map { ReviewMoment.Hero(key: $0.trackingKey, current: $0.current, unitCompleted: $0.currentUnitCompleted) }
+        }
+        guard ReviewMoment.isGoodResult(previous: hero(previous.first), new: hero(newStreaks.first)) else { return }
 
         ReviewPromptTracker.recordPositiveMoment()
         NotificationCenter.default.post(name: .reviewPromptPositiveMoment, object: nil)

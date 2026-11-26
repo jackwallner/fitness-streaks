@@ -1,5 +1,27 @@
 import Foundation
 
+/// The good results that may ask for a rating. The only automatic triggers; a
+/// launch, a tab, a sheet or a timer never asks.
+enum ReviewMoment {
+    /// What the predicate reads from the hero streak.
+    struct Hero: Equatable {
+        let key: String
+        let current: Int
+        let unitCompleted: Bool
+    }
+
+    /// The hero streak grew past a run of 2 or more days or weeks, or today's
+    /// (or this week's) goal was newly met inside a run of 2 or more. Both are a
+    /// result the user just earned. A different hero, a shorter run, a broken
+    /// run or no change is not.
+    static func isGoodResult(previous: Hero?, new: Hero?) -> Bool {
+        guard let previous, let new, previous.key == new.key else { return false }
+        let streakGrew = new.current > previous.current && previous.current >= 2
+        let goalJustMet = new.unitCompleted && !previous.unitCompleted && new.current >= 2
+        return streakGrew || goalJustMet
+    }
+}
+
 /// Persists rating-ask eligibility in the app group. The ask itself is the
 /// system `requestReview()` with no question in front of it (App Review 5.6.1).
 @MainActor

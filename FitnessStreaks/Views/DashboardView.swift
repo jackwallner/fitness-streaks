@@ -264,6 +264,7 @@ struct DashboardView: View {
             try? await Task.sleep(nanoseconds: 3_500_000_000)
             guard !Task.isCancelled,
                   !reviewRequestedThisSession,
+                  storeKit.isOn(.ratingPrompt),
                   isDashboardClear,
                   ReviewPromptTracker.shouldRequestAfterPositiveMoment(hasCompletedSetup: settings.hasCompletedSetup)
             else { return }

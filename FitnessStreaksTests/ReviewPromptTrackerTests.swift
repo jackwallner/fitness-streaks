@@ -98,3 +98,45 @@ final class ReviewPromptTrackerTests: XCTestCase {
         }
     }
 }
+
+/// The good results that may ask: a grown or newly met hero streak asks, a
+/// slip or an unchanged streak does not.
+final class ReviewMomentTests: XCTestCase {
+    private func hero(_ key: String, _ current: Int, done: Bool) -> ReviewMoment.Hero {
+        .init(key: key, current: current, unitCompleted: done)
+    }
+
+    private func hero(_ current: Int, done: Bool) -> ReviewMoment.Hero {
+        hero("steps", current, done: done)
+    }
+
+    func testGoalNewlyMetInsideARunAsks() {
+        XCTAssertTrue(ReviewMoment.isGoodResult(previous: hero(5, done: false), new: hero(6, done: true)))
+        XCTAssertTrue(ReviewMoment.isGoodResult(previous: hero(5, done: false), new: hero(5, done: true)))
+    }
+
+    func testGrownStreakAsks() {
+        XCTAssertTrue(ReviewMoment.isGoodResult(previous: hero(4, done: true), new: hero(5, done: true)))
+    }
+
+    func testBrokenOrShrunkStreakDoesNotAsk() {
+        XCTAssertFalse(ReviewMoment.isGoodResult(previous: hero(8, done: true), new: hero(0, done: false)))
+        XCTAssertFalse(ReviewMoment.isGoodResult(previous: hero(8, done: true), new: hero(3, done: false)))
+    }
+
+    func testUnchangedStreakDoesNotAsk() {
+        XCTAssertFalse(ReviewMoment.isGoodResult(previous: hero(5, done: true), new: hero(5, done: true)))
+        XCTAssertFalse(ReviewMoment.isGoodResult(previous: hero(5, done: false), new: hero(5, done: false)))
+    }
+
+    func testShortRunDoesNotAsk() {
+        XCTAssertFalse(ReviewMoment.isGoodResult(previous: hero(1, done: false), new: hero(1, done: true)))
+        XCTAssertFalse(ReviewMoment.isGoodResult(previous: hero(1, done: true), new: hero(2, done: true)))
+    }
+
+    func testNewHeroOrNoHeroDoesNotAsk() {
+        XCTAssertFalse(ReviewMoment.isGoodResult(previous: hero("steps", 5, done: false), new: hero("sleep", 9, done: true)))
+        XCTAssertFalse(ReviewMoment.isGoodResult(previous: nil, new: hero(5, done: true)))
+        XCTAssertFalse(ReviewMoment.isGoodResult(previous: hero(5, done: false), new: nil))
+    }
+}

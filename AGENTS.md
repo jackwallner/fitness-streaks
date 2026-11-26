@@ -50,7 +50,9 @@ Weekly totals: summed per ISO week starting Monday (see `DateHelpers.startOfWeek
 
 ## App-specific notes
 
-- Ratings: no in-app rating question (App Review 5.6.1). When the hero streak grows or today's goal is newly met (`StreakStore`), `DashboardView` calls the system `requestReview()` about 3.5s later if no sheet, alert, tutorial or trial pitch is up (from the 2nd launch, 30-day cooldown; `ReviewPromptTracker`). A blocked ask stays pending for the next moment. Settings has separate "RATE STREAKS" and "SEND FEEDBACK" rows. App Store ID `6762699692`. (Shared rules in the `ios-dev` skill.)
+- Ratings: no in-app rating question (App Review 5.6.1). The only automatic ask is the system `requestReview()`, about 3.5s after a good moment (`ReviewMoment.isGoodResult`, called from `StreakStore`): the hero streak grew inside a run of 2 or more, or today's (this week's) goal was newly met inside a run of 2 or more. `DashboardView` asks only if no sheet, alert, tutorial or trial pitch is up and the dashboard is still on screen (from the 2nd launch, 30-day cooldown stamped when called; `ReviewPromptTracker`). A blocked ask stays pending for the next moment. Remote switch `rating_prompt: off` pauses it. Settings has separate "RATE STREAKS" and "SEND FEEDBACK" rows. App Store ID `6762699692`. (Shared rules in the `ios-dev` skill.)
+- Remote config: `RemoteConfig` reads the current RevenueCat offering's metadata (`Shared/Services/RemoteConfig.swift`). Wording tests go through offering metadata `trial_cta` (`seven_day` control, `my`, `your`); the control is the shipped copy. Switch keys (`rating_prompt`) must be set the same on every offering. DEBUG: `-streaks.rc.<key> <value>`. The arm shown rides to RevenueCat as attribute `trial_cta`.
+- Ask to Buy: a purchase RevenueCat reports as `paymentPendingError` is `PurchaseOutcome.awaitingApproval`, shown as "Waiting for approval. Your purchase unlocks once it is approved." (never an error, nothing unlocked early). Approval arrives through `PurchasesDelegate` and unlocks without a relaunch.
 
 ---
 Shared iOS conventions (build, simulator, release/TestFlight, ASC key, signing, HealthKit/widget gotchas):
